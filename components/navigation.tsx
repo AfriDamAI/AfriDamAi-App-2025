@@ -24,9 +24,9 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-orange-600 to-orange-400 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">D</span>
+              <span className="text-white font-bold text-sm">A</span>
             </div>
-            <span className="font-bold text-lg text-foreground">DermAI</span>
+            <span className="font-bold text-lg text-foreground">AfriDamAI</span>
           </Link>
 
           {/* Desktop Navigation Links */}
