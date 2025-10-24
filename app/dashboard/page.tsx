@@ -15,9 +15,15 @@ interface HistoryStats {
   lastScan: number | null
 }
 
+interface ScanRecord {
+  id: string
+  type: string
+  timestamp: number
+}
+
 export default function Dashboard() {
   const [stats, setStats] = useState<HistoryStats | null>(null)
-  const [recentScans, setRecentScans] = useState<any[]>([])
+  const [recentScans, setRecentScans] = useState<ScanRecord[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -75,7 +81,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium text-muted-foreground">Skin Scans</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-600">{stats?.skinScans || 0}</div>
+              <div className="text-3xl font-bold text-orange-600">{stats?.skinScans || 0}</div>
               <p className="text-xs text-muted-foreground mt-1">Dermatology analyses</p>
             </CardContent>
           </Card>
@@ -172,10 +178,7 @@ export default function Dashboard() {
                       <p className="font-medium text-foreground capitalize">
                         {scan.type === "skin" ? "Skin Scan" : "Ingredient Analysis"}
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(scan.timestamp).toLocaleDateString()} at{" "}
-                        {new Date(scan.timestamp).toLocaleTimeString()}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{formatDateTime(scan.timestamp)}</p>
                     </div>
                     <Link href={`/results?id=${scan.id}`}>
                       <Button variant="outline" size="sm">
@@ -191,4 +194,9 @@ export default function Dashboard() {
       </div>
     </main>
   )
+}
+
+function formatDateTime(timestamp: number): string {
+  const date = new Date(timestamp)
+  return `${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`
 }

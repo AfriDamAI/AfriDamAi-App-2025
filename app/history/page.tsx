@@ -11,6 +11,7 @@ export default function History() {
   const [history, setHistory] = useState<ScanRecord[]>([])
   const [filter, setFilter] = useState<"all" | "skin" | "ingredient">("all")
   const [loading, setLoading] = useState(true)
+  const [selectedRecord, setSelectedRecord] = useState<ScanRecord | null>(null)
 
   useEffect(() => {
     const records = getHistory()
@@ -42,6 +43,7 @@ export default function History() {
 
   return (
     <main className="min-h-screen bg-background flex flex-col">
+
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">Scan History</h1>
@@ -122,12 +124,15 @@ export default function History() {
                       )}
                     </div>
                     <div className="flex gap-2 ml-4">
-                      <Link href={`/results?id=${record.id}`}>
-                        <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                          <Eye className="w-4 h-4" />
-                          View
-                        </Button>
-                      </Link>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedRecord(record)}
+                        className="gap-2 bg-transparent"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -141,6 +146,73 @@ export default function History() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* Modal to view full result details */}
+        {selectedRecord && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-foreground">
+                    {selectedRecord.type === "skin" ? "Skin Scan" : "Ingredient Analysis"} Details
+                  </h2>
+                  <button
+                    onClick={() => setSelectedRecord(null)}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(selectedRecord.timestamp).toLocaleDateString()} at{" "}
+                      {new Date(selectedRecord.timestamp).toLocaleTimeString()}
+                    </p>
+                  </div>
+
+                  {selectedRecord.results.conditions && selectedRecord.results.conditions.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-3">Detected Conditions</h3>
+                      <div className="space-y-2">
+                        {selectedRecord.results.conditions.map((condition, idx) => (
+                          <div key={idx} className="p-3 bg-muted rounded-lg">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="font-medium text-foreground">{condition.name}</span>
+                              <span className="text-xs text-muted-foreground">Confidence: {condition.confidence}%</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground capitalize">Severity: {condition.severity}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedRecord.results.safetyScore && (
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-2">Safety Score</h3>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-green-500 h-2 rounded-full"
+                          style={{ width: `${selectedRecord.results.safetyScore}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">{selectedRecord.results.safetyScore}%</p>
+                    </div>
+                  )}
+
+                  <Button
+                    onClick={() => setSelectedRecord(null)}
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white mt-6"
+                  >
+                    Close
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>

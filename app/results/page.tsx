@@ -1,33 +1,20 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import SkinAnalysisResults from "@/components/skin-analyzer-results"
-import { addToHistory } from "@/lib/history-manager"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { addToHistory } from "@/lib/history-manager"
 
 export default function ResultsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [analysisData, setAnalysisData] = useState<any>(null)
-  const [hasData, setHasData] = useState(false)
-  const router = useRouter()
+  const [recordId, setRecordId] = useState<string | null>(null)
 
   useEffect(() => {
-    const scanType = sessionStorage.getItem("scanType") as "skin" | "ingredient" | null
-    const scanImage = sessionStorage.getItem("scanImage")
-
-    if (!scanType || !scanImage) {
-      // Redirect back to scan if no data
-      router.push("/scan")
-      return
-    }
-
-    setHasData(true)
-
     // Simulate API call to get analysis results
     const timer = setTimeout(() => {
-      const results = {
+      const mockData = {
         overallHealth: 78,
         conditions: [
           {
@@ -65,32 +52,23 @@ export default function ResultsPage() {
           { name: "Broad Spectrum SPF 30", category: "Sunscreen", reason: "Daily UV protection" },
         ],
       }
+      setAnalysisData(mockData)
 
-      setAnalysisData(results)
-
-      if (scanType) {
-        addToHistory({
-          type: scanType,
-          imageUrl: scanImage,
-          results: {
-            conditions: results.conditions,
-          },
-        })
+      const record = addToHistory({
+        type: "skin",
+        results: {
+          conditions: mockData.conditions,
+        },
+      })
+      if (record) {
+        setRecordId(record.id)
       }
-
-      // Clear sessionStorage after saving
-      sessionStorage.removeItem("scanType")
-      sessionStorage.removeItem("scanImage")
 
       setIsLoading(false)
     }, 2000)
 
     return () => clearTimeout(timer)
-  }, [router])
-
-  if (!hasData) {
-    return null
-  }
+  }, [])
 
   return (
     <main className="min-h-screen bg-background">
@@ -98,7 +76,7 @@ export default function ResultsPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">Your Skin Analysis Results</h1>
           <p className="text-lg text-muted-foreground">
-            Powered by AfriDam AI dermatology analysis - for informational purposes only
+            Powered by AI dermatology analysis - for informational purposes only
           </p>
         </div>
 
@@ -115,6 +93,17 @@ export default function ResultsPage() {
           <>
             <SkinAnalysisResults data={analysisData} />
 
+            {recordId && (
+              <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <p className="text-sm text-green-700 dark:text-green-200">
+                  ✓ This result has been saved to your{" "}
+                  <Link href="/history" className="font-semibold underline hover:no-underline">
+                    scan history
+                  </Link>
+                </p>
+              </div>
+            )}
+
             <div className="mt-12 flex flex-col sm:flex-row gap-4">
               <Link href="/scan" className="flex-1">
                 <Button size="lg" className="w-full bg-orange-600 hover:bg-orange-700 text-white">
@@ -126,9 +115,9 @@ export default function ResultsPage() {
                   Analyze Ingredients
                 </Button>
               </Link>
-              <Link href="/dashboard" className="flex-1">
+              <Link href="/history" className="flex-1">
                 <Button size="lg" variant="outline" className="w-full bg-transparent">
-                  View Dashboard
+                  View History
                 </Button>
               </Link>
             </div>
