@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import Image from "next/image"
 
 interface ScanResultsProps {
   result: any
@@ -18,7 +19,7 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
 
       {result.image && (
         <Card className="p-6">
-          <img src={result.image || "/placeholder.svg"} alt="Analyzed" className="w-full rounded-lg mb-4" />
+          <Image src={result.image || "/placeholder.svg"} alt="Analyzed" className="w-full rounded-lg mb-4" />
         </Card>
       )}
 
