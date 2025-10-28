@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export default function HeroSection() {
   return (
@@ -47,8 +48,8 @@ export default function HeroSection() {
 
           {/* Right Image */}
           <div className="relative h-96 md:h-full">
-            <img
-              src="/woman-with-clear-healthy-skin-light-blue-backgroun.jpg"
+            <Image
+              src="/hero-image.jpg"
               alt="Woman with healthy skin"
               className="w-full h-full object-cover rounded-3xl shadow-2xl"
             />
