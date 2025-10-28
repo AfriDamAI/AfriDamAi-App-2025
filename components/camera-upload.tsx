@@ -5,7 +5,6 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
-import Image from "next/image"
 
 interface CameraUploadProps {
   onImageCapture: (imageData: string) => void
@@ -262,7 +261,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
         <Card className="p-8">
           <div className="flex flex-col gap-4">
             <h2 className="text-2xl font-bold text-foreground">Frame Preview</h2>
-            <Image
+            <img
               src={capturedImage || "/placeholder.svg"}
               alt="Captured skin frame"
               className="w-full rounded-lg max-h-96 object-cover"

@@ -29,28 +29,10 @@ export async function loadModel(): Promise<void> {
   try {
     // Dynamic import to avoid loading TensorFlow on server
     const tf = await import("@tensorflow/tfjs")
+    await import("@tensorflow/tfjs-backend-webgl")
 
-    // Try to load the WebGL backend for better performance, but don't fail the
-    // entire build if the optional backend package isn't installed in the
-    // environment (e.g. server-side builds). Fall back to CPU backend.
-    try {
-      await import("@tensorflow/tfjs-backend-webgl")
-      // Set WebGL backend if available
-      if (typeof tf.setBackend === "function") {
-        await tf.setBackend("webgl")
-      }
-    } catch (backendErr) {
-      // Backend package not available — log and fall back to CPU backend.
-      console.warn("Optional tfjs WebGL backend not available, falling back to CPU:", backendErr)
-      if (typeof tf.setBackend === "function") {
-        try {
-          await tf.setBackend("cpu")
-        } catch (setErr) {
-          // If setting backend fails, continue — model here is mocked anyway.
-          console.warn("Failed to set TF backend, continuing without backend change:", setErr)
-        }
-      }
-    }
+    // Set WebGL backend for better performance
+    await tf.setBackend("webgl")
 
     // In production, load from a hosted model URL:
     // model = await tf.loadLayersModel('https://your-model-url/model.json')
@@ -102,17 +84,17 @@ function simulateModelPrediction(imageData: any): SkinAnalysisOutput {
     {
       condition: "Acne",
       confidence: Math.random() * 0.3 + 0.6,
-  severity: (Math.random() > 0.5 ? ("mild" as const) : ("moderate" as const)),
+      severity: Math.random() > 0.5 ? "mild" : "moderate",
     },
     {
       condition: "Dryness",
       confidence: Math.random() * 0.3 + 0.5,
-  severity: "mild" as const,
+      severity: "mild",
     },
     {
       condition: "Oiliness",
       confidence: Math.random() * 0.2 + 0.4,
-  severity: "mild" as const,
+      severity: "mild",
     },
   ].filter((c) => c.confidence > 0.5)
 
