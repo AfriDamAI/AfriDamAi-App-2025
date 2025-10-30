@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -135,6 +135,16 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
     }
   }
 
+  React.useEffect(() => {
+    return () => {
+      // Cleanup media stream on unmount
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop())
+        mediaStreamRef.current = null;
+      }
+    };
+  }, []);
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -232,7 +242,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
             <div className="flex gap-4">
               {!isRecording ? (
                 <>
-                  <Button onClick={startRecording} size="lg" className="flex-1 bg-red-600 hover:bg-red-700 text-white">
+                  <Button onClick={startRecording} disabled={!mediaStreamRef.current || isRecording} size="lg" className="flex-1 bg-red-600 hover:bg-red-700 text-white">
                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                       <circle cx="12" cy="12" r="8" />
                     </svg>
@@ -244,7 +254,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                 </>
               ) : (
                 <>
-                  <Button onClick={stopRecording} size="lg" className="flex-1 bg-red-600 hover:bg-red-700 text-white">
+                  <Button onClick={stopRecording} disabled={!isRecording} size="lg" className="flex-1 bg-red-600 hover:bg-red-700 text-white">
                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                       <rect x="6" y="4" width="12" height="16" rx="1" />
                     </svg>
