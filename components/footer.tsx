@@ -18,10 +18,10 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">D</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-600 to-orange-400 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">A</span>
               </div>
-              <span className="font-bold text-lg text-foreground">DermAI</span>
+              <span className="font-bold text-lg text-foreground">AfriDamAI</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Your AI dermatologist for healthy skin. Scan, analyze, and improve.
@@ -102,11 +102,11 @@ export default function Footer() {
                   Cookie Policy
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   GDPR Compliance
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function Footer() {
         {/* Divider */}
         <div className="border-t border-border pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">© {currentYear} DermAI. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">© {currentYear} AfriDamAI. All rights reserved.</p>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               Made with <Heart className="w-4 h-4 text-red-500" /> for healthy skin
             </div>

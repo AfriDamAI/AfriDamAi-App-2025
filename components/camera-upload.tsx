@@ -275,6 +275,8 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
             <Image
               src={capturedImage || "/placeholder.svg"}
               alt="Captured skin frame"
+              width={800}
+              height={600}
               className="w-full rounded-lg max-h-96 object-cover"
             />
             <div className="flex gap-4">
