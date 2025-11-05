@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
@@ -8,7 +7,12 @@ import Image from "next/image"
 // NOTE: I've renamed the default export to a more generic name (e.g., HomePageContent)
 // to reflect that it now includes the Hero, Mission, and Platform sections.
 // ----------------------------------------------------------------
-export default function HomePageContent() {
+interface HeroSectionProps {
+  onScanClick: () => void
+  onIngredientsClick: () => void
+}
+
+export default function HomePageContent({ onScanClick, onIngredientsClick }: HeroSectionProps) {
   return (
     <div className="bg-background">
       {/* 1. Hero Section (Your Original Content) */}
@@ -28,16 +32,22 @@ export default function HomePageContent() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link href="/scan">
-                  <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto">
+               <Button
+                size="lg"
+                onClick={onScanClick}
+                className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto"
+              >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                     Start Skin Scan
                   </Button>
-                </Link>
-                <Link href="/ingredients">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent border-muted-foreground hover:bg-muted">
+                      <Button
+                size="lg"
+                variant="outline"
+                onClick={onIngredientsClick}
+                className="w-full sm:w-auto bg-transparent"
+              >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
@@ -48,7 +58,6 @@ export default function HomePageContent() {
                     </svg>
                     Analyze Ingredients
                   </Button>
-                </Link>
               </div>
             </div>
 
