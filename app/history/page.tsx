@@ -6,12 +6,21 @@ import { Button } from "@/components/ui/button"
 import { getHistory, deleteHistoryRecord, type ScanRecord } from "@/lib/history-manager"
 import Link from "next/link"
 import { Trash2, Eye } from "lucide-react"
-
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/providers/auth-provider"
 export default function History() {
   const [history, setHistory] = useState<ScanRecord[]>([])
   const [filter, setFilter] = useState<"all" | "skin" | "ingredient">("all")
   const [loading, setLoading] = useState(true)
   const [selectedRecord, setSelectedRecord] = useState<ScanRecord | null>(null)
+   const { user } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/")
+    }
+  }, [user, router])
 
   useEffect(() => {
     const records = getHistory()
@@ -29,6 +38,18 @@ export default function History() {
       deleteHistoryRecord(id)
       setHistory(history.filter((r) => r.id !== id))
     }
+  }
+
+   if (!user) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4">Authentication Required</h2>
+          <p className="text-muted-foreground mb-6">Please sign in to access your history</p>
+          <Button onClick={() => router.push("/")}>Go to Home</Button>
+        </div>
+      </main>
+    )
   }
 
   if (loading) {

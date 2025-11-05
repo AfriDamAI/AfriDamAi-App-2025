@@ -1,14 +1,23 @@
 "use client"
 
+import type React from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { useTheme } from "@/providers/theme-provider"
 import { Moon, Sun, Menu, X } from "lucide-react"
 import { useState } from "react"
+import { UserProfile } from "../components/user-profile"
+import { useAuth } from "@/providers/auth-provider"
 
-export default function Navigation() {
+interface NavigationProps {
+  onSignInClick: () => void
+  onSignUpClick: () => void
+}
+
+export default function Navigation({ onSignInClick, onSignUpClick }: NavigationProps) {
   const { theme, toggleTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+ const { user } = useAuth()
+
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -16,6 +25,14 @@ export default function Navigation() {
     { href: "/history", label: "History" },
     { href: "/about", label: "About" },
   ]
+
+    const handleNavClick = (e: React.MouseEvent, href: string) => {
+    const protectedRoutes = ["/dashboard", "/history"]
+    if (protectedRoutes.includes(href) && !user) {
+      e.preventDefault()
+      onSignUpClick()
+    }
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -32,7 +49,12 @@ export default function Navigation() {
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="text-foreground hover:text-primary transition-colors">
+                     <Link
+                key={link.href}
+                href={link.href}
+                className="text-foreground hover:text-primary transition-colors"
+                onClick={(e) => handleNavClick(e, link.href)}
+              >
                 {link.label}
               </Link>
             ))}
@@ -40,6 +62,7 @@ export default function Navigation() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-3">
+             <UserProfile onSignInClick={onSignInClick} onSignUpClick={onSignUpClick} />
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-muted transition-colors"
@@ -64,10 +87,6 @@ export default function Navigation() {
                 <Menu className="w-5 h-5 text-foreground" />
               )}
             </button>
-
-            <Link href="/scan" className="hidden sm:block">
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white">Get Started</Button>
-            </Link>
           </div>
         </div>
 
@@ -80,14 +99,14 @@ export default function Navigation() {
                   key={link.href}
                   href={link.href}
                   className="block px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
+                      onClick={(e) => {
+                    handleNavClick(e, link.href)
+                    setMobileMenuOpen(false)
+                  }}
                 >
                   {link.label}
                 </Link>
               ))}
-              <Link href="/scan" className="block">
-                <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white">Get Started</Button>
-              </Link>
             </div>
           </div>
         )}

@@ -1,15 +1,28 @@
 "use client"
 
+import type React from "react"
 import Link from "next/link"
 import { Heart } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useAuth } from "@/providers/auth-provider"
 
-export default function Footer() {
-  const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear())
+interface FooterProps {
+  onSignUpClick?: () => void
+}
 
-  useEffect(() => {
-    setCurrentYear(new Date().getFullYear())
-  }, [])
+export default function Footer({ onSignUpClick }: FooterProps) {
+  const currentYear = new Date().getFullYear()
+  const { user } = useAuth()
+
+  const handleProtectedClick = (e: React.MouseEvent, href: string) => {
+    const protectedRoutes = ["/scan", "/ingredients", "/dashboard", "/history"]
+    if (protectedRoutes.includes(href) && !user) {
+      e.preventDefault()
+      if (onSignUpClick) {
+        onSignUpClick()
+      }
+    }
+  }
 
   return (
     <footer className="bg-muted/50 border-t border-border mt-12">
@@ -18,10 +31,10 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">D</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-600 to-orange-400 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">A</span>
               </div>
-              <span className="font-bold text-lg text-foreground">DermAI</span>
+              <span className="font-bold text-lg text-foreground">AfriDamAI</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Your AI dermatologist for healthy skin. Scan, analyze, and improve.
@@ -33,7 +46,11 @@ export default function Footer() {
             <h3 className="font-semibold text-foreground mb-4">Product</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/scan" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                       <Link
+                  href="/scan"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={(e) => handleProtectedClick(e, "/scan")}
+                >
                   Skin Scanner
                 </Link>
               </li>
@@ -41,6 +58,7 @@ export default function Footer() {
                 <Link
                   href="/ingredients"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={(e) => handleProtectedClick(e, "/ingredients")}
                 >
                   Ingredient Analyzer
                 </Link>
@@ -49,12 +67,17 @@ export default function Footer() {
                 <Link
                   href="/dashboard"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={(e) => handleProtectedClick(e, "/dashboard")}
                 >
                   Dashboard
                 </Link>
               </li>
               <li>
-                <Link href="/history" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <Link
+                  href="/history"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={(e) => handleProtectedClick(e, "/history")}
+                >
                   History
                 </Link>
               </li>
@@ -102,11 +125,6 @@ export default function Footer() {
                   Cookie Policy
                 </a>
               </li>
-              <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  GDPR Compliance
-                </a>
-              </li>
             </ul>
           </div>
         </div>
@@ -114,7 +132,7 @@ export default function Footer() {
         {/* Divider */}
         <div className="border-t border-border pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">© {currentYear} DermAI. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">© {currentYear} AfriDamAI. All rights reserved.</p>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               Made with <Heart className="w-4 h-4 text-red-500" /> for healthy skin
             </div>
