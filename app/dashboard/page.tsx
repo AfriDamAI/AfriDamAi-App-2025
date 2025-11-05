@@ -7,7 +7,8 @@ import { getHistory, getHistoryStats, clearHistory } from "@/lib/history-manager
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-
+import { useAuth } from "@/providers/auth-provider"
+import { useRouter } from "next/navigation"
 interface HistoryStats {
   totalScans: number
   skinScans: number
@@ -25,6 +26,14 @@ export default function Dashboard() {
   const [stats, setStats] = useState<HistoryStats | null>(null)
   const [recentScans, setRecentScans] = useState<ScanRecord[]>([])
   const [loading, setLoading] = useState(true)
+   const { user } = useAuth()
+   const router = useRouter()
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/")
+    }
+  }, [user, router])
 
   useEffect(() => {
     setStats(getHistoryStats())
@@ -44,6 +53,19 @@ export default function Dashboard() {
       setStats(getHistoryStats())
       setRecentScans([])
     }
+  }
+
+
+  if (!user) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4">Authentication Required</h2>
+          <p className="text-muted-foreground mb-6">Please sign in to access the dashboard</p>
+          <Button onClick={() => router.push("/")}>Go to Home</Button>
+        </div>
+      </main>
+    )
   }
 
   if (loading) {
