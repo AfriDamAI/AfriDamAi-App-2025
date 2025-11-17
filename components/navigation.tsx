@@ -1,38 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
-import Link from "next/link"
-import { useTheme } from "@/providers/theme-provider"
-import { Moon, Sun, Menu, X } from "lucide-react"
-import { useState } from "react"
-import { UserProfile } from "../components/user-profile"
-import { useAuth } from "@/providers/auth-provider"
+import type React from "react";
+import Link from "next/link";
+import { useTheme } from "@/providers/theme-provider";
+import { Moon, Sun, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { UserProfile } from "../components/user-profile";
+import { useAuth } from "@/providers/auth-provider";
 
 interface NavigationProps {
-  onSignInClick: () => void
-  onSignUpClick: () => void
+  onSignInClick: () => void;
+  onSignUpClick: () => void;
+  onViewProfileClick: () => void;
 }
 
-export default function Navigation({ onSignInClick, onSignUpClick }: NavigationProps) {
-  const { theme, toggleTheme } = useTheme()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
- const { user } = useAuth()
-
+export default function Navigation({
+  onSignInClick,
+  onSignUpClick,
+  onViewProfileClick,
+}: NavigationProps) {
+  const { theme, toggleTheme } = useTheme();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/dashboard", label: "Dashboard" },
     { href: "/history", label: "History" },
     { href: "/about", label: "About" },
-  ]
+  ];
 
-    const handleNavClick = (e: React.MouseEvent, href: string) => {
-    const protectedRoutes = ["/dashboard", "/history"]
+  const handleNavClick = (e: React.MouseEvent, href: string) => {
+    const protectedRoutes = ["/dashboard", "/history"];
     if (protectedRoutes.includes(href) && !user) {
-      e.preventDefault()
-      onSignUpClick()
+      e.preventDefault();
+      onSignUpClick();
     }
-  }
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -49,7 +53,7 @@ export default function Navigation({ onSignInClick, onSignUpClick }: NavigationP
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-                     <Link
+              <Link
                 key={link.href}
                 href={link.href}
                 className="text-foreground hover:text-primary transition-colors"
@@ -62,7 +66,11 @@ export default function Navigation({ onSignInClick, onSignUpClick }: NavigationP
 
           {/* Right side actions */}
           <div className="flex items-center gap-3">
-             <UserProfile onSignInClick={onSignInClick} onSignUpClick={onSignUpClick} />
+            <UserProfile
+              onSignInClick={onSignInClick}
+              onSignUpClick={onSignUpClick}
+              onViewProfileClick={onViewProfileClick}
+            />
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-muted transition-colors"
@@ -99,9 +107,9 @@ export default function Navigation({ onSignInClick, onSignUpClick }: NavigationP
                   key={link.href}
                   href={link.href}
                   className="block px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors"
-                      onClick={(e) => {
-                    handleNavClick(e, link.href)
-                    setMobileMenuOpen(false)
+                  onClick={(e) => {
+                    handleNavClick(e, link.href);
+                    setMobileMenuOpen(false);
                   }}
                 >
                   {link.label}
@@ -112,5 +120,5 @@ export default function Navigation({ onSignInClick, onSignUpClick }: NavigationP
         )}
       </div>
     </nav>
-  )
+  );
 }
