@@ -14,22 +14,14 @@ function ProductCard({ products }: { products: Product[] }) {
 
     if (loading) {
         return (
-            <section className="py-20 bg-gray-50">
+            <section className="py-20 bg-gray-50 dark:bg-[#0e0e0e]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                            Our <span className="text-primary">Products</span>
-                        </h2>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                            Discover our collection of natural African skincare products, crafted with nourishing botanicals to help you glow with confidence.
-                        </p>
-                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                         {[...Array(8)].map((_, i) => (
-                            <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
+                            <div key={i} className="bg-white dark:bg-[#0b0b0b] rounded-2xl shadow-lg overflow-hidden animate-pulse">
                                 <div className="bg-gray-200 aspect-square"></div>
                                 <div className="p-6">
-                                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                                    <div className="h-4 bg-gray-200 dark:bg-[#0b0b0b] rounded mb-2"></div>
                                     <div className="h-3 bg-gray-200 rounded mb-3 w-3/4"></div>
                                     <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                                 </div>
@@ -45,7 +37,7 @@ function ProductCard({ products }: { products: Product[] }) {
             {products.map((product) => (
                 <div
                     key={product.id}
-                    className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                    className="bg-white dark:bg-[#0b0b0b] dark:border-b rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
                 >
                     {/* Product Image */}
                     <div className="relative bg-gray-100 aspect-square overflow-hidden">
@@ -58,7 +50,7 @@ function ProductCard({ products }: { products: Product[] }) {
 
                     {/* Product Info */}
                     <div className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-primary transition-colors">
                             {product.name}
                         </h3>
 

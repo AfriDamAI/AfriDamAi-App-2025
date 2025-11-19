@@ -66,21 +66,23 @@ export const mockedProducts: Product[] = [
 
 export function OurProductsSection() {
 
+
     return (
         <>
-            <section className="py-20 bg-gray-50">
+            <section className="py-20 bg-gray-50 dark:bg-[#0e0e0e] transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
                     {/* Section Header */}
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-black mb-6">
+                        <h2 className="text-4xl md:text-5xl font-bold  text-black dark:text-white mb-6">
                             Our <span className="text-primary">Skincare Collection</span>
                         </h2>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
                             Discover our collection of natural African skincare products, crafted with nourishing botanicals to help you glow with confidence.
                         </p>
                     </div>
 
-                    {/* featured Products  */}
+                    {/* Featured Products */}
                     <ProductCard products={mockedProducts} />
 
                     {/* View All Products Button */}
@@ -91,7 +93,12 @@ export function OurProductsSection() {
                         >
                             View All Products
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                />
                             </svg>
                         </Link>
                     </div>
