@@ -38,9 +38,10 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     setProfileSidebarOpen(false)
   }
 
+  const ViewProfileClick = handleViewProfile
   return (
     <>
-      {(pathname.startsWith("ecommerce") || pathname.includes("/ecommerce")) ? <EcommerceNavigationMenu onSignInClick={handleSignIn} onSignUpClick={handleSignUp} /> : <Navigation onSignInClick={handleSignIn} onSignUpClick={handleSignUp} />}
+      {(pathname.startsWith("ecommerce") || pathname.includes("/ecommerce")) ? <EcommerceNavigationMenu onSignInClick={handleSignIn} onSignUpClick={handleSignUp} /> : <Navigation onSignInClick={handleSignIn} onSignUpClick={handleSignUp} onViewProfileClick={ViewProfileClick} />}
       {children}
       <Footer onSignUpClick={handleSignUp} />
       <AuthModals isOpen={authModal.isOpen} onClose={handleCloseModal} type={authModal.type} />
