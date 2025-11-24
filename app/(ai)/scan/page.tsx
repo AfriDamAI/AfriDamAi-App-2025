@@ -18,7 +18,7 @@ export default function ScanPage() {
     }
   }
 
-   const { user } = useAuth()
+  const { user } = useAuth()
 
   useEffect(() => {
     if (!user) {
@@ -42,9 +42,9 @@ export default function ScanPage() {
     <main className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Skin Scan</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Skin Assessment</h1>
           <p className="text-lg text-muted-foreground">
-            Record a video or upload a video/image of your skin for AI analysis
+            Take or upload a skin photo so our AI can analyze potential concerns and provide insights.
           </p>
         </div>
         <CameraUpload onImageCapture={setImageData} onScanTypeSelected={handleScanTypeSelected} />
