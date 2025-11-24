@@ -19,10 +19,10 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
   if (!isSignedIn) {
     return (
       <div className="flex items-center gap-2">
-        <Button onClick={onSignInClick} variant="ghost" className="text-foreground hover:bg-muted">
+        <Button onClick={onSignInClick} variant="ghost" className="text-foreground hover:bg-black">
           Sign In
         </Button>
-        <Button onClick={onSignUpClick} className="bg-orange-600 hover:bg-orange-700 text-white hidden sm:inline-flex">
+        <Button onClick={onSignUpClick} className="bg-primary dark:bg-[#e1784f] hover:bg-orange-700 text-white hover:text-white hidden sm:inline-flex">
           Sign Up
         </Button>
       </div>
