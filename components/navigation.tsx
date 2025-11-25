@@ -3,10 +3,11 @@
 import type React from "react";
 import Link from "next/link";
 import { useTheme } from "@/providers/theme-provider";
-import { Moon, Sun, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Moon, Sun, Menu, X, Bell } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { UserProfile } from "../components/user-profile";
 import { useAuth } from "@/providers/auth-provider";
+import NotificationDropdown from "./notification-dropdown";
 
 interface NavigationProps {
   onSignInClick: () => void;
@@ -22,6 +23,26 @@ export default function Navigation({
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+
+  // State for notification bell dropdown
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown if clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
+        setNotificationOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [notificationRef]);
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -65,12 +86,18 @@ export default function Navigation({
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative" ref={notificationRef}>
             <UserProfile
               onSignInClick={onSignInClick}
               onSignUpClick={onSignUpClick}
               onViewProfileClick={onViewProfileClick}
             />
+
+            {/* reminder */}
+            <NotificationDropdown />
+
+
+
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-muted transition-colors"
