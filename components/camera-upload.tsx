@@ -1,221 +1,179 @@
-"use client"
-
-import React from "react"
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import Link from "next/link"
-import Image from "next/image"
+import React, { useState, useRef, useEffect } from "react";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import { Camera, Upload, RefreshCcw, Image as ImageIcon, CheckCircle, X } from "lucide-react";
 
 interface CameraUploadProps {
-  onImageCapture: (imageData: string) => void
-  onScanTypeSelected?: (type: "skin" | "ingredient") => void
+  onImageCapture: (imageData: string) => void;
+  onScanTypeSelected?: (type: "skin" | "ingredient") => void;
 }
 
 export default function CameraUpload({ onImageCapture, onScanTypeSelected }: CameraUploadProps) {
-  const [mode, setMode] = useState<"select" | "video" | "preview">("select")
-  const [capturedImage, setCapturedImage] = useState<string | null>(null)
-  const [isRecording, setIsRecording] = useState(false)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const mediaStreamRef = useRef<MediaStream | null>(null)
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
-  const chunksRef = useRef<Blob[]>([])
+  const [mode, setMode] = useState<"select" | "camera" | "preview">("select");
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const initializeVideo = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
-      })
-      mediaStreamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-      }
-      setMode("video")
-    } catch (error) {
-      console.error("[v0] Error accessing camera:", error)
-      alert("Unable to access camera. Please check permissions.")
-    }
-  }
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
 
-  const startRecording = () => {
-    if (!mediaStreamRef.current) return
+  const startCameraMode = () => {
+    setError(null);
+    setMode("camera");
+    setIsLoading(true);
+  };
 
-    chunksRef.current = []
-    const mediaRecorder = new MediaRecorder(mediaStreamRef.current)
+  useEffect(() => {
+    let activeStream: MediaStream | null = null;
 
-    mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        chunksRef.current.push(event.data)
-      }
-    }
+    const setupStream = async () => {
+      if (mode === "camera" && videoRef.current) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: "user",
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            },
+          });
 
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: "video/webm" })
-      extractFrameFromVideo(blob)
-    }
+          activeStream = stream;
+          mediaStreamRef.current = stream;
 
-    mediaRecorderRef.current = mediaRecorder
-    mediaRecorder.start()
-    setIsRecording(true)
-  }
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop()
-      setIsRecording(false)
-    }
-  }
-
-  const extractFrameFromVideo = (videoBlob: Blob) => {
-    const videoUrl = URL.createObjectURL(videoBlob)
-    const tempVideo = document.createElement("video")
-    tempVideo.src = videoUrl
-    tempVideo.crossOrigin = "anonymous"
-    tempVideo.preload = "metadata"
-
-    let frameExtracted = false
-
-    const extractFrame = () => {
-      if (frameExtracted) return
-      frameExtracted = true
-
-      if (canvasRef.current) {
-        const context = canvasRef.current.getContext("2d")
-        if (context && tempVideo.videoWidth > 0 && tempVideo.videoHeight > 0) {
-          canvasRef.current.width = tempVideo.videoWidth
-          canvasRef.current.height = tempVideo.videoHeight
-          context.drawImage(tempVideo, 0, 0)
-          const imageData = canvasRef.current.toDataURL("image/jpeg")
-          setCapturedImage(imageData)
-          onImageCapture(imageData)
-          setMode("preview")
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.onloadedmetadata = () => {
+              setIsLoading(false);
+              videoRef.current?.play().catch(e => console.error("Play error:", e));
+            };
+          }
+        } catch (err) {
+          console.error("Error accessing camera:", err);
+          setError("Unable to access camera. Please check permissions or try a different browser.");
+          setIsLoading(false);
         }
       }
-      URL.revokeObjectURL(videoUrl)
+    };
+
+    if (mode === "camera") {
+      setupStream();
     }
 
-    tempVideo.onloadedmetadata = () => {
-      const duration = tempVideo.duration
-      console.log("[v0] Video duration:", duration)
 
-      if (isFinite(duration) && duration > 0) {
-        // Seek to middle of video for best frame
-        tempVideo.currentTime = duration / 2
-      } else {
-        // If duration is invalid, try seeking to a small offset
-        console.warn("[v0] Invalid duration, seeking to 0.5s")
-        tempVideo.currentTime = 0.5
-      }
-    }
-
-    tempVideo.onseeked = () => {
-      console.log("[v0] Video seeked, extracting frame")
-      extractFrame()
-    }
-
-    // Fallback: if seeking doesn't trigger onseeked, extract after a delay
-    tempVideo.oncanplay = () => {
-      if (!frameExtracted) {
-        console.log("[v0] Video can play, scheduling frame extraction")
-        setTimeout(() => {
-          if (!frameExtracted) {
-            console.log("[v0] Extracting frame via timeout")
-            extractFrame()
-          }
-        }, 500)
-      }
-    }
-
-    tempVideo.onerror = () => {
-      console.error("[v0] Error loading video")
-      alert("Error processing video. Please try again.")
-      URL.revokeObjectURL(videoUrl)
-    }
-  }
-
-  React.useEffect(() => {
     return () => {
-      // Cleanup media stream on unmount
+      if (activeStream) {
+        activeStream.getTracks().forEach((track) => track.stop());
+      }
       if (mediaStreamRef.current) {
-        mediaStreamRef.current.getTracks().forEach((track) => track.stop())
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
         mediaStreamRef.current = null;
       }
     };
-  }, []);
+  }, [mode]);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      if (file.type.startsWith("video/")) {
-        extractFrameFromVideo(file)
-      } else {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          const imageData = e.target?.result as string
-          setCapturedImage(imageData)
-          onImageCapture(imageData)
-          setMode("preview")
-        }
-        reader.readAsDataURL(file)
+  const capturePhoto = () => {
+    if (canvasRef.current && videoRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+
+      if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+        alert("Camera is still loading, please wait...");
+        return;
+      }
+
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+
+      if (width === 0 || height === 0) return;
+
+      if (context) {
+        canvas.width = width;
+        canvas.height = height;
+        // Flip horizontally if using user-facing camera for natural mirror effect
+        context.translate(width, 0);
+        context.scale(-1, 1);
+        context.drawImage(video, 0, 0, width, height);
+
+        context.setTransform(1, 0, 0, 1, 0, 0);
+
+        const imageData = canvas.toDataURL("image/jpeg", 0.95);
+        setCapturedImage(imageData);
+        onImageCapture(imageData);
+
+        stopStream();
+        setMode("preview");
       }
     }
-  }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = e.target?.result as string;
+        setCapturedImage(imageData);
+        onImageCapture(imageData);
+        setMode("preview");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const stopStream = () => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+  };
 
   const handleReset = () => {
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => track.stop())
-      mediaStreamRef.current = null
-    }
-    setCapturedImage(null)
-    setMode("select")
-    setIsRecording(false)
-  }
+    stopStream();
+    setCapturedImage(null);
+    setMode("select");
+    setError(null);
+  };
+
+  const handleRetake = () => {
+    setCapturedImage(null);
+    startCameraMode();
+  };
 
   const handleAnalyzeSkin = () => {
-    onScanTypeSelected?.("skin")
-  }
+    onScanTypeSelected?.("skin");
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full">
       {/* Mode Selection */}
       {mode === "select" && (
         <Card className="p-8">
-          <div className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold text-foreground">Choose Input Method</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-6">
+            <h2 className="text-2xl font-bold text-gray-900 text-center">Choose Input Method</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Button
-                onClick={initializeVideo}
-                size="lg"
-                className="bg-orange-600 hover:bg-orange-700 text-white h-24 text-lg"
+                onClick={startCameraMode}
+                className="h-32 text-lg flex flex-col gap-3 bg-orange-600 hover:bg-orange-700 transition-all shadow-md hover:shadow-lg"
               >
-                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
-                Record Video
+                <Camera className="w-8 h-8" />
+                <span>Take Photo</span>
               </Button>
               <Button
                 onClick={() => fileInputRef.current?.click()}
-                size="lg"
                 variant="outline"
-                className="h-24 text-lg"
+                className="h-32 text-lg flex flex-col gap-3 hover:bg-gray-50 transition-all border-dashed border-2"
               >
-                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Upload Video/Image
+                <Upload className="w-8 h-8" />
+                <span>Upload Image</span>
               </Button>
             </div>
             <input
               ref={fileInputRef}
               type="file"
-              accept="video/*,image/*"
+              accept="image/*"
               onChange={handleFileUpload}
               className="hidden"
             />
@@ -223,77 +181,103 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
         </Card>
       )}
 
-      {/* Video Recording */}
-      {mode === "video" && (
-        <Card className="p-8">
+      {/* Camera View */}
+      {mode === "camera" && (
+        <Card className="p-6 relative overflow-hidden">
           <div className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold text-foreground">Record Skin Video</h2>
-            <p className="text-sm text-muted-foreground">
-              {isRecording
-                ? "Recording... Position your skin in the frame for best results"
-                : "Click 'Start Recording' and position your skin in the frame"}
-            </p>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="w-full rounded-lg bg-gray-900 aspect-video object-cover"
-            />
-            <div className="flex gap-4">
-              {!isRecording ? (
-                <>
-                  <Button onClick={startRecording} disabled={!mediaStreamRef.current || isRecording} size="lg" className="flex-1 bg-red-600 hover:bg-red-700 text-white">
-                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="8" />
-                    </svg>
-                    Start Recording
-                  </Button>
-                  <Button onClick={handleReset} size="lg" variant="outline" className="flex-1 bg-transparent">
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button onClick={stopRecording} disabled={!isRecording} size="lg" className="flex-1 bg-red-600 hover:bg-red-700 text-white">
-                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                      <rect x="6" y="4" width="12" height="16" rx="1" />
-                    </svg>
-                    Stop Recording
-                  </Button>
-                </>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-900">Take Skin Photo</h2>
+              <button onClick={handleReset} className="text-gray-500 hover:text-gray-700">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center">
+              {isLoading && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+                  <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                  <p>Initializing Camera...</p>
+                </div>
+              )}
+
+              {error && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-red-400 z-10 p-4 text-center bg-gray-900">
+                  <p className="mb-4">{error}</p>
+                  <Button onClick={startCameraMode} size="sm" variant="outline" className="border-red-400 text-red-400 hover:bg-red-900/20">Try Again</Button>
+                </div>
+              )}
+
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className={`w-full h-full object-cover transform scale-x-[-1] transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+              />
+
+              {/* Overlay guidelines */}
+              {!isLoading && !error && (
+                <div className="absolute inset-0 pointer-events-none border-2 border-white/20 m-8 rounded-lg">
+                  <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-orange-500 -mt-1 -ml-1 rounded-tl-lg"></div>
+                  <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-orange-500 -mt-1 -mr-1 rounded-tr-lg"></div>
+                  <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-orange-500 -mb-1 -ml-1 rounded-bl-lg"></div>
+                  <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-orange-500 -mb-1 -mr-1 rounded-br-lg"></div>
+                </div>
               )}
             </div>
-          </div>
-        </Card>
-      )}
 
-      {/* Preview */}
-      {mode === "preview" && capturedImage && (
-        <Card className="p-8">
-          <div className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold text-foreground">Frame Preview</h2>
-            <Image
-              src={capturedImage || "/placeholder.svg"}
-              alt="Captured skin frame"
-              width={800}
-              height={600}
-              className="w-full rounded-lg max-h-96 object-cover"
-            />
-            <div className="flex gap-4">
-              <Link href="/results" className="flex-1" onClick={handleAnalyzeSkin}>
-                <Button size="lg" className="w-full bg-orange-600 hover:bg-orange-700 text-white">
-                  Analyze Skin
-                </Button>
-              </Link>
-              <Button onClick={handleReset} size="lg" variant="outline" className="flex-1 bg-transparent">
-                Retake Video
+            <div className="flex gap-4 mt-2">
+              <Button
+                onClick={capturePhoto}
+                size="lg"
+                disabled={isLoading || !!error}
+                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white h-12 text-lg shadow-md"
+              >
+                <div className="w-4 h-4 rounded-full bg-white mr-2 animate-pulse"></div>
+                Capture
               </Button>
             </div>
           </div>
         </Card>
       )}
 
+      {/* Preview View */}
+      {mode === "preview" && capturedImage && (
+        <Card className="p-6">
+          <div className="flex flex-col gap-6">
+            <h2 className="text-xl font-bold text-gray-900">Review Photo</h2>
+
+            <div className="w-full bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+              <img
+                src={capturedImage}
+                alt="Captured skin"
+                className="w-full max-h-[500px] object-contain mx-auto"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                onClick={handleAnalyzeSkin}
+                size="lg"
+                className="bg-orange-600 hover:bg-orange-700 text-white shadow-md group"
+              >
+                <CheckCircle className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                Analyze Skin
+              </Button>
+              <Button onClick={handleRetake} size="lg" variant="outline" className="text-gray-600">
+                <RefreshCcw className="w-5 h-5 mr-2" />
+                Retake
+              </Button>
+            </div>
+
+            <Button onClick={handleReset} variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600">
+              Start Over
+            </Button>
+          </div>
+        </Card>
+      )}
+
       <canvas ref={canvasRef} className="hidden" />
     </div>
-  )
+  );
 }
