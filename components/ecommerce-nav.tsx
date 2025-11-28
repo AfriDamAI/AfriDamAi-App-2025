@@ -1,3 +1,5 @@
+"use client"
+
 import { useAuth } from '@/providers/auth-provider'
 import { useTheme } from '@/providers/theme-provider'
 import Link from 'next/link'
@@ -34,6 +36,8 @@ export default function EcommerceNavigationMenu({ onSignInClick, onSignUpClick }
         { href: "/", label: "Home" },
         { href: "/shop", label: "Shop" },
         { href: "/categories", label: "Categories" },
+        // { href: "/about", label: "About Us" },
+        { href: "/contact", label: "Contact" },
     ]
 
     const handleNavClick = (e: React.MouseEvent, href: string) => {
@@ -82,14 +86,25 @@ export default function EcommerceNavigationMenu({ onSignInClick, onSignUpClick }
                         </button>
                         <div className='max-w-20  bg-gray-400/30 rounded-full relative'>
                             <button
-                                onClick={toggleTheme}
+                                onClick={() => (window.location.href = "/ecommerce/cart-page")}
                                 className="p-2 rounded-lg hover:bg-muted transition-colors"
-                                aria-label="Toggle theme"
+                                aria-label="Toggle cart"
                             >
                                 <ShoppingBag size={20} />
-                                <span className='absolute text-orange-400  font-extrabold -top-1.5 -right-1'>16</span>
+                                <span className='absolute text-orange-400  font-extrabold -top-1.5 -right-1'>1</span>
                             </button>
                         </div>
+                        <button
+                            onClick={toggleTheme}
+                            className="p-2 rounded-lg hover:bg-muted transition-colors"
+                            aria-label="Toggle theme"
+                        >
+                            {theme === "light" ? (
+                                <Moon className="w-5 h-5 text-foreground" />
+                            ) : (
+                                <Sun className="w-5 h-5 text-foreground" />
+                            )}
+                        </button>
 
                         {/* Mobile Menu Button */}
                         <button
