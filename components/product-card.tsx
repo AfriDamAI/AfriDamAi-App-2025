@@ -3,13 +3,19 @@
 import React, { useEffect, useState } from 'react'
 import { type Product } from './our-product-section'
 
-function ProductCard({ products }: { products: Product[] }) {
+interface ProductCardProps {
+    products: Product[]
+    onClick?: (product: Product) => void
+}
+
+function ProductCard({ products, onClick }: ProductCardProps) {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             setLoading(false)
         }, 1000)
+        return () => clearTimeout(timer)
     }, [])
 
     if (loading) {
@@ -32,40 +38,50 @@ function ProductCard({ products }: { products: Product[] }) {
             </section>
         )
     }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {products.map((product) => (
-                <div
-                    key={product.id}
-                    className="bg-white dark:bg-[#0b0b0b] dark:border-b rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
-                >
-                    {/* Product Image */}
-                    <div className="relative bg-gray-100 aspect-square overflow-hidden">
-                        <img
-                            src={product.thumbnail || "/placeholder.svg"}
-                            alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                    </div>
+            {products.map((product) => {
+                const clickable = Boolean(onClick)
 
-                    {/* Product Info */}
-                    <div className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-primary transition-colors">
-                            {product.name}
-                        </h3>
-
-                        {/* Unit */}
-                        <div className="flex items-center mb-3">
-                            <span className="text-sm text-gray-500">Unit: {product.unit}</span>
+                return (
+                    <div
+                        key={product.id}
+                        onClick={() => clickable && onClick?.(product)}
+                        className={`bg-white dark:bg-[#0b0b0b] dark:border-b rounded-2xl shadow-lg transition-all duration-300 overflow-hidden group
+                            ${clickable ? "cursor-pointer hover:shadow-xl" : "cursor-default"}
+                        `}
+                    >
+                        {/* Product Image */}
+                        <div className="relative bg-gray-100 aspect-square overflow-hidden">
+                            <img
+                                src={product.thumbnail || "/placeholder.svg"}
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
                         </div>
 
-                        {/* Price */}
-                        <div className="flex items-center gap-2">
-                            <span className="text-xl font-bold text-primary">{product.price.toLocaleString()} $</span>
+                        {/* Product Info */}
+                        <div className="p-6">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-primary transition-colors">
+                                {product.name}
+                            </h3>
+
+                            {/* Unit */}
+                            <div className="flex items-center mb-3">
+                                <span className="text-sm text-gray-500">Unit: {product.unit}</span>
+                            </div>
+
+                            {/* Price */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl font-bold text-primary">
+                                    {product.price.toLocaleString()} $
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                )
+            })}
         </div>
     )
 }
