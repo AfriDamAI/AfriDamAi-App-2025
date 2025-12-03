@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import SkinAnalysisResults from "@/components/skin-analyzer-results"
+import Questionnaire from "@/components/questionnaire"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { addToHistory } from "@/lib/history-manager"
@@ -92,6 +93,8 @@ export default function ResultsPage() {
         ) : analysisData ? (
           <>
             <SkinAnalysisResults data={analysisData} />
+
+            <Questionnaire />
 
             {recordId && (
               <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
