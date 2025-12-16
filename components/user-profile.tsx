@@ -52,8 +52,6 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
 
           <Link href="/profile"
             onClick={() => {
-              // Guard the optional callback so missing prop doesn't crash the app
-              onViewProfileClick?.()
               setDropdownOpen(false)
             }}
             className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors flex items-center gap-2"
