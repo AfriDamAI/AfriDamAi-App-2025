@@ -4,8 +4,8 @@ import { useAuth } from '@/providers/auth-provider'
 import { useTheme } from '@/providers/theme-provider'
 import Link from 'next/link'
 import React, { JSX, useState } from 'react'
+import { Menu, Moon, ShoppingBag, Sun, X, LogOut } from 'lucide-react'
 import { UserProfile } from './user-profile'
-import { ChevronDown, Menu, Moon, ShoppingBag, Sun, X } from 'lucide-react'
 interface NavigationProps {
     onSignInClick: () => void
     onSignUpClick: () => void
@@ -29,7 +29,7 @@ export default function EcommerceNavigationMenu({ onSignInClick, onSignUpClick }
     }
     const { theme, toggleTheme } = useTheme()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const { user } = useAuth()
+    const { user, signOut } = useAuth()
 
 
     const navLinks = [
@@ -75,15 +75,10 @@ export default function EcommerceNavigationMenu({ onSignInClick, onSignUpClick }
                         </div>
 
                         {/* Right side actions */}
-                        <button
-                            // onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
-                        >
-                            <div className="w-8 h-8 bg-gradient-to-br from-orange-600 to-orange-400 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">{user?.name.charAt(0).toUpperCase()}</span>
-                            </div>
-                            <span className="text-sm font-medium text-foreground hidden sm:inline">{user?.name}</span>
-                        </button>
+                        <UserProfile
+                            onSignInClick={onSignInClick}
+                            onSignUpClick={onSignUpClick}
+                        />
                         <div className='max-w-20  bg-gray-400/30 rounded-full relative'>
                             <button
                                 onClick={() => (window.location.href = "/ecommerce/cart-page")}
@@ -138,6 +133,18 @@ export default function EcommerceNavigationMenu({ onSignInClick, onSignUpClick }
                                     {link.label}
                                 </Link>
                             ))}
+                            {user && (
+                                <button
+                                    onClick={() => {
+                                        signOut()
+                                        setMobileMenuOpen(false)
+                                    }}
+                                    className="w-full text-left px-4 py-2 rounded-lg text-red-600 hover:bg-muted transition-colors flex items-center gap-2"
+                                >
+                                    <LogOut size={20} />
+                                    <span>Sign Out</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
