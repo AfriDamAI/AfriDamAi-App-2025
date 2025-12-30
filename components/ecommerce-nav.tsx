@@ -29,7 +29,7 @@ export default function EcommerceNavigationMenu({ onSignInClick, onSignUpClick }
     }
     const { theme, toggleTheme } = useTheme()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const { user } = useAuth()
+    const { user, signOut } = useAuth()
 
 
     const navLinks = [
@@ -136,7 +136,7 @@ export default function EcommerceNavigationMenu({ onSignInClick, onSignUpClick }
                             {user && (
                                 <button
                                     onClick={() => {
-                                        useAuth().signOut()
+                                        signOut()
                                         setMobileMenuOpen(false)
                                     }}
                                     className="w-full text-left px-4 py-2 rounded-lg text-red-600 hover:bg-muted transition-colors flex items-center gap-2"

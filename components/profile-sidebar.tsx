@@ -14,7 +14,7 @@ interface ProfileSidebarProps {
 }
 
 export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
-  const { user, updateUserProfile } = useAuth()
+  const { user, updateUserProfile, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState<"overview" | "routine" | "appointment">("overview")
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState<string[]>([])
@@ -57,9 +57,9 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           {/* User Avatar and Basic Info */}
           <div className="text-center">
             <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-orange-400 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-white text-2xl font-bold">{(user.fullName || user.displayName || user.email || "U").charAt(0).toUpperCase()}</span>
+              <span className="text-white text-2xl font-bold">{(user.firstName || user.email || "U").charAt(0).toUpperCase()}</span>
             </div>
-            <h3 className="text-lg font-bold text-foreground">{user.fullName || user.displayName || "User"}</h3>
+            <h3 className="text-lg font-bold text-foreground">{user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.email || "User")}</h3>
             <p className="text-sm text-muted-foreground">{user.email}</p>
             <p className="text-xs text-muted-foreground mt-1">ID: {user.id}</p>
           </div>
@@ -67,7 +67,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           {/* Health Indicators */}
           <HealthIndicator
             label="Skin Type"
-            value={user.skinType ? (user.skinType.charAt(0).toUpperCase() + user.skinType.slice(1)) : "Not set"}
+            value={user.profile?.skinType ? (user.profile.skinType.charAt(0).toUpperCase() + user.profile.skinType.slice(1)) : "Not set"}
             color="blue"
           />
 
@@ -80,38 +80,20 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
               </div>
               <div className="p-3 bg-muted rounded-lg">
                 <p className="text-xs text-muted-foreground font-medium">Member Since</p>
-                <p className="text-sm font-semibold text-foreground">{user.createdDate ? new Date(user.createdDate).toLocaleDateString() : "Recently"}</p>
+                <p className="text-sm font-semibold text-foreground">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Recently"}</p>
               </div>
             </div>
           </div>
 
-          {/* Skin History */}
-          {user.skinHistory && user.skinHistory.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-foreground flex items-center gap-2">
-                <Heart className="w-4 h-4 text-red-500" />
-                Skin History
-              </h4>
-              <div className="space-y-2">
-                {user.skinHistory.map((history, idx) => (
-                  <div key={idx} className="p-3 bg-muted rounded-lg">
-                    <p className="text-sm font-medium text-foreground">{history.condition}</p>
-                    <p className="text-xs text-muted-foreground">{history.date} • {history.status}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Known Allergies */}
-          {user.knownAllergies && user.knownAllergies.length > 0 && (
+          {user.profile?.knownSkinAllergies && user.profile.knownSkinAllergies.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-semibold text-foreground flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-orange-500" />
                 Known Allergies
               </h4>
               <div className="flex flex-wrap gap-2">
-                {user.knownAllergies.map((allergy, idx) => (
+                {user.profile.knownSkinAllergies.map((allergy, idx) => (
                   <span
                     key={idx}
                     className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 text-xs rounded-full"
@@ -124,14 +106,14 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           )}
 
           {/* Previous Treatments */}
-          {user.previousTreatments && user.previousTreatments.length > 0 && (
+          {user.profile?.previousTreatments && user.profile.previousTreatments.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-semibold text-foreground flex items-center gap-2">
                 <Users className="w-4 h-4 text-green-500" />
                 Previous Treatments
               </h4>
               <div className="flex flex-wrap gap-2">
-                {user.previousTreatments.map((treatment, idx) => (
+                {user.profile.previousTreatments.map((treatment, idx) => (
                   <span
                     key={idx}
                     className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs rounded-full"
@@ -221,7 +203,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           <div className="pt-6 border-t border-border">
             <Button
               onClick={() => {
-                useAuth().signOut()
+                signOut()
                 onClose()
               }}
               variant="outline"
