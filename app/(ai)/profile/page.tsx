@@ -18,15 +18,15 @@ export default function ProfilePage() {
         }
     }, [isSignedIn, router])
 
-        if (!user) {
+    if (!user) {
 
-            return <div>Loading...</div>
+        return <div>Loading...</div>
 
-        }
+    }
 
-    
 
-    const displayName = user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.email || "User");
+
+    const displayName = user.firstName || (user.email ? user.email.split('@')[0] : "User");
 
     const stats = [
         { label: "Skin Health", value: "85%", icon: "✨", color: "text-emerald-500" },
@@ -77,7 +77,7 @@ export default function ProfilePage() {
                                     <div className="w-1.5 h-1.5 rounded-full bg-border md:block hidden" />
                                     <div className="flex items-center gap-1.5">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.33 0 4 1 4 4v2H7v-2c0-3 2.67-4 4-4z"></path></svg>
-                                        ID: {user.id.substring(0, 8)}...
+                                        ID: {user.email}
                                     </div>
                                 </div>
                             </div>
@@ -104,11 +104,10 @@ export default function ProfilePage() {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`whitespace-nowrap px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                                        activeTab === tab
+                                    className={`whitespace-nowrap px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === tab
                                             ? "bg-primary text-white shadow-lg shadow-primary/30"
                                             : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                                    }`}
+                                        }`}
                                 >
                                     {tab}
                                 </button>
@@ -181,7 +180,7 @@ export default function ProfilePage() {
                                         </div>
                                         Clinical History & Treatments
                                     </h3>
-                                    
+
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {user.profile?.previousTreatments && user.profile.previousTreatments.length > 0 ? (
                                             user.profile.previousTreatments.map((treatment, idx) => (
@@ -223,4 +222,4 @@ export default function ProfilePage() {
     );
 }
 
-    
+

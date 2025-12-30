@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { jwtDecode } from "jwt-decode";
-import { login, register, getProfile, setAuthToken, updateProfile as apiUpdateProfile } from "../lib/api-client"
+import { login, register, getProfile, setAuthToken, updateProfile as apiUpdateProfile, getUser, updateUser } from "../lib/api-client"
 import { UserLoginDto, CreateUserDto } from "../lib/types"
 
 interface User {
@@ -45,19 +45,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = localStorage.getItem("token");
     if (token) {
       setAuthToken(token);
-      getProfile().then(profile => {
-        // Based on Postman, the profile might return resultData or similar
-        // Adjusting based on user's code using profile.resultData
-        if (profile?.resultData) {
-          setUser(profile.resultData);
-        } else {
-          setUser(profile);
+      try {
+        const decoded: any = jwtDecode(token);
+        const userId = decoded.sub || decoded.id;
+        if (userId) {
+          getUser(userId).then((response: any) => {
+            const userData = response.resultData || response;
+            setUser(userData);
+          }).catch((err: any) => {
+            console.error("User fetch error:", err);
+            signOut();
+          });
         }
-      }).catch((err) => {
-        console.error("Profile fetch error:", err);
-        localStorage.removeItem("token");
-        setAuthToken(null);
-      });
+      } catch (err) {
+        console.error("Token decode error:", err);
+        signOut();
+      }
     }
   }, []);
 
@@ -68,10 +71,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
 
-      // The login response itself contains some user info (displayName, role)
-      // but we fetch the full profile to be sure
-      const profile = await getProfile();
-      setUser(profile.resultData || profile);
+      const decoded: any = jwtDecode(accessToken);
+      const userId = decoded.sub || decoded.id;
+      const response = await getUser(userId);
+      setUser(response.resultData || response);
     } catch (error: any) {
       console.error("Sign in error:", error);
       throw error;
@@ -96,9 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const updateUserProfile = async (updates: Partial<User>) => {
-    if (user) {
-      const updatedUser = await apiUpdateProfile(updates);
-      setUser(updatedUser.resultData || updatedUser);
+    if (user && user.id) {
+      const response = await updateUser(user.id, updates);
+      setUser(response.resultData || response);
     }
   }
 
