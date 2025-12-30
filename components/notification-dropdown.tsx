@@ -172,7 +172,7 @@ const NotificationDropdown = () => {
                             )}
                         </div>
                         <p className="text-sm text-slate-600">
-                            {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'You\'re all caught up!'}
+                            {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'You&apos;re all caught up!'}
                         </p>
                     </div>
 
@@ -184,7 +184,7 @@ const NotificationDropdown = () => {
                                     <Bell className="w-8 h-8 text-rose-300" />
                                 </div>
                                 <p className="text-slate-600 text-center">No notifications yet</p>
-                                <p className="text-sm text-slate-400 text-center mt-1">We'll notify you about your skincare routines and reminders</p>
+                                <p className="text-sm text-slate-400 text-center mt-1">We&apos;ll notify you about your skincare routines and reminders</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-rose-50">

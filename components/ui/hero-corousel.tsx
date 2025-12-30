@@ -59,16 +59,17 @@ export default function HeroCarousel() {
         {slides.map((slide, i) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-700 ${
-              i === index ? "opacity-100 z-10" : "opacity-0 z-0"
-            }`}
+            className={`absolute inset-0 transition-opacity duration-700 ${i === index ? "opacity-100 z-10" : "opacity-0 z-0"
+              }`}
             aria-hidden={i !== index}
           >
             {/* Use next/image if images are present in /public; fallback to img if not configured */}
-            <img
+            <Image
               src={slide.img}
               alt={slide.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              priority={i === 0}
             />
 
             <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent dark:from-black/60 flex items-end sm:items-center">
@@ -104,9 +105,8 @@ export default function HeroCarousel() {
             key={i}
             aria-label={`Go to slide ${i + 1}`}
             onClick={() => goTo(i)}
-            className={`w-3 h-3 rounded-full transition-colors ${
-              i === index ? "bg-white dark:bg-orange-400" : "bg-white/50 dark:bg-white/30"
-            }`}
+            className={`w-3 h-3 rounded-full transition-colors ${i === index ? "bg-white dark:bg-orange-400" : "bg-white/50 dark:bg-white/30"
+              }`}
           />
         ))}
       </div>

@@ -36,9 +36,9 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
       >
         <div className="w-8 h-8 bg-gradient-to-br from-orange-600 to-orange-400 rounded-full flex items-center justify-center">
-          <span className="text-white text-sm font-bold">{user?.fullName.charAt(0).toUpperCase()}</span>
+          <span className="text-white text-sm font-bold">{(user?.firstName || user?.email || "U").charAt(0).toUpperCase()}</span>
         </div>
-        <span className="text-sm font-medium text-foreground hidden sm:inline">{user?.fullName}</span>
+        <span className="text-sm font-medium text-foreground hidden sm:inline">{user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email}</span>
         <ChevronDown className="w-4 h-4 text-muted-foreground" />
       </button>
 
@@ -46,7 +46,7 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
       {dropdownOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-lg shadow-lg py-2 z-50">
           <div className="px-4 py-2 border-b border-border">
-            <p className="text-sm font-medium text-foreground">{user?.fullName}</p>
+            <p className="text-sm font-medium text-foreground">{user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email}</p>
             <p className="text-xs text-muted-foreground">{user?.email}</p>
           </div>
 

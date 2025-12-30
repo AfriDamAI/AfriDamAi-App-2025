@@ -1,9 +1,10 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
+import Image from "next/image"
 import { type Product } from './our-product-section'
 
-function ProductCard({ products }: { products: Product[] }) {
+function ProductCard({ products, onClick }: { products: Product[]; onClick?: (product: Product) => void }) {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -37,14 +38,16 @@ function ProductCard({ products }: { products: Product[] }) {
             {products.map((product) => (
                 <div
                     key={product.id}
-                    className="bg-white dark:bg-[#0b0b0b] dark:border-b rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                    className={`bg-white dark:bg-[#0b0b0b] dark:border-b rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group ${onClick ? 'cursor-pointer' : ''}`}
+                    {...(onClick && { onClick: () => onClick(product) })}
                 >
                     {/* Product Image */}
                     <div className="relative bg-gray-100 aspect-square overflow-hidden">
-                        <img
+                        <Image
                             src={product.thumbnail || "/placeholder.svg"}
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                     </div>
 

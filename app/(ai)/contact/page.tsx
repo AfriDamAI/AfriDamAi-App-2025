@@ -1,7 +1,6 @@
 import { Clock, Mail, MapPin, Phone, Sparkles } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
 import { ProductShowcase } from "@/components/product-showcase";
-import { ImageWithFallback } from "@/components/image-fallback";
 import Image from "next/image";
 
 export default function App() {
@@ -26,7 +25,7 @@ export default function App() {
                     </div>
                     <h1 className="text-white mb-4">Get in Touch</h1>
                     <p className="text-white/90 max-w-2xl mx-auto">
-                        Have questions about our AI-powered skincare solutions? We're here to help you find the perfect products for your skin.
+                        Have questions about our AI-powered skincare solutions? We&#39;re here to help you find the perfect products for your skin.
                     </p>
                 </div>
             </div>
@@ -36,7 +35,7 @@ export default function App() {
                     <div>
                         <h2 className="text-emerald-900 mb-2">Contact Information</h2>
                         <p className="text-slate-600 mb-8">
-                            Reach out to us through any of these channels. We're always happy to help.
+                            Reach out to us through any of these channels. We&#39;re always happy to help.
                         </p>
 
                         <div className="space-y-6 mb-12">

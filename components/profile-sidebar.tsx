@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { X, Calendar, MessageCircle, Heart, AlertCircle, User, Users } from 'lucide-react'
+import { X, Calendar, MessageCircle, Heart, AlertCircle, User, Users, LogOut } from 'lucide-react'
 import { useAuth } from "@/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { TreatmentRoutine } from "./treatment-routine"
@@ -14,7 +14,7 @@ interface ProfileSidebarProps {
 }
 
 export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
-  const { user, updateUserProfile } = useAuth()
+  const { user, updateUserProfile, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState<"overview" | "routine" | "appointment">("overview")
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState<string[]>([])
@@ -40,9 +40,8 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed right-0 top-0 h-screen w-full sm:w-96 bg-background border-l border-border z-50 transform transition-transform duration-300 overflow-y-auto ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed right-0 top-0 h-screen w-full sm:w-96 bg-background border-l border-border z-50 transform transition-transform duration-300 overflow-y-auto ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="sticky top-0 bg-background border-b border-border px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">My Profile</h2>
@@ -58,9 +57,9 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           {/* User Avatar and Basic Info */}
           <div className="text-center">
             <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-orange-400 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-white text-2xl font-bold">{user.fullName.charAt(0).toUpperCase()}</span>
+              <span className="text-white text-2xl font-bold">{(user.firstName || user.email || "U").charAt(0).toUpperCase()}</span>
             </div>
-            <h3 className="text-lg font-bold text-foreground">{user.fullName}</h3>
+            <h3 className="text-lg font-bold text-foreground">{user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.email || "User")}</h3>
             <p className="text-sm text-muted-foreground">{user.email}</p>
             <p className="text-xs text-muted-foreground mt-1">ID: {user.id}</p>
           </div>
@@ -68,7 +67,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           {/* Health Indicators */}
           <HealthIndicator
             label="Skin Type"
-            value={user.skinType.charAt(0).toUpperCase() + user.skinType.slice(1)}
+            value={user.profile?.skinType ? (user.profile.skinType.charAt(0).toUpperCase() + user.profile.skinType.slice(1)) : "Not set"}
             color="blue"
           />
 
@@ -77,42 +76,24 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 bg-muted rounded-lg">
                 <p className="text-xs text-muted-foreground font-medium">Sex</p>
-                <p className="text-sm font-semibold text-foreground capitalize">{user.sex}</p>
+                <p className="text-sm font-semibold text-foreground capitalize">{user.sex || "Not set"}</p>
               </div>
               <div className="p-3 bg-muted rounded-lg">
                 <p className="text-xs text-muted-foreground font-medium">Member Since</p>
-                <p className="text-sm font-semibold text-foreground">{new Date(user.createdDate).toLocaleDateString()}</p>
+                <p className="text-sm font-semibold text-foreground">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Recently"}</p>
               </div>
             </div>
           </div>
 
-          {/* Skin History */}
-          {user.skinHistory.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-foreground flex items-center gap-2">
-                <Heart className="w-4 h-4 text-red-500" />
-                Skin History
-              </h4>
-              <div className="space-y-2">
-                {user.skinHistory.map((history, idx) => (
-                  <div key={idx} className="p-3 bg-muted rounded-lg">
-                    <p className="text-sm font-medium text-foreground">{history.condition}</p>
-                    <p className="text-xs text-muted-foreground">{history.date} • {history.status}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Known Allergies */}
-          {user.knownAllergies.length > 0 && (
+          {user.profile?.knownSkinAllergies && user.profile.knownSkinAllergies.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-semibold text-foreground flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-orange-500" />
                 Known Allergies
               </h4>
               <div className="flex flex-wrap gap-2">
-                {user.knownAllergies.map((allergy, idx) => (
+                {user.profile.knownSkinAllergies.map((allergy, idx) => (
                   <span
                     key={idx}
                     className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 text-xs rounded-full"
@@ -125,14 +106,14 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           )}
 
           {/* Previous Treatments */}
-          {user.previousTreatments.length > 0 && (
+          {user.profile?.previousTreatments && user.profile.previousTreatments.length > 0 && (
             <div className="space-y-3">
               <h4 className="font-semibold text-foreground flex items-center gap-2">
                 <Users className="w-4 h-4 text-green-500" />
                 Previous Treatments
               </h4>
               <div className="flex flex-wrap gap-2">
-                {user.previousTreatments.map((treatment, idx) => (
+                {user.profile.previousTreatments.map((treatment, idx) => (
                   <span
                     key={idx}
                     className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs rounded-full"
@@ -144,36 +125,34 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
             </div>
           )}
 
+
           {/* Tabs */}
           <div className="border-t border-border pt-6">
             <div className="flex gap-2 mb-4">
               <button
                 onClick={() => setActiveTab("overview")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "overview"
-                    ? "bg-orange-600 text-white"
-                    : "bg-muted text-foreground hover:bg-muted/80"
-                }`}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "overview"
+                  ? "bg-orange-600 text-white"
+                  : "bg-muted text-foreground hover:bg-muted/80"
+                  }`}
               >
                 Overview
               </button>
               <button
                 onClick={() => setActiveTab("routine")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "routine"
-                    ? "bg-orange-600 text-white"
-                    : "bg-muted text-foreground hover:bg-muted/80"
-                }`}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "routine"
+                  ? "bg-orange-600 text-white"
+                  : "bg-muted text-foreground hover:bg-muted/80"
+                  }`}
               >
                 Routine
               </button>
               <button
                 onClick={() => setActiveTab("appointment")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "appointment"
-                    ? "bg-orange-600 text-white"
-                    : "bg-muted text-foreground hover:bg-muted/80"
-                }`}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "appointment"
+                  ? "bg-orange-600 text-white"
+                  : "bg-muted text-foreground hover:bg-muted/80"
+                  }`}
               >
                 Appointment
               </button>
@@ -218,6 +197,21 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
             {activeTab === "routine" && <TreatmentRoutine />}
 
             {activeTab === "appointment" && <AppointmentBooking />}
+          </div>
+
+          {/* Sign Out Button in Sidebar */}
+          <div className="pt-6 border-t border-border">
+            <Button
+              onClick={() => {
+                signOut()
+                onClose()
+              }}
+              variant="outline"
+              className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center justify-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </Button>
           </div>
         </div>
       </div>
