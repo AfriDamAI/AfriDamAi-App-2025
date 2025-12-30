@@ -22,7 +22,7 @@ export default function Navigation({
 }: NavigationProps) {
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   // State for notification bell dropdown
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -145,7 +145,7 @@ export default function Navigation({
               {user && (
                 <button
                   onClick={() => {
-                    useAuth().signOut()
+                    signOut()
                     setMobileMenuOpen(false)
                   }}
                   className="w-full text-left px-4 py-2 rounded-lg text-red-600 hover:bg-muted transition-colors flex items-center gap-2"
