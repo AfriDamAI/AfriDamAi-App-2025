@@ -6,7 +6,7 @@ import Footer from "@/components/footer"
 import { AuthModals } from "@/components/auth-modals"
 import { ProfileSidebar } from "@/components/profile-sidebar"
 import type React from "react"
-import { useParams, usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import EcommerceNavigationMenu from "./ecommerce-nav"
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
@@ -17,7 +17,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
     ;
 
-   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
+  const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
 
   const handleSignIn = () => {
     setAuthModal({ isOpen: true, type: "signin" })
@@ -30,7 +30,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     setAuthModal({ isOpen: false, type: "signin" })
   }
 
-   const handleViewProfile = () => {
+  const handleViewProfile = () => {
     setProfileSidebarOpen(true)
   }
 
@@ -45,7 +45,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
       {children}
       <Footer onSignUpClick={handleSignUp} />
       <AuthModals isOpen={authModal.isOpen} onClose={handleCloseModal} type={authModal.type} />
-        <ProfileSidebar isOpen={profileSidebarOpen} onClose={handleCloseProfileSidebar} />
+      <ProfileSidebar isOpen={profileSidebarOpen} onClose={handleCloseProfileSidebar} />
     </>
   )
 }

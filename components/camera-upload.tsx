@@ -1,7 +1,10 @@
+"use client"
+
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Camera, Upload, RefreshCcw, Image as ImageIcon, CheckCircle, X } from "lucide-react";
+import { Camera, RefreshCcw, Check, CheckCircle, X, Upload, Info } from 'lucide-react'
+import Image from "next/image"
 
 interface CameraUploadProps {
   onImageCapture: (imageData: string) => void;
@@ -247,11 +250,12 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
           <div className="flex flex-col gap-6">
             <h2 className="text-xl font-bold text-gray-900">Review Photo</h2>
 
-            <div className="w-full bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-              <img
+            <div className="w-full relative h-[500px] bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+              <Image
                 src={capturedImage}
                 alt="Captured skin"
-                className="w-full max-h-[500px] object-contain mx-auto"
+                fill
+                className="object-contain"
               />
             </div>
 

@@ -38,7 +38,6 @@ export default function RootLayout({
       <body className={`font-sans antialiased`}>
         <AuthProvider>
           <ThemeProvider>
-
             {children}
           </ThemeProvider>
         </AuthProvider>
