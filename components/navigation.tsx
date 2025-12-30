@@ -3,7 +3,7 @@
 import type React from "react";
 import Link from "next/link";
 import { useTheme } from "@/providers/theme-provider";
-import { Moon, Sun, Menu, X, Bell } from "lucide-react";
+import { Moon, Sun, Menu, X, Bell, LogOut } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { UserProfile } from "../components/user-profile";
 import { useAuth } from "@/providers/auth-provider";
@@ -142,6 +142,18 @@ export default function Navigation({
                   {link.label}
                 </Link>
               ))}
+              {user && (
+                <button
+                  onClick={() => {
+                    useAuth().signOut()
+                    setMobileMenuOpen(false)
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-lg text-red-600 hover:bg-muted transition-colors flex items-center gap-2"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Sign Out</span>
+                </button>
+              )}
             </div>
           </div>
         )}

@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Convert file to base64 for storage
-    const buffer = await file.arrayBuffer()
-    const base64 = Buffer.from(buffer).toString("base64")
+    // const buffer = await file.arrayBuffer()
+    // const base64 = Buffer.from(buffer).toString("base64")
 
     // Generate unique ID for the image
     const imageId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 },
     )
-  } catch (error) {
-    console.error("Upload error:", error)
+  } catch (_err) {
+    console.error("Upload error:", _err)
     return NextResponse.json({ error: "Upload failed" }, { status: 500 })
   }
 }

@@ -51,7 +51,7 @@ export function ContactForm() {
                     </div>
                     <h3 className="text-primary mb-2">Message Sent!</h3>
                     <p className="text-slate-600">
-                        Thank you for reaching out. We'll be in touch soon.
+                        Thank you for reaching out. We&apos;ll be in touch soon.
                     </p>
                 </div>
             ) : (
@@ -105,7 +105,7 @@ export function ContactForm() {
 
                     <div>
                         <label htmlFor="interest" className="block text-slate-700 mb-2">
-                            I'm interested in *
+                            I&#39;m interested in *
                         </label>
                         <select
                             id="interest"
