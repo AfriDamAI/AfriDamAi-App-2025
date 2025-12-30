@@ -29,8 +29,18 @@ export const getProfile = async () => {
   return response.data;
 };
 
+export const getUser = async (id: string) => {
+  const response = await apiClient.get(`/api/users/${id}`);
+  return response.data;
+};
+
 export const updateProfile = async (updates: Partial<any>) => {
   const response = await apiClient.patch("/api/profile", updates);
+  return response.data;
+};
+
+export const updateUser = async (id: string, updates: Partial<any>) => {
+  const response = await apiClient.patch(`/api/users/${id}`, updates);
   return response.data;
 };
 
