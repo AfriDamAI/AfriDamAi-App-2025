@@ -23,33 +23,20 @@ export default function Navigation({
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
-
-  // State for notification bell dropdown
-  const [notificationOpen, setNotificationOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown if clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target as Node)
-      ) {
-        setNotificationOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [notificationRef]);
-
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/history", label: "History" },
-    { href: "/about", label: "About" },
-  ];
+  // UPDATED: Removed "About" (404) and added "Mission"
+  // Also, we can filter these so "Home" and "Mission" only show when logged out
+  const navLinks = user 
+    ? [
+        { href: "/dashboard", label: "Dashboard" },
+        { href: "/history", label: "History" },
+      ]
+    : [
+        { href: "/", label: "Home" },
+        { href: "/mission", label: "Our Mission" }, // New Page Link
+        { href: "/contact", label: "Support" },
+      ];
 
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     const protectedRoutes = ["/dashboard", "/history"];
@@ -60,24 +47,31 @@ export default function Navigation({
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-600 to-orange-400 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+        <div className="flex justify-between items-center h-20"> {/* Increased height for logo */}
+          
+          {/* LOGO: REPLACED "A" BOX WITH REAL LOGO */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <img 
+              src="/logo.png" 
+              alt="AfriDam AI" 
+              className="h-12 w-auto object-contain drop-shadow-[0_0_10px_rgba(225,120,79,0.2)]" 
+            />
+            <div className="hidden sm:flex flex-col border-l border-border pl-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">
+                Clinical
+              </span>
             </div>
-            <span className="font-bold text-lg text-foreground">AfriDamAI</span>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-[#E1784F] transition-colors"
                 onClick={(e) => handleNavClick(e, link.href)}
               >
                 {link.label}
@@ -86,56 +80,51 @@ export default function Navigation({
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-3 relative" ref={notificationRef}>
+          <div className="flex items-center gap-4 relative" ref={notificationRef}>
+            
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl bg-muted/50 hover:bg-muted border border-border transition-all"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? (
+                <Moon className="w-4 h-4 text-foreground" />
+              ) : (
+                <Sun className="w-4 h-4 text-yellow-500" />
+              )}
+            </button>
+
+            {/* reminder/Notifications */}
+            <NotificationDropdown />
+
+            <div className="h-8 w-[1px] bg-border mx-2 hidden sm:block" />
+
             <UserProfile
               onSignInClick={onSignInClick}
               onSignUpClick={onSignUpClick}
               onViewProfileClick={onViewProfileClick}
             />
 
-            {/* reminder */}
-            <NotificationDropdown />
-
-
-
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === "light" ? (
-                <Moon className="w-5 h-5 text-foreground" />
-              ) : (
-                <Sun className="w-5 h-5 text-foreground" />
-              )}
-            </button>
-
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
-              aria-label="Toggle mobile menu"
             >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5 text-foreground" />
-              ) : (
-                <Menu className="w-5 h-5 text-foreground" />
-              )}
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border bg-background">
-            <div className="px-4 py-4 space-y-3">
+          <div className="md:hidden border-t border-border bg-background py-6 px-4 space-y-4 shadow-2xl animate-in slide-in-from-top-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors"
-                  onClick={(e) => {
-                    handleNavClick(e, link.href);
+                  className="block px-6 py-4 rounded-2xl bg-muted/30 text-[10px] font-black uppercase tracking-widest text-foreground hover:bg-[#E1784F] hover:text-white transition-all"
+                  onClick={() => {
                     setMobileMenuOpen(false);
                   }}
                 >
@@ -148,13 +137,12 @@ export default function Navigation({
                     signOut()
                     setMobileMenuOpen(false)
                   }}
-                  className="w-full text-left px-4 py-2 rounded-lg text-red-600 hover:bg-muted transition-colors flex items-center gap-2"
+                  className="w-full text-left px-6 py-4 rounded-2xl bg-red-500/10 text-red-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-3"
                 >
-                  <LogOut className="w-5 h-5" />
-                  <span>Sign Out</span>
+                  <LogOut size={16} />
+                  <span>Terminate Session</span>
                 </button>
               )}
-            </div>
           </div>
         )}
       </div>

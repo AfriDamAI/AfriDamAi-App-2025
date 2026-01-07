@@ -1,23 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 import { AuthModals } from "@/components/auth-modals"
 import { ProfileSidebar } from "@/components/profile-sidebar"
 import type React from "react"
 import { usePathname } from "next/navigation"
-import EcommerceNavigationMenu from "./ecommerce-nav"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
   const [authModal, setAuthModal] = useState<{ isOpen: boolean; type: "signin" | "signup" }>({
     isOpen: false,
     type: "signin",
   })
+  
   const pathname = usePathname()
-    ;
-
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
+
+  // World-Class Logic: Determine if we are in the "Apothecary" (Marketplace)
+  const isMarketplace = pathname.startsWith("/marketplace") || pathname.includes("marketplace");
 
   const handleSignIn = () => {
     setAuthModal({ isOpen: true, type: "signin" })
@@ -26,26 +28,64 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const handleSignUp = () => {
     setAuthModal({ isOpen: true, type: "signup" })
   }
-  const handleCloseModal = () => {
-    setAuthModal({ isOpen: false, type: "signin" })
-  }
+
+  const handleCloseModal = useCallback(() => {
+    setAuthModal((prev) => {
+      if (!prev.isOpen) return prev;
+      return { ...prev, isOpen: false };
+    });
+  }, []);
 
   const handleViewProfile = () => {
     setProfileSidebarOpen(true)
   }
 
-  const handleCloseProfileSidebar = () => {
-    setProfileSidebarOpen(false)
-  }
-
-  const ViewProfileClick = handleViewProfile
   return (
-    <>
-      {(pathname.startsWith("ecommerce") || pathname.includes("/ecommerce")) ? <EcommerceNavigationMenu onSignInClick={handleSignIn} onSignUpClick={handleSignUp} /> : <Navigation onSignInClick={handleSignIn} onSignUpClick={handleSignUp} onViewProfileClick={ViewProfileClick} />}
-      {children}
+    <div className="relative min-h-screen flex flex-col">
+      {/* 🛠️ Glassmorphism Navigation Layer */}
+      <motion.header 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="sticky top-0 z-50"
+      >
+        <Navigation 
+          onSignInClick={handleSignIn} 
+          onSignUpClick={handleSignUp} 
+          onViewProfileClick={handleViewProfile} 
+        />
+      </motion.header>
+      
+      {/* 🚀 Dynamic Content Entry */}
+      <motion.main 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex-grow relative"
+      >
+        {children}
+      </motion.main>
+      
       <Footer onSignUpClick={handleSignUp} />
-      <AuthModals isOpen={authModal.isOpen} onClose={handleCloseModal} type={authModal.type} />
-      <ProfileSidebar isOpen={profileSidebarOpen} onClose={handleCloseProfileSidebar} />
-    </>
+      
+      {/* 🛡️ World-Class Modals with AnimatePresence */}
+      <AnimatePresence>
+        {authModal.isOpen && (
+          <AuthModals 
+            isOpen={authModal.isOpen} 
+            onClose={handleCloseModal} 
+            type={authModal.type} 
+          />
+        )}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {profileSidebarOpen && (
+          <ProfileSidebar 
+            isOpen={profileSidebarOpen} 
+            onClose={() => setProfileSidebarOpen(false)} 
+          />
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
