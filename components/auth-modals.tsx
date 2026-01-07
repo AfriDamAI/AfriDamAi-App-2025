@@ -1,11 +1,11 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
+import { useState, useEffect } from "react"
+import { X, ShieldCheck, CheckCircle2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
+import Link from "next/link"
 
 interface AuthModalsProps {
   isOpen: boolean
@@ -14,32 +14,42 @@ interface AuthModalsProps {
 }
 
 export function AuthModals({ isOpen, onClose, type }: AuthModalsProps) {
-  const { signIn, signUp } = useAuth()
+  const router = useRouter()
+  const { signIn, signUp, user } = useAuth()
+  
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [sex, setSex] = useState("male")
   const [phoneNo, setPhoneNo] = useState("")
+  const [agreedToTerms, setAgreedToTerms] = useState(false) // 🛡️ Mandatory for World-Class status
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
+  useEffect(() => {
+    if (user && isOpen) {
+      onClose();
+      router.push('/dashboard'); // Taking them to the portal hub first
+    }
+  }, [user, isOpen, router, onClose]); 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // 🛡️ Legal Check
+    if (type === "signup" && !agreedToTerms) {
+      setError("Please acknowledge the clinical terms to continue.");
+      return;
+    }
+
     setError("")
     setIsLoading(true)
 
     try {
       if (type === "signin") {
-        if (!email || !password) {
-          throw new Error("Please fill in all fields")
-        }
         await signIn({ email, password })
-        onClose()
       } else {
-        if (!firstName || !lastName || !email || !password || !phoneNo) {
-          throw new Error("Please fill in all fields")
-        }
         await signUp({
           firstName,
           lastName,
@@ -48,17 +58,10 @@ export function AuthModals({ isOpen, onClose, type }: AuthModalsProps) {
           phoneNo,
           password
         })
-        onClose()
       }
-
-      setEmail("")
-      setPassword("")
-      setFirstName("")
-      setLastName("")
-      setPhoneNo("")
     } catch (err: any) {
-      console.error("Auth error:", err)
-      setError(err.response?.data?.message || err.message || "An error occurred")
+      const errorMessage = err.response?.data?.message || err.message || "Authentication failed";
+      setError(Array.isArray(errorMessage) ? errorMessage[0] : errorMessage);
     } finally {
       setIsLoading(false)
     }
@@ -68,131 +71,95 @@ export function AuthModals({ isOpen, onClose, type }: AuthModalsProps) {
 
   return (
     <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm" onClick={onClose} />
-
-      {/* Modal */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background border border-border rounded-2xl shadow-2xl w-full max-w-md z-50 p-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-foreground">{type === "signin" ? "Sign In" : "Sign Up"}</h2>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-muted rounded-lg transition-colors"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5" />
+      <div className="fixed inset-0 bg-black/90 z-[60] backdrop-blur-xl transition-all" onClick={onClose} />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#1C1A19] border border-white/10 rounded-[3rem] shadow-[0_0_100px_rgba(225,120,79,0.1)] w-full max-w-md z-[70] p-10 overflow-hidden">
+        
+        {/* Branding Background Glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/10 blur-[60px] rounded-full pointer-events-none" />
+        
+        <div className="flex justify-between items-center mb-10 relative z-10">
+          <div className="flex flex-col">
+            <h2 className="text-3xl font-black text-[#F7F3EE] tracking-tighter uppercase italic">
+              {type === "signin" ? "Initialize" : "Register"}
+            </h2>
+            <p className="text-[10px] font-black text-[#E1784F] uppercase tracking-[0.4em]">Your Skin, Decoded</p>
+          </div>
+          <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all">
+            <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
           {type === "signup" && (
             <>
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">First Name</label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="John"
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Last Name</label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Doe"
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Sex</label>
-                <select
-                  value={sex}
-                  onChange={(e) => setSex(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Phone Number</label>
                 <input
-                  type="tel"
-                  value={phoneNo}
-                  onChange={(e) => setPhoneNo(e.target.value)}
-                  placeholder="+1234567890"
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+                  type="text"
+                  placeholder="First Name"
+                  className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-[#E1784F] transition-all"
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-[#E1784F] transition-all"
+                  onChange={(e) => setLastName(e.target.value)}
                 />
               </div>
+              <input
+                type="tel"
+                placeholder="Phone (e.g. +250...)"
+                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-[#E1784F] transition-all"
+                onChange={(e) => setPhoneNo(e.target.value)}
+              />
             </>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email Address"
+            className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-[#E1784F] transition-all"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
-            />
-          </div>
+          <input
+            type="password"
+            placeholder="Secure Password"
+            className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-[#E1784F] transition-all"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          {type === "signup" && (
+            <div className="flex items-start gap-3 py-4 px-2">
+              <div 
+                onClick={() => setAgreedToTerms(!agreedToTerms)}
+                className={`mt-1 shrink-0 w-5 h-5 rounded-md border flex items-center justify-center transition-all cursor-pointer ${agreedToTerms ? 'bg-[#4DB6AC] border-[#4DB6AC]' : 'border-white/20 bg-white/5'}`}
+              >
+                {agreedToTerms && <CheckCircle2 size={14} className="text-black" />}
+              </div>
+              <label className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-relaxed cursor-pointer select-none" onClick={() => setAgreedToTerms(!agreedToTerms)}>
+                I acknowledge that AI analysis is for informational use and agree to the 
+                <span className="text-[#E1784F] ml-1">Terms of Service</span>
+              </label>
+            </div>
+          )}
 
           {error && (
-            <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-200 text-sm">
+            <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest text-center">
               {error}
             </div>
           )}
 
-          <Button
+          <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-[#E1784F] text-white font-black uppercase text-[10px] tracking-[0.3em] py-6 rounded-[1.5rem] shadow-2xl shadow-[#E1784F]/20 disabled:opacity-50 hover:brightness-110 active:scale-[0.98] transition-all mt-4"
           >
-            {isLoading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-            {type === "signin" ? "Sign In" : "Create Account"}
-          </Button>
-
-          <p className="text-center text-sm text-muted-foreground">
-            {type === "signin" ? (
-              <>
-                Don&#39;t have an account?{" "}
-                <button type="button" onClick={onClose} className="text-orange-600 hover:underline font-medium">
-                  Sign up
-                </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{" "}
-                <button type="button" onClick={onClose} className="text-orange-600 hover:underline font-medium">
-                  Sign in
-                </button>
-              </>
-            )}
-          </p>
+            {isLoading ? "Synchronizing..." : (type === "signin" ? "Initialize Portal" : "Generate Account")}
+          </button>
         </form>
-
-        <p className="text-xs text-muted-foreground mt-4 text-center">Your data is securely stored and protected.</p>
       </div>
     </>
   )

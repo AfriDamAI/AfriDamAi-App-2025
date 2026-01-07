@@ -1,11 +1,15 @@
+// Path: lib/api-client.ts
+
 import axios from "axios";
 import { environment } from "./environment";
-import { UserLoginDto, CreateUserDto, AuthResponse } from "./types"; // Assuming types are defined in ./types
+import { UserLoginDto, CreateUserDto, AuthResponse } from "./types";
 
 const apiClient = axios.create({
-  baseURL: environment.backendUrl,
+  // Fallback to 3001 if environment variable fails
+  baseURL: environment.backendUrl || "http://localhost:3001",
 });
 
+/** 🔐 Security Sync: Injects the JWT token into every header **/
 export const setAuthToken = (token: string | null) => {
   if (token) {
     apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -14,6 +18,34 @@ export const setAuthToken = (token: string | null) => {
   }
 };
 
+/** 🛡️ Response Interceptor: Handles 'resultData', 404 Password bugs, and Session Expiry **/
+apiClient.interceptors.response.use(
+  (response) => {
+    // Unwraps 'resultData' for the frontend
+    return response.data?.resultData ? { ...response, data: response.data.resultData } : response;
+  },
+  (error) => {
+    const responseData = error.response?.data;
+    
+    // 🛡️ CRITICAL FIX: Handle the backend's 404 "Invalid password" response
+    // This allows the UI to show the real error instead of just "Not Found"
+    if (responseData?.message?.message === "Invalid password" || responseData?.message === "Invalid password") {
+      const customError = new Error("Invalid password");
+      (customError as any).response = error.response;
+      return Promise.reject(customError);
+    }
+
+    // Handle session expiry
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      if (typeof window !== "undefined") window.location.href = "/";
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+/** 🔑 Auth Endpoints **/
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
   const response = await apiClient.post("/api/auth/user/login", credentials);
   return response.data;
@@ -24,6 +56,7 @@ export const register = async (userData: CreateUserDto) => {
   return response.data;
 };
 
+/** 👤 Profile & User Data **/
 export const getProfile = async () => {
   const response = await apiClient.get("/api/profile");
   return response.data;
@@ -34,62 +67,28 @@ export const getUser = async (id: string) => {
   return response.data;
 };
 
-export const updateProfile = async (updates: Partial<any>) => {
-  const response = await apiClient.patch("/api/profile", updates);
-  return response.data;
-};
-
 export const updateUser = async (id: string, updates: Partial<any>) => {
-  const response = await apiClient.patch(`/api/users/${id}`, updates);
+  const response = await apiClient.put(`/api/users/${id}`, updates);
   return response.data;
 };
 
-// Existing functions
+/** 🔬 AI Analyzer **/
 export async function uploadImage(file: File): Promise<{ imageId: string; fileName: string }> {
-    const formData = new FormData()
-    formData.append("file", file)
-  
-    const response = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    })
-  
-    if (!response.ok) {
-      throw new Error("Upload failed")
-    }
-  
-    return response.json()
-  }
-  
-  export async function analyzeSkinImage(imageId: string, imageData?: string): Promise<any> {
-    const response = await fetch("/api/analyze-skin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ imageId, imageData }),
-    })
-  
-    if (!response.ok) {
-      throw new Error("Analysis failed")
-    }
-  
-    return response.json()
-  }
-  
-  export async function analyzeIngredients(ingredients: string): Promise<any> {
-    const response = await fetch("/api/analyze-ingredients", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ingredients }),
-    })
-  
-    if (!response.ok) {
-      throw new Error("Analysis failed")
-    }
-  
-    return response.json()
-  }
-  
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiClient.post("/api/analyzer", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+}
+
+export async function analyzeSkinImage(imageId: string): Promise<any> {
+  const response = await apiClient.post("/api/analyzer/scan", { imageId });
+  return response.data;
+}
+
+/** 🌿 Ingredient Analyzer **/
+export async function analyzeIngredients(ingredients: string): Promise<any> {
+  const response = await apiClient.post("/api/analyzer/ingredients", { ingredients });
+  return response.data;
+}
