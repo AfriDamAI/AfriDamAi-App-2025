@@ -12,7 +12,11 @@ interface User {
   lastName: string;
   sex: string;
   phoneNo: string;
-  profile?: any;
+  profile?: {
+    avatarUrl?: string; // Added for the technical team's profile feature
+    bio?: string;
+    [key: string]: any;
+  };
 }
 
 interface AuthContextType {
@@ -23,6 +27,7 @@ interface AuthContextType {
   signUp: (userData: CreateUserDto) => Promise<void>
   signOut: () => void
   updateUserProfile: (updates: Partial<User>) => Promise<void>
+  refreshUser: () => Promise<void> // Added to sync profile pic after upload
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -36,9 +41,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return response?.resultData || response?.data || response;
   };
 
+  const fetchUserData = async (userId: string) => {
+    try {
+      const response = await getUser(userId);
+      setUser(extractUserData(response));
+    } catch (err) {
+      console.error("Failed to fetch user data:", err);
+      signOut();
+    }
+  };
+
   useEffect(() => {
     const initAuth = async () => {
-      // Safety check for Next.js SSR
       if (typeof window === "undefined") return;
 
       const token = localStorage.getItem("token");
@@ -48,8 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const decoded: any = jwtDecode(token);
           const userId = decoded.sub || decoded.id;
           if (userId) {
-            const response = await getUser(userId);
-            setUser(extractUserData(response));
+            await fetchUserData(userId);
           }
         } catch (err) {
           console.error("Auth initialization failed:", err);
@@ -65,7 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (credentials: UserLoginDto) => {
     try {
       const data = await login(credentials);
-      // Backend synergy: checking both possible locations for the token
       const accessToken = data.resultData?.accessToken || data.accessToken || data.data?.accessToken;
       
       if (!accessToken) throw new Error("No access token received from server");
@@ -76,8 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const decoded: any = jwtDecode(accessToken);
       const userId = decoded.sub || decoded.id;
       
-      const response = await getUser(userId);
-      setUser(extractUserData(response));
+      await fetchUserData(userId);
     } catch (error: any) {
       console.error("Login failed:", error);
       throw error;
@@ -87,7 +98,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (userData: CreateUserDto) => {
     try {
       await register(userData);
-      // Auto-login after successful registration
       await signIn({ email: userData.email, password: userData.password });
     } catch (error: any) {
       console.error("Registration failed:", error);
@@ -99,7 +109,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     localStorage.removeItem("token");
     setAuthToken(null);
-    // Force a reload to clear any lingering protected states if needed
   }
 
   const updateUserProfile = async (updates: Partial<User>) => {
@@ -114,6 +123,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // New function for the UI to call after a successful image upload
+  const refreshUser = async () => {
+    if (user?.id) {
+      await fetchUserData(user.id);
+    }
+  }
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -122,7 +138,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn, 
       signUp, 
       signOut, 
-      updateUserProfile 
+      updateUserProfile,
+      refreshUser
     }}>
       {children}
     </AuthContext.Provider>

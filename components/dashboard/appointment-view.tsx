@@ -2,194 +2,160 @@
 
 import { useState } from "react"
 import { 
-  Calendar as CalendarIcon, 
-  Clock, 
-  Video, 
-  Star, 
   CheckCircle2, 
-  ChevronRight, 
   Stethoscope, 
   ShieldCheck, 
-  X,
-  CreditCard,
   History,
-  CalendarCheck,
-  Globe,
-  UserRound,
-  GraduationCap // Ensure this matches the usage below
+  Zap,
+  Lock,
+  ArrowRight,
+  UserCheck,
+  MessageCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { motion, AnimatePresence } from "framer-motion"
-
-const SPECIALTIES = [
-  {
-    id: "spec1",
-    role: "Consultant Dermatologist",
-    description: "Expert clinical diagnosis for complex skin conditions and melanin-rich pathology.",
-    focus: "Medical Dermatology",
-    icon: Stethoscope,
-    price: 25000,
-  },
-  {
-    id: "spec2",
-    role: "Clinical Nurse Specialist",
-    description: "Specialized care coordination, routine dermal monitoring, and AI result verification.",
-    focus: "Nursing & Monitoring",
-    icon: GraduationCap, // FIXED: Changed from graduationCap to GraduationCap
-    price: 15000,
-  },
-  {
-    id: "spec3",
-    role: "Skincare Consultant",
-    description: "Guidance on product regimens and maintenance for healthy, radiant skin.",
-    focus: "Aesthetic Health",
-    icon: UserRound,
-    price: 10000,
-  }
-];
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/providers/auth-provider"
 
 export function AppointmentView() {
+  const { user } = useAuth();
+  const router = useRouter();
+  
   const [activeTab, setActiveTab] = useState<'book' | 'history'>('book');
-  const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'processing' | 'success'>('idle');
 
-  const selectedSpecialty = SPECIALTIES.find(s => s.id === selectedSpecId);
+  // Logic: Check if user is a subscriber
+  const hasSubscription = user?.profile?.subscriptionPlan && user?.profile?.subscriptionPlan !== "Free";
 
-  const handleBooking = () => {
+  const handleInstantPay = () => {
     setBookingStatus('processing');
-    // Simulate production API delay
+    // Logic for the $15 one-time checkout
     setTimeout(() => setBookingStatus('success'), 2000);
-  };
-
-  const resetView = () => {
-    setSelectedSpecId(null);
-    setSelectedTime(null);
-    setBookingStatus('idle');
   };
 
   if (bookingStatus === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] text-center p-8 bg-card rounded-[3rem] border border-border animate-in zoom-in-95 duration-500">
-        <div className="w-24 h-24 bg-[#4DB6AC]/20 rounded-full flex items-center justify-center mb-8 ring-8 ring-[#4DB6AC]/5">
-          <CheckCircle2 className="w-12 h-12 text-[#4DB6AC]" />
+      <div className="flex flex-col items-center justify-center py-20 text-center animate-in zoom-in-95">
+        <div className="w-20 h-20 bg-[#4DB6AC]/20 rounded-full flex items-center justify-center mb-6">
+          <CheckCircle2 className="w-10 h-10 text-[#4DB6AC]" />
         </div>
-        <h2 className="text-3xl font-black italic uppercase tracking-tighter text-foreground mb-4">Request Received</h2>
-        <p className="text-muted-foreground max-w-md mx-auto mb-10 font-bold uppercase text-[10px] tracking-[0.2em] leading-relaxed">
-          Your request for a <span className="text-[#E1784F]">{selectedSpecialty?.role}</span> has been logged. You will be matched with a specialist shortly.
+        <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-2 text-foreground">Doctor Notified</h2>
+        <p className="text-muted-foreground font-bold uppercase text-[9px] tracking-widest mb-10">
+          Your $15 session is active. A specialist will join the chat in <span className="text-[#E1784F]">~5 mins</span>.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs">
-          <Button onClick={resetView} variant="outline" className="flex-1 rounded-2xl font-black uppercase text-[10px] tracking-widest py-6">New Booking</Button>
-          <Button onClick={() => { resetView(); setActiveTab('history'); }} className="flex-1 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest py-6 shadow-xl shadow-[#E1784F]/20">History</Button>
-        </div>
+        <Button onClick={() => setBookingStatus('idle')} className="bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14">Open Chat</Button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 pb-20 transition-colors duration-500">
-      <div className="flex gap-8 border-b border-border pb-2">
+    <div className="space-y-10 pb-10">
+      <div className="flex gap-8 border-b border-border">
         <button 
           onClick={() => setActiveTab('book')}
-          className={`flex items-center gap-2 pb-4 px-1 text-[10px] uppercase tracking-widest font-black transition-all border-b-2 ${activeTab === 'book' ? 'text-[#E1784F] border-[#E1784F]' : 'text-muted-foreground border-transparent'}`}
+          className={`pb-4 text-[10px] uppercase tracking-widest font-black transition-all border-b-2 ${activeTab === 'book' ? 'text-[#E1784F] border-[#E1784F]' : 'text-muted-foreground border-transparent'}`}
         >
-          <CalendarCheck size={16} /> Choose Specialty
+          {hasSubscription ? "Consult Specialist" : "Access Specialist"}
         </button>
         <button 
           onClick={() => setActiveTab('history')}
-          className={`flex items-center gap-2 pb-4 px-1 text-[10px] uppercase tracking-widest font-black transition-all border-b-2 ${activeTab === 'history' ? 'text-[#E1784F] border-[#E1784F]' : 'text-muted-foreground border-transparent'}`}
+          className={`pb-4 text-[10px] uppercase tracking-widest font-black transition-all border-b-2 ${activeTab === 'history' ? 'text-[#E1784F] border-[#E1784F]' : 'text-muted-foreground border-transparent'}`}
         >
-          <History size={16} /> History
+          Past Sessions
         </button>
       </div>
 
       {activeTab === 'book' ? (
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="flex-1 space-y-6">
-            <div className="grid gap-6">
-              {SPECIALTIES.map((spec) => (
-                <div 
-                  key={spec.id}
-                  onClick={() => { setSelectedSpecId(spec.id); setSelectedTime(null); }}
-                  className={`group bg-card p-8 rounded-[2.5rem] cursor-pointer transition-all border-2 ${selectedSpecId === spec.id ? 'border-[#E1784F] bg-[#E1784F]/5 shadow-sm' : 'border-border hover:border-[#4DB6AC]/50'}`}
-                >
-                  <div className="flex flex-col sm:flex-row gap-8 items-center">
-                    <div className={`w-20 h-20 rounded-3xl flex items-center justify-center transition-colors ${selectedSpecId === spec.id ? 'bg-[#E1784F] text-white shadow-xl' : 'bg-muted text-[#4DB6AC]'}`}>
-                      <spec.icon size={36} />
-                    </div>
-
-                    <div className="flex-1 text-center sm:text-left">
-                      <h3 className="text-2xl font-black italic uppercase text-foreground leading-none">{spec.role}</h3>
-                      <p className="text-[#4DB6AC] text-[9px] font-black uppercase tracking-[0.3em] mt-2 mb-4">{spec.focus}</p>
-                      <p className="text-muted-foreground text-xs font-bold uppercase tracking-tight leading-relaxed max-w-lg">{spec.description}</p>
-                    </div>
-
-                    <div className="sm:border-l border-border sm:pl-8 text-center sm:text-right w-full sm:w-32">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1">Fee</p>
-                        <span className="text-2xl font-black text-foreground">₦{(spec.price/1000).toFixed(0)}k</span>
-                    </div>
+        <div className="grid lg:grid-cols-1 md:gap-10">
+          {!hasSubscription ? (
+            /* --- THE CHOICE SCREEN FOR NON-SUBSCRIBERS --- */
+            <div className="grid md:grid-cols-2 gap-6">
+              
+              {/* OPTION 1: STARTER TRIAL (UPDATED TO $3) */}
+              <div className="bg-[#1C1A19] dark:bg-[#F7F3EE] p-8 rounded-[2.5rem] flex flex-col justify-between space-y-8 text-white dark:text-[#1C1A19] relative overflow-hidden group border-2 border-transparent hover:border-[#E1784F]/30 transition-all">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/20 blur-3xl rounded-full" />
+                <div className="space-y-4 relative z-10">
+                  <div className="w-12 h-12 bg-[#E1784F] rounded-2xl flex items-center justify-center text-white shadow-xl">
+                    <Zap size={24} fill="currentColor" />
                   </div>
+                  <h3 className="text-xl font-black italic uppercase tracking-tight">Starter Month</h3>
+                  <p className="opacity-60 text-[10px] font-bold uppercase leading-relaxed">
+                    Unlock full clinical access and specialist chat for your first 30 days. Perfect for new members.
+                  </p>
                 </div>
-              ))}
+                <div className="space-y-4 relative z-10">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black italic">$3</span>
+                    <span className="text-[9px] font-black uppercase opacity-60 tracking-widest">/ First Month</span>
+                  </div>
+                  <Button 
+                    onClick={() => router.push('/pricing')}
+                    className="w-full h-14 bg-[#E1784F] text-white rounded-xl font-black uppercase text-[9px] tracking-widest shadow-xl"
+                  >
+                    Unlock Starter Access
+                  </Button>
+                </div>
+              </div>
+
+              {/* OPTION 2: INSTANT ONE-TIME CHAT */}
+              <div className="bg-card border-2 border-border p-8 rounded-[2.5rem] flex flex-col justify-between space-y-8 hover:border-[#4DB6AC] transition-all group">
+                <div className="space-y-4">
+                  <div className="w-12 h-12 bg-[#4DB6AC]/10 rounded-2xl flex items-center justify-center text-[#4DB6AC]">
+                    <MessageCircle size={24} />
+                  </div>
+                  <h3 className="text-xl font-black italic uppercase tracking-tight text-foreground">Urgent One-Time Session</h3>
+                  <p className="text-muted-foreground text-[10px] font-bold uppercase leading-relaxed opacity-70">
+                    Need an answer now without a plan? Get a priority one-time consultation today.
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black text-foreground italic">$15</span>
+                    <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">/ Session</span>
+                  </div>
+                  <Button 
+                    onClick={handleInstantPay}
+                    className="w-full h-14 bg-muted text-foreground hover:bg-[#4DB6AC] hover:text-white rounded-xl font-black uppercase text-[9px] tracking-widest transition-all"
+                  >
+                    Start $15 Session
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <AnimatePresence>
-            {selectedSpecId && (
-              <motion.aside 
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="lg:w-96"
-              >
-                <div className="bg-card rounded-[2.5rem] p-8 border border-border shadow-2xl sticky top-24">
-                  <div className="flex justify-between items-center mb-8 border-b border-border pb-4">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-[#E1784F]">Clinical Booking</h3>
-                    <button onClick={() => setSelectedSpecId(null)}><X size={20} className="text-muted-foreground hover:text-foreground" /></button>
+          ) : (
+            /* --- THE ACTIVE STATE FOR SUBSCRIBERS --- */
+            <div className="p-10 bg-gradient-to-br from-[#1C1A19] to-black rounded-[3rem] text-white relative overflow-hidden border border-white/5 shadow-2xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#E1784F]/10 blur-[80px] rounded-full" />
+              <div className="relative z-10 space-y-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-[#4DB6AC] rounded-2xl flex items-center justify-center shadow-lg">
+                    <Stethoscope size={28} />
                   </div>
-
-                  <div className="space-y-8">
-                    <div className="space-y-4">
-                      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground">Select Arrival Time</p>
-                      <div className="grid grid-cols-2 gap-3">
-                        {["09:00 AM", "11:00 AM", "02:00 PM", "04:00 PM"].map(time => (
-                          <button 
-                            key={time} 
-                            onClick={() => setSelectedTime(time)} 
-                            className={`py-4 rounded-xl text-[10px] font-black transition-all border-2 ${selectedTime === time ? 'bg-[#4DB6AC] border-[#4DB6AC] text-white shadow-lg shadow-[#4DB6AC]/20' : 'border-border text-foreground hover:bg-muted'}`}
-                          >
-                            {time}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="pt-8 border-t border-border">
-                      <div className="flex justify-between mb-8">
-                        <span className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.4em]">Consult Fee</span>
-                        <span className="text-xl font-black text-foreground">₦{selectedSpecialty?.price.toLocaleString()}</span>
-                      </div>
-                      <Button 
-                        disabled={!selectedTime || bookingStatus === 'processing'} 
-                        onClick={handleBooking} 
-                        className="w-full h-16 rounded-2xl bg-[#E1784F] text-white font-black uppercase text-[10px] tracking-[0.3em] shadow-2xl shadow-[#E1784F]/30 active:scale-[0.98] transition-all"
-                      >
-                        {bookingStatus === 'processing' ? "Syncing..." : "Pay & Confirm"}
-                      </Button>
-                    </div>
+                  <div>
+                    <h3 className="text-3xl font-black italic uppercase tracking-tighter">Clinical Console</h3>
+                    <p className="text-[#4DB6AC] text-[9px] font-black uppercase tracking-[0.3em] mt-1">Direct Specialist Line Active</p>
                   </div>
                 </div>
-              </motion.aside>
-            )}
-          </AnimatePresence>
+                <p className="text-white/70 font-medium text-sm max-w-lg leading-relaxed italic">
+                  As a Care Plan member, you have priority access to our clinical team. Start a session to review your recent scans or discuss your skin progress.
+                </p>
+                <Button className="h-16 px-12 bg-white text-[#1C1A19] rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#E1784F] hover:text-white transition-all shadow-2xl">
+                  Start Consultation
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center min-h-[400px] text-center bg-muted/30 rounded-[3rem] border border-dashed border-border p-12">
-          <History className="w-12 h-12 text-muted-foreground mb-6 opacity-20" />
-          <h3 className="text-xl font-black italic uppercase text-foreground">Clinical Logs Empty</h3>
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mt-2">Past consultations will be archived here.</p>
+        <div className="flex flex-col items-center justify-center min-h-[300px] text-center space-y-4 opacity-40">
+          <History className="w-10 h-10 mb-2" />
+          <h3 className="text-sm font-black uppercase tracking-widest">No Past Logs</h3>
         </div>
       )}
+      
+      <div className="flex items-center justify-center gap-3 pt-6 opacity-30">
+        <ShieldCheck size={12} className="text-[#4DB6AC]" />
+        <span className="text-[8px] font-black uppercase tracking-[0.4em]">Verified clinical specialists only</span>
+      </div>
     </div>
   )
 }

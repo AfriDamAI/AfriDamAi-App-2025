@@ -11,28 +11,34 @@ import {
   Search,
   ShoppingBag,
   Stethoscope,
-  ArrowUpRight
+  Sparkles,
+  ArrowRight,
+  Heart,
+  Zap,
+  Camera,
+  Clock
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { useTheme } from "@/providers/theme-provider" 
 import { AppointmentView } from "@/components/dashboard/appointment-view"
+import { getHistory, type ScanRecord } from "@/lib/history-manager"
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    transition: { staggerChildren: 0.1 }
   }
 }
 
 const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
+  hidden: { y: 15, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
   }
 }
 
@@ -40,12 +46,16 @@ export default function DashboardPage() {
   const { user, signOut, isLoading } = useAuth()
   const { theme } = useTheme() 
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState("overview")
+  const [activeTab, setActiveTab] = useState("home")
+  const [recentScans, setRecentScans] = useState<ScanRecord[]>([])
 
   const isDark = theme === "dark"
 
   useEffect(() => {
     if (!isLoading && !user) router.push("/")
+    // Load recent history (Top 3)
+    const history = getHistory().slice(0, 3)
+    setRecentScans(history)
   }, [user, isLoading, router])
 
   if (isLoading || !user) return (
@@ -53,86 +63,75 @@ export default function DashboardPage() {
       <motion.div 
         animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
         transition={{ repeat: Infinity, duration: 2 }}
-        className="w-16 h-16 bg-[#E1784F] rounded-2xl flex items-center justify-center font-black text-white shadow-2xl"
+        className="w-12 h-12 bg-[#E1784F] rounded-full flex items-center justify-center font-black text-white shadow-2xl"
       >A</motion.div>
     </div>
   )
 
+  const displayName = user.firstName || "Friend";
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col md:flex-row font-sans selection:bg-[#E1784F]/30 transition-colors duration-500 overflow-hidden">
       
-      {/* --- 1. SIDEBAR: FULLY CONNECTED --- */}
-      <aside className="w-full md:w-80 border-r border-border p-8 space-y-12 bg-muted/30 backdrop-blur-3xl z-20 sticky top-0 h-screen hidden md:flex flex-col">
-        <motion.div 
-          whileHover={{ scale: 1.02 }}
-          className="flex flex-col items-center gap-4 px-2 cursor-pointer mb-6 border-b border-border pb-10" 
-          onClick={() => router.push('/')}
-        >
+      {/* --- 1. SIDEBAR --- */}
+      <aside className="w-full md:w-72 border-r border-border p-6 space-y-10 bg-card/50 backdrop-blur-3xl z-20 sticky top-0 h-screen hidden md:flex flex-col">
+        <div className="px-2 cursor-pointer" onClick={() => router.push('/')}>
            <img 
              src="/logo.png" 
-             alt="AfriDam AI Logo" 
-             className={`w-32 h-auto object-contain transition-all ${isDark ? 'brightness-100' : 'brightness-90'}`} 
+             alt="AfriDam AI" 
+             className={`h-10 w-auto object-contain transition-all ${isDark ? 'brightness-100' : 'brightness-90'}`} 
            />
-           <div className="text-center">
-             <span className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.5em]">Clinical Portal</span>
-           </div>
-        </motion.div>
+        </div>
 
         <nav className="flex-1 space-y-1">
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.5em] px-4 mb-4 text-center">Command Center</p>
-          
           {[
-            { id: "overview", label: "Overview", icon: LayoutDashboard },
-            { id: "scanner", label: "AI Scanner", icon: Activity, path: "/ai-scanner" },
-            { id: "checker", label: "Ingredient Checker", icon: Search, path: "/ai-checker" },
-            { id: "marketplace", label: "Marketplace", icon: ShoppingBag, path: "/marketplace" },
-            { id: "appointment", label: "Doctor Chat", icon: Stethoscope },
-            { id: "history", label: "Logs", icon: HistoryIcon, path: "/history" }
+            { id: "home", label: "Home", icon: LayoutDashboard },
+            { id: "scanner", label: "Skin Scanner", icon: Activity, path: "/ai-scanner" },
+            { id: "checker", label: "Safety Check", icon: Search, path: "/ai-checker" },
+            { id: "marketplace", label: "Care Shop", icon: ShoppingBag, path: "/marketplace" },
+            { id: "appointment", label: "Chat a Doctor", icon: Stethoscope },
+            { id: "history", label: "My Diary", icon: HistoryIcon, path: "/history" }
           ].map((link) => (
             <button 
               key={link.id}
-              onClick={() => {
-                if (link.path) {
-                    router.push(link.path); // External route
-                } else {
-                    setActiveTab(link.id); // Internal dashboard tab
-                }
-              }}
-              className={`w-full flex items-center gap-4 px-5 py-4 rounded-[1.25rem] text-[11px] uppercase tracking-widest font-black transition-all ${
-                activeTab === link.id ? "bg-[#E1784F] text-white shadow-2xl shadow-[#E1784F]/20" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              onClick={() => link.path ? router.push(link.path) : setActiveTab(link.id)}
+              className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl text-[10px] uppercase tracking-[0.2em] font-black transition-all ${
+                activeTab === link.id 
+                ? "bg-[#E1784F] text-white shadow-lg shadow-[#E1784F]/20" 
+                : "text-muted-foreground hover:text-[#E1784F] hover:bg-[#E1784F]/5"
               }`}
             >
-              <link.icon size={18} /> {link.label}
+              <link.icon size={16} /> {link.label}
             </button>
           ))}
         </nav>
 
-        <div className="pt-8 border-t border-border">
-           <button onClick={() => signOut?.()} className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 transition-all">
-             <LogOut size={18} /> Terminate Session
+        <div className="pt-6 border-t border-border flex items-center justify-between px-2">
+           <button onClick={() => signOut?.()} className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-red-500 transition-all flex items-center gap-2">
+             <LogOut size={14} /> Sign Out
            </button>
+           <div onClick={() => router.push('/profile')} className="w-10 h-10 rounded-full border-2 border-border overflow-hidden cursor-pointer hover:border-[#E1784F] transition-all">
+              {user.profile?.avatarUrl ? <img src={user.profile.avatarUrl} className="w-full h-full object-cover" alt="Profile" /> : <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold">JD</div>}
+           </div>
         </div>
       </aside>
 
       {/* --- 2. MAIN CONTENT --- */}
-      <main className="flex-1 p-6 md:p-12 lg:p-16 max-h-screen overflow-y-auto relative bg-background">
-        <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(circle_at_50%_0%,rgba(225,120,79,0.05),transparent_70%)] pointer-events-none" />
+      <main className="flex-1 p-6 md:p-10 lg:p-14 max-h-screen overflow-y-auto relative bg-background">
+        <div className="absolute top-0 left-0 w-full h-[400px] bg-[radial-gradient(circle_at_50%_0%,rgba(225,120,79,0.04),transparent_70%)] pointer-events-none" />
         
-        <header className="flex justify-between items-center mb-16 relative z-10">
-           <div className="flex items-center gap-3 bg-muted px-5 py-2.5 rounded-full border border-border backdrop-blur-md">
-              <span className="w-2 h-2 bg-[#4DB6AC] rounded-full animate-pulse"></span>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#4DB6AC]">Clinical Node Active</span>
+        <header className="flex justify-between items-center mb-10 relative z-10">
+           <div className="space-y-1">
+              <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-foreground">Hello, {displayName}</h2>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#E1784F]">Your skin is glowing today</p>
            </div>
            
-           <div className="flex items-center gap-6">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-black text-foreground uppercase tracking-tighter italic leading-none">{user.firstName} {user.lastName}</p>
-                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-1">ID: {user.email?.split('@')[0].toUpperCase()}</p>
-              </div>
-              <div onClick={() => router.push('/profile')} className="w-14 h-14 rounded-2xl bg-muted border border-border flex items-center justify-center cursor-pointer hover:border-[#E1784F]/50 transition-all group shadow-sm">
-                <UserIcon size={22} className="text-muted-foreground group-hover:text-[#E1784F] transition-colors" />
-              </div>
-           </div>
+           <button 
+             onClick={() => router.push('/pricing')}
+             className="hidden sm:flex items-center gap-3 px-6 py-3 bg-[#1C1A19] dark:bg-white text-white dark:text-black rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all"
+           >
+             Upgrade <Zap size={12} fill="currentColor" />
+           </button>
         </header>
 
         <AnimatePresence mode="wait">
@@ -141,117 +140,141 @@ export default function DashboardPage() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            exit="hidden"
-            className="relative z-10 max-w-7xl mx-auto"
+            className="relative z-10 max-w-6xl mx-auto space-y-10"
           >
-            {activeTab === "overview" && (
-              <div className="space-y-10">
-                {/* 3. HERO CTA: CONNECTED TO SCANNER */}
-                <motion.div 
+            {activeTab === "home" && (
+              <>
+                {/* --- SCANNER CARD --- */}
+                <motion.section 
                   variants={itemVariants}
-                  whileHover={{ y: -5 }}
-                  className="bg-gradient-to-br from-[#E1784F] to-[#C55A32] p-10 md:p-16 rounded-[4rem] relative overflow-hidden group shadow-2xl shadow-[#E1784F]/20 cursor-pointer text-white"
                   onClick={() => router.push('/ai-scanner')}
+                  className="relative overflow-hidden bg-gradient-to-br from-[#E1784F] via-[#F0A287] to-[#C55A32] p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 cursor-pointer group hover:scale-[1.01] transition-all shadow-xl"
                 >
-                   <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
-                   <div className="relative z-10 max-w-xl space-y-6">
-                      <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9]">
-                        Instant <br /> AI Analysis
-                      </h2>
-                      <p className="opacity-90 text-lg font-medium leading-relaxed">
-                        Immediate clinical-grade skin assessment optimized for melanin-rich dermal data.
-                      </p>
-                      <div className="pt-4 flex items-center gap-4 font-black uppercase text-xs tracking-[0.3em]">
-                        Start Scanning <ChevronRight size={20} className="group-hover:translate-x-2 transition-transform" />
-                      </div>
-                   </div>
+                  <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
+                  
+                  <div className="flex items-center gap-6 relative z-10">
+                    <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white shadow-sm border border-white/20 group-hover:rotate-12 transition-transform">
+                      <Camera size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Skin Scanner</h3>
+                      <p className="text-white/80 text-[11px] font-medium max-w-[200px]">Quick, private analysis for your skin.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 relative z-10">
+                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/60 opacity-0 group-hover:opacity-100 transition-all">Start Scan</span>
+                    <div className="w-12 h-12 bg-white text-[#E1784F] rounded-xl flex items-center justify-center shadow-lg group-hover:translate-x-2 transition-transform">
+                      <ArrowRight size={18} />
+                    </div>
+                  </div>
+                </motion.section>
+
+                {/* TWO COLUMN GRID */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <motion.div 
+                    variants={itemVariants}
+                    onClick={() => router.push('/ai-checker')}
+                    className="p-8 bg-[#F0F9F8] dark:bg-[#4DB6AC]/5 border border-[#4DB6AC]/20 rounded-[2.5rem] space-y-4 hover:border-[#4DB6AC] transition-all cursor-pointer group shadow-sm"
+                  >
+                    <div className="w-10 h-10 bg-[#4DB6AC] text-white rounded-xl flex items-center justify-center shadow-md"><Search size={18}/></div>
+                    <h4 className="text-lg font-black italic uppercase text-foreground">Safety Check</h4>
+                    <p className="text-muted-foreground text-[11px] leading-relaxed">Check if your products are gentle enough for the family.</p>
+                  </motion.div>
+
+                  <motion.div 
+                    variants={itemVariants}
+                    onClick={() => setActiveTab('appointment')}
+                    className="p-8 bg-blue-50/50 dark:bg-blue-400/5 border border-blue-400/20 rounded-[2.5rem] space-y-4 hover:border-blue-400 transition-all cursor-pointer group shadow-sm"
+                  >
+                    <div className="w-10 h-10 bg-blue-500 text-white rounded-xl flex items-center justify-center shadow-md"><Stethoscope size={18}/></div>
+                    <h4 className="text-lg font-black italic uppercase text-foreground">Chat a Doctor</h4>
+                    <p className="text-muted-foreground text-[11px] leading-relaxed">Connect with specialists who understand melanin-rich skin.</p>
+                  </motion.div>
+                </div>
+
+                {/* --- RECENT ACTIVITY SECTION --- */}
+                <motion.div variants={itemVariants} className="space-y-6">
+                  <div className="flex justify-between items-center px-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">Recent Activity</h4>
+                    <button onClick={() => router.push('/history')} className="text-[9px] font-black uppercase tracking-widest text-[#E1784F] hover:opacity-70">View Diary</button>
+                  </div>
+
+                  {recentScans.length > 0 ? (
+                    <div className="space-y-3">
+                      {recentScans.map((scan) => (
+                        <div key={scan.id} className="p-5 bg-card border border-border rounded-3xl flex items-center justify-between group hover:border-[#E1784F]/30 transition-all">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${scan.type === 'skin' ? 'bg-blue-500/10 text-blue-500' : 'bg-[#4DB6AC]/10 text-[#4DB6AC]'}`}>
+                              {scan.type === 'skin' ? <Activity size={18}/> : <Search size={18}/>}
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-black italic uppercase tracking-tight text-foreground">{scan.results.conditions?.[0]?.name || (scan.type === 'skin' ? 'Skin Glow Check' : 'Safety Analysis')}</p>
+                              <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">{new Date(scan.timestamp).toLocaleDateString()}</p>
+                            </div>
+                          </div>
+                          <ChevronRight size={14} className="text-muted-foreground group-hover:text-[#E1784F] group-hover:translate-x-1 transition-all" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-10 border-2 border-dashed border-border rounded-[2.5rem] text-center">
+                       <Clock size={20} className="mx-auto text-muted-foreground mb-3 opacity-30" />
+                       <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-50">No recent scans found</p>
+                    </div>
+                  )}
                 </motion.div>
 
-                {/* 4. FEATURE CARDS: FULLY CONNECTED */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {[
-                    { icon: ShoppingBag, label: "Marketplace", sub: "Vetted Products", color: "#4DB6AC", path: "/marketplace" },
-                    { icon: Search, label: "Ingredient Checker", sub: "Safety Analysis", color: "#E1784F", path: "/ai-checker" },
-                    { icon: Stethoscope, label: "Doctor Chat", sub: "Specialist Access", color: isDark ? "#888" : "#444", tab: "appointment" }
-                  ].map((stat, i) => (
-                    <motion.div 
-                      key={i}
-                      variants={itemVariants}
-                      whileHover={{ scale: 1.02 }}
-                      onClick={() => {
-                        if (stat.tab) {
-                            setActiveTab(stat.tab); // Internal tab switch
-                        } else if (stat.path) {
-                            router.push(stat.path); // External page redirect
-                        }
-                      }}
-                      className="bg-card border border-border p-10 rounded-[3.5rem] transition-all cursor-pointer group relative overflow-hidden shadow-md"
-                    >
-                      <div className="absolute top-0 right-0 w-32 h-32 blur-[60px] rounded-full opacity-[0.08]" style={{ backgroundColor: stat.color }} />
-                      <stat.icon className="mb-8 group-hover:scale-110 transition-transform" size={32} style={{ color: stat.color }} />
-                      <h3 className="text-2xl font-black italic uppercase tracking-tight mb-2 text-foreground">{stat.label}</h3>
-                      <p className="text-muted-foreground font-bold uppercase text-[10px] tracking-widest">{stat.sub}</p>
-                      <ArrowUpRight className="absolute bottom-10 right-10 text-muted-foreground group-hover:text-[#E1784F] transition-colors" size={24} />
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
+                {/* --- PORTABLE SPECIALIST CARD --- */}
+                <motion.div 
+                  variants={itemVariants}
+                  className="bg-[#1C1A19] dark:bg-[#F7F3EE] text-white dark:text-[#1C1A19] p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-[#E1784F]/20 blur-[40px] rounded-full" />
+                  <div className="flex items-center gap-5 relative z-10">
+                    <div className="w-10 h-10 bg-[#E1784F] rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                       <Zap size={16} className="text-white fill-white" />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-black italic uppercase tracking-widest">Urgent Specialist Care</p>
+                        <p className="text-[9px] opacity-60 font-bold uppercase tracking-widest mt-1">Direct expert advice in minutes.</p>
+                    </div>
+                  </div>
+                  <button className="px-8 py-4 bg-[#E1784F] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-[#E1784F]/20">
+                    Book for $15
+                  </button>
+                </motion.div>
+              </>
             )}
 
-            {/* --- 5. APPOINTMENT VIEW TAB --- */}
+            {/* --- CHAT A DOCTOR VIEW --- */}
             {activeTab === "appointment" && (
-              <motion.div variants={itemVariants} className="space-y-10">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-4">
-                  <div>
-                    <h2 className="text-4xl font-black italic uppercase tracking-tighter text-foreground leading-none">
-                      Expert <span className="text-[#E1784F]">Consultation</span>
-                    </h2>
-                    <p className="text-muted-foreground font-bold uppercase text-[10px] tracking-[0.3em] mt-4">
-                      Pan-African Specialist Network • Lagos & Nairobi
-                    </p>
-                  </div>
-                  <button 
-                    onClick={() => setActiveTab("overview")} 
-                    className="flex items-center gap-2 bg-muted px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#E1784F] hover:text-white transition-all shadow-sm"
-                  >
-                    Back to Overview
-                  </button>
+              <motion.div variants={itemVariants} className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-black italic uppercase tracking-tighter">Our Care Team</h2>
+                    <button onClick={() => setActiveTab("home")} className="text-[9px] font-black uppercase tracking-widest text-[#E1784F]">Back Home</button>
                 </div>
-                
-                <div className="bg-card rounded-[3.5rem] border border-border p-8 md:p-12 shadow-sm">
+                <div className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm">
                    <AppointmentView />
                 </div>
               </motion.div>
             )}
 
-            {/* --- 6. LOGS (HISTORY) VIEW TAB --- */}
-            {activeTab === "history" && (
-              <motion.div variants={itemVariants} className="space-y-10">
-                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-4">
-                    <h2 className="text-4xl font-black italic uppercase tracking-tighter text-foreground leading-none">
-                      Clinical <span className="text-[#4DB6AC]">Logs</span>
-                    </h2>
-                    <button 
-                      onClick={() => setActiveTab("overview")} 
-                      className="flex items-center gap-2 bg-muted px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#E1784F] hover:text-white transition-all"
-                    >
-                      Back to Overview
-                    </button>
-                 </div>
+            {/* --- COMPACT FOOTER --- */}
+            <motion.footer variants={itemVariants} className="mt-20 pt-10 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-6 pb-10">
+              <div className="flex items-center gap-4">
+                <img src="/logo.png" className="h-5 w-auto grayscale opacity-30" alt="AfriDam" />
+                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-50">
+                  © 2026 AfriDam AI • Made with Pride in Lagos, Nigeria
+                </p>
+              </div>
+              <div className="flex gap-6 text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-50">
+                <span className="hover:text-[#E1784F] cursor-pointer transition-colors">Privacy</span>
+                <span className="hover:text-[#E1784F] cursor-pointer transition-colors">Terms</span>
+                <span className="hover:text-[#E1784F] cursor-pointer transition-colors">Clinical Protocol</span>
+              </div>
+            </motion.footer>
 
-                 <div className="bg-muted/30 rounded-[3rem] border border-dashed border-border p-20 text-center">
-                    <HistoryIcon className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-20" />
-                    <h3 className="text-xl font-black italic uppercase text-foreground">No Logs Detected</h3>
-                    <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.4em] mt-4">Scan history will appear after your first AI analysis.</p>
-                    <button 
-                      onClick={() => router.push('/ai-scanner')}
-                      className="mt-10 px-10 py-4 bg-foreground text-background rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#4DB6AC] hover:text-white transition-all"
-                    >
-                      Start First Scan
-                    </button>
-                 </div>
-              </motion.div>
-            )}
           </motion.div>
         </AnimatePresence>
       </main>
