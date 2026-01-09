@@ -18,8 +18,9 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
 
-  // World-Class Logic: Determine if we are in the "Apothecary" (Marketplace)
-  const isMarketplace = pathname.startsWith("/marketplace") || pathname.includes("marketplace");
+  // 🛡️ WORLD-CLASS LOGIC: Identify the Dashboard/Portal environment
+  // We only want the big footer on the Landing Page.
+  const isLandingPage = pathname === "/";
 
   const handleSignIn = () => {
     setAuthModal({ isOpen: true, type: "signin" })
@@ -65,10 +66,11 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
         {children}
       </motion.main>
       
-      <Footer onSignUpClick={handleSignUp} />
+      {/* 🎯 THE FIX: Only show the big Footer on the public landing page */}
+      {isLandingPage && <Footer onSignUpClick={handleSignUp} />}
       
       {/* 🛡️ World-Class Modals with AnimatePresence */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {authModal.isOpen && (
           <AuthModals 
             isOpen={authModal.isOpen} 
@@ -78,7 +80,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
       
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {profileSidebarOpen && (
           <ProfileSidebar 
             isOpen={profileSidebarOpen} 

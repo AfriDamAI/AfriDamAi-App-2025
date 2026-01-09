@@ -21,14 +21,13 @@ export const setAuthToken = (token: string | null) => {
 /** 🛡️ Response Interceptor: Handles 'resultData', 404 Password bugs, and Session Expiry **/
 apiClient.interceptors.response.use(
   (response) => {
-    // Unwraps 'resultData' for the frontend
+    // Unwraps 'resultData' for the frontend to simplify component usage
     return response.data?.resultData ? { ...response, data: response.data.resultData } : response;
   },
   (error) => {
     const responseData = error.response?.data;
     
-    // 🛡️ CRITICAL FIX: Handle the backend's 404 "Invalid password" response
-    // This allows the UI to show the real error instead of just "Not Found"
+    // 🛡️ CRITICAL FIX: Handle the backend's specific "Invalid password" response
     if (responseData?.message?.message === "Invalid password" || responseData?.message === "Invalid password") {
       const customError = new Error("Invalid password");
       (customError as any).response = error.response;
@@ -38,7 +37,9 @@ apiClient.interceptors.response.use(
     // Handle session expiry
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      if (typeof window !== "undefined") window.location.href = "/";
+      if (typeof window !== "undefined" && !window.location.pathname.includes('/auth')) {
+        window.location.href = "/";
+      }
     }
 
     return Promise.reject(error);
@@ -62,6 +63,16 @@ export const getProfile = async () => {
   return response.data;
 };
 
+// Technical Team Request: Dedicated Avatar Upload
+export const uploadAvatar = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiClient.post("/api/profile/upload-avatar", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
 export const getUser = async (id: string) => {
   const response = await apiClient.get(`/api/users/${id}`);
   return response.data;
@@ -72,7 +83,12 @@ export const updateUser = async (id: string, updates: Partial<any>) => {
   return response.data;
 };
 
-/** 🔬 AI Analyzer **/
+/** 🔬 AI Analyzer & Chat Bot (AI Team Request) **/
+export const sendChatMessage = async (message: string) => {
+  const response = await apiClient.post("/api/analyzer/chat", { message });
+  return response.data;
+};
+
 export async function uploadImage(file: File): Promise<{ imageId: string; fileName: string }> {
   const formData = new FormData();
   formData.append("file", file);
@@ -92,3 +108,5 @@ export async function analyzeIngredients(ingredients: string): Promise<any> {
   const response = await apiClient.post("/api/analyzer/ingredients", { ingredients });
   return response.data;
 }
+
+export default apiClient;

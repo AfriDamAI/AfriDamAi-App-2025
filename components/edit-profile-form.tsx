@@ -1,8 +1,23 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/auth-provider";
+import { 
+  User, 
+  Activity, 
+  Globe, 
+  AlertTriangle, 
+  Save, 
+  Loader2, 
+  CheckCircle2,
+  ChevronDown
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const AFRICAN_COUNTRIES = [
+  "Nigeria", "Ghana", "Kenya", "South Africa", "Ethiopia", 
+  "Rwanda", "Uganda", "Egypt", "Morocco", "Other"
+];
 
 export const EditProfileForm = () => {
   const { user, updateUserProfile } = useAuth();
@@ -11,30 +26,32 @@ export const EditProfileForm = () => {
     lastName: "",
     phoneNo: "",
     sex: "",
-    ageRange: 0,
+    nationality: "",
+    otherCountry: "",
     skinType: "",
-    knownSkinAllergies: "",
-    previousTreatments: "",
+    allergies: "", // 🛡️ Linked to Onboarding
   });
+  
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (user) {
+      const isAfrican = AFRICAN_COUNTRIES.includes(user.profile?.nationality || "");
       setFormData({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         phoneNo: user.phoneNo || "",
         sex: user.sex || "",
-        ageRange: user.profile?.ageRange || 0,
+        nationality: isAfrican ? (user.profile?.nationality || "Nigeria") : "Other",
+        otherCountry: isAfrican ? "" : (user.profile?.nationality || ""),
         skinType: user.profile?.skinType || "",
-        knownSkinAllergies: user.profile?.knownSkinAllergies?.join(", ") || "",
-        previousTreatments: user.profile?.previousTreatments?.join(", ") || "",
+        allergies: user.profile?.allergies || "",
       });
     }
   }, [user]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -44,22 +61,24 @@ export const EditProfileForm = () => {
     setSuccess(false);
     try {
       if (!user) return;
-      const { firstName, lastName, phoneNo, sex, ...profileData } = formData;
+      const finalNationality = formData.nationality === "Other" ? formData.otherCountry : formData.nationality;
+      
       const payload = {
-        firstName,
-        lastName,
-        phoneNo,
-        sex,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phoneNo: formData.phoneNo,
+        sex: formData.sex,
         profile: {
           ...user.profile,
-          ageRange: Number(profileData.ageRange),
-          skinType: profileData.skinType,
-          knownSkinAllergies: profileData.knownSkinAllergies.split(",").map(s => s.trim()),
-          previousTreatments: profileData.previousTreatments.split(",").map(s => s.trim()),
+          nationality: finalNationality,
+          skinType: formData.skinType,
+          allergies: formData.allergies,
         }
       };
+      
       await updateUserProfile(payload);
       setSuccess(true);
+      setTimeout(() => setSuccess(false), 4000);
     } catch (error) {
       console.error("Failed to update profile", error);
     } finally {
@@ -68,166 +87,150 @@ export const EditProfileForm = () => {
   };
 
   return (
-    <div className="bg-card border border-border rounded-3xl p-8 md:p-10 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h2 className="text-2xl font-black text-foreground mb-1 tracking-tight">Edit Profile</h2>
-          <p className="text-sm font-medium text-muted-foreground">Keep your skin profile and contact info up to date.</p>
+    <div className="bg-card border border-border rounded-[2.5rem] p-8 md:p-12 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="space-y-1">
+          <h2 className="text-3xl font-black italic uppercase tracking-tighter text-foreground">Edit Clinical Profile</h2>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Update your identity and dermal metrics</p>
         </div>
-        {success && (
-          <div className="bg-primary/10 border border-primary/20 text-primary px-4 py-2 rounded-xl flex items-center gap-2 animate-bounce-short">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-            <span className="text-sm font-bold">Success! Profile updated.</span>
-          </div>
-        )}
+        
+        <AnimatePresence>
+          {success && (
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 text-[#4DB6AC] px-6 py-3 rounded-2xl flex items-center gap-3"
+            >
+              <CheckCircle2 size={18} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Changes Synced</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-12 gap-10">
-        {/* Personal Info Section */}
-        <div className="md:col-span-5 space-y-6">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-orange-600/10 flex items-center justify-center text-orange-600">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+      <form onSubmit={handleUpdate} className="space-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          
+          {/* LEFT COLUMN: IDENTITY */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-3 border-b border-border pb-4">
+              <User className="text-[#E1784F]" size={18} />
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground">Identity Node</h3>
             </div>
-            <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground">General Info</h3>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/80 pl-1">First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-muted/40 border-2 border-transparent focus:border-primary/30 focus:bg-card rounded-xl text-foreground font-bold transition-all outline-none"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">First Name</label>
+                <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="auth-input w-full" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Last Name</label>
+                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="auth-input w-full" />
+              </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/80 pl-1">Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-muted/40 border-2 border-transparent focus:border-primary/30 focus:bg-card rounded-xl text-foreground font-bold transition-all outline-none"
-              />
-            </div>
-          </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/80 pl-1">Biological Sex</label>
-            <div className="flex gap-2">
-              {["male", "female", "other"].map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, sex: s })}
-                  className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${formData.sex === s
-                      ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
-                      : "bg-muted/40 text-muted-foreground border-transparent hover:border-border"
-                    }`}
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Nationality</label>
+              <div className="relative">
+                <select 
+                  name="nationality"
+                  value={formData.nationality}
+                  onChange={handleChange}
+                  className="auth-input w-full appearance-none cursor-pointer"
                 >
-                  {s}
-                </button>
-              ))}
+                  {AFRICAN_COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <Globe className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20" size={16} />
+              </div>
+              {formData.nationality === "Other" && (
+                <motion.input 
+                  initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                  name="otherCountry" value={formData.otherCountry} onChange={handleChange}
+                  placeholder="Specify country" className="auth-input w-full mt-2" 
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Biological Sex</label>
+              <div className="flex gap-2">
+                {["female", "male"].map((s) => (
+                  <button
+                    key={s} type="button" onClick={() => setFormData({ ...formData, sex: s })}
+                    className={`flex-1 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${formData.sex === s
+                        ? "bg-[#E1784F] text-white border-[#E1784F] shadow-lg shadow-[#E1784F]/20"
+                        : "bg-muted/40 text-muted-foreground border-transparent hover:border-border"
+                      }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/80 pl-1">Phone Number</label>
-            <input
-              type="tel"
-              name="phoneNo"
-              value={formData.phoneNo}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-muted/40 border-2 border-transparent focus:border-primary/30 focus:bg-card rounded-xl text-foreground font-bold transition-all outline-none"
-              placeholder="+123..."
-            />
+          {/* RIGHT COLUMN: CLINICAL DATA */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-3 border-b border-border pb-4">
+              <Activity className="text-[#4DB6AC]" size={18} />
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground">Clinical Metrics</h3>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Phone Number</label>
+              <input type="tel" name="phoneNo" value={formData.phoneNo} onChange={handleChange} className="auth-input w-full" placeholder="+234..." />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Skin Type</label>
+              <div className="relative">
+                <select
+                  name="skinType"
+                  value={formData.skinType}
+                  onChange={handleChange}
+                  className="auth-input w-full appearance-none cursor-pointer"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Oily / Shine">Oily / Shine</option>
+                  <option value="Dry / Tight">Dry / Tight</option>
+                  <option value="Balanced">Balanced</option>
+                  <option value="Sensitive">Sensitive</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20" size={16} />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 ml-2">
+                <AlertTriangle className="text-red-500" size={12} />
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Known Allergies</label>
+              </div>
+              <textarea
+                name="allergies"
+                value={formData.allergies}
+                onChange={handleChange}
+                rows={3}
+                className="auth-input w-full resize-none min-h-[100px] py-4"
+                placeholder="Fragrance, Vitamin C, Nuts, etc."
+              />
+            </div>
           </div>
         </div>
 
-        {/* Vertical Divider for desktop */}
-        <div className="hidden md:block w-px bg-border self-stretch" />
-
-        {/* Skin Care Details Section */}
-        <div className="md:col-span-6 space-y-6">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-orange-600/10 flex items-center justify-center text-orange-600">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a2 2 0 00-1.96 1.414l-.477 2.387a2 2 0 00.547 1.022l1.428 1.428a2 2 0 001.022.547l2.387.477a2 2 0 001.96-1.414l.477-2.387a2 2 0 00-.547-1.022l-1.428-1.428z"></path></svg>
-            </div>
-            <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Skin Profile</h3>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/80 pl-1">Age Range</label>
-              <input
-                type="number"
-                name="ageRange"
-                value={formData.ageRange}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-muted/40 border-2 border-transparent focus:border-primary/30 focus:bg-card rounded-xl text-foreground font-bold transition-all outline-none"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/80 pl-1">Skin Type</label>
-              <select
-                name="skinType"
-                value={formData.skinType}
-                onChange={(e) => setFormData({ ...formData, skinType: e.target.value })}
-                className="w-full px-4 py-3 bg-muted/40 border-2 border-transparent focus:border-primary/30 focus:bg-card rounded-xl text-foreground font-bold transition-all outline-none appearance-none"
-              >
-                <option value="">Select Type</option>
-                <option value="oily">Oily</option>
-                <option value="dry">Dry</option>
-                <option value="normal">Normal</option>
-                <option value="sensitive">Sensitive</option>
-                <option value="combination">Combination</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/80 pl-1">Known Skin Allergies</label>
-            <textarea
-              name="knownSkinAllergies"
-              value={formData.knownSkinAllergies}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-4 py-3 bg-muted/40 border-2 border-transparent focus:border-primary/30 focus:bg-card rounded-xl text-foreground font-bold transition-all outline-none resize-none"
-              placeholder="Nut allergies, Nickel, etc (comma separated)"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground/80 pl-1">Previous Treatments</label>
-            <textarea
-              name="previousTreatments"
-              value={formData.previousTreatments}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-4 py-3 bg-muted/40 border-2 border-transparent focus:border-primary/30 focus:bg-card rounded-xl text-foreground font-bold transition-all outline-none resize-none"
-              placeholder="Laser, Peels, etc (comma separated)"
-            />
-          </div>
-
-          <div className="pt-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full group bg-primary hover:bg-orange-700 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-70 disabled:active:scale-100"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <svg className="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                  <span className="uppercase tracking-widest text-sm">Save Profile Changes</span>
-                </>
-              )}
-            </button>
-          </div>
+        <div className="pt-8 border-t border-border flex justify-end">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full md:w-auto px-12 h-16 bg-foreground text-background dark:bg-white dark:text-black rounded-2xl font-black uppercase text-[11px] tracking-[0.3em] hover:bg-[#E1784F] hover:text-white transition-all shadow-2xl flex items-center justify-center gap-4 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="animate-spin" size={18} /> : (
+              <>
+                <Save size={18} />
+                Confirm Profile Sync
+              </>
+            )}
+          </button>
         </div>
       </form>
     </div>
