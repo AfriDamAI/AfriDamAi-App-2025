@@ -1,12 +1,15 @@
 import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "./types";
 
-/** * 🛠️ OGA FIX: Direct access to process.env
- * We bypass the environment object here to ensure Next.js injects 
- * the Vercel variable directly into the client-side bundle.
+/** * 🛠️ OGA FIX: Robust Base URL Handling
+ * We trim any trailing slashes from the environment variable 
+ * to ensure we don't end up with "//" or "/api/api" in our requests.
  */
+const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+const cleanBaseUrl = rawBaseUrl.endsWith("/") ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
+
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: cleanBaseUrl,
 });
 
 /** 🔐 Security Sync **/
@@ -21,12 +24,11 @@ export const setAuthToken = (token: string | null) => {
 /** 🛡️ Response Interceptor **/
 apiClient.interceptors.response.use(
   (response) => {
-    // Standardizing response data access
     return response.data?.resultData ? { ...response, data: response.data.resultData } : response;
   },
   (error) => {
     if (!error.response) {
-      console.error("🚀 Network Error: Check if backend is running at:", process.env.NEXT_PUBLIC_API_URL);
+      console.error("🚀 Network Error: Check if backend is running at:", cleanBaseUrl);
     }
     const responseData = error.response?.data;
     if (responseData?.message === "Invalid password") {
@@ -42,6 +44,7 @@ apiClient.interceptors.response.use(
 );
 
 /** 🔑 Auth Endpoints **/
+// Note: Endpoints must match the backend routes (e.g., if backend prefix is already /api)
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
   const response = await apiClient.post("/api/auth/user/login", credentials);
   return response.data;
