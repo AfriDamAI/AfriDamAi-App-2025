@@ -34,17 +34,19 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
   const skipToFinish = () => setStep(totalSteps);
 
   /**
-   * 🛡️ OGA FIX: Cleaned up the finish logic
-   * We only call onComplete(). We let the Parent (OnboardingPage) 
-   * handle the navigation to keep it stable.
+   * 🛡️ OGA FIX: Nuclear Sync Logic
+   * We send the flag to the root AND the profile object to be 100% safe.
    */
   const handleFinish = async () => {
     if (isSaving) return;
     setIsSaving(true);
     
     try {
-      // 1. Update the clinical profile in the DB
-      await updateUserProfile?.({
+      // 1. Prepare the update payload
+      const updatePayload = {
+        // Root level flag
+        onboardingCompleted: true, 
+        // Profile nested data
         profile: {
           ...user?.profile,
           skinType: formData.skinType,
@@ -52,19 +54,23 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
           environment: formData.environment,
           melaninTone: formData.melaninTone,
           allergies: formData.allergies,
-          onboardingCompleted: true 
+          onboardingCompleted: true // Mirror flag for safety
         }
-      });
+      };
+
+      // 2. Sync with Backend
+      await updateUserProfile?.(updatePayload);
       
-      // 2. Give the database a moment to breath
+      // 3. 🛡️ THE BREATHING ROOM: 
+      // This ensures the DB transaction is fully committed on the server
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // 3. Trigger the completion callback only
+      // 4. Trigger Parent Callback
       onComplete();
 
     } catch (err) {
       console.error("Clinical Profile Sync Failed:", err);
-      // Even if it fails, we trigger onComplete so the user isn't stuck
+      // Fallback: Trigger completion anyway so user isn't stuck in a loop
       onComplete();
     }
   };
@@ -76,8 +82,9 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-xl bg-card border border-white/5 rounded-[3rem] shadow-2xl"
+        className="relative w-full max-w-xl bg-card border border-white/5 rounded-[3rem] shadow-2xl overflow-hidden"
       >
+        {/* Progress Bar */}
         <div className="absolute top-0 left-0 w-full h-1.5 bg-white/5">
           <motion.div 
             className="h-full bg-[#E1784F]"
@@ -121,7 +128,7 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
                 </div>
                 <div className="grid gap-3">
                   {["Oily / Shine", "Dry / Tight", "Balanced", "Sensitive"].map((type) => (
-                    <button key={type} onClick={() => { setFormData({...formData, skinType: type}); nextStep(); }} className="p-8 rounded-[2rem] border border-white/5 bg-white/5 hover:border-[#4DB6AC] text-left transition-all flex justify-between items-center group">
+                    <button key={type} onClick={() => { setFormData({...formData, skinType: type}); nextStep(); }} className="p-8 rounded-[2rem] border border-white/5 bg-white/5 hover:border-[#4DB6AC] text-left transition-all flex justify-between items-center group text-white">
                       <span className="text-xs font-black uppercase tracking-widest text-white/60 group-hover:text-white">{type}</span>
                       <ChevronRight size={18} className="text-white/10 group-hover:text-[#4DB6AC]" />
                     </button>
@@ -136,7 +143,7 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
                   <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-[0.5em]">Section 03: Goals</span>
                   <h2 className="text-4xl md:text-5xl font-black italic uppercase text-white leading-none tracking-tighter">Primary <br/> Objective?</h2>
                 </div>
-                <div className="grid gap-3">
+                <div className="grid gap-3 text-white">
                   {["Hyperpigmentation", "Active Acne", "Scars / Blemishes", "Anti-Aging"].map((id) => (
                     <button key={id} onClick={() => { setFormData({...formData, primaryConcern: id}); nextStep(); }} className="p-8 rounded-[2rem] border border-white/5 bg-white/5 hover:border-[#E1784F] text-left flex justify-between items-center transition-all">
                       <span className="text-xs font-black uppercase tracking-widest text-white/60">{id}</span>

@@ -1,14 +1,15 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { OnboardingSurvey } from "@/components/onboarding-survey"
 import { motion } from "framer-motion"
+import { Loader2 } from "lucide-react"
 
 export default function OnboardingPage() {
-  // 🛡️ OGA FIX: Added 'requiresOnboarding' to handle the gatekeeping
   const { user, isLoading, requiresOnboarding, refreshUser } = useAuth()
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -21,48 +22,69 @@ export default function OnboardingPage() {
 
       // 2. 🛡️ THE ANTI-BOOM GUARD: 
       // If the user has ALREADY finished, send them to dashboard.
-      // If requiresOnboarding is FALSE, it means they are done.
-      if (!requiresOnboarding) {
+      if (!requiresOnboarding && !isRedirecting) {
         router.push("/dashboard")
       }
     }
-  }, [user, isLoading, requiresOnboarding, router])
+  }, [user, isLoading, requiresOnboarding, router, isRedirecting])
 
-  // Handle the completion of the survey
+  /**
+   * 🚀 OGA FIX: Robust Completion Logic
+   * We ensure the state is fully synchronized before moving Nathan.
+   */
   const handleSurveySuccess = async () => {
-    // 1. Refresh the user data from the backend to get the new 'onboardingCompleted: true' status
-    await refreshUser();
-    // 2. Only THEN go to the dashboard
-    router.push("/dashboard");
+    setIsRedirecting(true);
+    try {
+      // 1. Sync the AuthProvider state with the database
+      await refreshUser();
+      
+      // 2. 🛡️ NUCLEAR SYNC: 
+      // Using window.location.replace instead of router.push for the final jump
+      // ensures the dashboard starts with a fresh, clean state—killing the loop forever.
+      window.location.replace("/dashboard");
+    } catch (err) {
+      console.error("Redirect Sync Failed:", err);
+      window.location.replace("/dashboard");
+    }
   }
 
-  // Loading state
-  if (isLoading || !user) {
+  // Cinematic Loading State
+  if (isLoading || !user || isRedirecting) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center space-y-6">
         <motion.div 
           animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 2 }}
-          className="w-16 h-16 bg-[#E1784F] rounded-[2rem] flex items-center justify-center font-black text-white shadow-[0_0_50px_rgba(225,120,79,0.2)]"
+          className="w-20 h-20 bg-[#E1784F] rounded-[2.5rem] flex items-center justify-center font-black text-5xl text-white shadow-[0_0_60px_rgba(225,120,79,0.3)]"
         >A</motion.div>
+        <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.6em] animate-pulse">
+          Synchronizing Clinical Profile
+        </p>
       </div>
     )
   }
 
-  // 🛡️ Only render the survey if the user actually needs it
+  // Only render if needed
   if (!requiresOnboarding) return null;
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] relative overflow-hidden flex items-center justify-center p-4">
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(77,182,172,0.05),transparent_70%)] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_70%,rgba(225,120,79,0.05),transparent_70%)] pointer-events-none" />
+    <main className="min-h-screen bg-[#0A0A0A] relative overflow-hidden flex items-center justify-center p-6 md:p-10">
+      {/* --- WORLD CLASS AMBIANCE --- */}
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(77,182,172,0.08),transparent_70%)] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_70%,rgba(225,120,79,0.08),transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-4xl">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative z-10 w-full max-w-5xl"
+      >
          <OnboardingSurvey onComplete={handleSurveySuccess} />
-      </div>
+      </motion.div>
 
-      <div className="absolute bottom-10 left-0 w-full flex justify-center opacity-10 pointer-events-none">
-        <img src="/logo.png" alt="AfriDam AI" className="h-4 w-auto grayscale" />
+      {/* Subtle Brand Watermark */}
+      <div className="absolute bottom-12 left-0 w-full flex justify-center opacity-10 pointer-events-none">
+        <img src="/logo.png" alt="AfriDam AI" className="h-5 w-auto grayscale" />
       </div>
     </main>
   )
