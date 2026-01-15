@@ -15,7 +15,7 @@ interface User {
   profile?: {
     avatarUrl?: string;
     bio?: string;
-    onboardingCompleted?: boolean; // 👈 This is our Shield
+    onboardingCompleted?: boolean;
     [key: string]: any;
   };
 }
@@ -24,11 +24,11 @@ interface AuthContextType {
   user: User | null
   isSignedIn: boolean
   isLoading: boolean
-  requiresOnboarding: boolean // 👈 NEW: Explicitly check for fresh users
+  requiresOnboarding: boolean
   signIn: (credentials: UserLoginDto) => Promise<void>
   signUp: (userData: CreateUserDto) => Promise<void>
   signOut: () => void
-  updateUserProfile: (updates: Partial<User>) => Promise<void>
+  updateUserProfile: (updates: Partial<any>) => Promise<User | null> // 🛡️ OGA FIX: Return the user
   refreshUser: () => Promise<void>
 }
 
@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   const extractUserData = (response: any) => {
+    // Standardizing how we pull user data from NestJS resultData wrapper
     return response?.resultData || response?.data || response;
   };
 
@@ -105,7 +106,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Login failed:", error);
       throw error;
     } finally {
-      // 🛡️ OGA FIX: We don't stop loading until the USER state is fully set with profile info
       setIsLoading(false);
     }
   }
@@ -130,16 +130,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }
 
-  const updateUserProfile = async (updates: Partial<User>) => {
-    if (user?.id) {
-      try {
-        const response = await updateUser(user.id, updates);
-        const updatedUser = extractUserData(response);
-        setUser(updatedUser);
-      } catch (error) {
-        console.error("Profile update failed:", error);
-        throw error;
-      }
+  /**
+   * 🛡️ OGA FIX: Update User Profile
+   * We now return the updated user data so the Onboarding page can verify it 
+   * BEFORE redirecting to the dashboard.
+   */
+  const updateUserProfile = async (updates: Partial<any>): Promise<User | null> => {
+    if (!user?.id) return null;
+    try {
+      const response = await updateUser(user.id, updates);
+      const updatedUser = extractUserData(response);
+      
+      // Force immediate local update
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error("Profile update failed:", error);
+      throw error;
     }
   }
 
@@ -149,18 +156,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // 🛡️ THE GATEKEEPER logic
+  /**
+   * 🛡️ THE GATEKEEPER
+   * We added a check to ensure we aren't blocking if the app is still loading.
+   */
   const requiresOnboarding = useMemo(() => {
-    if (!user) return false;
-    // If onboardingCompleted is not explicitly TRUE, they REQUIRE onboarding.
-    return user.profile?.onboardingCompleted !== true;
-  }, [user]);
+    if (isLoading || !user) return false;
+    // Check both nested profile and root level onboardingCompleted (depending on your Prisma schema)
+    const isCompleted = user.profile?.onboardingCompleted === true || (user as any).onboardingCompleted === true;
+    return !isCompleted;
+  }, [user, isLoading]);
 
   const contextValue = useMemo(() => ({
     user,
     isSignedIn: !!user,
     isLoading,
-    requiresOnboarding, // 👈 Exposed to the whole app
+    requiresOnboarding,
     signIn,
     signUp,
     signOut,
