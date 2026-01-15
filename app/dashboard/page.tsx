@@ -14,7 +14,8 @@ import {
   Zap,
   Camera,
   Clock,
-  User as UserIcon
+  User as UserIcon,
+  AlertCircle
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -41,7 +42,6 @@ const itemVariants = {
 }
 
 export default function DashboardPage() {
-  // 🛡️ OGA FIX: Added 'requiresOnboarding' from our updated provider
   const { user, signOut, isLoading, requiresOnboarding } = useAuth()
   const { theme } = useTheme() 
   const router = useRouter()
@@ -50,27 +50,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoading) {
-      // 1. No user? Back to landing.
+      // 🛡️ BALANCED GATEKEEPER
+      // If no user, go to landing. But if user exists, NEVER force-loop to onboarding.
       if (!user) {
         router.push("/")
         return
       }
 
-      // 2. 🛡️ THE GATEKEEPER: If they MUST onboard, send them there.
-      // But only if we are sure they haven't finished.
-      if (requiresOnboarding) {
-        console.log("Onboarding required, redirecting...");
-        router.push("/onboarding")
-        return
-      }
-
-      // 3. Load history only if they are a full user
+      // Load history
       const history = getHistory().slice(0, 3)
       setRecentScans(history)
     }
-  }, [user, isLoading, requiresOnboarding, router])
+  }, [user, isLoading, router])
 
-  if (isLoading || !user || (requiresOnboarding && activeTab === "home")) return (
+  if (isLoading || !user) return (
     <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
       <motion.div 
         animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
@@ -162,6 +155,26 @@ export default function DashboardPage() {
             
             {activeTab === "home" && (
               <>
+                {/* 🛡️ OPTIONAL ONBOARDING BANNER (Non-aggressive) */}
+                {requiresOnboarding && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-6 bg-[#E1784F]/10 border border-[#E1784F]/20 rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center gap-4">
+                      <AlertCircle className="text-[#E1784F]" size={24} />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#E1784F]">Complete your health profile for better AI accuracy</p>
+                    </div>
+                    <button 
+                      onClick={() => router.push('/onboarding')}
+                      className="px-6 py-3 bg-[#E1784F] text-white rounded-xl text-[9px] font-black uppercase tracking-widest"
+                    >
+                      Finish Setup
+                    </button>
+                  </motion.div>
+                )}
+
                 <motion.section 
                   variants={itemVariants}
                   onClick={() => router.push('/ai-scanner')}
@@ -171,14 +184,14 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-6 relative z-10">
                     <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-inner"><Camera size={28} /></div>
                     <div>
-                      <h3 className="text-2xl md:text-3xl font-black italic uppercase text-white tracking-tighter">Skin Scanner</h3>
-                      <p className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em]">Live Analysis</p>
+                      <h3 className="text-2xl md:text-3xl font-black italic uppercase text-white tracking-tighter text-left">Skin Scanner</h3>
+                      <p className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em] text-left">Live Analysis</p>
                     </div>
                   </div>
                   <div className="w-14 h-14 bg-white text-[#E1784F] rounded-2xl flex items-center justify-center shadow-2xl group-hover:translate-x-2 transition-transform"><ArrowRight size={24} /></div>
                 </motion.section>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
                   <motion.div variants={itemVariants} onClick={() => router.push('/ai-checker')} className="p-10 bg-card/40 border border-border rounded-[3rem] space-y-4 hover:border-[#4DB6AC]/50 cursor-pointer shadow-sm group backdrop-blur-sm">
                     <div className="w-12 h-12 bg-[#4DB6AC]/10 text-[#4DB6AC] rounded-2xl flex items-center justify-center group-hover:bg-[#4DB6AC] group-hover:text-white transition-all shadow-inner"><Sparkles size={22}/></div>
                     <h4 className="text-xl font-black italic uppercase">Safety Check</h4>
@@ -197,7 +210,7 @@ export default function DashboardPage() {
                   className="bg-[#1C1A19] dark:bg-card text-white dark:text-foreground p-10 rounded-[3rem] flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden border border-white/5"
                 >
                   <div className="absolute top-0 right-0 w-64 h-64 bg-[#E1784F]/5 blur-[80px] rounded-full" />
-                  <div className="flex items-center gap-6 relative z-10">
+                  <div className="flex items-center gap-6 relative z-10 text-left">
                     <div className="w-14 h-14 bg-[#E1784F] rounded-2xl flex items-center justify-center shadow-xl animate-pulse"><Zap size={24} className="text-white fill-white" /></div>
                     <div>
                         <p className="text-lg font-black italic uppercase tracking-tighter">Urgent Specialist Care</p>
@@ -216,7 +229,7 @@ export default function DashboardPage() {
                     <div className="space-y-4">
                       {recentScans.map((scan) => (
                         <div key={scan.id} className="p-8 bg-card/60 border border-border rounded-2.5rem flex items-center justify-between group hover:border-[#E1784F]/40 transition-all shadow-sm cursor-pointer">
-                          <div className="flex items-center gap-5">
+                          <div className="flex items-center gap-5 text-left">
                             <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center text-[#E1784F] shadow-inner"><Activity size={20}/></div>
                             <div>
                               <p className="text-md font-black italic uppercase text-foreground leading-none mb-1">{scan.results.conditions?.[0]?.name || 'Scan Analysis'}</p>
@@ -238,7 +251,7 @@ export default function DashboardPage() {
             )}
 
             {activeTab === "appointment" && (
-              <motion.div variants={itemVariants} className="bg-card rounded-[3.5rem] border border-border p-10 shadow-sm relative overflow-hidden">
+              <motion.div variants={itemVariants} className="bg-card rounded-[3.5rem] border border-border p-10 shadow-sm relative overflow-hidden text-left">
                  <div className="flex justify-between items-center mb-10">
                    <h2 className="text-3xl font-black italic uppercase tracking-tighter">Clinical Care Team</h2>
                    <button onClick={() => setActiveTab("home")} className="text-[9px] font-black uppercase tracking-widest px-4 py-2 bg-white/5 rounded-lg border border-white/5 text-[#E1784F]">Back</button>
