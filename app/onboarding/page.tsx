@@ -3,7 +3,8 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
-import { OnboardingSurvey } from "@/components/onboarding/onboarding-survey"
+// 🛠️ FIXED: Corrected path because 'onboarding-survey.tsx' lives directly in 'components'
+import { OnboardingSurvey } from "@/components/onboarding-survey"
 import { motion } from "framer-motion"
 
 export default function OnboardingPage() {
@@ -19,7 +20,6 @@ export default function OnboardingPage() {
     }
 
     // 2. If the user ALREADY completed onboarding, don't let them do it again.
-    // This respects the 'onboardingCompleted' flag we built into your Dashboard.
     if (user?.profile?.onboardingCompleted) {
       router.push("/dashboard")
     }
