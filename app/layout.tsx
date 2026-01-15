@@ -18,17 +18,14 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
 })
 
-// 🛡️ SMART GUARD: Prevents logged-in users from seeing the landing page
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    // If user is signed in and tries to access the landing page, push to dashboard
     if (!isLoading && isSignedIn && pathname === "/") {
       router.replace("/dashboard");
     }
@@ -46,15 +43,16 @@ export default function RootLayout({
   const isLandingPage = pathname === "/";
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" /> 
         <title>AfriDam AI | Your Skin, Decoded</title>
-        <meta name="description" content="The first AI dermatology platform designed specifically for melanin-rich skin." />
+        <meta name="description" content="AI dermatology for melanin-rich skin." />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground selection:bg-[#E1784F]/30 overflow-x-hidden min-h-screen relative`}>
         
-        {/* WORLD-CLASS TEXTURE */}
-        <div className="fixed inset-0 z-[9999] pointer-events-none opacity-[0.02] dark:opacity-[0.04] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        {/* 🛡️ FIXED TEXTURE: Moved to z-[-1] so it stays BEHIND your buttons */}
+        <div className="fixed inset-0 z-[-1] pointer-events-none opacity-[0.02] dark:opacity-[0.04] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
         <AuthProvider>
           <AuthGuard>
@@ -62,13 +60,14 @@ export default function RootLayout({
               <AnimatePresence mode="wait">
                 <motion.div
                   key={pathname}
+                  className="min-h-screen w-full relative z-10" // Force content to the front
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
                   {isLandingPage ? (
-                    <main className="w-full relative">
+                    <main className="w-full relative overflow-x-hidden">
                       {children}
                     </main>
                   ) : (
@@ -79,7 +78,6 @@ export default function RootLayout({
                 </motion.div>
               </AnimatePresence>
 
-              {/* GLOBAL COMPONENTS */}
               <AIChatBot />
             </ThemeProvider>
           </AuthGuard>
