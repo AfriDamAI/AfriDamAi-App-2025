@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react" // 🛡️ OGA FIX: Added Suspense
 import SkinAnalysisResults from "@/components/skin-analyzer-results"
 import Questionnaire from "@/components/questionnaire"
 import Link from "next/link"
@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2, ChevronLeft, CheckCircle, ArrowRight, AlertCircle } from "lucide-react"
 
-export default function ResultsPage() {
+/**
+ * 🚀 OGA FIX: Part 1 - The Results Logic
+ * We moved the logic here so it can be safely wrapped in Suspense.
+ */
+function ResultsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(true)
@@ -20,7 +24,6 @@ export default function ResultsPage() {
 
   useEffect(() => {
     const fetchRealAnalysis = async () => {
-      // If there's no ID, we can't show real results
       if (!scanId) {
         setError("No active scan record found. Please perform a new scan.")
         setIsLoading(false)
@@ -29,20 +32,20 @@ export default function ResultsPage() {
 
       try {
         setIsLoading(true)
-        // 🚀 OGA FIX: Fetch the actual record from your NestJS Backend
+        // 🚀 OGA FIX: Fetch using absolute API URL from env
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/analyzer/${scanId}`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Authorization': `Bearer ${localStorage.getItem('token')}`, // Use 'token' to match your AuthProvider
           }
         })
 
         if (!response.ok) throw new Error("Could not retrieve clinical data")
 
-        const data = await response.json()
+        const res = await response.json()
+        const data = res.resultData || res; // Handle wrapped resultData from NestJS
         
-        // Map the backend data to what the UI expects
         setAnalysisData({
-          overallHealth: data.healthScore || 85, // Fallback if not in DB
+          overallHealth: data.healthScore || 85,
           finding: data.description,
           predictions: data.predictions,
           status: data.status,
@@ -61,24 +64,20 @@ export default function ResultsPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#1C1A19] flex items-center justify-center">
-        <div className="text-center space-y-6">
-          <div className="relative">
-             <Loader2 className="w-16 h-16 text-[#E1784F] animate-spin mx-auto" />
-             <div className="absolute inset-0 bg-[#E1784F]/20 blur-2xl rounded-full animate-pulse" />
-          </div>
-          <p className="text-[#F7F3EE] font-black uppercase tracking-[0.4em] text-xs">
-            Decoding Neural Scan...
-          </p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6">
+        <div className="relative">
+           <Loader2 className="w-16 h-16 text-[#E1784F] animate-spin mx-auto" />
+           <div className="absolute inset-0 bg-[#E1784F]/20 blur-2xl rounded-full animate-pulse" />
         </div>
-      </main>
+        <p className="text-[#F7F3EE] font-black uppercase tracking-[0.4em] text-xs">
+          Decoding Neural Scan...
+        </p>
+      </div>
     )
   }
 
   return (
-    <main className="min-h-screen bg-[#1C1A19] text-[#F7F3EE] p-6 lg:p-12">
-      <div className="max-w-6xl mx-auto space-y-12">
-        
+    <div className="max-w-6xl mx-auto space-y-12">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/5 pb-10">
           <div>
@@ -108,8 +107,6 @@ export default function ResultsPage() {
           </div>
         ) : analysisData ? (
           <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            
-            {/* Real Data plugged into the Results Component */}
             <SkinAnalysisResults data={analysisData} />
             
             <div className="bg-[#151312] border border-white/5 rounded-[3.5rem] p-8 md:p-12 shadow-2xl">
@@ -132,32 +129,37 @@ export default function ResultsPage() {
                 </p>
             </div>
 
-            {/* Quick Navigation Footer */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10">
-              <Button 
-                onClick={() => router.push('/ai-scanner')}
-                className="h-20 bg-white text-black hover:bg-[#E1784F] hover:text-white rounded-[2rem] font-black uppercase tracking-widest text-[10px] transition-all shadow-xl"
-              >
+              <Button onClick={() => router.push('/ai-scanner')} className="h-20 bg-white text-black hover:bg-[#E1784F] hover:text-white rounded-[2rem] font-black uppercase tracking-widest text-[10px] shadow-xl">
                 New Skin Scan
               </Button>
-              <Button 
-                onClick={() => router.push('/ai-checker')}
-                variant="outline"
-                className="h-20 bg-transparent border-white/10 hover:bg-white/5 text-white rounded-[2rem] font-black uppercase tracking-widest text-[10px]"
-              >
+              <Button onClick={() => router.push('/ai-checker')} variant="outline" className="h-20 bg-transparent border-white/10 text-white rounded-[2rem] font-black uppercase tracking-widest text-[10px]">
                 Check Ingredients
               </Button>
-              <Button 
-                onClick={() => router.push('/dashboard')}
-                variant="outline"
-                className="h-20 bg-transparent border-white/10 hover:bg-white/5 text-white rounded-[2rem] font-black uppercase tracking-widest text-[10px]"
-              >
+              <Button onClick={() => router.push('/dashboard')} variant="outline" className="h-20 bg-transparent border-white/10 text-white rounded-[2rem] font-black uppercase tracking-widest text-[10px]">
                 User Portal
               </Button>
             </div>
           </div>
         ) : null}
-      </div>
+    </div>
+  )
+}
+
+/**
+ * 🛡️ OGA FIX: Part 2 - The Page Wrapper
+ * This satisfies the Next.js build requirement.
+ */
+export default function ResultsPage() {
+  return (
+    <main className="min-h-screen bg-[#1C1A19] text-[#F7F3EE] p-6 lg:p-12">
+      <Suspense fallback={
+         <div className="min-h-screen flex items-center justify-center">
+            <Loader2 className="w-12 h-12 text-[#E1784F] animate-spin" />
+         </div>
+      }>
+        <ResultsContent />
+      </Suspense>
     </main>
   )
 }
