@@ -44,7 +44,6 @@ apiClient.interceptors.response.use(
 );
 
 /** 🔑 Auth Endpoints **/
-// Note: Endpoints must match the backend routes (e.g., if backend prefix is already /api)
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
   const response = await apiClient.post("/api/auth/user/login", credentials);
   return response.data;
@@ -85,9 +84,15 @@ export const updateUser = async (id: string, updates: Partial<any>) => {
 export async function uploadImage(file: File): Promise<{ imageId: string; fileName: string }> {
   const formData = new FormData();
   formData.append("file", file);
-  const response = await apiClient.post("/api/analyzer", formData, {
+  
+  /**
+   * 🚀 OGA FIX: Changed route from /api/analyzer to /api/analyzer/upload
+   * This ensures the request hits the backend route that triggers the scanAndSave AI logic.
+   */
+  const response = await apiClient.post("/api/analyzer/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+  
   return response.data;
 }
 
