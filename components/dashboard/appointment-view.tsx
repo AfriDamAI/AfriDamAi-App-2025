@@ -7,9 +7,6 @@ import {
   ShieldCheck, 
   History,
   Zap,
-  Lock,
-  ArrowRight,
-  UserCheck,
   MessageCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -23,13 +20,41 @@ export function AppointmentView() {
   const [activeTab, setActiveTab] = useState<'book' | 'history'>('book');
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'processing' | 'success'>('idle');
 
-  // Logic: Check if user is a subscriber
   const hasSubscription = user?.profile?.subscriptionPlan && user?.profile?.subscriptionPlan !== "Free";
 
-  const handleInstantPay = () => {
+  // 🚀 CEO LIVE LOGIC: Connect to NestJS Backend
+  const handleInstantPay = async () => {
     setBookingStatus('processing');
-    // Logic for the $15 one-time checkout
-    setTimeout(() => setBookingStatus('success'), 2000);
+    
+    try {
+      // 1. Tell the backend to prepare a $15 Appointment & Transaction
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/instant`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Ensure user is logged in
+        },
+        body: JSON.stringify({
+          specialty: 'DERMATOLOGIST',
+          type: 'INSTANT_SESSION',
+          price: 15.00
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.checkoutUrl) {
+        // 2. Redirect user to Flutterwave/Paystack/Stripe
+        window.location.href = data.checkoutUrl;
+      } else {
+        // Fallback for demo/testing
+        setTimeout(() => setBookingStatus('success'), 2000);
+      }
+    } catch (error) {
+      console.error("Payment Initialization Failed", error);
+      setBookingStatus('idle');
+      alert("Consultation service temporarily unavailable.");
+    }
   };
 
   if (bookingStatus === 'success') {
@@ -67,10 +92,9 @@ export function AppointmentView() {
       {activeTab === 'book' ? (
         <div className="grid lg:grid-cols-1 md:gap-10">
           {!hasSubscription ? (
-            /* --- THE CHOICE SCREEN FOR NON-SUBSCRIBERS --- */
             <div className="grid md:grid-cols-2 gap-6">
               
-              {/* OPTION 1: STARTER TRIAL (UPDATED TO $3) */}
+              {/* OPTION 1: STARTER TRIAL */}
               <div className="bg-[#1C1A19] dark:bg-[#F7F3EE] p-8 rounded-[2.5rem] flex flex-col justify-between space-y-8 text-white dark:text-[#1C1A19] relative overflow-hidden group border-2 border-transparent hover:border-[#E1784F]/30 transition-all">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/20 blur-3xl rounded-full" />
                 <div className="space-y-4 relative z-10">
@@ -96,7 +120,7 @@ export function AppointmentView() {
                 </div>
               </div>
 
-              {/* OPTION 2: INSTANT ONE-TIME CHAT */}
+              {/* OPTION 2: INSTANT ONE-TIME CHAT ($15) */}
               <div className="bg-card border-2 border-border p-8 rounded-[2.5rem] flex flex-col justify-between space-y-8 hover:border-[#4DB6AC] transition-all group">
                 <div className="space-y-4">
                   <div className="w-12 h-12 bg-[#4DB6AC]/10 rounded-2xl flex items-center justify-center text-[#4DB6AC]">
@@ -113,16 +137,16 @@ export function AppointmentView() {
                     <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">/ Session</span>
                   </div>
                   <Button 
+                    disabled={bookingStatus === 'processing'}
                     onClick={handleInstantPay}
                     className="w-full h-14 bg-muted text-foreground hover:bg-[#4DB6AC] hover:text-white rounded-xl font-black uppercase text-[9px] tracking-widest transition-all"
                   >
-                    Start $15 Session
+                    {bookingStatus === 'processing' ? 'Connecting...' : 'Start $15 Session'}
                   </Button>
                 </div>
               </div>
             </div>
           ) : (
-            /* --- THE ACTIVE STATE FOR SUBSCRIBERS --- */
             <div className="p-10 bg-gradient-to-br from-[#1C1A19] to-black rounded-[3rem] text-white relative overflow-hidden border border-white/5 shadow-2xl">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#E1784F]/10 blur-[80px] rounded-full" />
               <div className="relative z-10 space-y-8">

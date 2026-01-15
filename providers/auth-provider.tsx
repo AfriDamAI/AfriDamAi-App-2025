@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react"
 import { jwtDecode } from "jwt-decode";
 import { login, register, setAuthToken, getUser, updateUser } from "../lib/api-client"
 import { UserLoginDto, CreateUserDto } from "../lib/types"
@@ -13,8 +13,9 @@ interface User {
   sex: string;
   phoneNo: string;
   profile?: {
-    avatarUrl?: string; // Added for the technical team's profile feature
+    avatarUrl?: string;
     bio?: string;
+    onboardingCompleted?: boolean;
     [key: string]: any;
   };
 }
@@ -27,7 +28,7 @@ interface AuthContextType {
   signUp: (userData: CreateUserDto) => Promise<void>
   signOut: () => void
   updateUserProfile: (updates: Partial<User>) => Promise<void>
-  refreshUser: () => Promise<void> // Added to sync profile pic after upload
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -36,7 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Helper to extract clean user data from various NestJS response formats
   const extractUserData = (response: any) => {
     return response?.resultData || response?.data || response;
   };
@@ -44,10 +44,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUserData = async (userId: string) => {
     try {
       const response = await getUser(userId);
-      setUser(extractUserData(response));
+      const userData = extractUserData(response);
+      setUser(userData);
+      return userData;
     } catch (err) {
       console.error("Failed to fetch user data:", err);
       signOut();
+      return null;
     }
   };
 
@@ -56,19 +59,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (typeof window === "undefined") return;
 
       const token = localStorage.getItem("token");
+      
       if (token) {
-        setAuthToken(token);
         try {
           const decoded: any = jwtDecode(token);
-          const userId = decoded.sub || decoded.id;
-          if (userId) {
-            await fetchUserData(userId);
+          
+          // Check if token is expired
+          const currentTime = Date.now() / 1000;
+          if (decoded.exp && decoded.exp < currentTime) {
+            signOut();
+          } else {
+            setAuthToken(token);
+            const userId = decoded.sub || decoded.id;
+            if (userId) {
+              await fetchUserData(userId);
+            }
           }
         } catch (err) {
           console.error("Auth initialization failed:", err);
           signOut();
         }
       }
+      
+      // Ensure loading only stops AFTER we know the user state
       setIsLoading(false);
     };
 
@@ -77,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (credentials: UserLoginDto) => {
     try {
+      setIsLoading(true);
       const data = await login(credentials);
       const accessToken = data.resultData?.accessToken || data.accessToken || data.data?.accessToken;
       
@@ -92,16 +106,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       console.error("Login failed:", error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   }
 
   const signUp = async (userData: CreateUserDto) => {
     try {
+      setIsLoading(true);
       await register(userData);
       await signIn({ email: userData.email, password: userData.password });
     } catch (error: any) {
       console.error("Registration failed:", error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -109,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     localStorage.removeItem("token");
     setAuthToken(null);
+    setIsLoading(false);
   }
 
   const updateUserProfile = async (updates: Partial<User>) => {
@@ -123,24 +143,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // New function for the UI to call after a successful image upload
   const refreshUser = async () => {
     if (user?.id) {
       await fetchUserData(user.id);
     }
   }
 
+  // 🛡️ THE SPEED FIX: Memoize the context value
+  // This prevents the entire App Tree from re-rendering unless the user or loading state actually changes.
+  const contextValue = useMemo(() => ({
+    user,
+    isSignedIn: !!user,
+    isLoading,
+    signIn,
+    signUp,
+    signOut,
+    updateUserProfile,
+    refreshUser
+  }), [user, isLoading]);
+
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isSignedIn: !!user, 
-      isLoading, 
-      signIn, 
-      signUp, 
-      signOut, 
-      updateUserProfile,
-      refreshUser
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   )
