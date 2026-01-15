@@ -16,6 +16,7 @@ interface User {
     avatarUrl?: string;
     bio?: string;
     onboardingCompleted?: boolean;
+    hasCompletedOnboarding?: boolean; // Added for redundancy to match DB schema
     [key: string]: any;
   };
 }
@@ -28,7 +29,7 @@ interface AuthContextType {
   signIn: (credentials: UserLoginDto) => Promise<void>
   signUp: (userData: CreateUserDto) => Promise<void>
   signOut: () => void
-  updateUserProfile: (updates: Partial<any>) => Promise<User | null> // 🛡️ OGA FIX: Return the user
+  updateUserProfile: (updates: Partial<any>) => Promise<User | null>
   refreshUser: () => Promise<void>
 }
 
@@ -39,7 +40,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   const extractUserData = (response: any) => {
-    // Standardizing how we pull user data from NestJS resultData wrapper
     return response?.resultData || response?.data || response;
   };
 
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return userData;
     } catch (err) {
       console.error("Failed to fetch user data:", err);
-      signOut();
+      // Don't auto-signout here to avoid loops during server glitches
       return null;
     }
   };
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             signOut();
           } else {
             setAuthToken(token);
-            const userId = decoded.sub || decoded.id;
+            const userId = decoded.sub || decoded.id || decoded.userId;
             if (userId) {
               await fetchUserData(userId);
             }
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthToken(accessToken);
 
       const decoded: any = jwtDecode(accessToken);
-      const userId = decoded.sub || decoded.id;
+      const userId = decoded.sub || decoded.id || decoded.userId;
       
       await fetchUserData(userId);
     } catch (error: any) {
@@ -113,7 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (userData: CreateUserDto) => {
     try {
       setIsLoading(true);
+      // 1. Create the account
       await register(userData);
+      // 2. Immediate login
       await signIn({ email: userData.email, password: userData.password });
     } catch (error: any) {
       console.error("Registration failed:", error);
@@ -130,19 +132,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }
 
-  /**
-   * 🛡️ OGA FIX: Update User Profile
-   * We now return the updated user data so the Onboarding page can verify it 
-   * BEFORE redirecting to the dashboard.
-   */
   const updateUserProfile = async (updates: Partial<any>): Promise<User | null> => {
     if (!user?.id) return null;
     try {
       const response = await updateUser(user.id, updates);
       const updatedUser = extractUserData(response);
       
-      // Force immediate local update
-      setUser(updatedUser);
+      // 🛡️ RE-ENFORCED: Immediate State Sync
+      setUser(prev => {
+        if (!prev) return updatedUser;
+        return {
+          ...prev,
+          ...updatedUser,
+          profile: {
+            ...prev.profile,
+            ...updatedUser.profile
+          }
+        };
+      });
       return updatedUser;
     } catch (error) {
       console.error("Profile update failed:", error);
@@ -157,14 +164,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   /**
-   * 🛡️ THE GATEKEEPER
-   * We added a check to ensure we aren't blocking if the app is still loading.
+   * 🛡️ THE STABLE GATEKEEPER
+   * Checks every possible variation of the onboarding flag to ensure it STAYS hidden.
    */
   const requiresOnboarding = useMemo(() => {
     if (isLoading || !user) return false;
-    // Check both nested profile and root level onboardingCompleted (depending on your Prisma schema)
-    const isCompleted = user.profile?.onboardingCompleted === true || (user as any).onboardingCompleted === true;
-    return !isCompleted;
+    
+    const profile = user.profile;
+    const isDone = 
+      profile?.onboardingCompleted === true || 
+      profile?.hasCompletedOnboarding === true || 
+      (user as any).onboardingCompleted === true ||
+      (user as any).hasCompletedOnboarding === true;
+
+    return !isDone;
   }, [user, isLoading]);
 
   const contextValue = useMemo(() => ({
