@@ -41,7 +41,8 @@ const itemVariants = {
 }
 
 export default function DashboardPage() {
-  const { user, signOut, isLoading } = useAuth()
+  // 🛡️ OGA FIX: Added 'requiresOnboarding' from our updated provider
+  const { user, signOut, isLoading, requiresOnboarding } = useAuth()
   const { theme } = useTheme() 
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("home")
@@ -49,27 +50,32 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoading) {
+      // 1. No user? Back to landing.
       if (!user) {
         router.push("/")
         return
       }
 
-      if (user?.profile?.onboardingCompleted === false) {
+      // 2. 🛡️ THE GATEKEEPER: If they MUST onboard, send them there.
+      // But only if we are sure they haven't finished.
+      if (requiresOnboarding) {
+        console.log("Onboarding required, redirecting...");
         router.push("/onboarding")
         return
       }
 
+      // 3. Load history only if they are a full user
       const history = getHistory().slice(0, 3)
       setRecentScans(history)
     }
-  }, [user, isLoading, router])
+  }, [user, isLoading, requiresOnboarding, router])
 
-  if (isLoading || !user) return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
+  if (isLoading || !user || (requiresOnboarding && activeTab === "home")) return (
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
       <motion.div 
         animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
         transition={{ repeat: Infinity, duration: 2 }}
-        className="w-16 h-16 bg-[#E1784F] rounded-[2rem] flex items-center justify-center font-black text-white shadow-2xl"
+        className="w-16 h-16 bg-[#E1784F] rounded-[2rem] flex items-center justify-center font-black text-white shadow-[0_0_50px_rgba(225,120,79,0.3)]"
       >A</motion.div>
     </div>
   )
@@ -143,7 +149,7 @@ export default function DashboardPage() {
         <header className="flex justify-between items-center mb-12 relative z-10">
            <div className="space-y-1">
               <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-foreground leading-none">Hello, {displayName}</h2>
-              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#E1784F]">Check if your skin is glowing today</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#E1784F]">AfriDam Clinical Dashboard</p>
            </div>
            
            <button onClick={() => router.push('/pricing')} className="hidden sm:flex items-center gap-3 px-8 py-4 bg-[#1C1A19] dark:bg-white text-white dark:text-black rounded-xl text-[9px] font-black uppercase tracking-widest shadow-2xl hover:scale-105 transition-all">
@@ -166,7 +172,7 @@ export default function DashboardPage() {
                     <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-inner"><Camera size={28} /></div>
                     <div>
                       <h3 className="text-2xl md:text-3xl font-black italic uppercase text-white tracking-tighter">Skin Scanner</h3>
-                      <p className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em]">Start Analysis</p>
+                      <p className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em]">Live Analysis</p>
                     </div>
                   </div>
                   <div className="w-14 h-14 bg-white text-[#E1784F] rounded-2xl flex items-center justify-center shadow-2xl group-hover:translate-x-2 transition-transform"><ArrowRight size={24} /></div>
@@ -195,7 +201,7 @@ export default function DashboardPage() {
                     <div className="w-14 h-14 bg-[#E1784F] rounded-2xl flex items-center justify-center shadow-xl animate-pulse"><Zap size={24} className="text-white fill-white" /></div>
                     <div>
                         <p className="text-lg font-black italic uppercase tracking-tighter">Urgent Specialist Care</p>
-                        <p className="text-[9px] opacity-60 font-black uppercase tracking-[0.3em] mt-1 text-[#E1784F]">Direct expert advice for $15</p>
+                        <p className="text-[9px] opacity-60 font-black uppercase tracking-[0.3em] mt-1 text-[#E1784F]">Expert clinical consultation</p>
                     </div>
                   </div>
                   <button className="w-full md:w-auto px-10 py-5 bg-[#E1784F] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:scale-105 transition-all">Book Now</button>
@@ -209,7 +215,7 @@ export default function DashboardPage() {
                   {recentScans.length > 0 ? (
                     <div className="space-y-4">
                       {recentScans.map((scan) => (
-                        <div key={scan.id} className="p-8 bg-card/60 border border-border rounded-[2.5rem] flex items-center justify-between group hover:border-[#E1784F]/40 transition-all shadow-sm cursor-pointer">
+                        <div key={scan.id} className="p-8 bg-card/60 border border-border rounded-2.5rem flex items-center justify-between group hover:border-[#E1784F]/40 transition-all shadow-sm cursor-pointer">
                           <div className="flex items-center gap-5">
                             <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center text-[#E1784F] shadow-inner"><Activity size={20}/></div>
                             <div>

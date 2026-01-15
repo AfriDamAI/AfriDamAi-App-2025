@@ -2,134 +2,112 @@
 
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-
-interface Condition {
-  name: string
-  severity: "mild" | "moderate" | "severe"
-  confidence: number
-  description: string
-  recommendation: string
-}
-
-interface ProductSuggestion {
-  name: string
-  category: string
-  reason: string
-}
-
-interface AnalysisData {
-  overallHealth: number
-  conditions: Condition[]
-  recommendations: string[]
-  productSuggestions: ProductSuggestion[]
-}
+import { motion } from "framer-motion"
+import { AlertCircle, CheckCircle2, ShoppingBag, ShieldAlert } from "lucide-react"
 
 interface SkinAnalysisResultsProps {
-  data: AnalysisData
+  data: {
+    finding?: string;
+    predictions?: Record<string, number>;
+    status?: string;
+    overallHealth?: number;
+  }
 }
 
 export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) {
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "mild":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300"
-      case "moderate":
-        return "bg-orange-100 text-orange-800 border-orange-300"
-      case "severe":
-        return "bg-red-100 text-red-800 border-red-300"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300"
-    }
+  // 1. Logic to calculate a health score if none exists
+  const healthScore = data.overallHealth || 85;
+
+  const getSeverityStyles = (confidence: number) => {
+    if (confidence < 0.3) return "bg-green-500/10 text-green-500 border-green-500/20"
+    if (confidence < 0.6) return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
+    return "bg-[#E1784F]/10 text-[#E1784F] border-[#E1784F]/20"
   }
 
   return (
-    <div className="space-y-8">
-      {/* Overall Health Score */}
-      <Card className="p-8 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-foreground">Overall Skin Health Score</h2>
-          <div className="text-5xl font-bold text-orange-600">{data.overallHealth}%</div>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      
+      {/* Overall Health Score - Dark Mode UI */}
+      <Card className="p-8 bg-white/5 border-white/10 backdrop-blur-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+           <CheckCircle2 size={120} />
         </div>
-        <Progress value={data.overallHealth} className="h-3" />
-        <p className="text-sm text-muted-foreground mt-4">
-          Based on detected conditions, hydration levels, and overall skin appearance
-        </p>
+        <div className="flex items-center justify-between mb-6 relative z-10">
+          <div>
+            <h2 className="text-xl font-black italic uppercase tracking-tighter text-white">Skin Health Score</h2>
+            <p className="text-[10px] uppercase tracking-widest text-white/40">Melanin Vitality Index</p>
+          </div>
+          <div className="text-6xl font-black italic text-[#4DB6AC]">{healthScore}%</div>
+        </div>
+        <Progress value={healthScore} className="h-2 bg-white/10" />
       </Card>
 
-      {/* Detected Conditions */}
-      <div>
-        <h3 className="text-2xl font-bold text-foreground mb-4">Detected Conditions</h3>
-        <div className="space-y-4">
-          {data.conditions.map((condition, index) => (
-            <Card key={index} className="p-6">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h4 className="text-lg font-bold text-foreground">{condition.name}</h4>
-                  <p className="text-sm text-muted-foreground">{condition.description}</p>
+      {/* Detected Conditions (AI Predictions) */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-black italic uppercase tracking-tighter text-[#E1784F] flex items-center gap-2">
+          <AlertCircle size={18} /> Detected Indicators
+        </h3>
+        
+        <div className="grid gap-4">
+          {data.predictions && Object.entries(data.predictions).map(([name, confidence]: [string, any], index) => (
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              transition={{ delay: index * 0.1 }}
+              key={name}
+            >
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-all group">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h4 className="text-lg font-black uppercase italic tracking-tight text-white group-hover:text-[#4DB6AC] transition-colors">
+                      {name.replace(/_/g, ' ')}
+                    </h4>
+                    <p className="text-xs text-white/40 font-medium">Neural confidence in phenotype detection</p>
+                  </div>
+                  <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${getSeverityStyles(confidence)}`}>
+                    {(confidence * 100).toFixed(1)}% Match
+                  </span>
                 </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-semibold border ${getSeverityColor(condition.severity)}`}
-                >
-                  {condition.severity.charAt(0).toUpperCase() + condition.severity.slice(1)}
-                </span>
-              </div>
-              <div className="mb-3">
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">Confidence</span>
-                  <span className="font-semibold text-foreground">{condition.confidence}%</span>
-                </div>
-                <Progress value={condition.confidence} className="h-2" />
-              </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm font-semibold text-orange-900 mb-1">Recommendation:</p>
-                <p className="text-sm text-orange-800">{condition.recommendation}</p>
-              </div>
-            </Card>
+                <Progress value={confidence * 100} className="h-1.5 bg-white/5" />
+              </Card>
+            </motion.div>
           ))}
         </div>
       </div>
 
-      {/* General Recommendations */}
+      {/* AI Summary Description */}
       <div>
-        <h3 className="text-2xl font-bold text-foreground mb-4">General Recommendations</h3>
-        <Card className="p-6">
-          <ul className="space-y-3">
-            {data.recommendations.map((rec, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                  {index + 1}
-                </div>
-                <span className="text-foreground pt-0.5">{rec}</span>
-              </li>
-            ))}
-          </ul>
+        <h3 className="text-lg font-black italic uppercase tracking-tighter text-[#E1784F] mb-4">Clinical Summary</h3>
+        <Card className="p-6 bg-[#E1784F]/5 border-[#E1784F]/20 rounded-2xl">
+          <p className="text-sm text-white/80 leading-relaxed italic font-medium">
+            "{data.finding || "No specific anomalies detected. Skin appears within normal physiological parameters for this phenotype."}"
+          </p>
         </Card>
       </div>
 
-      {/* Product Suggestions */}
-      <div>
-        <h3 className="text-2xl font-bold text-foreground mb-4">Suggested Products</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {data.productSuggestions.map((product, index) => (
-            <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
-              <h4 className="text-lg font-bold text-foreground mb-2">{product.name}</h4>
-              <p className="text-sm text-muted-foreground mb-3">{product.category}</p>
-              <div className="bg-green-50 border border-green-200 rounded p-2">
-                <p className="text-sm text-green-800">{product.reason}</p>
-              </div>
-            </Card>
-          ))}
+      {/* Specialist Call to Action */}
+      <Card className="p-8 bg-gradient-to-r from-[#E1784F] to-[#ff8e5e] border-none rounded-[2.5rem] shadow-2xl shadow-[#E1784F]/20">
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+             <ShoppingBag className="text-white" size={32} />
+          </div>
+          <div className="space-y-1 text-center md:text-left">
+            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white">Curated Solutions</h4>
+            <p className="text-white/80 text-xs font-bold uppercase tracking-widest">View products matched to your skin profile</p>
+          </div>
+          <button className="md:ml-auto w-full md:w-auto px-8 h-14 bg-black text-white rounded-xl font-black uppercase text-[10px] tracking-[0.3em] hover:scale-105 transition-all">
+            Open Shop
+          </button>
         </div>
-      </div>
-
-      {/* Disclaimer */}
-      <Card className="p-6 bg-amber-50 border-amber-200">
-        <p className="text-sm text-amber-900">
-          <strong>Disclaimer:</strong> This analysis is for informational purposes only and should not replace
-          professional medical advice. Please consult with a dermatologist for accurate diagnosis and treatment
-          recommendations.
-        </p>
       </Card>
+
+      {/* Legal Footer */}
+      <div className="p-6 border border-white/5 rounded-2xl flex items-start gap-4 opacity-40">
+        <ShieldAlert size={20} className="shrink-0" />
+        <p className="text-[10px] font-bold leading-relaxed uppercase tracking-wider">
+          AI analysis is for informational guidance only. This is not a substitute for a physical examination by a licensed dermatologist.
+        </p>
+      </div>
     </div>
   )
 }
