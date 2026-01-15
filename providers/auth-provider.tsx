@@ -15,7 +15,7 @@ interface User {
   profile?: {
     avatarUrl?: string;
     bio?: string;
-    onboardingCompleted?: boolean;
+    onboardingCompleted?: boolean; // 👈 This is our Shield
     [key: string]: any;
   };
 }
@@ -24,6 +24,7 @@ interface AuthContextType {
   user: User | null
   isSignedIn: boolean
   isLoading: boolean
+  requiresOnboarding: boolean // 👈 NEW: Explicitly check for fresh users
   signIn: (credentials: UserLoginDto) => Promise<void>
   signUp: (userData: CreateUserDto) => Promise<void>
   signOut: () => void
@@ -63,9 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token) {
         try {
           const decoded: any = jwtDecode(token);
-          
-          // Check if token is expired
           const currentTime = Date.now() / 1000;
+          
           if (decoded.exp && decoded.exp < currentTime) {
             signOut();
           } else {
@@ -80,8 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           signOut();
         }
       }
-      
-      // Ensure loading only stops AFTER we know the user state
       setIsLoading(false);
     };
 
@@ -107,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Login failed:", error);
       throw error;
     } finally {
+      // 🛡️ OGA FIX: We don't stop loading until the USER state is fully set with profile info
       setIsLoading(false);
     }
   }
@@ -135,7 +134,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user?.id) {
       try {
         const response = await updateUser(user.id, updates);
-        setUser(extractUserData(response));
+        const updatedUser = extractUserData(response);
+        setUser(updatedUser);
       } catch (error) {
         console.error("Profile update failed:", error);
         throw error;
@@ -149,18 +149,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // 🛡️ THE SPEED FIX: Memoize the context value
-  // This prevents the entire App Tree from re-rendering unless the user or loading state actually changes.
+  // 🛡️ THE GATEKEEPER logic
+  const requiresOnboarding = useMemo(() => {
+    if (!user) return false;
+    // If onboardingCompleted is not explicitly TRUE, they REQUIRE onboarding.
+    return user.profile?.onboardingCompleted !== true;
+  }, [user]);
+
   const contextValue = useMemo(() => ({
     user,
     isSignedIn: !!user,
     isLoading,
+    requiresOnboarding, // 👈 Exposed to the whole app
     signIn,
     signUp,
     signOut,
     updateUserProfile,
     refreshUser
-  }), [user, isLoading]);
+  }), [user, isLoading, requiresOnboarding]);
 
   return (
     <AuthContext.Provider value={contextValue}>
