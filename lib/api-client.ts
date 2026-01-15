@@ -1,9 +1,12 @@
 import axios from "axios";
-import { environment } from "./environment";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "./types";
 
+/** * 🛠️ OGA FIX: Direct access to process.env
+ * We bypass the environment object here to ensure Next.js injects 
+ * the Vercel variable directly into the client-side bundle.
+ */
 const apiClient = axios.create({
-  baseURL: environment.backendUrl || "http://localhost:3001",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
 /** 🔐 Security Sync **/
@@ -18,11 +21,12 @@ export const setAuthToken = (token: string | null) => {
 /** 🛡️ Response Interceptor **/
 apiClient.interceptors.response.use(
   (response) => {
+    // Standardizing response data access
     return response.data?.resultData ? { ...response, data: response.data.resultData } : response;
   },
   (error) => {
     if (!error.response) {
-      console.error("🚀 Network Error: Check if backend is running.");
+      console.error("🚀 Network Error: Check if backend is running at:", process.env.NEXT_PUBLIC_API_URL);
     }
     const responseData = error.response?.data;
     if (responseData?.message === "Invalid password") {

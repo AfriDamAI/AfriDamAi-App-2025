@@ -25,8 +25,12 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            // Allows the app to process video streams and blob images from the scanner
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https:;",
+            /**
+             * 🛠️ OGA FIX: Added Backend URL & Vercel live to CSP
+             * 1. connect-src: Added https://*.afridamai.com to allow frontend-backend talk.
+             * 2. script-src: Added vercel.live to stop the feedback script error.
+             */
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https: https://*.afridamai.com;",
           },
           {
             key: 'Strict-Transport-Security',
