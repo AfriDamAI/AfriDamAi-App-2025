@@ -26,7 +26,7 @@ export async function addToHistory(record: Omit<ScanRecord, "id" | "timestamp">)
     const syncedRecord = response.data;
 
     // 2. Update Local Cache for Instant UI updates
-    const history = getLocalHistory();
+    const history = getHistory();
     history.unshift(syncedRecord);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_RECORDS)));
     
@@ -46,7 +46,7 @@ export async function addToHistory(record: Omit<ScanRecord, "id" | "timestamp">)
        localRecord.imageUrl = "pending_upload"; 
     }
 
-    const history = getLocalHistory();
+    const history = getHistory();
     history.unshift(localRecord);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_RECORDS)));
     return localRecord;
@@ -54,7 +54,7 @@ export async function addToHistory(record: Omit<ScanRecord, "id" | "timestamp">)
 }
 
 /** 🛡️ RE-ENFORCED: Fetching from Cloud + Local Hybrid **/
-export function getLocalHistory(): ScanRecord[] {
+export function getHistory(): ScanRecord[] {
   if (typeof window === "undefined") return [];
   try {
     const data = localStorage.getItem(STORAGE_KEY)
@@ -74,7 +74,7 @@ export async function fetchFullHistory(): Promise<ScanRecord[]> {
     return cloudHistory;
   } catch (error) {
     console.error("Clinical Node Fetch Failed:", error);
-    return getLocalHistory();
+    return getHistory();
   }
 }
 
@@ -84,7 +84,7 @@ export async function deleteHistoryRecord(id: string) {
     await apiClient.delete(`/history/${id}`);
     
     // 2. Clear from Local Cache
-    const history = getLocalHistory();
+    const history = getHistory();
     const filtered = history.filter((record) => record.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
   } catch (error) {
@@ -92,12 +92,12 @@ export async function deleteHistoryRecord(id: string) {
   }
 }
 
-export function clearLocalHistory() {
+export function clearHistory() {
   localStorage.removeItem(STORAGE_KEY)
 }
 
 export function getHistoryStats() {
-  const history = getLocalHistory()
+  const history = getHistory()
   return {
     totalScans: history.length,
     skinScans: history.filter((r) => r.type === "skin").length,
