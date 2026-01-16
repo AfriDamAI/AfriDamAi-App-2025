@@ -3,11 +3,12 @@
 import type React from "react";
 import Link from "next/link";
 import { useTheme } from "@/providers/theme-provider";
-import { Moon, Sun, Menu, X, Bell, LogOut } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { Moon, Sun, Menu, X, LogOut, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
 import { UserProfile } from "../components/user-profile";
 import { useAuth } from "@/providers/auth-provider";
 import NotificationDropdown from "./notification-dropdown";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface NavigationProps {
   onSignInClick: () => void;
@@ -23,129 +24,136 @@ export default function Navigation({
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const notificationRef = useRef<HTMLDivElement>(null);
 
-  // UPDATED: Removed "About" (404) and added "Mission"
-  // Also, we can filter these so "Home" and "Mission" only show when logged out
+  // 🛡️ RE-ENFORCED: Prevent scrolling when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [mobileMenuOpen]);
+
   const navLinks = user 
     ? [
         { href: "/dashboard", label: "Dashboard" },
-        { href: "/history", label: "History" },
+        { href: "/history", label: "My Diary" },
+        { href: "/profile", label: "Profile" },
       ]
     : [
         { href: "/", label: "Home" },
-        { href: "/mission", label: "Our Mission" }, // New Page Link
+        { href: "/mission", label: "Our Mission" },
+        { href: "/marketplace", label: "Care Hub" },
         { href: "/contact", label: "Support" },
       ];
 
-  const handleNavClick = (e: React.MouseEvent, href: string) => {
-    const protectedRoutes = ["/dashboard", "/history"];
-    if (protectedRoutes.includes(href) && !user) {
-      e.preventDefault();
-      onSignUpClick();
-    }
-  };
-
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border transition-colors duration-500">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20"> {/* Increased height for logo */}
+    <nav className="sticky top-0 z-[60] bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-6 md:px-8">
+        <div className="flex justify-between items-center h-20 md:h-24">
           
-          {/* LOGO: REPLACED "A" BOX WITH REAL LOGO */}
-          <Link href="/" className="flex items-center gap-3 group">
+          {/* 🌍 BRAND LOGO */}
+          <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
             <img 
               src="/logo.png" 
               alt="AfriDam AI" 
-              className="h-12 w-auto object-contain drop-shadow-[0_0_10px_rgba(225,120,79,0.2)]" 
+              className="h-10 md:h-12 w-auto object-contain" 
             />
-            <div className="hidden sm:flex flex-col border-l border-border pl-3">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">
+            <div className="hidden sm:flex flex-col border-l border-border/50 pl-3">
+              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">
                 Clinical
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-10">
+          {/* 💻 DESKTOP LINKS */}
+          <div className="hidden lg:flex items-center gap-10">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-[#E1784F] transition-colors"
-                onClick={(e) => handleNavClick(e, link.href)}
+                className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-[#E1784F] transition-all"
               >
                 {link.label}
               </Link>
             ))}
           </div>
 
-          {/* Right side actions */}
-          <div className="flex items-center gap-4 relative" ref={notificationRef}>
+          {/* ⚡ ACTION ZONE */}
+          <div className="flex items-center gap-3 md:gap-4">
             
-            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-muted/50 hover:bg-muted border border-border transition-all"
-              aria-label="Toggle theme"
+              className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all"
             >
-              {theme === "light" ? (
-                <Moon className="w-4 h-4 text-foreground" />
-              ) : (
-                <Sun className="w-4 h-4 text-yellow-500" />
-              )}
+              {theme === "light" ? <Moon size={16} /> : <Sun size={16} className="text-[#E1784F]" />}
             </button>
 
-            {/* reminder/Notifications */}
             <NotificationDropdown />
 
-            <div className="h-8 w-[1px] bg-border mx-2 hidden sm:block" />
+            <div className="hidden md:block">
+              <UserProfile
+                onSignInClick={onSignInClick}
+                onSignUpClick={onSignUpClick}
+                onViewProfileClick={onViewProfileClick}
+              />
+            </div>
 
-            <UserProfile
-              onSignInClick={onSignInClick}
-              onSignUpClick={onSignUpClick}
-              onViewProfileClick={onViewProfileClick}
-            />
-
-            {/* Mobile Menu Button */}
+            {/* 🍔 MOBILE BURGER: RE-ENFORCED */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+              className="lg:hidden p-3 rounded-2xl bg-[#E1784F]/10 text-[#E1784F] border border-[#E1784F]/20 active:scale-90 transition-all"
             >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
+      {/* 📱 MOBILE FULL-SCREEN OVERLAY */}
+      <AnimatePresence>
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border bg-background py-6 px-4 space-y-4 shadow-2xl animate-in slide-in-from-top-4">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 top-20 z-[70] bg-background flex flex-col p-8 lg:hidden"
+          >
+            <div className="flex-grow space-y-4">
+              <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.4em] mb-8">Menu Navigation</p>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block px-6 py-4 rounded-2xl bg-muted/30 text-[10px] font-black uppercase tracking-widest text-foreground hover:bg-[#E1784F] hover:text-white transition-all"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between w-full p-6 rounded-[2rem] bg-card border border-border group active:bg-[#E1784F] transition-all"
                 >
-                  {link.label}
+                  <span className="text-xl font-black italic uppercase tracking-tighter group-active:text-white">{link.label}</span>
+                  <ArrowRight size={20} className="text-[#E1784F] group-active:text-white" />
                 </Link>
               ))}
-              {user && (
-                <button
-                  onClick={() => {
-                    signOut()
-                    setMobileMenuOpen(false)
-                  }}
-                  className="w-full text-left px-6 py-4 rounded-2xl bg-red-500/10 text-red-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-3"
+            </div>
+
+            <div className="pt-8 border-t border-border space-y-4">
+              {!user ? (
+                <button 
+                  onClick={() => { setMobileMenuOpen(false); onSignUpClick(); }}
+                  className="w-full py-6 bg-[#E1784F] text-white rounded-[2rem] font-black uppercase text-[11px] tracking-widest shadow-xl"
                 >
-                  <LogOut size={16} />
-                  <span>Terminate Session</span>
+                  Start Journey
+                </button>
+              ) : (
+                <button
+                  onClick={() => { signOut(); setMobileMenuOpen(false); }}
+                  className="w-full py-6 bg-red-500/10 text-red-500 rounded-[2rem] font-black uppercase text-[11px] tracking-widest flex items-center justify-center gap-3"
+                >
+                  <LogOut size={16} /> Sign Out
                 </button>
               )}
-          </div>
+            </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
     </nav>
   );
 }

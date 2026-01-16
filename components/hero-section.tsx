@@ -2,12 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { motion } from "framer-motion"
+import { ArrowRight, Zap, ShieldCheck, Sparkles, Camera } from "lucide-react"
 import { OurProductsSection } from "./our-product-section"
 
-// ----------------------------------------------------------------
-// NOTE: I've renamed the default export to a more generic name (e.g., HomePageContent)
-// to reflect that it now includes the Hero, Mission, and Platform sections.
-// ----------------------------------------------------------------
 interface HeroSectionProps {
   onScanClick: () => void;
   onIngredientsClick: () => void;
@@ -18,230 +16,155 @@ export default function HomePageContent({
   onIngredientsClick,
 }: HeroSectionProps) {
   return (
-    <div className="bg-background">
-      {/* 1. Hero Section (Your Original Content) */}
-      <section className="relative overflow-hidden bg-background py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="flex flex-col gap-6">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight text-balance">
-                AI That Understands African Skin
+    <div className="bg-background selection:bg-[#E1784F]/30 overflow-x-hidden">
+      
+      {/* 🛡️ 1. WORLD-CLASS HERO SECTION */}
+      <section className="relative min-h-[90svh] flex items-center justify-center overflow-hidden px-6 py-12 md:py-32">
+        {/* Background Glows */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#E1784F]/10 blur-[120px] rounded-full" />
+        </div>
+
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            
+            {/* Left Content: BOLD & ITALIC */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="flex flex-col gap-8 text-left"
+            >
+              <div className="inline-flex items-center gap-2 w-fit px-4 py-2 rounded-full bg-[#E1784F]/10 border border-[#E1784F]/20">
+                <Sparkles size={14} className="text-[#E1784F]" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">
+                  Clinical Intelligence
+                </span>
+              </div>
+
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic uppercase tracking-tighter leading-[0.9] text-foreground text-balance">
+                Built by <br className="hidden md:block"/> 
+                <span className="text-[#E1784F]">Africans</span>, <br/> 
+                for Africans.
               </h1>
 
-              <p className="text-lg text-muted-foreground leading-relaxed text-balance">
-                Scan your skin instantly, detect potential issues, and analyze
-                cosmetic ingredients powered by AfriDam AI — secure, accurate,
-                and dermatologist-approved.
+              <p className="text-md md:text-xl text-muted-foreground font-medium leading-relaxed max-w-xl text-balance">
+                Every skin tells a beautiful story. We use smart technology built with love to help you find the gentle care you deserve.
               </p>
 
-              {/* CTA Buttons */}
+              {/* High-Impact CTA Zone */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button
-                  size="lg"
+                <button
                   onClick={onScanClick}
-                  className="dark:bg-[#e0774e] bg-primary hover:bg-orange-700 text-white w-full sm:w-auto"
+                  className="group px-8 py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl shadow-[#E1784F]/20 transition-all flex items-center justify-center gap-3 active:scale-95"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Run Skin Check
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
+                  Start Journey <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button
                   onClick={onIngredientsClick}
-                  className="w-full sm:w-auto bg-transparent"
+                  className="px-8 py-5 bg-transparent border border-border text-foreground rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-foreground/5 transition-all flex items-center justify-center gap-3"
                 >
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
                   Analyze Ingredients
-                </Button>
+                </button>
               </div>
-            </div>
 
-            {/* Right Image */}
-            <div className="relative w-full h-64">
+              {/* Trust Badges */}
+              <div className="flex items-center gap-8 pt-6 border-t border-border/50">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="text-[#4DB6AC]" size={20} />
+                  <span className="text-[9px] font-black uppercase tracking-widest opacity-50 text-foreground">Derm-Approved</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Zap className="text-[#E1784F]" size={20} />
+                  <span className="text-[9px] font-black uppercase tracking-widest opacity-50 text-foreground">Instant Results</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Right Content: PREMIUM IMAGE CARD */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 1 }}
+              className="relative aspect-[4/5] md:aspect-square lg:aspect-auto lg:h-[700px] rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl"
+            >
               <Image
                 src="/beautiful-face.jpg"
-                alt="Beautiful Face"
+                alt="Melanin Skin Excellence"
                 fill
-                style={{ objectFit: "cover" }}
+                priority
+                className="object-cover"
               />
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-transparent to-transparent" />
+              
+              {/* Floating UI Elements for Mobile "Pop" */}
+              <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#E1784F] rounded-2xl flex items-center justify-center text-white">
+                    <Camera size={24} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] font-black text-white uppercase tracking-widest">AI Scanner Active</p>
+                    <p className="text-[8px] text-white/50 uppercase tracking-widest">Scanning for 14+ conditions</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* 2. Our Mission Section - Added based on request */}
-      <section id="mission" className="py-20 md:py-32 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="font-bold text-sm uppercase tracking-widest text-orange-600">
-              Our Mission
-            </span>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mt-4">
-              Addressing the Core Challenges in African Skincare
+      {/* 2. RE-ENFORCED MISSION SECTION */}
+      <section id="mission" className="py-24 md:py-40 relative">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-left md:text-center mb-20 space-y-4">
+            <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-[0.5em]">Our Mission</span>
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black italic uppercase tracking-tighter text-foreground leading-none">
+              Closing the <br className="hidden md:block"/> Clinical Gap
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Problem 1: Lack of Access */}
-            <div className="bg-card p-8 rounded-2xl border border-border transition-shadow hover:shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                🏥 Lack of Access
-              </h3>
-              <p className="mt-2 text-muted-foreground">
-                <span className="font-bold text-red-500">Challenge:</span> 1
-                dermatologist for every 1M+ people, leaving rural areas with no
-                specialists.
-              </p>
-              <p className="mt-2 text-orange-600">
-                <span className="font-bold">Solution:</span> Instant AI-powered
-                skin analysis from any phone, closing the access gap.
-              </p>
-            </div>
-            {/* Problem 2: Pervasive Misdiagnosis */}
-            <div className="bg-card p-8 rounded-2xl border border-border transition-shadow hover:shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                🎯 Pervasive Misdiagnosis
-              </h3>
-              <p className="mt-2 text-muted-foreground">
-                <span className="font-bold text-red-500">Challenge:</span>{" "}
-                Global AI models fail on darker skin, leading to critical
-                errors.
-              </p>
-              <p className="mt-2 text-orange-600">
-                <span className="font-bold">Solution:</span> Our model is
-                trained on African skin for accurate, bias-free results.
-              </p>
-            </div>
-            {/* Problem 3: Harmful Products */}
-            <div className="bg-card p-8 rounded-2xl border border-border transition-shadow hover:shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                ⚠️ Harmful Products
-              </h3>
-              <p className="mt-2 text-muted-foreground">
-                <span className="font-bold text-red-500">Challenge:</span> Fake
-                creams and mercury-laced soaps flood the market, damaging skin.
-              </p>
-              <p className="mt-2 text-orange-600">
-                <span className="font-bold">Solution:</span> Scan products for
-                harmful ingredients and expiry dates before use.
-              </p>
-            </div>
-            {/* Problem 4: No Health Monitoring */}
-            <div className="bg-card p-8 rounded-2xl border border-border transition-shadow hover:shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                👩🏾‍⚕️ No Health Monitoring
-              </h3>
-              <p className="mt-2 text-muted-foreground">
-                <span className="font-bold text-red-500">Challenge:</span>{" "}
-                People treat symptoms randomly, with no data on what works.
-              </p>
-              <p className="mt-2 text-orange-600">
-                <span className="font-bold">Solution:</span> Track your skincare
-                journey with photo logs and smart comparisons.
-              </p>
-            </div>
-            {/* Problem 5: Unverified Vendors */}
-            <div className="bg-card p-8 rounded-2xl border border-border transition-shadow hover:shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                🧴 Unverified Vendors
-              </h3>
-              <p className="mt-2 text-muted-foreground">
-                <span className="font-bold text-red-500">Challenge:</span> The
-                market is flooded with counterfeits from unregulated sellers.
-              </p>
-              <p className="mt-2 text-orange-600">
-                <span className="font-bold">Solution:</span> A curated
-                marketplace of safe, vetted skincare products.
-              </p>
-            </div>
-            {/* Problem 6: No Central Data */}
-            <div className="bg-card p-8 rounded-2xl border border-border transition-shadow hover:shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                📉 No Central Data
-              </h3>
-              <p className="mt-2 text-muted-foreground">
-                <span className="font-bold text-red-500">Challenge:</span> No
-                large-scale dermatology database for African populations stunts
-                research.
-              </p>
-              <p className="mt-2 text-orange-600">
-                <span className="font-bold">Solution:</span> Building a
-                pan-African dataset to power future innovation.
-              </p>
-            </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { icon: "🏥", title: "Access", desc: "1 derm per 1M people in Africa. We bring the expert to your pocket.", color: "text-red-500" },
+              { icon: "🎯", title: "Accuracy", desc: "Global AI fails on dark skin. We trained ours specifically for melanin.", color: "text-blue-500" },
+              { icon: "⚠️", title: "Safety", desc: "Mercury and fake creams are dangerous. We scan for what matters.", color: "text-[#E1784F]" },
+              { icon: "👩🏾‍⚕️", title: "Monitoring", desc: "Random treatments damage skin. We provide a data-driven journey.", color: "text-[#4DB6AC]" },
+              { icon: "🧴", title: "Vetted", desc: "Curated marketplace for verified, African-safe products.", color: "text-purple-500" },
+              { icon: "📉", title: "Research", desc: "Building the largest African dermatology dataset in history.", color: "text-orange-400" },
+            ].map((item, i) => (
+              <div key={i} className="group p-8 md:p-10 bg-card/40 border border-border rounded-[2.5rem] hover:border-[#E1784F]/30 transition-all text-left">
+                <div className="text-3xl mb-6">{item.icon}</div>
+                <h3 className="text-xl font-black italic uppercase text-foreground mb-4">{item.title}</h3>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* our products */}
       <OurProductsSection />
 
-      {/* 3. Our Platform Section - Added based on request */}
-      <section id="features" className="py-20 md:py-32 bg-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-16">
-            <span className="font-bold text-sm uppercase tracking-widest text-orange-600">
-              Our Platform
-            </span>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mt-4">
-              An Ecosystem of Trust & Precision
+      {/* 3. PLATFORM ECOSYSTEM */}
+      <section id="features" className="py-24 md:py-40 bg-muted/50 rounded-t-[4rem] md:rounded-t-[6rem]">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="mb-20 space-y-4">
+            <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-[0.5em]">Ecosystem</span>
+            <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-foreground leading-none">
+              Trust & Precision
             </h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-16">
-            <div className="bg-card p-6 rounded-2xl flex flex-col items-center justify-center space-y-4 transition-all duration-300 border border-transparent hover:border-orange-600/50 hover:shadow-md">
-              <h3 className="text-md font-bold text-foreground">
-                AI Skin Scanner
-              </h3>
-            </div>
-            <div className="bg-card p-6 rounded-2xl flex flex-col items-center justify-center space-y-4 transition-all duration-300 border border-transparent hover:border-orange-600/50 hover:shadow-md">
-              <h3 className="text-md font-bold text-foreground">
-                Ingredient Detector
-              </h3>
-            </div>
-            <div className="bg-card p-6 rounded-2xl flex flex-col items-center justify-center space-y-4 transition-all duration-300 border border-transparent hover:border-orange-600/50 hover:shadow-md">
-              <h3 className="text-md font-bold text-foreground">
-                Expiry Date Checker
-              </h3>
-            </div>
-            <div className="bg-card p-6 rounded-2xl flex flex-col items-center justify-center space-y-4 transition-all duration-300 border border-transparent hover:border-orange-600/50 hover:shadow-md">
-              <h3 className="text-md font-bold text-foreground">
-                Progress Tracker
-              </h3>
-            </div>
-            <div className="bg-card p-6 rounded-2xl flex flex-col items-center justify-center space-y-4 transition-all duration-300 border border-transparent hover:border-orange-600/50 hover:shadow-md">
-              <h3 className="text-md font-bold text-foreground">
-                Personalized AI Routines
-              </h3>
-            </div>
-            <div className="bg-card p-6 rounded-2xl flex flex-col items-center justify-center space-y-4 transition-all duration-300 border border-transparent hover:border-orange-600/50 hover:shadow-md">
-              <h3 className="text-md font-bold text-foreground">
-                Skincare Marketplace
-              </h3>
-            </div>
-            <div className="bg-card p-6 rounded-2xl flex flex-col items-center justify-center space-y-4 transition-all duration-300 border border-transparent hover:border-orange-600/50 hover:shadow-md">
-              <h3 className="text-md font-bold text-foreground">
-                Educational Hub
-              </h3>
-            </div>
-            <div className="bg-card p-6 rounded-2xl flex flex-col items-center justify-center space-y-4 transition-all duration-300 border border-transparent hover:border-orange-600/50 hover:shadow-md">
-              <h3 className="text-md font-bold text-foreground">
-                TeleDermal Consult
-              </h3>
-            </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {[
+              "AI Skin Scanner", "Ingredient Detector", "Expiry Checker", "Progress Tracker",
+              "AI Routines", "Marketplace", "Educational Hub", "Consultation"
+            ].map((feature, i) => (
+              <div key={i} className="bg-card p-6 md:p-10 rounded-[2rem] border border-transparent hover:border-[#E1784F]/30 hover:shadow-2xl transition-all cursor-default">
+                <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] text-foreground">
+                  {feature}
+                </h3>
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -1,8 +1,9 @@
 "use client"
 
-import { Bell, Check, Clock, X } from 'lucide-react';
+import { Bell, Check, Clock, X, Trash2, ShieldCheck } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react'
 
+// 🛡️ TYPE DEFINITION (Matches Backend Entity)
 type NotificationType = 'routine' | 'product' | 'reminder' | 'achievement';
 
 interface Notification {
@@ -15,68 +16,31 @@ interface Notification {
     icon?: string;
 }
 
-const mockNotifications: Notification[] = [
-    {
-        id: '1',
-        type: 'routine',
-        title: 'Morning Routine Reminder',
-        message: 'Time for your morning skincare routine! Don\'t forget your vitamin C serum.',
-        time: '2 min ago',
-        read: false,
-        icon: '🌅'
-    },
-    {
-        id: '2',
-        type: 'product',
-        title: 'Product Running Low',
-        message: 'Your Hyaluronic Acid serum is running low. Consider reordering soon.',
-        time: '1 hour ago',
-        read: false,
-        icon: '📦'
-    },
-    {
-        id: '3',
-        type: 'reminder',
-        title: 'Weekly Mask Reminder',
-        message: 'It\'s time for your weekly hydrating face mask treatment.',
-        time: '3 hours ago',
-        read: false,
-        icon: '✨'
-    },
-    {
-        id: '4',
-        type: 'routine',
-        title: 'Evening Routine Coming Up',
-        message: 'Don\'t forget your evening skincare routine at 9 PM.',
-        time: '5 hours ago',
-        read: true,
-        icon: '🌙'
-    },
-    {
-        id: '5',
-        type: 'achievement',
-        title: '7-Day Streak! 🎉',
-        message: 'Congratulations! You\'ve maintained your routine for 7 days straight.',
-        time: '1 day ago',
-        read: true,
-        icon: '🏆'
-    },
-    {
-        id: '6',
-        type: 'reminder',
-        title: 'Sunscreen Application',
-        message: 'Remember to reapply your sunscreen if you\'re going outside.',
-        time: '2 days ago',
-        read: true,
-        icon: '☀️'
-    }
-];
 const NotificationDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+    // 🛡️ FIXED: Starting with an empty array to remove hardcoded placeholders
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [loading, setLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const unreadCount = notifications.filter(n => !n.read).length;
+
+    // 🛡️ SYNC LOGIC: This is where we will fetch real data from your API
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            setLoading(true);
+            try {
+                // TODO: const response = await api.get('/notifications/me');
+                // setNotifications(response.data);
+            } catch (error) {
+                console.error("Failed to sync notifications", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchNotifications();
+    }, []);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -84,156 +48,109 @@ const NotificationDropdown = () => {
                 setIsOpen(false);
             }
         }
-
         if (isOpen) {
             document.addEventListener('mousedown', handleClickOutside);
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
         }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen]);
 
     const markAsRead = (id: string) => {
-        setNotifications(prev =>
-            prev.map(n => (n.id === id ? { ...n, read: true } : n))
-        );
+        setNotifications(prev => prev.map(n => (n.id === id ? { ...n, read: true } : n)));
+        // TODO: api.patch(`/notifications/${id}/read`);
     };
 
     const markAllAsRead = () => {
         setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        // TODO: api.patch('/notifications/read-all');
     };
 
     const deleteNotification = (id: string) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
+        // TODO: api.delete(`/notifications/${id}`);
     };
-
-    const getNotificationStyle = (type: NotificationType) => {
-        switch (type) {
-            case 'routine':
-                return 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200';
-            case 'product':
-                return 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200';
-            case 'reminder':
-                return 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200';
-            case 'achievement':
-                return 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200';
-            default:
-                return 'bg-gray-50 border-gray-200';
-        }
-    };
-
-    const getIconColor = (type: NotificationType) => {
-        switch (type) {
-            case 'routine':
-                return 'text-blue-600';
-            case 'product':
-                return 'text-amber-600';
-            case 'reminder':
-                return 'text-purple-600';
-            case 'achievement':
-                return 'text-green-600';
-            default:
-                return 'text-gray-600';
-        }
-    };
-
 
     return (
         <div className="relative" ref={dropdownRef}>
-            {/* Notification Bell Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 hover:bg-rose-50 rounded-xl transition-colors duration-200"
+                className="relative p-2.5 hover:bg-rose-50 rounded-2xl transition-all active:scale-95"
+                aria-label="Notifications"
             >
-                <Bell className="w-6 h-6 text-slate-700" />
+                <Bell className="w-6 h-6 text-slate-600" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 w-5 h-5 bg-gradient-to-br from-rose-500 to-pink-600 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                    <span className="absolute top-1.5 right-1.5 w-5 h-5 bg-rose-500 text-white text-[10px] font-bold rounded-full border-2 border-white flex items-center justify-center">
                         {unreadCount}
                     </span>
                 )}
             </button>
 
-            {/* Dropdown Panel */}
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-rose-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsOpen(false)} />
+            )}
+
+            {isOpen && (
+                <div className="fixed md:absolute right-4 left-4 md:left-auto md:right-0 mt-3 md:w-96 bg-white rounded-[2.5rem] shadow-2xl border border-rose-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+                    
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-rose-50 to-pink-50 px-6 py-4 border-b border-rose-100">
-                        <div className="flex items-center justify-between mb-1">
-                            <h3 className="text-rose-900">Notifications</h3>
-                            {unreadCount > 0 && (
-                                <button
-                                    onClick={markAllAsRead}
-                                    className="text-xs text-rose-600 hover:text-rose-700 flex items-center gap-1 transition-colors"
-                                >
-                                    <Check className="w-3 h-3" />
-                                    Mark all read
-                                </button>
-                            )}
+                    <div className="bg-white px-7 py-6 border-b border-slate-50">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900">Activity</h3>
+                                <p className="text-xs text-slate-400 mt-0.5">Stay updated with your skincare journey</p>
+                            </div>
+                            <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-slate-50 rounded-full md:hidden">
+                                <X className="w-5 h-5 text-slate-400" />
+                            </button>
                         </div>
-                        <p className="text-sm text-slate-600">
-                            {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'You&apos;re all caught up!'}
-                        </p>
                     </div>
 
-                    {/* Notifications List */}
-                    <div className="max-h-[500px] overflow-y-auto">
+                    {/* Content List */}
+                    <div className="max-h-[60vh] md:max-h-[400px] overflow-y-auto overscroll-contain bg-white">
                         {notifications.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12 px-6">
-                                <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full flex items-center justify-center mb-4">
-                                    <Bell className="w-8 h-8 text-rose-300" />
+                            <div className="py-20 px-8 text-center">
+                                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-5">
+                                    <ShieldCheck className="w-10 h-10 text-slate-200" />
                                 </div>
-                                <p className="text-slate-600 text-center">No notifications yet</p>
-                                <p className="text-sm text-slate-400 text-center mt-1">We&apos;ll notify you about your skincare routines and reminders</p>
+                                <h4 className="text-slate-900 font-bold text-lg">Secure & Quiet</h4>
+                                <p className="text-sm text-slate-500 mt-2 max-w-[200px] mx-auto">
+                                    When we have updates on your skin analysis or routines, they will appear here.
+                                </p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-rose-50">
-                                {notifications.map((notification: Notification) => (
+                            <div className="divide-y divide-slate-50">
+                                {notifications.map((n) => (
                                     <div
-                                        key={notification.id}
-                                        className={`px-6 py-4 hover:bg-rose-50/50 transition-colors duration-150 ${!notification.read ? 'bg-rose-50/30' : ''
-                                            }`}
+                                        key={n.id}
+                                        className={`px-7 py-6 transition-colors cursor-pointer ${!n.read ? 'bg-rose-50/10' : 'bg-white'}`}
+                                        onClick={() => markAsRead(n.id)}
                                     >
-                                        <div className="flex gap-3">
-                                            {/* Icon */}
-                                            <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${getNotificationStyle(notification.type)} border`}>
-                                                <span className="text-lg">{notification.icon}</span>
+                                        <div className="flex gap-4">
+                                            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-xl shadow-sm">
+                                                {n.icon}
                                             </div>
-
-                                            {/* Content */}
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex items-start justify-between gap-2 mb-1">
-                                                    <h4 className={`text-sm ${!notification.read ? 'text-slate-900' : 'text-slate-700'}`}>
-                                                        {notification.title}
-                                                    </h4>
-                                                    {!notification.read && (
-                                                        <div className="w-2 h-2 bg-rose-500 rounded-full flex-shrink-0 mt-1"></div>
-                                                    )}
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <p className={`text-sm font-bold truncate ${!n.read ? 'text-slate-900' : 'text-slate-500'}`}>
+                                                        {n.title}
+                                                    </p>
+                                                    {!n.read && <span className="w-2 h-2 bg-rose-500 rounded-full mt-1.5" />}
                                                 </div>
-                                                <p className="text-sm text-slate-600 mb-2 line-clamp-2">
-                                                    {notification.message}
+                                                <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                                                    {n.message}
                                                 </p>
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-1 text-xs text-slate-400">
-                                                        <Clock className="w-3 h-3" />
-                                                        {notification.time}
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        {!notification.read && (
-                                                            <button
-                                                                onClick={() => markAsRead(notification.id)}
-                                                                className="text-xs text-rose-600 hover:text-rose-700 transition-colors"
-                                                            >
-                                                                Mark read
-                                                            </button>
-                                                        )}
-                                                        <button
-                                                            onClick={() => deleteNotification(notification.id)}
-                                                            className="p-1 hover:bg-rose-100 rounded transition-colors"
-                                                        >
-                                                            <X className="w-3 h-3 text-slate-400 hover:text-slate-600" />
-                                                        </button>
-                                                    </div>
+                                                <div className="flex items-center justify-between mt-3">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                        <Clock className="w-3 h-3" /> {n.time}
+                                                    </span>
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+                                                        className="p-1 text-slate-300 hover:text-rose-500 transition-colors"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -243,11 +160,14 @@ const NotificationDropdown = () => {
                         )}
                     </div>
 
-                    {/* Footer */}
+                    {/* Footer Actions */}
                     {notifications.length > 0 && (
-                        <div className="bg-gradient-to-r from-rose-50 to-pink-50 px-6 py-3 border-t border-rose-100">
-                            <button className="w-full text-sm text-rose-600 hover:text-rose-700 transition-colors">
-                                View all notifications
+                        <div className="p-5 bg-slate-50/30 border-t border-slate-50 flex gap-3">
+                            <button 
+                                onClick={markAllAsRead}
+                                className="flex-1 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 hover:border-rose-200 hover:text-rose-500 transition-all"
+                            >
+                                Clear All
                             </button>
                         </div>
                     )}
@@ -257,4 +177,4 @@ const NotificationDropdown = () => {
     );
 }
 
-export default NotificationDropdown
+export default NotificationDropdown;

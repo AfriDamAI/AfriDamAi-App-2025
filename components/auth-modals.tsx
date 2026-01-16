@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { X, CheckCircle2, ChevronDown, Globe, ArrowRight, Loader2, Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react"
+import { X, CheckCircle2, ChevronDown, Globe, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { motion, AnimatePresence } from "framer-motion"
@@ -28,7 +28,7 @@ interface AuthModalsProps {
 
 export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsProps) {
   const router = useRouter()
-  const { signIn, signUp, user } = useAuth()
+  const { signIn, signUp, user, forgotPassword } = useAuth() // 🛡️ Re-enforced with forgotPassword
   
   const [authView, setAuthView] = useState<"signin" | "signup" | "forgot">(initialType)
   const [showPassword, setShowPassword] = useState(false)
@@ -38,15 +38,16 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
   const [lastName, setLastName] = useState("")
   const [sex, setSex] = useState("female")
   const [nationality, setNationality] = useState("Nigeria")
-  const [otherCountry, setOtherCountry] = useState("")
+  const [countryCode, setCountryCode] = useState("+234") // 🛡️ Added country code state
   const [phoneNo, setPhoneNo] = useState("")
   const [agreedToTerms, setAgreedToTerms] = useState(false) 
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("") // 🛡️ Added success state
   const [isLoading, setIsLoading] = useState(false)
 
-  // 🛡️ RE-ENFORCED: Nuke state when switching views or opening/closing
   const resetStates = () => {
     setError("")
+    setSuccess("")
     setEmail("")
     setPassword("")
     setFirstName("")
@@ -57,8 +58,10 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
   }
 
   useEffect(() => {
-    setAuthView(initialType)
-    resetStates()
+    if (isOpen) {
+      setAuthView(initialType)
+      resetStates()
+    }
   }, [initialType, isOpen])
 
   useEffect(() => {
@@ -70,26 +73,30 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
+    setSuccess("")
+
     if (authView === "signup" && !agreedToTerms) {
       setError("PLEASE ACCEPT HEALTH PROTOCOLS.");
       return;
     }
 
-    setError("")
     setIsLoading(true)
 
     try {
       if (authView === "signin") {
         await signIn({ email, password })
       } else if (authView === "signup") {
-        const finalNationality = nationality === "Other" ? otherCountry : nationality;
+        // 🛡️ RE-ENFORCED: Combine code and number
+        const fullPhone = `${countryCode}${phoneNo.replace(/\D/g, '')}`; 
         await signUp({
-          firstName, lastName, email, sex, phoneNo, password, nationality: finalNationality
+          firstName, lastName, email, sex, phoneNo: fullPhone, password, nationality
         })
-      } else {
-        // Recovery Logic
-        setError("RECOVERY LINK SENT IF ACCOUNT EXISTS.")
-        setEmail("") 
+      } else if (authView === "forgot") {
+        // 🛡️ RE-ENFORCED: Call real service
+        await forgotPassword(email)
+        setSuccess("RECOVERY LINK DISPATCHED IF ACCOUNT EXISTS.")
+        setEmail("")
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || "Connection Error";
@@ -115,22 +122,16 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="relative bg-[#1C1A19] border-t md:border border-white/10 rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl w-full max-w-lg z-10 overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/10 blur-[60px] rounded-full pointer-events-none" />
-        
         <div className="p-6 md:p-12 max-h-[85vh] md:max-h-[90vh] overflow-y-auto no-scrollbar">
-          <div className="flex justify-between items-start mb-6 md:mb-10 text-left">
+          <div className="flex justify-between items-start mb-6 md:mb-10">
             <div className="space-y-1">
-              <h2 className="text-3xl md:text-4xl font-black text-[#F7F3EE] tracking-tighter uppercase italic leading-none">
+              <h2 className="text-3xl font-black text-[#F7F3EE] uppercase italic">
                 {authView === "signin" ? "Welcome Back" : authView === "signup" ? "Create Account" : "Reset Access"}
               </h2>
-              <p className="text-[9px] md:text-[10px] font-black text-[#E1784F] uppercase tracking-[0.4em]">
-                {authView === "forgot" ? "Recovery" : "Join AfriDam AI"}
-              </p>
             </div>
-            <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400">
+            <button onClick={onClose} className="p-2 rounded-full bg-white/5 border border-white/10 text-gray-400">
               <X size={18} />
             </button>
           </div>
@@ -138,35 +139,30 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
           <form onSubmit={handleSubmit} className="space-y-4">
             {authView === "signup" && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3 md:gap-4">
-                  <input required placeholder="FIRST NAME" className="auth-input-premium" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                  <input required placeholder="LAST NAME" className="auth-input-premium" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                <div className="grid grid-cols-2 gap-4">
+                  <input required placeholder="FIRST NAME" className="auth-input-premium bg-[#252321] text-[#F7F3EE]" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                  <input required placeholder="LAST NAME" className="auth-input-premium bg-[#252321] text-[#F7F3EE]" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3 md:gap-4">
-                  <div className="relative">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="relative">
                     <select 
-                      value={sex}
-                      onChange={(e) => setSex(e.target.value)}
-                      className="auth-input-premium appearance-none w-full cursor-pointer pr-10"
+                      value={nationality}
+                      onChange={(e) => {
+                        const country = AFRICAN_COUNTRIES.find(c => c.name === e.target.value);
+                        setNationality(e.target.value);
+                        if (country) setCountryCode(country.code);
+                      }}
+                      className="auth-input-premium appearance-none w-full bg-[#252321] text-[#F7F3EE] pr-10"
                     >
-                      <option value="female">FEMALE</option>
-                      <option value="male">MALE</option>
+                      {AFRICAN_COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.name.toUpperCase()}</option>)}
                     </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={14} />
+                    <Globe className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                   </div>
-                  <input required type="tel" placeholder="PHONE" className="auth-input-premium" value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} />
-                </div>
-
-                <div className="relative">
-                  <select 
-                    value={nationality}
-                    onChange={(e) => setNationality(e.target.value)}
-                    className="auth-input-premium appearance-none w-full cursor-pointer pr-10"
-                  >
-                    {AFRICAN_COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.name.toUpperCase()} ({c.code})</option>)}
-                  </select>
-                  <Globe className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
+                  <div className="flex gap-2">
+                    <span className="flex items-center justify-center bg-[#252321] border border-white/10 rounded-2xl px-3 text-[10px] font-black text-[#E1784F]">{countryCode}</span>
+                    <input required type="tel" placeholder="PHONE" className="auth-input-premium bg-[#252321] text-[#F7F3EE] flex-1" value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} />
+                  </div>
                 </div>
               </div>
             )}
@@ -175,7 +171,7 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
               required
               type="email"
               placeholder="EMAIL ADDRESS"
-              className="auth-input-premium w-full text-white"
+              className="auth-input-premium w-full bg-[#252321] text-[#F7F3EE]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -186,50 +182,38 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
                   required
                   type={showPassword ? "text" : "password"}
                   placeholder="PASSWORD"
-                  className="auth-input-premium w-full text-white pr-14"
+                  className="auth-input-premium w-full bg-[#252321] text-[#F7F3EE] pr-14"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             )}
 
-            {authView === "signin" && (
-              <button type="button" onClick={() => setAuthView("forgot")} className="text-[9px] font-black uppercase tracking-widest text-[#E1784F] block ml-1">
-                Forgot Password?
-              </button>
-            )}
-
             {authView === "signup" && (
               <div className="flex items-center gap-4 py-2">
-                <div 
+                <button 
+                  type="button"
                   onClick={() => setAgreedToTerms(!agreedToTerms)}
-                  className={`shrink-0 w-6 h-6 rounded-lg border flex items-center justify-center transition-all cursor-pointer ${agreedToTerms ? 'bg-[#4DB6AC] border-[#4DB6AC]' : 'border-white/10 bg-white/5'}`}
+                  className={`shrink-0 w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${agreedToTerms ? 'bg-[#4DB6AC] border-[#4DB6AC]' : 'border-white/10 bg-white/5'}`}
                 >
                   {agreedToTerms && <CheckCircle2 size={14} className="text-white" />}
-                </div>
-                <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest cursor-pointer text-left">
+                </button>
+                <label className="text-[9px] text-gray-500 font-black uppercase tracking-widest">
                   Accept <span className="text-[#4DB6AC]">Health Protocols</span>
                 </label>
               </div>
             )}
 
-            {error && (
-              <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-[9px] font-black uppercase tracking-widest text-center">
-                {error}
-              </div>
-            )}
+            {error && <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-[9px] font-black uppercase text-center">{error}</div>}
+            {success && <div className="p-4 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400 text-[9px] font-black uppercase text-center">{success}</div>}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#E1784F] text-white font-black uppercase text-[10px] md:text-[11px] tracking-[0.3em] py-5 md:py-6 rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+              className="w-full bg-[#E1784F] text-white font-black uppercase text-[11px] tracking-[0.3em] py-6 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3"
             >
               {isLoading ? <Loader2 className="animate-spin" size={18} /> : (
                 <>{authView === "signin" ? "Login Now" : authView === "signup" ? "Create Account" : "Send Link"} <ArrowRight size={16} /></>
@@ -238,10 +222,7 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
 
             <button 
               type="button"
-              onClick={() => {
-                resetStates();
-                setAuthView(authView === "signin" ? "signup" : "signin");
-              }}
+              onClick={() => { resetStates(); setAuthView(authView === "signin" ? "signup" : "signin"); }}
               className="w-full text-center text-[9px] font-black uppercase tracking-widest text-gray-500 pt-2"
             >
               {authView === "signin" ? "New here? Create Account" : "Already a member? Login"}

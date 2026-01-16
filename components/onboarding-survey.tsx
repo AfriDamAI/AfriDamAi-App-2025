@@ -35,15 +35,16 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
 
   /**
    * 🛡️ RE-ENFORCED: Sync Logic
-   * Saves to both root and profile to ensure the Dashboard banner vanishes.
+   * Saves to both root and profile to ensure the Dashboard banner vanishes instantly.
    */
   const handleFinish = async () => {
     if (isSaving) return;
     setIsSaving(true);
     
     try {
+      // 🛡️ OGA FIX: We broadcast the completion to every possible field
+      // This kills the "Stubborn Banner" problem once and for all.
       const updatePayload = {
-        // Redundant flags to match all possible DB schema variations
         onboardingCompleted: true, 
         hasCompletedOnboarding: true,
         profile: {
@@ -54,21 +55,21 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
         }
       };
 
-      // 1. Force the update through the Auth Provider
+      // 1. Trigger the global auth provider update
       await updateUserProfile?.(updatePayload);
       
-      // 2. 🛡️ BREATHING ROOM: Ensure server persistence
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // 2. 🛡️ Clinical Pause: Allow DB to settle and avoid UI race conditions
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // 3. Final callback to parent
+      // 3. Close the modal
       onComplete();
 
     } catch (err) {
       console.error("Clinical Profile Sync Failed:", err);
-      // Fail-safe: Always let the user through to the dashboard
+      // Fail-safe: Always let the user through to the dashboard if the network stutters
       onComplete();
     } finally {
-      setIsSaving(false);
+      setIsLoading(false);
     }
   };
 

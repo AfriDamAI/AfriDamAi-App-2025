@@ -14,9 +14,9 @@ import {
   ShoppingBag,
   ShieldCheck,
   Scan,
-  Lock,
   Loader2,
-  ArrowRight
+  ArrowRight,
+  Upload
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -24,7 +24,7 @@ import { useAuth } from "@/providers/auth-provider"
 
 export default function UnifiedScanner() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, isLoading: authLoading } = useAuth()
   
   const [imgSource, setImgSource] = useState<string | null>(null)
   const [isCapturing, setIsCapturing] = useState(false)
@@ -38,6 +38,10 @@ export default function UnifiedScanner() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  useEffect(() => {
+    if (!authLoading && !user) router.push("/");
+  }, [user, authLoading, router]);
+
   const startCamera = async () => {
     setErrorDetails(null)
     setIsCapturing(true)
@@ -45,7 +49,7 @@ export default function UnifiedScanner() {
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 720 } },
+        video: { facingMode: "user", width: { ideal: 1080 }, height: { ideal: 1080 } },
         audio: false
       })
       streamRef.current = stream
@@ -55,7 +59,7 @@ export default function UnifiedScanner() {
       }
     } catch (err: any) {
       setIsCapturing(false)
-      setErrorDetails("Camera access denied. Check permissions.")
+      setErrorDetails("Camera hardware unreachable.");
       setStatus("Hardware Error")
     }
   }
@@ -88,10 +92,11 @@ export default function UnifiedScanner() {
       const file = new File([blob], "scan.jpg", { type: "image/jpeg" });
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('flag', 'skin_analysis');
 
-      const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyzer/scan`, {
+      const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyzer/process-request`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         body: formData,
       });
 
@@ -99,58 +104,75 @@ export default function UnifiedScanner() {
       setResults({ finding: data.description || "Analysis Complete", predictions: data.predictions });
       setStatus("Complete")
     } catch (err: any) {
-      setErrorDetails("AI Node busy. Try again.");
+      setErrorDetails("NEURAL LINK BUSY. RETRY SCAN.");
     } finally {
       setIsAnalyzing(false)
     }
   }
 
-  return (
-    <div className="min-h-[100svh] bg-[#0A0A0A] text-white p-4 md:p-10 relative overflow-x-hidden font-sans">
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-10%,rgba(225,120,79,0.1),transparent_70%)] pointer-events-none" />
+  if (authLoading || !user) return (
+    <div className="min-h-screen bg-black flex items-center justify-center text-[#E1784F]">
+       <Loader2 className="animate-spin w-10 h-10" />
+    </div>
+  );
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-6 relative z-10">
+  return (
+    <main className="min-h-[100svh] bg-background text-foreground px-6 py-12 md:p-12 lg:p-16 overflow-x-hidden selection:bg-[#E1784F]/30">
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-10%,rgba(225,120,79,0.06),transparent_70%)] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto space-y-10 md:space-y-16 relative z-10">
         
-        {/* HEADER - COMPACT */}
-        <header className="flex justify-between items-center bg-white/[0.03] backdrop-blur-3xl p-4 md:p-6 rounded-[2rem] border border-white/10">
-          <div className="flex items-center gap-4">
-            <button onClick={() => router.push('/dashboard')} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+        {/* 🛡️ RE-ENFORCED CLINICAL HEADER */}
+        <header className="flex justify-between items-center text-left">
+          <div className="flex items-center gap-4 md:gap-8">
+            <button onClick={() => router.push('/dashboard')} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#E1784F] hover:bg-[#E1784F] hover:text-white transition-all">
               <ChevronLeft size={20} />
             </button>
-            <div className="text-left">
-              <h1 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter leading-none">AI <span className="text-[#E1784F]">Scanner</span></h1>
-              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-[#E1784F]">Clinical Grade</p>
+            <div className="space-y-1">
+               <h1 className="text-3xl md:text-6xl lg:text-7xl font-black italic tracking-tighter uppercase leading-none text-foreground">
+                 Skin <span className="text-[#E1784F]">Scanner</span>
+               </h1>
+               <div className="flex items-center gap-2">
+                 <ShieldCheck size={12} className="text-[#4DB6AC]" />
+                 <span className="text-[9px] md:text-[11px] font-black text-muted-foreground uppercase tracking-[0.3em] italic">{status}</span>
+               </div>
             </div>
-          </div>
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${errorDetails ? 'bg-red-500/10 border-red-500/20' : 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20'}`}>
-            <ShieldCheck size={12} className={errorDetails ? "text-red-500" : "text-[#4DB6AC]"} />
-            <span className="text-[8px] font-black uppercase tracking-widest">{status}</span>
           </div>
         </header>
 
         {!results ? (
-          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 items-start">
             
-            {/* MODERATE CAMERA VIEWPORT */}
+            {/* 📸 SMART LENS PORTAL */}
             <div className="w-full lg:col-span-7 relative group">
-              <Card className="bg-black border border-white/10 overflow-hidden aspect-square relative rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl">
+              <div className="bg-[#0A0A0A] border-4 md:border-[12px] border-white/5 overflow-hidden aspect-square relative rounded-[2.5rem] md:rounded-[4rem] shadow-2xl">
                 <AnimatePresence mode="wait">
                   {isCapturing ? (
-                    <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
+                    <div className="relative w-full h-full">
+                        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
+                        <div className="absolute inset-0 border-[30px] md:border-[60px] border-black/60 pointer-events-none">
+                            <div className="w-full h-full border-2 border-dashed border-[#E1784F]/40 rounded-3xl" />
+                        </div>
+                    </div>
                   ) : imgSource ? (
-                    <img src={imgSource} className="w-full h-full object-cover" alt="Captured" />
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full relative">
+                        <img src={imgSource} className="w-full h-full object-cover" alt="Captured" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    </motion.div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6">
-                      <div className="w-20 h-20 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center">
-                        <Scan className="w-10 h-10 text-white/20" />
+                    <div className="flex flex-col items-center justify-center h-full p-12 text-center space-y-8">
+                      <div className="w-24 h-24 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#E1784F]/40 transition-all">
+                        <Scan className="w-10 h-10 text-white/20 group-hover:text-[#E1784F] transition-all" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter">Clinical View</h3>
-                        <p className="text-white/30 text-[9px] font-black uppercase tracking-widest">Awaiting Lens Activation</p>
+                        <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Initiate Scan</h3>
+                        <p className="text-white/30 text-[9px] font-black uppercase tracking-widest leading-relaxed max-w-[200px] mx-auto">Center your face in the lens for AI sequencing.</p>
                       </div>
-                      <div className="flex flex-col gap-3 w-full max-w-xs">
-                        <Button onClick={startCamera} className="h-14 bg-[#E1784F] text-white rounded-xl font-black uppercase text-[10px] tracking-widest">Open Camera</Button>
-                        <Button onClick={() => fileInputRef.current?.click()} className="h-14 bg-white/5 text-white border border-white/10 rounded-xl font-black uppercase text-[10px] tracking-widest">Upload</Button>
+                      <div className="flex flex-col gap-4 w-full max-w-xs">
+                        <button onClick={startCamera} className="h-16 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl active:scale-95 transition-all">Open Lens</button>
+                        <button onClick={() => fileInputRef.current?.click()} className="h-16 bg-white/5 text-white border border-white/10 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2">
+                            <Upload size={14} /> Upload Sample
+                        </button>
                         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
                           const file = e.target.files?.[0];
                           if(file) {
@@ -165,103 +187,112 @@ export default function UnifiedScanner() {
                 </AnimatePresence>
 
                 {isAnalyzing && (
-                  <motion.div 
-                    initial={{ top: "0%" }} animate={{ top: "100%" }} transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                    className="absolute left-0 right-0 h-[2px] bg-[#4DB6AC] shadow-[0_0_20px_#4DB6AC] z-30"
-                  />
+                  <div className="absolute inset-0 bg-black/90 backdrop-blur-2xl z-40 flex flex-col items-center justify-center space-y-6">
+                     <Loader2 className="animate-spin text-[#4DB6AC] w-14 h-14" />
+                     <p className="text-[#4DB6AC] font-black uppercase text-[10px] tracking-[0.4em] animate-pulse italic">Sequencing Sample...</p>
+                     <motion.div 
+                        initial={{ top: "0%" }} animate={{ top: "100%" }} transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        className="absolute left-0 right-0 h-[2px] bg-[#4DB6AC] shadow-[0_0_20px_#4DB6AC] z-30"
+                      />
+                  </div>
                 )}
-              </Card>
+              </div>
 
               {isCapturing && (
-                <button onClick={capture} className="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-white p-1 shadow-2xl">
+                <button onClick={capture} className="absolute bottom-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-white p-1 shadow-2xl active:scale-90 transition-all">
                   <div className="w-full h-full rounded-full border-4 border-[#E1784F] bg-white flex items-center justify-center">
-                    <div className="w-4 h-4 rounded-full bg-[#E1784F] animate-pulse" />
+                    <div className="w-14 h-14 rounded-full bg-[#E1784F] shadow-lg shadow-[#E1784F]/40 animate-pulse" />
                   </div>
                 </button>
               )}
             </div>
 
-            {/* INFO PANEL */}
-            <div className="w-full lg:col-span-5 space-y-6">
-              <div className="p-6 md:p-8 bg-white/5 border border-white/10 rounded-[2.5rem] space-y-8 backdrop-blur-3xl text-left">
+            {/* 🛡️ PROTOCOL PANEL */}
+            <div className="w-full lg:col-span-5 space-y-8 text-left">
+              <div className="p-10 bg-card/40 border border-border rounded-[3rem] space-y-10 backdrop-blur-3xl relative">
                 <div className="flex items-center gap-3 text-[#E1784F]">
-                  <Activity size={18} />
-                  <h4 className="font-black uppercase italic text-xs tracking-tight">Protocol</h4>
+                  <Activity size={20} />
+                  <h4 className="font-black uppercase italic text-sm tracking-[0.1em]">Clinical Protocol</h4>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {[
-                    { t: "AI Synthesis", d: "Analysis by 4 melanin-specific networks." },
-                    { t: "Safe Storage", d: "Clinical data is encrypted and private." }
+                    { t: "AI Synthesis", d: "Analysis powered by melanin-specific neural networks." },
+                    { t: "Privacy Lock", d: "Clinical data is encrypted and HIPAA-aligned." }
                   ].map((item, i) => (
-                    <div key={i} className="flex gap-4">
-                      <span className="text-[#4DB6AC] font-black text-[10px] mt-1">0{i+1}</span>
-                      <div className="space-y-0.5">
-                         <p className="text-[9px] font-black uppercase tracking-widest text-white/80">{item.t}</p>
-                         <p className="text-[10px] font-bold text-white/30 leading-relaxed">{item.d}</p>
+                    <div key={i} className="flex gap-6">
+                      <span className="text-[#4DB6AC] font-black text-xs">0{i+1}</span>
+                      <div className="space-y-1">
+                         <p className="text-[10px] font-black uppercase tracking-widest text-foreground">{item.t}</p>
+                         <p className="text-[11px] font-bold text-muted-foreground leading-relaxed">{item.d}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 {imgSource && !isAnalyzing && (
-                  <Button onClick={analyze} className="w-full h-16 bg-white text-black rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-[#E1784F] hover:text-white transition-all">
-                    Analyze Sample <Zap size={14} className="ml-2 fill-current" />
-                  </Button>
-                )}
-                {isAnalyzing && (
-                  <div className="w-full py-4 flex flex-col items-center gap-2">
-                    <Loader2 className="animate-spin text-[#4DB6AC]" size={24} />
-                    <p className="text-[8px] font-black uppercase tracking-widest text-white/40">Decoding Scan...</p>
-                  </div>
+                  <button onClick={analyze} className="w-full h-20 bg-foreground text-background rounded-[1.8rem] font-black uppercase text-[11px] tracking-[0.3em] transition-all flex items-center justify-center gap-4 active:scale-95 shadow-2xl">
+                    Finalize Analysis <Zap size={18} fill="currentColor" />
+                  </button>
                 )}
               </div>
+
+              {errorDetails && (
+                <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-[10px] font-black uppercase tracking-widest text-center italic">
+                    {errorDetails}
+                </div>
+              )}
             </div>
           </div>
         ) : (
-          /* RESULTS VIEW */
-          <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6 pb-20">
-            <div className="p-6 md:p-12 bg-white/5 border border-white/10 rounded-[2.5rem] md:rounded-[4rem] backdrop-blur-3xl text-left">
-              <div className="flex items-center gap-5 mb-10">
-                <div className="w-14 h-14 bg-[#4DB6AC]/10 rounded-2xl border border-[#4DB6AC]/20 flex items-center justify-center text-[#4DB6AC]">
-                  <CheckCircle2 size={28} />
+          /* 🏆 CLINICAL RESULTS VIEW */
+          <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-10 pb-20">
+            <div className="p-8 md:p-16 bg-card/40 border border-border rounded-[3.5rem] md:rounded-[5rem] backdrop-blur-3xl text-left">
+              <div className="flex items-center gap-6 mb-12">
+                <div className="w-16 h-16 bg-[#4DB6AC]/10 rounded-[1.5rem] border border-[#4DB6AC]/20 flex items-center justify-center text-[#4DB6AC]">
+                  <CheckCircle2 size={32} />
                 </div>
                 <div>
-                  <h2 className="text-2xl md:text-4xl font-black italic uppercase tracking-tighter text-white">Analysis <span className="text-[#4DB6AC]">Live</span></h2>
-                  <p className="text-white/20 text-[8px] font-black uppercase tracking-[0.2em]">Verified Result</p>
+                  <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-foreground">Analysis <span className="text-[#4DB6AC]">Live</span></h2>
+                  <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">Verified Biological Signal</p>
                 </div>
               </div>
 
-              <div className="p-6 md:p-10 bg-white/5 rounded-[2rem] border border-white/5 space-y-4 mb-8">
-                <p className="text-[9px] font-black uppercase tracking-widest text-[#E1784F]">AI Finding</p>
-                <h4 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter leading-tight text-white">{results.finding}</h4>
-                <div className="flex flex-wrap gap-2">
+              <div className="p-8 md:p-12 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6 mb-10">
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#E1784F]">Diagnostic Finding</p>
+                <h4 className="text-2xl md:text-4xl lg:text-5xl font-black italic uppercase tracking-tighter leading-tight text-foreground">{results.finding}</h4>
+                <div className="flex flex-wrap gap-3 pt-4">
                   {results.predictions && Object.entries(results.predictions).map(([name, score]: any) => (
-                    <div key={name} className="px-3 py-1.5 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 text-[#4DB6AC] font-black text-[8px] uppercase rounded-lg">
-                      {name}: {(score * 100).toFixed(1)}%
+                    <div key={name} className="px-5 py-2.5 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 text-[#4DB6AC] font-black text-[9px] uppercase rounded-xl">
+                      {name}: {(score * 100).toFixed(1)}% Confidence
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="p-6 md:p-10 bg-[#E1784F] text-white rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
-                 <div className="flex items-center gap-4 text-left">
-                    <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center"><Stethoscope size={24}/></div>
-                    <div>
-                       <p className="text-xl font-black italic uppercase leading-none">Consult Expert</p>
-                       <p className="text-[8px] font-bold uppercase opacity-80 tracking-widest mt-1">Review this result with a doctor for $15.</p>
+              {/* REVENUE GENERATION CARD */}
+              <div className="p-8 md:p-12 bg-[#E1784F] text-white rounded-[3rem] flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl">
+                 <div className="flex items-center gap-6 text-left">
+                    <div className="w-16 h-16 bg-white/20 rounded-[1.5rem] flex items-center justify-center shadow-inner"><Stethoscope size={28}/></div>
+                    <div className="space-y-1">
+                       <p className="text-2xl font-black italic uppercase leading-none">Consult Expert</p>
+                       <p className="text-[10px] font-bold uppercase opacity-80 tracking-widest">Verify this scan with a certified specialist.</p>
                     </div>
                  </div>
-                 <Button onClick={() => router.push('/appointment')} className="w-full md:w-auto bg-black text-white px-8 h-14 rounded-xl font-black uppercase text-[9px] tracking-widest">Book Session</Button>
+                 <button onClick={() => router.push('/appointment')} className="w-full lg:w-auto bg-black text-white px-10 h-16 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all">Book Clinical Review</button>
               </div>
             </div>
             
-            <div className="flex gap-4">
-              <Button onClick={() => setResults(null)} className="flex-1 h-14 bg-white/5 border border-white/10 rounded-xl font-black uppercase text-[9px] tracking-widest text-white/40">New Scan</Button>
-              <Button onClick={() => router.push('/ecommerce')} className="flex-1 h-14 bg-white text-black rounded-xl font-black uppercase text-[9px] tracking-widest">Find Care</Button>
+            <div className="flex flex-col md:flex-row gap-6">
+              <button onClick={() => setResults(null)} className="flex-1 h-20 bg-white/5 border border-white/5 rounded-[2rem] font-black uppercase text-[11px] tracking-widest text-muted-foreground hover:bg-white/10 transition-all flex items-center justify-center gap-3">
+                 <RotateCcw size={16} /> New Scan
+              </button>
+              <button onClick={() => router.push('/ecommerce')} className="flex-1 h-20 bg-foreground text-background rounded-[2rem] font-black uppercase text-[11px] tracking-widest shadow-2xl transition-all flex items-center justify-center gap-3">
+                 Find Recommended Care <ShoppingBag size={16} />
+              </button>
             </div>
           </motion.div>
         )}
-      </motion.div>
-    </div>
+      </div>
+    </main>
   )
 }
