@@ -1,4 +1,4 @@
-// NLP engine for analyzing ingredients and generating insights
+"use client"
 
 import { findIngredient } from "./ingredient-database"
 
@@ -25,8 +25,9 @@ export interface IngredientAnalysisResult {
  * Parse ingredient list from text
  */
 export function parseIngredients(ingredientText: string): string[] {
+  // 🛡️ RE-ENFORCED: Handles commas, semicolons, and newlines from mobile pastes
   return ingredientText
-    .split(/[,;]/)
+    .split(/[,;\n]/)
     .map((ing) => ing.trim())
     .filter((ing) => ing.length > 0 && ing.length < 100)
 }
@@ -74,13 +75,14 @@ export function calculateSafetyScore(analyzedIngredients: AnalyzedIngredient[]):
           score -= 5
           break
         case "avoid":
-          score -= 15
+          // 🛡️ RE-ENFORCED: Avoided ingredients are high-risk on melanin-rich skin
+          score -= 20 
           break
       }
     }
   }
 
-  // Penalize for unknown ingredients
+  // Penalize for unknown ingredients to ensure clinical caution
   const unknownCount = analyzedIngredients.length - analyzedCount
   score -= unknownCount * 2
 
@@ -114,7 +116,7 @@ export function determineSkinTypeCompatibility(analyzedIngredients: AnalyzedIngr
       return ing.profile.skinTypeCompatibility[skinType as keyof typeof ing.profile.skinTypeCompatibility]
     }).length
 
-    const compatibilityRatio = compatibleCount / analyzedIngredients.length
+    const compatibilityRatio = compatibleCount / (analyzedIngredients.length || 1)
 
     if (compatibilityRatio >= 0.9) {
       compatibility[skinType] = "Excellent"
@@ -146,37 +148,37 @@ export function generateRecommendations(
   }
 
   // Frequency recommendation
-  if (irritants.includes("Salicylic Acid") || irritants.includes("Retinol")) {
+  if (irritants.some(i => ["salicylic acid", "retinol", "benzoyl peroxide"].includes(i.toLowerCase()))) {
     recommendations.push("Start with 2-3 times per week usage and gradually increase")
   }
 
-  // SPF recommendation
+  // 🛡️ RE-ENFORCED: SPF and PIH Prevention for Melanin-rich skin
   if (
     analyzedIngredients.some((ing) => ing.name.toLowerCase().includes("vitamin c")) ||
-    analyzedIngredients.some((ing) => ing.name.toLowerCase().includes("retinol"))
+    analyzedIngredients.some((ing) => ing.name.toLowerCase().includes("retinol")) ||
+    analyzedIngredients.some((ing) => ing.name.toLowerCase().includes("acid"))
   ) {
-    recommendations.push("Use SPF 30+ sunscreen during the day")
+    recommendations.push("Apply SPF 30+ daily to prevent hyperpigmentation (PIH) while using actives")
   }
 
   // Allergen warning
   if (allergens.length > 0) {
-    recommendations.push(`Avoid if allergic to: ${allergens.join(", ")}`)
+    recommendations.push(`Risk of reaction. Avoid if allergic to: ${allergens.join(", ")}`)
   }
 
   // Combination warning
   if (irritants.length > 1) {
-    recommendations.push("Avoid mixing with other exfoliants or active ingredients")
+    recommendations.push("Caution: Multiple actives detected. Avoid mixing with other exfoliants")
   }
 
   // Pregnancy warning
   if (
-    analyzedIngredients.some((ing) => ing.name.toLowerCase().includes("retinol")) ||
-    analyzedIngredients.some((ing) => ing.name.toLowerCase().includes("salicylic"))
+    analyzedIngredients.some((ing) => ["retinol", "salicylic acid", "hydroquinone"].includes(ing.name.toLowerCase()))
   ) {
-    recommendations.push("Not recommended during pregnancy - consult healthcare provider")
+    recommendations.push("Clinical Alert: Consult your healthcare provider if pregnant or nursing")
   }
 
-  return recommendations.length > 0 ? recommendations : ["Product appears safe for general use"]
+  return recommendations.length > 0 ? recommendations : ["Formulation appears stable for general application"]
 }
 
 /**
@@ -189,13 +191,13 @@ export function generateSummary(
   unknownCount: number,
 ): string {
   if (safetyScore >= 85) {
-    return "This product appears to be safe for most skin types with minimal concerns."
+    return "Clinical Grade: This product appears to be safe for most phenotypes with minimal concerns."
   } else if (safetyScore >= 70) {
-    return "This product is generally safe but contains some ingredients that may cause irritation in sensitive skin."
+    return "Balanced: This product is generally safe but contains components that may cause sensitivity."
   } else if (safetyScore >= 50) {
-    return "This product contains several active ingredients and potential irritants. Patch test recommended."
+    return "Active Potency: This product contains multiple irritants. Clinical patch test highly recommended."
   } else {
-    return "This product contains ingredients that may cause significant irritation. Consult a dermatologist before use."
+    return "High Risk: Significant irritant potential detected. Consult our Specialist Node before use."
   }
 }
 

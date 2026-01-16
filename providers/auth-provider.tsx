@@ -2,7 +2,14 @@
 
 import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react"
 import { jwtDecode } from "jwt-decode";
-import { login, register, setAuthToken, getUser, updateUser, forgotPassword as forgotPasswordApi } from "../lib/api-client"
+import { 
+  login, 
+  register, 
+  setAuthToken, 
+  getUser, 
+  updateUser, 
+  forgotPassword as forgotPasswordApi 
+} from "../lib/api-client"
 import { UserLoginDto, CreateUserDto } from "../lib/types"
 
 interface User {
@@ -12,11 +19,12 @@ interface User {
   lastName: string;
   sex: string;
   phoneNo: string;
-  onboardingCompleted?: boolean; // 🛡️ Root level check
+  onboardingCompleted?: boolean;
   profile?: {
     avatarUrl?: string;
     onboardingCompleted?: boolean;
     hasCompletedOnboarding?: boolean;
+    subscriptionPlan?: string;
     [key: string]: any;
   };
 }
@@ -29,7 +37,7 @@ interface AuthContextType {
   signIn: (credentials: UserLoginDto) => Promise<void>
   signUp: (userData: CreateUserDto) => Promise<void>
   signOut: () => void
-  forgotPassword: (email: string) => Promise<void> // 🛡️ ADDED MISSING LINK
+  forgotPassword: (email: string) => Promise<void>
   updateUserProfile: (updates: Partial<any>) => Promise<User | null>
   refreshUser: () => Promise<void>
 }
@@ -40,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // 🛡️ RE-ENFORCED: Unified Data Normalizer
   const extractUserData = (response: any) => {
     return response?.resultData || response?.data || response;
   };
@@ -51,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData);
       return userData;
     } catch (err) {
-      console.error("Clinical Data Fetch Failed:", err);
+      console.error("Clinical Node Sync Failed:", err);
       return null;
     }
   };
@@ -59,8 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       if (typeof window === "undefined") return;
-      setIsLoading(true); // 🛡️ Ensure guard is active
-
+      
       const token = localStorage.getItem("token");
       
       if (token) {
@@ -68,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const decoded: any = jwtDecode(token);
           const currentTime = Date.now() / 1000;
           
+          // 🛡️ RE-ENFORCED: Automatic Session Expiry Check
           if (decoded.exp && decoded.exp < currentTime) {
             signOut();
           } else {
@@ -78,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
           }
         } catch (err) {
+          console.error("Auth Initialisation Error:", err);
           signOut();
         }
       }
@@ -91,9 +101,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       const data = await login(credentials);
+      
+      // Handle various API return structures
       const accessToken = data.resultData?.accessToken || data.accessToken || data.data?.accessToken;
       
-      if (!accessToken) throw new Error("Authentication failed: No token");
+      if (!accessToken) throw new Error("Sync Failed: Invalid Token Payload");
 
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
@@ -113,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       await register(userData);
+      // Auto-login after successful clinical registration
       await signIn({ email: userData.email, password: userData.password });
     } catch (error: any) {
       throw error;
@@ -123,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const forgotPassword = async (email: string) => {
     try {
-      // 🛡️ RE-ENFORCED: Actually call the backend we fixed
+      // 🛡️ RE-ENFORCED: Calling the verified clinical email node
       await forgotPasswordApi(email);
     } catch (error: any) {
       throw error;
@@ -159,12 +172,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /**
    * 🛡️ THE NUCLEAR STABILIZER
-   * Only returns a value once loading is complete to prevent the "Login Flicker"
+   * Prevents premature redirection by verifying loading state
    */
   const requiresOnboarding = useMemo(() => {
     if (isLoading || !user) return false;
     
-    // Check root and profile levels
     const isDone = 
       user.onboardingCompleted === true || 
       user.profile?.onboardingCompleted === true || 

@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { X, Calendar, MessageCircle, Heart, AlertCircle, User, Users, LogOut } from 'lucide-react'
+import { X, Calendar, MessageCircle, Heart, AlertCircle, User, Users, LogOut, Activity, Zap } from 'lucide-react'
 import { useAuth } from "@/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { TreatmentRoutine } from "./treatment-routine"
 import { AppointmentBooking } from "./appointment-booking"
-import { HealthIndicator } from "./health-indicator"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface ProfileSidebarProps {
   isOpen: boolean
@@ -14,204 +14,153 @@ interface ProfileSidebarProps {
 }
 
 export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
-  const { user, updateUserProfile, signOut } = useAuth()
+  const { user, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState<"overview" | "routine" | "appointment">("overview")
   const [comment, setComment] = useState("")
-  const [comments, setComments] = useState<string[]>([])
-
-  const handleAddComment = () => {
-    if (comment.trim()) {
-      setComments([...comments, comment])
-      setComment("")
-    }
-  }
 
   if (!user) return null
 
+  const userInitial = (user.firstName || user.email || "U").charAt(0).toUpperCase();
+
   return (
     <>
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
-          onClick={onClose}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div
-        className={`fixed right-0 top-0 h-screen w-full sm:w-96 bg-background border-l border-border z-50 transform transition-transform duration-300 overflow-y-auto ${isOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-      >
-        <div className="sticky top-0 bg-background border-b border-border px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-foreground">My Profile</h2>
-          <button
+      {/* 🛡️ RE-ENFORCED: BLURRED OVERLAY */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
             onClick={onClose}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
+          />
+        )}
+      </AnimatePresence>
+
+      {/* 🛡️ RE-ENFORCED: PREMIUM SIDEBAR */}
+      <div
+        className={`fixed right-0 top-0 h-screen w-full sm:w-[450px] bg-background border-l border-border z-[110] transform transition-transform duration-500 ease-in-out overflow-y-auto no-scrollbar ${
+          isOpen ? "translate-x-0 shadow-[-20px_0_50px_rgba(0,0,0,0.2)]" : "translate-x-full"
+        }`}
+      >
+        {/* HEADER */}
+        <div className="sticky top-0 bg-background/80 backdrop-blur-md border-b border-border px-8 py-6 flex items-center justify-between z-20">
+          <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-foreground italic">Clinical Profile</h2>
+          <button onClick={onClose} className="p-3 bg-muted/50 hover:bg-[#E1784F]/10 hover:text-[#E1784F] rounded-2xl transition-all">
+            <X size={20} />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* User Avatar and Basic Info */}
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-orange-400 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-white text-2xl font-bold">{(user.firstName || user.email || "U").charAt(0).toUpperCase()}</span>
+        <div className="p-8 space-y-10">
+          {/* USER IDENTITY CARD */}
+          <div className="text-center space-y-4">
+            <div className="w-24 h-24 bg-[#E1784F] rounded-[2.5rem] flex items-center justify-center mx-auto shadow-2xl shadow-[#E1784F]/20 border-4 border-background relative">
+              <span className="text-white text-4xl font-black italic">{userInitial}</span>
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#4DB6AC] rounded-2xl flex items-center justify-center border-4 border-background text-white">
+                <Zap size={16} />
+              </div>
             </div>
-            <h3 className="text-lg font-bold text-foreground">{user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.email || "User")}</h3>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
-            <p className="text-xs text-muted-foreground mt-1">ID: {user.id}</p>
-          </div>
-
-          {/* Health Indicators */}
-          <HealthIndicator
-            label="Skin Type"
-            value={user.profile?.skinType ? (user.profile.skinType.charAt(0).toUpperCase() + user.profile.skinType.slice(1)) : "Not set"}
-            color="blue"
-          />
-
-          {/* User Information Cards */}
-          <div className="space-y-3 pt-4 border-t border-border">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-muted rounded-lg">
-                <p className="text-xs text-muted-foreground font-medium">Sex</p>
-                <p className="text-sm font-semibold text-foreground capitalize">{user.sex || "Not set"}</p>
-              </div>
-              <div className="p-3 bg-muted rounded-lg">
-                <p className="text-xs text-muted-foreground font-medium">Member Since</p>
-                <p className="text-sm font-semibold text-foreground">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Recently"}</p>
-              </div>
+            <div>
+              <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground">
+                {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : "Valued Member"}
+              </h3>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em] mt-1">{user.email}</p>
             </div>
           </div>
 
-          {/* Known Allergies */}
-          {user.profile?.knownSkinAllergies && user.profile.knownSkinAllergies.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-foreground flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-orange-500" />
-                Known Allergies
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {user.profile.knownSkinAllergies.map((allergy, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 text-xs rounded-full"
-                  >
-                    {allergy}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* QUICK METRICS */}
+          <div className="grid grid-cols-2 gap-4">
+             <div className="p-5 bg-muted/30 rounded-3xl border border-border">
+                <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Biological Sex</p>
+                <p className="text-sm font-black italic uppercase text-foreground">{user.sex || "Not Set"}</p>
+             </div>
+             <div className="p-5 bg-muted/30 rounded-3xl border border-border">
+                <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Member Since</p>
+                <p className="text-sm font-black italic uppercase text-foreground">
+                  {user.createdAt ? new Date(user.createdAt).getFullYear() : "2026"}
+                </p>
+             </div>
+          </div>
 
-          {/* Previous Treatments */}
-          {user.profile?.previousTreatments && user.profile.previousTreatments.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-foreground flex items-center gap-2">
-                <Users className="w-4 h-4 text-green-500" />
-                Previous Treatments
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {user.profile.previousTreatments.map((treatment, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs rounded-full"
-                  >
-                    {treatment}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-
-          {/* Tabs */}
-          <div className="border-t border-border pt-6">
-            <div className="flex gap-2 mb-4">
+          {/* TABS SELECTOR */}
+          <div className="flex bg-muted/50 p-1.5 rounded-[1.5rem] border border-border">
+            {["overview", "routine", "appointment"].map((tab) => (
               <button
-                onClick={() => setActiveTab("overview")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "overview"
-                  ? "bg-orange-600 text-white"
-                  : "bg-muted text-foreground hover:bg-muted/80"
-                  }`}
+                key={tab}
+                onClick={() => setActiveTab(tab as any)}
+                className={`flex-1 py-3 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all ${
+                  activeTab === tab ? "bg-[#E1784F] text-white shadow-lg" : "text-muted-foreground hover:text-foreground"
+                }`}
               >
-                Overview
+                {tab}
               </button>
-              <button
-                onClick={() => setActiveTab("routine")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "routine"
-                  ? "bg-orange-600 text-white"
-                  : "bg-muted text-foreground hover:bg-muted/80"
-                  }`}
-              >
-                Routine
-              </button>
-              <button
-                onClick={() => setActiveTab("appointment")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "appointment"
-                  ? "bg-orange-600 text-white"
-                  : "bg-muted text-foreground hover:bg-muted/80"
-                  }`}
-              >
-                Appointment
-              </button>
-            </div>
+            ))}
+          </div>
 
-            {/* Tab Content */}
+          {/* TAB CONTENT */}
+          <div className="space-y-8 min-h-[300px]">
             {activeTab === "overview" && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    <MessageCircle className="w-4 h-4 inline mr-2" />
-                    Add Comment
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+                {/* Allergies node */}
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F] flex items-center gap-2">
+                    <AlertCircle size={14} /> Critical Warnings
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {user.profile?.allergies ? (
+                       <span className="px-4 py-2 bg-[#E1784F]/10 text-[#E1784F] text-[9px] font-black uppercase tracking-widest rounded-xl border border-[#E1784F]/20">
+                          {user.profile.allergies}
+                       </span>
+                    ) : (
+                       <p className="text-[10px] font-medium text-muted-foreground italic">No clinical warnings found.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Personal Notes */}
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground flex items-center gap-2">
+                    <MessageCircle size={14} /> Dermal Observations
                   </label>
                   <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder="Add personal notes or observations..."
-                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    rows={3}
+                    placeholder="Log personal observations..."
+                    className="w-full px-5 py-4 bg-muted/30 border border-border rounded-2xl text-sm font-medium italic focus:ring-2 focus:ring-[#E1784F]/20 outline-none resize-none"
+                    rows={4}
                   />
-                  <Button
-                    onClick={handleAddComment}
-                    className="w-full mt-2 bg-orange-600 hover:bg-orange-700 text-white"
-                  >
-                    Submit Comment
+                  <Button className="w-full h-14 bg-foreground text-background dark:bg-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl">
+                    Submit Logs
                   </Button>
                 </div>
-
-                {comments.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-foreground">Recent Comments</p>
-                    {comments.map((c, idx) => (
-                      <div key={idx} className="p-3 bg-muted rounded-lg">
-                        <p className="text-sm text-foreground">{c}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              </motion.div>
             )}
 
-            {activeTab === "routine" && <TreatmentRoutine />}
+            {activeTab === "routine" && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <TreatmentRoutine />
+              </motion.div>
+            )}
 
-            {activeTab === "appointment" && <AppointmentBooking />}
+            {activeTab === "appointment" && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <AppointmentBooking />
+              </motion.div>
+            )}
           </div>
 
-          {/* Sign Out Button in Sidebar */}
-          <div className="pt-6 border-t border-border">
+          {/* FOOTER ACTIONS */}
+          <div className="pt-10 border-t border-border flex flex-col gap-4 pb-12">
             <Button
-              onClick={() => {
-                signOut()
-                onClose()
-              }}
+              onClick={() => { signOut(); onClose(); }}
               variant="outline"
-              className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center justify-center gap-2"
+              className="w-full h-16 border-red-500/20 text-red-500 hover:bg-red-500/10 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3"
             >
-              <LogOut className="w-4 h-4" />
-              Sign Out
+              <LogOut size={18} /> Sign Out
             </Button>
+            <p className="text-[7px] font-black text-center text-muted-foreground uppercase tracking-[0.5em] opacity-40">
+              AfriDam AI Clinical Systems • 2026
+            </p>
           </div>
         </div>
       </div>

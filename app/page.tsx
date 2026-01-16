@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { 
   Sparkles, Camera, ArrowRight, Stethoscope, ChevronRight, Sun, Moon,
-  Search, MapPin, Mail, Heart, Menu, X, Zap, ShieldCheck
+  Search, MapPin, Mail, Heart, Menu, X, Zap, ShieldCheck, ShoppingBag
 } from "lucide-react"
 import { AuthModals } from "@/components/auth-modals"
 import { OnboardingSurvey } from "@/components/onboarding-survey"
@@ -25,7 +25,7 @@ export default function LandingPage() {
   const isDark = theme === "dark";
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -50,15 +50,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-[#E1784F]/30 overflow-x-hidden transition-colors duration-500">
       
-      {/* 1. AFRICAN PRIDE BANNER */}
-      <div className="bg-[#1C1A19] py-3 text-center border-b border-white/5 relative z-[70]">
+      {/* 🌍 1. FIXED TOP BANNER (STAYS AT TOP) */}
+      <div className="bg-[#1C1A19] py-3 text-center border-b border-white/5 fixed top-0 left-0 right-0 z-[110]">
         <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white">
           🌍 MADE BY AFRICANS, FOR AFRICANS • RESTORING DIGNITY
         </p>
       </div>
 
-      {/* 2. NAVIGATION: RE-ENFORCED WITH LOGIN BUTTON */}
-      <nav className={`fixed top-12 left-0 right-0 z-50 transition-all duration-500 px-6 ${scrolled ? 'bg-background/80 backdrop-blur-xl border-b border-border py-4' : 'bg-transparent py-8'}`}>
+      {/* 🧭 2. RECTIFIED NAVIGATION (FIXED Z-INDEX & 404) */}
+      <nav className={`fixed top-11 left-0 right-0 z-[100] transition-all duration-500 px-6 ${
+        scrolled ? 'bg-background/90 backdrop-blur-2xl border-b border-border py-4 shadow-xl' : 'bg-transparent py-8'
+      }`}>
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-4 active:scale-95 transition-transform">
             <img src="/logo.png" alt="AfriDam AI" className="h-10 md:h-14 w-auto object-contain" />
@@ -68,6 +70,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
                <Link href="/mission" className="hover:text-[#E1784F]">Our Story</Link>
                <a href="#features" className="hover:text-[#E1784F]">How it Works</a>
+               {/* 🛡️ 404 FIX: POINTING TO /marketplace */}
                <Link href="/marketplace" className="hover:text-[#E1784F]">Care Hub</Link>
             </div>
             
@@ -94,7 +97,7 @@ export default function LandingPage() {
 
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="fixed inset-0 z-[100] bg-background p-8 flex flex-col lg:hidden">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="fixed inset-0 z-[200] bg-background p-8 flex flex-col lg:hidden">
              <div className="flex justify-between items-center mb-12">
                 <img src="/logo.png" className="h-10 w-auto" alt="Logo" />
                 <button onClick={() => setMobileMenuOpen(false)} className="p-3 bg-muted rounded-2xl"><X size={20}/></button>
@@ -112,8 +115,8 @@ export default function LandingPage() {
         )}
       </AnimatePresence>
 
-      {/* 3. HERO SECTION */}
-      <section className="relative min-h-[95svh] flex items-center justify-center pt-24 px-6 overflow-hidden">
+      {/* 3. HERO SECTION WITH RESTORED SCAN ANIMATION */}
+      <section className="relative min-h-[95svh] flex items-center justify-center pt-32 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 items-center gap-12 relative z-10 text-left">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-7 space-y-10">
             <div className="inline-flex items-center gap-3 bg-[#E1784F]/10 border border-[#E1784F]/20 px-4 py-2 rounded-full">
@@ -128,13 +131,30 @@ export default function LandingPage() {
               Start Journey <ArrowRight className="group-hover:translate-x-2 transition-transform" />
             </button>
           </motion.div>
+
           <div className="lg:col-span-5 relative">
-             <div className="aspect-[4/5] rounded-[4rem] overflow-hidden border-8 border-muted shadow-2xl relative">
-                <img src="/model-hero.JPG" alt="AfriDam Excellence" className="w-full h-full object-cover" />
+             <div className="aspect-[4/5] rounded-[4rem] overflow-hidden border-8 border-muted shadow-2xl relative bg-[#3D261C]">
+                <img src="/model-hero.JPG" alt="AfriDam Excellence" className="w-full h-full object-cover opacity-80" />
+                
+                {/* 🛡️ THE SCANNING LINE ANIMATION RESTORED */}
+                <motion.div 
+                  initial={{ top: "0%" }}
+                  animate={{ top: "100%" }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  className="absolute left-0 right-0 h-1 bg-[#4DB6AC] shadow-[0_0_20px_#4DB6AC] z-20"
+                />
+
                 <div className="absolute inset-x-6 bottom-6 p-6 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl text-left">
                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#4DB6AC] rounded-2xl flex items-center justify-center text-white"><Camera size={24} /></div>
-                      <div><p className="text-[10px] font-black text-white uppercase tracking-widest">Scanning Skin Glow</p><p className="text-[8px] text-[#4DB6AC] font-black uppercase tracking-widest animate-pulse">Neural Link Active</p></div>
+                      <div className="w-12 h-12 bg-[#4DB6AC] rounded-2xl flex items-center justify-center text-white shadow-lg">
+                        <Camera size={24} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[10px] font-black text-white uppercase tracking-widest">Scanning Skin Glow</p>
+                        <div className="h-1 w-full bg-white/10 rounded-full mt-2 overflow-hidden">
+                           <motion.div initial={{ width: 0 }} animate={{ width: "92%" }} transition={{ duration: 2, repeat: Infinity }} className="h-full bg-[#4DB6AC]" />
+                        </div>
+                      </div>
                    </div>
                 </div>
              </div>
@@ -168,7 +188,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 6. FEATURES GRID */}
+      {/* 6. FEATURES GRID (KILLED 404 ON CARE HUB) */}
       <section id="features" className="py-24 md:py-48 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto space-y-20">
           <div className="text-left space-y-4">
@@ -179,7 +199,7 @@ export default function LandingPage() {
             {[
               { title: "Glow Check", icon: Camera, color: "#4DB6AC", text: "Instant skin analysis calibrated for melanin-rich skin types.", path: "/ai-scanner" },
               { title: "Safety Check", icon: Search, color: "#E1784F", text: "Decode ingredients in seconds. No more harmful chemicals.", path: "/ai-checker" },
-              { title: "Consult Hub", icon: Stethoscope, color: "#4DB6AC", text: "Connect with specialists who understand your clinical needs.", path: "/appointment" }
+              { title: "Care Shop", icon: ShoppingBag, color: "#4DB6AC", text: "Clinical products vetted for the safety of your skin.", path: "/marketplace" }
             ].map((f, i) => (
               <div key={i} onClick={() => handleFeatureAccess(f.path)} className="group p-10 md:p-12 bg-card border border-border rounded-[3.5rem] hover:border-[#E1784F]/30 transition-all cursor-pointer text-left shadow-sm hover:shadow-2xl">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 bg-muted border border-border group-hover:bg-[#E1784F]/10"><f.icon className="w-8 h-8 text-foreground group-hover:text-[#E1784F]" /></div>
@@ -216,7 +236,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 8. FOOTER */}
+      {/* 8. FOOTER: CORRECTED 404 LINKS */}
       <footer className="pt-24 pb-12 px-6 border-t border-border bg-card">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16">
           <div className="md:col-span-5 space-y-8 text-left">

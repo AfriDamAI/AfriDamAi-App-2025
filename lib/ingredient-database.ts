@@ -1,4 +1,9 @@
-// Comprehensive ingredient database with safety profiles and properties
+"use client"
+
+/**
+ * 🔬 AFRIDAM AI CLINICAL INTELLIGENCE
+ * Comprehensive ingredient database with melanin-specific safety profiles.
+ */
 
 export interface IngredientProfile {
   name: string
@@ -63,7 +68,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["bha", "2-hydroxybenzoic acid"],
     type: "exfoliant",
     safetyRating: "caution",
-    commonConcerns: ["May cause irritation in sensitive skin", "Avoid if pregnant", "Can cause dryness"],
+    commonConcerns: ["May cause irritation in sensitive skin", "Avoid if pregnant", "Can cause dryness", "Risk of hyperpigmentation if overused on dark skin"],
     allergenPotential: false,
     irritantPotential: true,
     skinTypeCompatibility: {
@@ -203,14 +208,62 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     description: "Powerful acne-fighting ingredient",
     benefits: ["Acne treatment", "Antibacterial"],
   },
+  // 🛡️ RE-ENFORCED: Melanin-Centric Additions
+  sheabutter: {
+    name: "Shea Butter",
+    aliases: ["butyrospermum parkii", "vitellaria paradoxa"],
+    type: "emollient",
+    safetyRating: "safe",
+    commonConcerns: ["May be heavy for extremely oily skin"],
+    allergenPotential: false,
+    irritantPotential: false,
+    skinTypeCompatibility: {
+      oily: false,
+      combination: true,
+      normal: true,
+      dry: true,
+      sensitive: true,
+    },
+    description: "Traditional African lipid extracted from Shea tree nuts",
+    benefits: ["Barrier repair", "Deep moisture", "Anti-inflammatory"],
+  },
+  hydroquinone: {
+    name: "Hydroquinone",
+    aliases: ["quinol", "1,4-dihydroxybenzene"],
+    type: "lightening agent",
+    safetyRating: "avoid",
+    commonConcerns: ["Risk of exogenous ochronosis on dark skin", "Significant irritation risk", "Strictly medical use only"],
+    allergenPotential: true,
+    irritantPotential: true,
+    skinTypeCompatibility: {
+      oily: false,
+      combination: false,
+      normal: false,
+      dry: false,
+      sensitive: false,
+    },
+    description: "Potent skin depigmenting agent with high risk profiles for melanin-rich skin",
+    benefits: ["Hyperpigmentation treatment"],
+  }
 }
 
 /**
  * Normalize ingredient name for database lookup
  */
 export function normalizeIngredientName(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, "")
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "").trim()
 }
+
+/**
+ * 🛡️ RE-ENFORCED: Pre-computed Alias Map for O(1) Search Performance
+ */
+const aliasMap: Record<string, string> = {}
+Object.entries(ingredientDatabase).forEach(([key, profile]) => {
+  aliasMap[key] = key
+  profile.aliases.forEach(alias => {
+    aliasMap[normalizeIngredientName(alias)] = key
+  })
+})
 
 /**
  * Find ingredient in database
@@ -218,16 +271,10 @@ export function normalizeIngredientName(name: string): string {
 export function findIngredient(name: string): IngredientProfile | null {
   const normalized = normalizeIngredientName(name)
 
-  // Direct lookup
-  if (ingredientDatabase[normalized]) {
-    return ingredientDatabase[normalized]
-  }
-
-  // Search by aliases
-  for (const ingredient of Object.values(ingredientDatabase)) {
-    if (ingredient.aliases.some((alias) => normalizeIngredientName(alias) === normalized)) {
-      return ingredient
-    }
+  // Direct lookup via alias map (Optimized)
+  const databaseKey = aliasMap[normalized]
+  if (databaseKey && ingredientDatabase[databaseKey]) {
+    return ingredientDatabase[databaseKey]
   }
 
   return null

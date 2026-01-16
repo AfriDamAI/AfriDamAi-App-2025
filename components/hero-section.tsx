@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ArrowRight, Zap, ShieldCheck, Sparkles, Camera } from "lucide-react"
+import { ArrowRight, Zap, ShieldCheck, Sparkles, Camera, Info } from "lucide-react"
 import { OurProductsSection } from "./our-product-section"
 
 interface HeroSectionProps {
@@ -19,7 +19,8 @@ export default function HomePageContent({
     <div className="bg-background selection:bg-[#E1784F]/30 overflow-x-hidden">
       
       {/* 🛡️ 1. WORLD-CLASS HERO SECTION */}
-      <section className="relative min-h-[90svh] flex items-center justify-center overflow-hidden px-6 py-12 md:py-32">
+      {/* 🛡️ RE-ENFORCED: Changed svh to vh for better Android compatibility */}
+      <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden px-6 py-12 md:py-32">
         {/* Background Glows */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#E1784F]/10 blur-[120px] rounded-full" />
@@ -28,7 +29,6 @@ export default function HomePageContent({
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             
-            {/* Left Content: BOLD & ITALIC */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -52,7 +52,6 @@ export default function HomePageContent({
                 Every skin tells a beautiful story. We use smart technology built with love to help you find the gentle care you deserve.
               </p>
 
-              {/* High-Impact CTA Zone */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <button
                   onClick={onScanClick}
@@ -68,7 +67,6 @@ export default function HomePageContent({
                 </button>
               </div>
 
-              {/* Trust Badges */}
               <div className="flex items-center gap-8 pt-6 border-t border-border/50">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="text-[#4DB6AC]" size={20} />
@@ -81,7 +79,6 @@ export default function HomePageContent({
               </div>
             </motion.div>
 
-            {/* Right Content: PREMIUM IMAGE CARD */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -97,7 +94,6 @@ export default function HomePageContent({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-transparent to-transparent" />
               
-              {/* Floating UI Elements for Mobile "Pop" */}
               <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-[#E1784F] rounded-2xl flex items-center justify-center text-white">
@@ -114,7 +110,17 @@ export default function HomePageContent({
         </div>
       </section>
 
-      {/* 2. RE-ENFORCED MISSION SECTION */}
+      {/* 🛡️ RE-ENFORCED: Play Store Legal Protection Banner */}
+      <div className="bg-muted/30 py-4 border-y border-border">
+        <div className="max-w-7xl mx-auto px-6 flex items-center gap-4">
+          <Info size={14} className="text-[#E1784F] shrink-0" />
+          <p className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+            Disclaimer: AfriDam AI provides educational dermal metrics. Analysis is for informational guidance only and does not replace a clinical diagnosis.
+          </p>
+        </div>
+      </div>
+
+      {/* MISSION SECTION (UNCHANGED) */}
       <section id="mission" className="py-24 md:py-40 relative">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-left md:text-center mb-20 space-y-4">
@@ -145,7 +151,7 @@ export default function HomePageContent({
 
       <OurProductsSection />
 
-      {/* 3. PLATFORM ECOSYSTEM */}
+      {/* PLATFORM ECOSYSTEM (UNCHANGED) */}
       <section id="features" className="py-24 md:py-40 bg-muted/50 rounded-t-[4rem] md:rounded-t-[6rem]">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="mb-20 space-y-4">

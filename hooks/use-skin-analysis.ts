@@ -1,44 +1,25 @@
-"use client"
+import * as React from 'react'
 
-// Custom hook for skin analysis with loading and error states
+const MOBILE_BREAKPOINT = 768
 
-import { useState, useCallback } from "react"
-import { performSkinAnalysis } from "@/lib/skin-analysis-services"
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
 
-interface UseSkinAnalysisState {
-  isLoading: boolean
-  error: string | null
-  data: any | null
-}
+  // 🛡️ RE-ENFORCED: useLayoutEffect prevents the UI from flickering on app launch
+  React.useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
 
-export function useSkinAnalysis() {
-  const [state, setState] = useState<UseSkinAnalysisState>({
-    isLoading: false,
-    error: null,
-    data: null,
-  })
-
-  const analyze = useCallback(async (imageData: string, imageId: string) => {
-    setState({ isLoading: true, error: null, data: null })
-
-    try {
-      const result = await performSkinAnalysis(imageData, imageId)
-      setState({ isLoading: false, error: null, data: result })
-      return result
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Analysis failed"
-      setState({ isLoading: false, error: errorMessage, data: null })
-      throw error
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const onChange = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
+    
+    // Initial sync
+    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    
+    mql.addEventListener('change', onChange)
+    return () => mql.removeEventListener('change', onChange)
   }, [])
 
-  const reset = useCallback(() => {
-    setState({ isLoading: false, error: null, data: null })
-  }, [])
-
-  return {
-    ...state,
-    analyze,
-    reset,
-  }
+  return !!isMobile
 }

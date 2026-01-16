@@ -1,41 +1,66 @@
 import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "./types";
 
-/** * 🛠️ OGA FIX: Universal URL Normalizer **/
+/** 🛠️ OGA FIX: Universal URL Normalizer **/
 const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 const cleanBaseUrl = rawBaseUrl.endsWith("/") ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
 
 const apiClient = axios.create({
   baseURL: cleanBaseUrl,
+  headers: {
+    "Content-Type": "application/json",
+  }
 });
 
-/** 🔐 Security Sync **/
+/** 🛡️ REQUEST INTERCEPTOR: The "Always-On" Auth Guard **/
+apiClient.interceptors.request.use(
+  (config) => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+/** 🔐 Manual Security Sync (Used during Login/Logout) **/
 export const setAuthToken = (token: string | null) => {
   if (typeof window !== "undefined") {
     if (token) {
-      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       localStorage.setItem("token", token);
+      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     } else {
-      delete apiClient.defaults.headers.common["Authorization"];
       localStorage.removeItem("token");
+      delete apiClient.defaults.headers.common["Authorization"];
     }
   }
 };
 
-/** 🛡️ Response Interceptor **/
+/** 🛡️ RESPONSE INTERCEPTOR: Clinical Data Extractor **/
 apiClient.interceptors.response.use(
   (response) => {
-    return response.data?.resultData ? { ...response, data: response.data.resultData } : response;
+    // 🚀 OGA FIX: Safely unwrap resultData without losing the response structure
+    if (response.data && Object.prototype.hasOwnProperty.call(response.data, 'resultData')) {
+        return { ...response, data: response.data.resultData };
+    }
+    return response;
   },
   (error) => {
     if (!error.response) {
-      console.error("🚀 Network Error: Check if backend is active at:", cleanBaseUrl);
+      console.error("🚀 Critical Node Offline:", cleanBaseUrl);
     }
+    
+    // 🛡️ RE-ENFORCED: Standardize 401 Unauthorized handling for Play Store
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
         localStorage.removeItem("token");
-        // Only redirect if not already on landing
-        if (window.location.pathname !== "/") window.location.href = "/"; 
+        // Only kick to home if we aren't already there (avoids infinite loops)
+        if (window.location.pathname !== "/") {
+            window.location.href = "/";
+        }
       }
     }
     return Promise.reject(error);
@@ -53,7 +78,6 @@ export const register = async (userData: CreateUserDto) => {
   return response.data;
 };
 
-/** 🛡️ RE-ENFORCED: Missing Forgot Password (FIXES DEPLOY ERROR) **/
 export const forgotPassword = async (email: string) => {
   const response = await apiClient.post("/auth/user/forgot-password", { email });
   return response.data;
@@ -70,17 +94,25 @@ export const getUser = async (id: string) => {
   return response.data;
 };
 
-export const updateUser = async (id: string, updates: Partial<any>) => {
-  const response = await apiClient.put(`/users/${id}`, updates);
+export const updateUserProfile = async (updates: any) => {
+  // 🚀 OGA FIX: Points to the unified profile update node
+  const response = await apiClient.put("/profile/update", updates);
   return response.data;
 };
 
 /** 🔬 AI Analyzer - RE-ENFORCED FOR PRODUCTION **/
-export async function uploadImage(file: File): Promise<any> {
+export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
-  formData.append("file", file);
   
-  // 🚀 OGA FIX: Using the newer clinical endpoint for AI processing
+  if (typeof file === 'string') {
+    // 🛡️ RE-ENFORCED: Handle Base64 from CameraUpload component
+    const res = await fetch(file);
+    const blob = await res.blob();
+    formData.append("file", blob, "scan_capture.jpg");
+  } else {
+    formData.append("file", file);
+  }
+  
   const response = await apiClient.post("/analyzer/process-request", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
