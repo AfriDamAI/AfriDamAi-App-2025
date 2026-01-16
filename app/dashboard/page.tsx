@@ -16,7 +16,7 @@ import {
   User as UserIcon,
   AlertCircle,
   X,
-  HeartPulse // 🛡️ Re-inserted for the Urgent Session
+  HeartPulse 
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -36,12 +36,15 @@ const itemVariants = {
 }
 
 export default function DashboardPage() {
-  const { user, signOut, isLoading, requiresOnboarding } = useAuth()
+  const { user, signOut, isLoading } = useAuth()
   const { theme, setTheme } = useTheme() 
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("home")
   const [recentScans, setRecentScans] = useState<ScanRecord[]>([])
   const [dismissedOnboarding, setDismissedOnboarding] = useState(false)
+
+  // 🛡️ RE-ENFORCED: Aesthetic Context Logic
+  const requiresOnboarding = user?.onboardingCompleted === false;
 
   useEffect(() => {
     if (!theme) setTheme('light')
@@ -66,7 +69,7 @@ export default function DashboardPage() {
     </div>
   )
 
-  const displayName = user.firstName || "Obey";
+  const displayName = user.firstName || "User";
 
   return (
     <div className="min-h-[100svh] bg-background text-foreground flex flex-col md:flex-row font-sans selection:bg-[#E1784F]/30 overflow-x-hidden">
@@ -78,12 +81,12 @@ export default function DashboardPage() {
         </div>
         <nav className="flex-1 space-y-2">
           {[
-            { id: "home", label: "Home", icon: LayoutDashboard },
-            { id: "scanner", label: "Skin Scanner", icon: Activity, path: "/ai-scanner" },
+            { id: "home", label: "Overview", icon: LayoutDashboard },
+            { id: "scanner", label: "Skin Health", icon: Camera, path: "/ai-scanner" },
             { id: "checker", label: "Safety Check", icon: Sparkles, path: "/ai-checker" },
-            { id: "marketplace", label: "Care Shop", icon: ShoppingBag, path: "/marketplace" }, // 🛡️ FIXED 404
-            { id: "appointment", label: "Chat a Doctor", icon: Stethoscope },
-            { id: "history", label: "My Diary", icon: HistoryIcon, path: "/history" }
+            { id: "marketplace", label: "Care Shop", icon: ShoppingBag, path: "/marketplace" },
+            { id: "appointment", label: "Expert Chat", icon: Stethoscope },
+            { id: "history", label: "Skin Diary", icon: HistoryIcon, path: "/history" }
           ].map((link) => (
             <button 
               key={link.id}
@@ -110,10 +113,10 @@ export default function DashboardPage() {
       <nav className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-3xl border-t border-white/5 z-50 flex md:hidden justify-around items-center p-4 pb-8">
         {[
            { id: "home", icon: LayoutDashboard, label: "Home" },
-           { id: "scanner", icon: Camera, label: "Scan", path: "/ai-scanner" },
-           { id: "checker", icon: Sparkles, label: "Check", path: "/ai-checker" },
+           { id: "scanner", icon: Camera, label: "Glow", path: "/ai-scanner" },
+           { id: "checker", icon: Sparkles, label: "Safety", path: "/ai-checker" },
            { id: "marketplace", icon: ShoppingBag, label: "Shop", path: "/marketplace" },
-           { id: "appointment", icon: Stethoscope, label: "Doctor" }
+           { id: "appointment", icon: Stethoscope, label: "Consult" }
         ].map((link) => (
           <button 
             key={link.id} 
@@ -135,9 +138,8 @@ export default function DashboardPage() {
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-black italic uppercase tracking-tighter text-foreground leading-none">
                 Hello, {displayName}
               </h2>
-              {/* 🛡️ RE-ENFORCED GREETING */}
               <p className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">
-                Check if your skin is glowing today
+                Ready to protect your skin's natural glow?
               </p>
            </div>
            
@@ -151,19 +153,19 @@ export default function DashboardPage() {
             
             {activeTab === "home" && (
               <>
-                {/* 🛡️ URGENT SESSION CARD - RE-INSERTED */}
+                {/* 🛡️ AESTHETIC SESSION CARD */}
                 <motion.section 
                   variants={itemVariants}
                   className="p-6 md:p-8 bg-card border border-[#E1784F]/20 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/5 blur-3xl rounded-full" />
                   <div className="flex items-center gap-5 text-left relative z-10">
-                    <div className="w-14 h-14 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 shadow-inner">
+                    <div className="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center text-[#E1784F] shadow-inner">
                       <HeartPulse size={28} />
                     </div>
                     <div>
-                      <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-foreground">Urgent Session</h3>
-                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Need an answer now? Priority one-time consultation.</p>
+                      <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-foreground">Aesthetic Session</h3>
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Get immediate beauty answers from our aesthetic consultants.</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6 w-full md:w-auto z-10">
@@ -175,7 +177,7 @@ export default function DashboardPage() {
                       onClick={() => router.push('/appointment?type=urgent')}
                       className="flex-1 md:flex-none px-8 py-4 bg-[#E1784F] text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all"
                     >
-                      Start Session
+                      Start Consultation
                     </button>
                   </div>
                 </motion.section>
@@ -186,11 +188,11 @@ export default function DashboardPage() {
                     <button onClick={() => setDismissedOnboarding(true)} className="absolute top-4 right-4 text-[#E1784F]/40 hover:text-[#E1784F]"><X size={16} /></button>
                     <div className="flex items-center gap-3 text-left">
                       <div className="w-10 h-10 bg-[#E1784F]/20 rounded-xl flex items-center justify-center text-[#E1784F]"><AlertCircle size={20} /></div>
-                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#E1784F]">Complete your clinical profile for melanin-rich accuracy</p>
+                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#E1784F]">Optimize your profile for child-safe and melanin-rich beauty checks</p>
                     </div>
                     <div className="flex gap-3 w-full md:w-auto">
                         <button onClick={() => setDismissedOnboarding(true)} className="flex-1 px-6 py-4 border border-[#E1784F]/20 text-[#E1784F] rounded-2xl text-[8px] font-black uppercase tracking-widest">Skip</button>
-                        <button onClick={() => router.push('/onboarding')} className="flex-1 px-6 py-4 bg-[#E1784F] text-white rounded-2xl text-[8px] font-black uppercase tracking-widest">Finish Setup</button>
+                        <button onClick={() => router.push('/onboarding')} className="flex-1 px-6 py-4 bg-[#E1784F] text-white rounded-2xl text-[8px] font-black uppercase tracking-widest">Setup Guide</button>
                     </div>
                   </motion.div>
                 )}
@@ -200,8 +202,8 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-4 text-left relative z-10 text-white">
                     <div className="w-12 h-12 md:w-16 md:h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center"><Camera size={24} /></div>
                     <div>
-                      <h3 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter">Skin Scanner</h3>
-                      <p className="text-white/70 text-[8px] font-black uppercase tracking-[0.2em]">Start Analysis</p>
+                      <h3 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter">Glow Check</h3>
+                      <p className="text-white/70 text-[8px] font-black uppercase tracking-[0.2em]">Analyze Skin Health</p>
                     </div>
                   </div>
                   <div className="w-12 h-12 bg-white text-[#E1784F] rounded-xl flex items-center justify-center group-hover:translate-x-1 transition-transform"><ArrowRight size={20} /></div>
@@ -211,21 +213,21 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                   <motion.div variants={itemVariants} onClick={() => router.push('/ai-checker')} className="p-8 bg-card/40 border border-border rounded-[2.5rem] space-y-4 hover:border-[#4DB6AC]/50 cursor-pointer">
                     <div className="w-10 h-10 bg-[#4DB6AC]/10 text-[#4DB6AC] rounded-xl flex items-center justify-center"><Sparkles size={18}/></div>
-                    <h4 className="text-lg font-black italic uppercase">Safety Check</h4>
-                    <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-wider">Analyze ingredients for melanin-rich compatibility.</p>
+                    <h4 className="text-lg font-black italic uppercase">Safety Watch</h4>
+                    <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-wider">Check product ingredients for child-safe and skin-safe beauty.</p>
                   </motion.div>
                   <motion.div variants={itemVariants} onClick={() => setActiveTab('appointment')} className="p-8 bg-card/40 border border-border rounded-[2.5rem] space-y-4 hover:border-blue-400/50 cursor-pointer">
                     <div className="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><Stethoscope size={18}/></div>
-                    <h4 className="text-lg font-black italic uppercase">Chat a Doctor</h4>
-                    <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-wider">Connect with specialists who understand you.</p>
+                    <h4 className="text-lg font-black italic uppercase">Aesthetic Expert</h4>
+                    <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-wider">Connect with consultants who specialize in your skin type.</p>
                   </motion.div>
                 </div>
 
-                {/* 🛡️ MY DIARY SECTION - RE-INSTATED FULLY */}
+                {/* SKIN DIARY SECTION */}
                 <motion.div variants={itemVariants} className="space-y-4 md:space-y-6">
                   <div className="flex justify-between items-center px-2">
-                    <h4 className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground">My Diary</h4>
-                    <button onClick={() => router.push('/history')} className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#E1784F]">View All</button>
+                    <h4 className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground">Skin Diary</h4>
+                    <button onClick={() => router.push('/history')} className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#E1784F]">History</button>
                   </div>
                   
                   {recentScans.length > 0 ? (
@@ -235,7 +237,9 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-4">
                             <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center text-[#E1784F]"><Activity size={18}/></div>
                             <div>
-                              <p className="text-sm md:text-md font-black italic uppercase text-foreground leading-none mb-1 truncate max-w-[150px] md:max-w-none">{scan.results.conditions?.[0]?.name || 'Analysis'}</p>
+                              <p className="text-sm md:text-md font-black italic uppercase text-foreground leading-none mb-1 truncate max-w-[150px] md:max-w-none">
+                                {scan.results.concerns?.[0]?.name || 'Beauty Check'}
+                              </p>
                               <p className="text-[7px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest">{new Date(scan.timestamp).toLocaleDateString()}</p>
                             </div>
                           </div>
@@ -245,7 +249,7 @@ export default function DashboardPage() {
                     </div>
                   ) : (
                     <div className="py-12 border-2 border-dashed border-border rounded-[2.5rem] text-center bg-card/20 backdrop-blur-sm">
-                       <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40">Clinical Records Empty</p>
+                       <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40">Journey Records Empty</p>
                     </div>
                   )}
                 </motion.div>
@@ -255,15 +259,18 @@ export default function DashboardPage() {
             {activeTab === "appointment" && (
               <motion.div variants={itemVariants} className="bg-card rounded-[2.5rem] border border-border p-6 md:p-10 text-left">
                  <div className="flex justify-between items-center mb-8">
-                   <h2 className="text-2xl font-black italic uppercase tracking-tighter">Clinical Team</h2>
-                   <button onClick={() => setActiveTab("home")} className="text-[8px] font-black uppercase tracking-widest px-4 py-2 bg-[#E1784F]/10 text-[#E1784F] rounded-lg">Back</button>
+                   <h2 className="text-2xl font-black italic uppercase tracking-tighter">Aesthetic Team</h2>
+                   <button onClick={() => setActiveTab("home")} className="text-[8px] font-black uppercase tracking-widest px-4 py-2 bg-[#E1784F]/10 text-[#E1784F] rounded-lg">Home</button>
                  </div>
                  <AppointmentView />
               </motion.div>
             )}
 
             <footer className="mt-12 pt-8 border-t border-border/40 flex flex-col items-center gap-4 pb-4">
-               <p className="text-[7px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 text-center">© 2026 AfriDam AI • Clinical Intelligence</p>
+               <p className="text-[7px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 text-center italic">
+                 AfriDam AI is an aesthetic wellness tool. Not for medical diagnosis.
+               </p>
+               <p className="text-[7px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 text-center">© 2026 AfriDam AI • Aesthetic Intelligence</p>
             </footer>
 
           </motion.div>
