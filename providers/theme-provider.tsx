@@ -13,25 +13,26 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // 🛡️ RE-ENFORCED: Default to "light" explicitly for first-time users
+  // 🛡️ RE-ENFORCED: Initial state set to "light" for clinical consistency
   const [theme, setTheme] = useState<Theme>("light")
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // 1. Check if user has a saved preference from a previous visit
+    // 1. Check if user has a saved preference
     const savedTheme = localStorage.getItem("theme") as Theme | null
     
-    // 🛡️ OGA FIX: We ignore "prefers-color-scheme" for the initial landing experience
-    // to ensure the app stays "Light" by default as requested.
+    // 🛡️ OGA FIX: Intentional override of system settings for "Light-First" onboarding
     const initialTheme = savedTheme || "light"
 
     setTheme(initialTheme)
     
-    // 2. Apply the class to the HTML tag immediately
+    // 2. Immediate DOM Sync for Tailwind 4.0 dark: classes
     if (initialTheme === "dark") {
       document.documentElement.classList.add("dark")
+      document.documentElement.style.colorScheme = "dark"
     } else {
       document.documentElement.classList.remove("dark")
+      document.documentElement.style.colorScheme = "light"
     }
     
     setMounted(true)
@@ -42,22 +43,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const newTheme = prev === "light" ? "dark" : "light"
       localStorage.setItem("theme", newTheme)
       
-      // Sync the HTML class for Tailwind dark: mode
+      // 🛡️ RE-ENFORCED: Sync both Class and colorScheme for mobile browser compatibility
       if (newTheme === "dark") {
         document.documentElement.classList.add("dark")
+        document.documentElement.style.colorScheme = "dark"
       } else {
         document.documentElement.classList.remove("dark")
+        document.documentElement.style.colorScheme = "light"
       }
       
       return newTheme
     })
   }
 
-  // 🛡️ Prevent Hydration Mismatch: Render children only after mounting
-  // but provide the context so the app doesn't crash.
+  // 🛡️ NUCLEAR STABILIZER: Prevent Hydration Flicker
+  // The "invisible" class prevents the user from seeing the default 
+  // theme before the JS decides which one to apply.
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className={!mounted ? "invisible" : "visible"}>
+      <div className={!mounted ? "invisible" : "visible contents"}>
         {children}
       </div>
     </ThemeContext.Provider>

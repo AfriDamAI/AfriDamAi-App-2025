@@ -1,8 +1,12 @@
+"use client"
+
+import apiClient from "./api-client";
+
 export interface ScanRecord {
   id: string
   type: "skin" | "ingredient"
   timestamp: number
-  imageUrl?: string
+  imageUrl?: string // 🛡️ OGA FIX: Should be a cloud URL, not a Base64 string
   results: {
     conditions?: Array<{ name: string; severity: string; confidence: number }>
     ingredients?: string[]
@@ -11,56 +15,89 @@ export interface ScanRecord {
   notes?: string
 }
 
-const STORAGE_KEY = "dermai_history"
+const STORAGE_KEY = "afridam_clinical_cache"
 const MAX_RECORDS = 50
 
-export function addToHistory(record: Omit<ScanRecord, "id" | "timestamp">) {
+/** 🛡️ RE-ENFORCED: Sync with NestJS Backend + Local Cache **/
+export async function addToHistory(record: Omit<ScanRecord, "id" | "timestamp">) {
   try {
-    const history = getHistory()
-    const newRecord: ScanRecord = {
-      ...record,
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: Date.now(),
-    }
-    history.unshift(newRecord)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_RECORDS)))
-    return newRecord
+    // 1. Persist to Cloud first (Mandatory for Clinical Node)
+    const response = await apiClient.post("/history/sync", record);
+    const syncedRecord = response.data;
+
+    // 2. Update Local Cache for Instant UI updates
+    const history = getLocalHistory();
+    history.unshift(syncedRecord);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_RECORDS)));
+    
+    return syncedRecord;
   } catch (error) {
-    console.error("Error adding to history:", error)
-    return null
+    console.warn("Cloud Sync Failed, falling back to Local Protocol", error);
+    
+    // Fallback: Local-only storage if offline
+    const localRecord: ScanRecord = {
+      ...record,
+      id: `offline-${Date.now()}`,
+      timestamp: Date.now(),
+    };
+    
+    // 🛡️ OGA FIX: Strip large image data to prevent LocalStorage crash
+    if (localRecord.imageUrl?.startsWith('data:')) {
+       localRecord.imageUrl = "pending_upload"; 
+    }
+
+    const history = getLocalHistory();
+    history.unshift(localRecord);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, MAX_RECORDS)));
+    return localRecord;
   }
 }
 
-export function getHistory(): ScanRecord[] {
+/** 🛡️ RE-ENFORCED: Fetching from Cloud + Local Hybrid **/
+export function getLocalHistory(): ScanRecord[] {
+  if (typeof window === "undefined") return [];
   try {
     const data = localStorage.getItem(STORAGE_KEY)
     return data ? JSON.parse(data) : []
   } catch (error) {
-    console.error("Error retrieving history:", error)
     return []
   }
 }
 
-export function deleteHistoryRecord(id: string) {
+export async function fetchFullHistory(): Promise<ScanRecord[]> {
   try {
-    const history = getHistory()
-    const filtered = history.filter((record) => record.id !== id)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered))
+    const response = await apiClient.get("/history/all");
+    const cloudHistory = response.data;
+    
+    // Sync local cache with the latest from cloud
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudHistory.slice(0, MAX_RECORDS)));
+    return cloudHistory;
   } catch (error) {
-    console.error("Error deleting history record:", error)
+    console.error("Clinical Node Fetch Failed:", error);
+    return getLocalHistory();
   }
 }
 
-export function clearHistory() {
+export async function deleteHistoryRecord(id: string) {
   try {
-    localStorage.removeItem(STORAGE_KEY)
+    // 1. Remove from Cloud
+    await apiClient.delete(`/history/${id}`);
+    
+    // 2. Clear from Local Cache
+    const history = getLocalHistory();
+    const filtered = history.filter((record) => record.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
   } catch (error) {
-    console.error("Error clearing history:", error)
+    console.error("Error deleting clinical record:", error);
   }
+}
+
+export function clearLocalHistory() {
+  localStorage.removeItem(STORAGE_KEY)
 }
 
 export function getHistoryStats() {
-  const history = getHistory()
+  const history = getLocalHistory()
   return {
     totalScans: history.length,
     skinScans: history.filter((r) => r.type === "skin").length,

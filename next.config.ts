@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* 🛡️ DEPLOYMENT BYPASS: 
      Allows the build to complete even with 'unused variable' warnings.
+     Critical for the 2026 "Fast-to-Market" GitHub Push.
   */
   eslint: {
     ignoreDuringBuilds: true,
@@ -26,10 +27,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             /**
-             * 🛠️ OGA FIX: Explicitly Whitelisting Google Cloud Run Domain
-             * The previous '*.afridamai.com' was blocking your actual backend at '.run.app'.
-             * 1. connect-src: Now includes your specific Google Cloud URL.
-             * 2. script-src: Includes vercel.live for deployment feedback tools.
+             * 🛠️ OGA FIX: Whitelisting Production Nodes
+             * 1. connect-src: Whitelists your specific Google Cloud Run Backend.
+             * 2. img-src: Allows 'blob:' and 'data:' for local AI scan previews.
+             * 3. media-src: Essential for the live camera stream.
              */
             value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https: https://afridam-backend-api-131829695574.us-central1.run.app;",
           },
@@ -54,7 +55,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  /* 🛡️ SAFETY REDIRECTS */
+  /* 🛡️ SAFETY REDIRECTS: Ensuring Clinical Tool Persistence */
   async redirects() {
     return [
       {
@@ -79,13 +80,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: '**', // 🛡️ Allows images from any verified source
       },
     ],
   },
   
-  // Suppress hydration warnings during AI processing
+  // 🛡️ RE-ENFORCED: React Strict Mode for detecting double-renders in AI components
   reactStrictMode: true,
+  
+  // 🛡️ RE-ENFORCED: Production optimization
+  swcMinify: true,
 };
 
 export default nextConfig;

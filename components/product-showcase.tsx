@@ -1,40 +1,43 @@
-import { ArrowRight, Sparkles } from "lucide-react";
+"use client"
+
+import { ArrowRight, Sparkles, ShoppingCart, ShieldCheck } from "lucide-react";
 import { ImageWithFallback } from "./image-fallback";
+import { motion } from "framer-motion";
 
 const products = [
     {
         id: 1,
-        name: "AI Skin Analysis Serum",
-        category: "Serums",
-        description: "Advanced formula with hyaluronic acid, recommended by our AI based on your skin profile.",
-        image: "https://images.unsplash.com/photo-1643379850623-7eb6442cd262?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxza2luY2FyZSUyMHNlcnVtJTIwYm90dGxlfGVufDF8fHx8MTc2NDY5NzQ5M3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+        name: "AI Melanin Serum",
+        category: "Clinical Serums",
+        description: "Advanced hydration protocol calibrated for melanin-rich skin types.",
+        image: "https://images.unsplash.com/photo-1643379850623-7eb6442cd262?q=80&w=1080",
         price: "$89",
-        tag: "Best Seller"
+        tag: "High Match"
     },
     {
         id: 2,
-        name: "Natural Radiance Cream",
-        category: "Moisturizers",
-        description: "Organic ingredients that nourish and protect your skin throughout the day.",
-        image: "https://images.unsplash.com/photo-1609357912334-e96886c0212b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuYXR1cmFsJTIwc2tpbmNhcmUlMjBjcmVhbXxlbnwxfHx8fDE3NjQ2NjQzMTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+        name: "Radiance Protection",
+        category: "Barrier Care",
+        description: "Organic ceramide complex to reinforce the African skin barrier.",
+        image: "https://images.unsplash.com/photo-1609357912334-e96886c0212b?q=80&w=1080",
         price: "$65",
-        tag: "AI Recommended"
+        tag: "AI Choice"
     },
     {
         id: 3,
-        name: "Hydration Boost Treatment",
+        name: "Glow Boost Therapy",
         category: "Treatments",
-        description: "Intensive hydration therapy for dry and sensitive skin types.",
-        image: "https://images.unsplash.com/photo-1629051192950-d251e96ab1b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNlJTIwbW9pc3R1cml6ZXIlMjBwcm9kdWN0fGVufDF8fHx8MTc2NDc0NDc4NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+        description: "Intensive therapy for hyperpigmentation and uneven tones.",
+        image: "https://images.unsplash.com/photo-1629051192950-d251e96ab1b0?q=80&w=1080",
         price: "$75",
-        tag: "New"
+        tag: "Clinical"
     },
     {
         id: 4,
-        name: "Luxury Skincare Set",
-        category: "Sets",
-        description: "Complete skincare routine curated by our AI for optimal results.",
-        image: "https://images.unsplash.com/photo-1760614034530-a0d34463e03d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxza2luY2FyZSUyMHByb2R1Y3RzJTIwbHV4dXJ5fGVufDF8fHx8MTc2NDY3NjA3MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+        name: "The Heritage Set",
+        category: "Protocols",
+        description: "Complete 4-step routine curated for your specific AI profile.",
+        image: "https://images.unsplash.com/photo-1760614034530-a0d34463e03d?q=80&w=1080",
         price: "$199",
         tag: "Premium"
     }
@@ -42,46 +45,53 @@ const products = [
 
 export function ProductShowcase() {
     return (
-        <div id="products" className="bg-gradient-to-br from-slate-50 to-primary/5 py-16 lg:py-24">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                    <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
+        <div id="products" className="bg-background py-24 lg:py-32">
+            <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                
+                {/* 🏷️ HEADER SECTION */}
+                <div className="text-left mb-20 border-l-4 border-[#E1784F] pl-8">
+                    <div className="inline-flex items-center gap-3 bg-[#E1784F]/10 text-[#E1784F] px-4 py-2 rounded-full mb-6">
                         <Sparkles className="w-4 h-4" />
-                        <span>AI-Powered Recommendations</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Neural Recommendation Engine</span>
                     </div>
-                    <h2 className="text-primary mb-4">Discover Our Products</h2>
-                    <p className="text-slate-600 max-w-2xl mx-auto">
-                        Explore our collection of premium skincare products, each carefully formulated and selected by our AI to meet your unique skin needs.
+                    <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-foreground mb-6">
+                        The Care <span className="text-[#E1784F]">Market.</span>
+                    </h2>
+                    <p className="text-muted-foreground text-sm font-medium uppercase tracking-tight max-w-2xl leading-relaxed">
+                        Explore clinical-grade products vetted for the safety of African skin. Every selection is matched to your AI scan profile.
                     </p>
                 </div>
 
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12">
+                {/* 🛍️ PRODUCT GRID */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
                     {products.map((product) => (
                         <div
                             key={product.id}
-                            className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                            className="bg-card rounded-[2.5rem] border border-border overflow-hidden hover:border-[#E1784F]/30 transition-all duration-500 group"
                         >
-                            <div className="relative overflow-hidden aspect-square">
+                            <div className="relative aspect-square overflow-hidden bg-muted">
                                 <ImageWithFallback
                                     src={product.image}
                                     alt={product.name}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
                                 />
-                                <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full">
+                                <div className="absolute top-6 right-6 bg-[#E1784F] text-white text-[8px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-xl">
                                     {product.tag}
                                 </div>
                             </div>
-                            <div className="p-6">
-                                <p className="text-emerald-600 mb-1">{product.category}</p>
-                                <h3 className="text-slate-900 mb-2">{product.name}</h3>
-                                <p className="text-slate-600 mb-4 line-clamp-2">
+                            
+                            <div className="p-8 space-y-4">
+                                <div>
+                                    <p className="text-[#4DB6AC] text-[9px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tighter text-foreground">{product.name}</h3>
+                                </div>
+                                <p className="text-muted-foreground text-[11px] font-medium leading-relaxed line-clamp-2">
                                     {product.description}
                                 </p>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-primary">{product.price}</span>
-                                    <button className="text-primary hover:text-primary/80 flex items-center gap-1 group-hover:gap-2 transition-all">
-                                        View
-                                        <ArrowRight className="w-4 h-4" />
+                                <div className="flex items-center justify-between pt-4 border-t border-border">
+                                    <span className="text-lg font-black italic text-foreground">{product.price}</span>
+                                    <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#E1784F] hover:gap-3 transition-all">
+                                        View Clinicals <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
@@ -89,42 +99,40 @@ export function ProductShowcase() {
                     ))}
                 </div>
 
-                <div className="text-center">
-                    <button className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg transition-colors inline-flex items-center gap-2">
-                        View All Products
-                        <ArrowRight className="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div className="mt-16 bg-white rounded-2xl p-8 lg:p-12 shadow-sm">
-                    <div className="grid lg:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <h3 className="text-primary mb-4">Get Your Personalized Skincare Routine</h3>
-                            <p className="text-slate-600 mb-6">
-                                Our AI-powered skin analysis tool creates a customized skincare routine based on your unique skin type, concerns, and goals. Answer a few simple questions and receive personalized product recommendations.
+                {/* 🧬 CONVERSION BOX */}
+                <div className="bg-muted/30 rounded-[3.5rem] p-10 lg:p-16 border border-border overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-12 opacity-5">
+                         <ShieldCheck size={200} />
+                    </div>
+                    <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
+                        <div className="space-y-8">
+                            <h3 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-foreground">
+                                Sync Your <span className="text-[#4DB6AC]">Routine.</span>
+                            </h3>
+                            <p className="text-sm font-medium text-muted-foreground leading-relaxed uppercase tracking-tight">
+                                Our AI creates a customized clinical routine based on your scan. Stop guessing and start using products vetted for your phenotype.
                             </p>
-                            <button className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2">
+                            <button 
+                                onClick={() => window.location.href = '/ai-scanner'}
+                                className="bg-[#E1784F] hover:bg-[#ff8e5e] text-white px-10 py-6 rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] shadow-2xl transition-all flex items-center gap-3"
+                            >
                                 <Sparkles className="w-5 h-5" />
-                                Start AI Consultation
+                                Start AI Analysis
                             </button>
                         </div>
+                        
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-primary/5 rounded-xl p-6 text-center">
-                                <div className="text-primary mb-2">98%</div>
-                                <p className="text-slate-600">Satisfaction Rate</p>
-                            </div>
-                            <div className="bg-rose-50 rounded-xl p-6 text-center">
-                                <div className="text-rose-600 mb-2">50K+</div>
-                                <p className="text-slate-600">Happy Customers</p>
-                            </div>
-                            <div className="bg-primary/5 rounded-xl p-6 text-center">
-                                <div className="text-primary mb-2">100%</div>
-                                <p className="text-slate-600">Natural Ingredients</p>
-                            </div>
-                            <div className="bg-rose-50 rounded-xl p-6 text-center">
-                                <div className="text-rose-600 mb-2">24/7</div>
-                                <p className="text-slate-600">AI Support</p>
-                            </div>
+                            {[
+                                { val: "98%", label: "Accuracy Rate", color: "bg-[#4DB6AC]/10 text-[#4DB6AC]" },
+                                { val: "50K+", label: "African Users", color: "bg-[#E1784F]/10 text-[#E1784F]" },
+                                { val: "100%", label: "Vetted Safe", color: "bg-[#4DB6AC]/10 text-[#4DB6AC]" },
+                                { val: "24/7", label: "Expert Hub", color: "bg-[#E1784F]/10 text-[#E1784F]" }
+                            ].map((stat, i) => (
+                                <div key={i} className={`${stat.color} rounded-[2rem] p-8 text-center border border-current/5`}>
+                                    <div className="text-3xl font-black italic tracking-tighter mb-1">{stat.val}</div>
+                                    <p className="text-[8px] font-black uppercase tracking-widest opacity-60">{stat.label}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

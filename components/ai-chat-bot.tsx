@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageSquare, X, Send, Sparkles, User, Bot, Zap, ShieldCheck } from "lucide-react"
+import { MessageSquare, X, Send, Sparkles, User, Bot, Zap, ShieldCheck, Info } from "lucide-react"
 import { useTheme } from "@/providers/theme-provider"
 
 interface Message {
@@ -17,11 +17,13 @@ export function AIChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  
+  // 🛡️ RE-ENFORCED: Clinical Disclaimer in the first message
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       role: "assistant",
-      content: "Welcome to your AfriDam Clinical Concierge. I can help you analyze skin scans, understand ingredients, or connect you with a specialist for $15. How can I assist your glow today?",
+      content: "Welcome to AfriDam Clinical Node. I am an AI assistant designed to help you navigate our services. I cannot provide medical diagnoses. For clinical issues, I can connect you with a specialist for $15. How can I assist your glow today?",
       timestamp: new Date()
     }
   ]);
@@ -47,95 +49,105 @@ export function AIChatBot() {
 
     setMessages(prev => [...prev, userMsg]);
     setInput("");
-    
-    // Simulate "Clinical Thinking"
     setIsTyping(true);
     
-    // This is where your AI Team will plug in the real API
+    // Simulate API Response Logic
     setTimeout(() => {
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "I've noted your concern. For a detailed clinical analysis, please use our Skin Scanner. If this is an emergency, I can book an urgent $15 session with a specialist right now.",
+        content: "Understood. Based on your input, I recommend running a Neural Skin Scan for high-precision metrics. Would you like to start a scan or book an urgent specialist chat?",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, assistantMsg]);
       setIsTyping(false);
-    }, 1500);
+    }, 1800);
   };
 
   return (
     <>
-      {/* 1. FLOATING TOGGLE BUTTON - Radiant Glow */}
+      {/* 🚀 1. FLOATING TOGGLE */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-8 right-8 z-[100] w-16 h-16 bg-[#4DB6AC] text-white rounded-[1.5rem] shadow-[0_20px_50px_rgba(77,182,172,0.4)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all group overflow-hidden"
+        className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[999] w-16 h-16 bg-[#4DB6AC] text-white rounded-[1.8rem] shadow-[0_20px_50px_rgba(77,182,172,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all group"
       >
-        <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         {isOpen ? <X size={24} /> : (
           <div className="relative">
-            <Sparkles size={24} className="animate-pulse" />
-            <span className="absolute -top-3 -right-3 w-4 h-4 bg-[#E1784F] text-[8px] font-black flex items-center justify-center rounded-full border-2 border-white">1</span>
+            <MessageSquare size={24} className="fill-white/20" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#E1784F] rounded-full border-2 border-[#4DB6AC] animate-ping" />
           </div>
         )}
       </button>
 
-      {/* 2. CHAT WINDOW */}
+      {/* 🏛️ 2. CHAT CONSOLE */}
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: 40, scale: 0.95, transformOrigin: "bottom right" }}
+            initial={{ opacity: 0, y: 50, scale: 0.9, transformOrigin: "bottom right" }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.95 }}
-            className={`fixed bottom-28 right-8 z-[100] w-[90vw] md:w-[400px] h-[600px] max-h-[75vh] rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.3)] border flex flex-col overflow-hidden backdrop-blur-3xl transition-colors duration-500 ${
-              isDark ? 'bg-[#151312]/95 border-white/10' : 'bg-white/95 border-black/5'
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className={`fixed bottom-24 right-6 md:right-10 z-[998] w-[calc(100vw-3rem)] md:w-[420px] max-h-[70vh] md:h-[650px] rounded-[3rem] shadow-[0_40px_120px_rgba(0,0,0,0.4)] border flex flex-col overflow-hidden backdrop-blur-3xl transition-all ${
+              isDark ? 'bg-[#151312]/98 border-white/10' : 'bg-white/98 border-black/5'
             }`}
           >
-            {/* HEADER - High End Gradient */}
-            <div className="p-8 bg-gradient-to-br from-[#1C1A19] to-[#000000] text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/20 blur-3xl rounded-full" />
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-[#4DB6AC] flex items-center justify-center shadow-lg shadow-[#4DB6AC]/20">
-                  <Bot className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-black italic uppercase text-xs tracking-[0.3em]">Clinical Node</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Verified Specialist AI</span>
+            {/* Header: Identity Bar */}
+            <div className="p-8 bg-[#1C1A19] text-white relative">
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(225,120,79,0.15),transparent_70%)]" />
+              <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#4DB6AC] flex items-center justify-center shadow-lg shadow-[#4DB6AC]/20">
+                    <Zap className="w-6 h-6 text-white" fill="white" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-black italic uppercase text-xs tracking-[0.3em]">Neural Concierge</h3>
+                    <p className="text-[8px] font-black uppercase text-[#4DB6AC] tracking-widest flex items-center gap-2 mt-1">
+                      <span className="w-1.5 h-1.5 bg-[#4DB6AC] rounded-full animate-pulse" />
+                      Protocol Online
+                    </p>
                   </div>
                 </div>
+                <button onClick={() => setIsOpen(false)} className="text-white/20 hover:text-white transition-colors">
+                  <X size={20} />
+                </button>
               </div>
             </div>
 
-            {/* MESSAGES AREA */}
+            {/* Warning Banner: Play Store Compliance */}
+            <div className="bg-[#E1784F]/10 px-8 py-3 flex items-center gap-3 border-y border-[#E1784F]/10">
+               <Info size={12} className="text-[#E1784F]" />
+               <p className="text-[7px] font-black uppercase tracking-widest text-[#E1784F]">
+                 Advisory: Non-Diagnostic AI Assistant
+               </p>
+            </div>
+
+            {/* Message Stream */}
             <div 
               ref={scrollRef}
-              className="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth no-scrollbar"
+              className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar scroll-smooth"
             >
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${
-                      msg.role === 'assistant' ? 'bg-[#4DB6AC]/10 text-[#4DB6AC]' : 'bg-[#E1784F]/10 text-[#E1784F]'
-                    }`}>
-                      {msg.role === 'assistant' ? <Zap size={14} fill="currentColor" /> : <User size={14} />}
-                    </div>
-                    <div className={`p-5 rounded-2xl text-[11px] font-bold leading-relaxed shadow-sm ${
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${
                       msg.role === 'assistant' 
-                        ? (isDark ? 'bg-white/5 text-gray-300 border border-white/5' : 'bg-black/5 text-gray-700 border border-black/5')
-                        : 'bg-[#E1784F] text-white shadow-[#E1784F]/20 shadow-lg'
+                        ? 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20 text-[#4DB6AC]' 
+                        : 'bg-[#E1784F]/10 border-[#E1784F]/20 text-[#E1784F]'
+                    }`}>
+                      {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
+                    </div>
+                    <div className={`p-5 rounded-2xl text-[11px] font-bold leading-relaxed shadow-sm tracking-tight ${
+                      msg.role === 'assistant' 
+                        ? (isDark ? 'bg-white/5 text-gray-300' : 'bg-black/5 text-gray-700')
+                        : 'bg-[#E1784F] text-white shadow-lg shadow-[#E1784F]/20'
                     }`}>
                       {msg.content}
                     </div>
                   </div>
                 </div>
               ))}
-              
-              {/* Thinking State */}
               {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-muted/50 px-5 py-3 rounded-2xl flex gap-1 items-center">
+                <div className="flex justify-start pl-12">
+                  <div className="flex gap-1.5">
                     <span className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce" />
                     <span className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce [animation-delay:0.2s]" />
                     <span className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce [animation-delay:0.4s]" />
@@ -144,31 +156,27 @@ export function AIChatBot() {
               )}
             </div>
 
-            {/* INPUT AREA */}
-            <div className="p-8 border-t border-border bg-transparent">
-              <div className="relative flex items-center gap-3">
+            {/* Terminal: Input Bar */}
+            <div className="p-8 pt-0">
+              <div className="relative group">
                 <input 
                   type="text" 
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Ask a clinical question..." 
-                  className={`w-full bg-muted/50 border border-border rounded-2xl px-6 py-5 text-[10px] font-black uppercase tracking-widest outline-none focus:border-[#4DB6AC] transition-all ${
-                    isDark ? 'placeholder:text-gray-700' : 'placeholder:text-gray-400'
-                  }`}
+                  placeholder="Clinical Query..." 
+                  className={`w-full bg-muted/30 border border-border rounded-2xl px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:border-[#4DB6AC] transition-all placeholder:opacity-30`}
                 />
                 <button 
                   onClick={handleSendMessage}
-                  className="absolute right-2 p-3 bg-[#E1784F] text-white rounded-xl hover:scale-105 transition-all shadow-lg"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#E1784F] text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95 transition-all"
                 >
                   <Send size={16} />
                 </button>
               </div>
-              <div className="flex items-center justify-center gap-3 mt-6 opacity-30">
-                 <ShieldCheck size={10} />
-                 <p className="text-[7px] font-black uppercase tracking-[0.4em]">
-                   End-to-End Encrypted Consultation
-                 </p>
+              <div className="mt-6 flex items-center justify-center gap-3 opacity-20">
+                 <ShieldCheck size={12} />
+                 <p className="text-[7px] font-black uppercase tracking-[0.5em]">Neural Link Encrypted</p>
               </div>
             </div>
           </motion.div>

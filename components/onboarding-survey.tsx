@@ -33,17 +33,12 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
   const skipToFinish = () => setStep(totalSteps);
 
-  /**
-   * 🛡️ RE-ENFORCED: Sync Logic
-   * Saves to both root and profile to ensure the Dashboard banner vanishes instantly.
-   */
   const handleFinish = async () => {
     if (isSaving) return;
     setIsSaving(true);
     
     try {
-      // 🛡️ OGA FIX: We broadcast the completion to every possible field
-      // This kills the "Stubborn Banner" problem once and for all.
+      // 🛡️ RESTORED: Both completion keys for maximum compatibility
       const updatePayload = {
         onboardingCompleted: true, 
         hasCompletedOnboarding: true,
@@ -55,26 +50,23 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
         }
       };
 
-      // 1. Trigger the global auth provider update
       await updateUserProfile?.(updatePayload);
       
-      // 2. 🛡️ Clinical Pause: Allow DB to settle and avoid UI race conditions
+      // 🛡️ RESTORED: Full 1000ms Clinical Pause
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // 3. Close the modal
       onComplete();
-
     } catch (err) {
       console.error("Clinical Profile Sync Failed:", err);
-      // Fail-safe: Always let the user through to the dashboard if the network stutters
       onComplete();
     } finally {
-      setIsLoading(false);
+      // 🛡️ FIXED: Correct variable name
+      setIsSaving(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 md:p-6 bg-[#0A0A0A]/98 backdrop-blur-3xl overflow-hidden font-sans">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-3 md:p-6 bg-[#0A0A0A]/98 backdrop-blur-3xl overflow-hidden font-sans">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(225,120,79,0.1),transparent_70%)] pointer-events-none" />
       
       <motion.div 
@@ -82,7 +74,6 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         className="relative w-full max-w-xl bg-[#1C1A19] border border-white/5 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl overflow-hidden"
       >
-        {/* Progress Tracker */}
         <div className="absolute top-0 left-0 w-full h-1 bg-white/5">
           <motion.div 
             className="h-full bg-[#E1784F]"
@@ -91,6 +82,7 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
           />
         </div>
 
+        {/* 🛡️ RESTORED: Original LG Padding */}
         <div className="p-6 md:p-12 lg:p-16">
           <AnimatePresence mode="wait">
             

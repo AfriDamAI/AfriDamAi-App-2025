@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 import { AuthModals } from "@/components/auth-modals"
@@ -18,9 +18,10 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
 
-  // 🛡️ WORLD-CLASS LOGIC: Identify the Dashboard/Portal environment
-  // We only want the big footer on the Landing Page.
-  const isLandingPage = pathname === "/";
+  // 🛡️ RE-ENFORCED: Strategic Footer Logic
+  // Hide footer only inside the "App/Portal" environment to keep it clean
+  const hideFooterRoutes = ["/dashboard", "/profile", "/ai-scanner", "/ai-checker"];
+  const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route));
 
   const handleSignIn = () => {
     setAuthModal({ isOpen: true, type: "signin" })
@@ -31,24 +32,29 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   }
 
   const handleCloseModal = useCallback(() => {
-    setAuthModal((prev) => {
-      if (!prev.isOpen) return prev;
-      return { ...prev, isOpen: false };
-    });
+    setAuthModal({ isOpen: false, type: "signin" });
   }, []);
 
   const handleViewProfile = () => {
     setProfileSidebarOpen(true)
   }
 
+  // 🛡️ RE-ENFORCED: Reset scroll lock if path changes while menu is open
+  useEffect(() => {
+    setProfileSidebarOpen(false);
+    setAuthModal(prev => ({ ...prev, isOpen: false }));
+    document.body.style.overflow = 'unset';
+  }, [pathname]);
+
   return (
-    <div className="relative min-h-screen flex flex-col">
-      {/* 🛠️ Glassmorphism Navigation Layer */}
+    <div className="relative min-h-screen flex flex-col bg-background">
+      
+      {/* 🏛️ 1. HEADER LAYER: Clinical Navigation */}
       <motion.header 
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="sticky top-0 z-50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="sticky top-0 z-[100]"
       >
         <Navigation 
           onSignInClick={handleSignIn} 
@@ -57,30 +63,40 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
         />
       </motion.header>
       
-      {/* 🚀 Dynamic Content Entry */}
-      <motion.main 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex-grow relative"
-      >
-        {children}
-      </motion.main>
+      {/* 🚀 2. MAIN CONTENT AREA */}
+      <main className="flex-grow relative z-10">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.3 }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </main>
       
-      {/* 🎯 THE FIX: Only show the big Footer on the public landing page */}
-      {isLandingPage && <Footer onSignUpClick={handleSignUp} />}
+      {/* 🎯 3. FOOTER: Public Only */}
+      {showFooter && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <Footer onSignUpClick={handleSignUp} />
+        </motion.div>
+      )}
       
-      {/* 🛡️ World-Class Modals with AnimatePresence */}
-      <AnimatePresence mode="wait">
+      {/* 🛡️ 4. GLOBAL AUTH MODALS */}
+      <AnimatePresence>
         {authModal.isOpen && (
           <AuthModals 
-            isOpen={authModal.isOpen} 
             onClose={handleCloseModal} 
             type={authModal.type} 
           />
         )}
       </AnimatePresence>
       
-      <AnimatePresence mode="wait">
+      {/* 👤 5. PROFILE SIDEBAR */}
+      <AnimatePresence>
         {profileSidebarOpen && (
           <ProfileSidebar 
             isOpen={profileSidebarOpen} 
