@@ -2,26 +2,34 @@
 
 import apiClient from "./api-client";
 
+/**
+ * 🛡️ AFRIDAM AESTHETIC & BEAUTY HISTORY
+ * Target Audience: Skincare, Women, and Children.
+ * Optimized for 2026 Google Play Wellness Compliance.
+ */
+
 export interface ScanRecord {
   id: string
   type: "skin" | "ingredient"
   timestamp: number
-  imageUrl?: string // 🛡️ OGA FIX: Should be a cloud URL, not a Base64 string
+  imageUrl?: string // 🛡️ Cloud URL reference
   results: {
-    conditions?: Array<{ name: string; severity: string; confidence: number }>
+    // 🛡️ RE-ENFORCED: Reframed from medical 'conditions' to aesthetic 'concerns'
+    concerns?: Array<{ name: string; intensity: string; confidence: number }>
     ingredients?: string[]
     safetyScore?: number
+    isChildSafe?: boolean // 👶 NEW: Pediatric safety indicator for mothers
   }
   notes?: string
 }
 
-const STORAGE_KEY = "afridam_clinical_cache"
+const STORAGE_KEY = "afridam_aesthetic_cache"
 const MAX_RECORDS = 50
 
 /** 🛡️ RE-ENFORCED: Sync with NestJS Backend + Local Cache **/
 export async function addToHistory(record: Omit<ScanRecord, "id" | "timestamp">) {
   try {
-    // 1. Persist to Cloud first (Mandatory for Clinical Node)
+    // 1. Persist to Cloud first (Aesthetic Node Sync)
     const response = await apiClient.post("/history/sync", record);
     const syncedRecord = response.data;
 
@@ -73,7 +81,7 @@ export async function fetchFullHistory(): Promise<ScanRecord[]> {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudHistory.slice(0, MAX_RECORDS)));
     return cloudHistory;
   } catch (error) {
-    console.error("Clinical Node Fetch Failed:", error);
+    console.error("Aesthetic Node Fetch Failed:", error);
     return getHistory();
   }
 }
@@ -88,7 +96,7 @@ export async function deleteHistoryRecord(id: string) {
     const filtered = history.filter((record) => record.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
   } catch (error) {
-    console.error("Error deleting clinical record:", error);
+    console.error("Error deleting aesthetic record:", error);
   }
 }
 
@@ -99,9 +107,9 @@ export function clearHistory() {
 export function getHistoryStats() {
   const history = getHistory()
   return {
-    totalScans: history.length,
-    skinScans: history.filter((r) => r.type === "skin").length,
+    totalAnalyses: history.length,
+    skinChecks: history.filter((r) => r.type === "skin").length,
     ingredientAnalyses: history.filter((r) => r.type === "ingredient").length,
-    lastScan: history[0]?.timestamp || null,
+    lastAnalysis: history[0]?.timestamp || null,
   }
 }
