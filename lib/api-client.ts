@@ -1,5 +1,8 @@
 import axios from "axios";
-import { UserLoginDto, CreateUserDto, AuthResponse } from "./types";
+/** * 🛡️ OGA FIX: Using Absolute Alias (@/) to ensure 
+ * Vercel deployment finds the types file correctly.
+ */
+import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /** 🛠️ OGA FIX: Universal URL Normalizer **/
 const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
@@ -91,6 +94,12 @@ export const getProfile = async () => {
 
 export const getUser = async (id: string) => {
   const response = await apiClient.get(`/users/${id}`);
+  return response.data;
+};
+
+/** 🛠️ OGA FIX: Adding back the generic updateUser to match AuthProvider expectations **/
+export const updateUser = async (id: string, updates: any) => {
+  const response = await apiClient.put(`/users/${id}`, updates);
   return response.data;
 };
 
