@@ -2,6 +2,10 @@
 
 import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react"
 import { jwtDecode } from "jwt-decode";
+
+/** * 🛡️ OGA FIX: Switched to Absolute Aliases (@/) 
+ * This prevents the Vercel "Module Not Found" error caused by relative path sensitivity.
+ */
 import { 
   login, 
   register, 
@@ -9,8 +13,9 @@ import {
   getUser, 
   updateUser, 
   forgotPassword as forgotPasswordApi 
-} from "../lib/api-client"
-import { UserLoginDto, CreateUserDto } from "../lib/types"
+} from "@/lib/api-client" 
+
+import { UserLoginDto, CreateUserDto } from "@/lib/types"
 
 interface User {
   id: string;
@@ -48,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // 🛡️ RE-ENFORCED: Unified Data Normalizer
+  // 🛡️ RE-ENFORCED: Unified Data Normalizer for NestJS Responses
   const extractUserData = (response: any) => {
     return response?.resultData || response?.data || response;
   };
