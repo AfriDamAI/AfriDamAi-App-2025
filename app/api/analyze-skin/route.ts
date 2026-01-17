@@ -1,4 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
+/** * 🛡️ OGA FIX: Points to our verified hybrid service 
+ * that combines local TensorFlow with Tobi's Cloud AI.
+ */
+import { performSkinAnalysis } from "@/lib/skin-analysis-service"
 
 interface AnalysisRequest {
   imageId: string
@@ -9,48 +13,39 @@ export async function POST(request: NextRequest) {
   try {
     const body: AnalysisRequest = await request.json()
 
+    // 🛡️ RE-ENFORCED: Validation for Play Store Stability
     if (!body.imageId && !body.imageData) {
-      return NextResponse.json({ error: "No image data provided" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Neural input missing. Please capture a clear image." }, 
+        { status: 400 }
+      )
     }
 
-    // Simulate AI analysis - in production, this would call TensorFlow.js or a backend ML service
-    const analysisResult = {
-      imageId: body.imageId,
+    /**
+     * 🔬 NEURAL HYBRID EXECUTION
+     * We pass the data to our service which:
+     * 1. Runs local TensorFlow (Fast results)
+     * 2. Calls Tobi's new /ai/analyze-skin/enrich (Deep results)
+     */
+    const analysisResult = await performSkinAnalysis(
+      body.imageData || "", 
+      body.imageId
+    );
+
+    // 🛡️ RE-ENFORCED: Standardizing for the Aesthetic Dashboard
+    return NextResponse.json({
+      ...analysisResult,
       timestamp: new Date().toISOString(),
-      overallHealth: Math.floor(Math.random() * 30) + 70, // 70-100
-      conditions: [
-        {
-          name: "Mild Acne",
-          severity: "mild",
-          confidence: Math.floor(Math.random() * 20) + 80,
-          description: "Small comedones detected on forehead and chin",
-          recommendation: "Use gentle exfoliants 2-3 times weekly",
-        },
-        {
-          name: "Dryness",
-          severity: "moderate",
-          confidence: Math.floor(Math.random() * 20) + 75,
-          description: "Dry patches detected on cheeks",
-          recommendation: "Increase hydration with moisturizers containing hyaluronic acid",
-        },
-      ],
-      recommendations: [
-        "Use a gentle cleanser twice daily",
-        "Apply SPF 30+ sunscreen daily",
-        "Stay hydrated with 8+ glasses of water",
-        "Consider a dermatologist consultation for persistent acne",
-      ],
-      productSuggestions: [
-        { name: "Gentle Cleanser", category: "Cleanser", reason: "Non-irritating for acne-prone skin" },
-        { name: "Hyaluronic Acid Serum", category: "Serum", reason: "Hydration for dry patches" },
-        { name: "Vitamin C Serum", category: "Serum", reason: "Brightening for uneven tone" },
-        { name: "Broad Spectrum SPF 30", category: "Sunscreen", reason: "Daily UV protection" },
-      ],
-    }
+      status: "Verified by AfriDam AI"
+    }, { status: 200 })
 
-    return NextResponse.json(analysisResult, { status: 200 })
-  } catch (error) {
-    console.error("Analysis error:", error)
-    return NextResponse.json({ error: "Analysis failed" }, { status: 500 })
+  } catch (error: any) {
+    console.error("Aesthetic analysis error:", error)
+    
+    // 🛡️ RE-ENFORCED: Graceful failure for the UI
+    return NextResponse.json(
+      { error: error.message || "Glow synchronization failed." }, 
+      { status: 500 }
+    )
   }
 }

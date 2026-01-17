@@ -14,15 +14,18 @@ import {
   RotateCcw,
   AlertTriangle,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  ArrowRight,
+  Baby,
+  Upload
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 export default function IngredientCheckerPage() {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   
   const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [imgSource, setImgSource] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -72,11 +75,13 @@ export default function IngredientCheckerPage() {
       const file = new File([blob], "label.jpg", { type: "image/jpeg" });
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('flag', 'ingredient_analysis');
-
+      
       setScanProgress(50);
 
-      const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyzer/process-request`, {
+      /** * 🚀 OGA FIX: SYNCED WITH TOBI'S NEW AI MODULE
+       * Updated path to /ai/analyze-ingredients
+       */
+      const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/analyze-ingredients`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -87,11 +92,13 @@ export default function IngredientCheckerPage() {
       if (!apiResponse.ok) throw new Error("AI Node Busy");
 
       const data = await apiResponse.json();
+      const payload = data.resultData || data;
       
       setResults({
-        riskLevel: data.safetyRating || "ANALYSIS COMPLETE",
-        safetyScore: data.score || 100,
-        flagged: data.flaggedIngredients || [] 
+        riskLevel: payload.riskLevel || "ANALYSIS COMPLETE",
+        safetyScore: payload.safetyScore || 100,
+        flagged: payload.ingredients?.filter((ing: any) => ing.safety !== 'safe') || [],
+        isChildSafe: payload.isChildSafe ?? true
       });
 
       setScanProgress(100);
@@ -109,10 +116,12 @@ export default function IngredientCheckerPage() {
   );
 
   return (
-    <main className="min-h-[100svh] bg-background text-foreground px-6 py-12 md:p-12 lg:p-16 overflow-x-hidden selection:bg-[#E1784F]/30">
-      <div className="max-w-7xl mx-auto space-y-10 md:space-y-16">
+    <main className="min-h-[100svh] bg-background text-foreground px-6 py-12 md:p-12 lg:p-16 overflow-x-hidden relative">
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,rgba(225,120,79,0.15),transparent_70%)] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto space-y-10 md:space-y-16 relative z-10">
         
-        {/* 🛡️ RE-ENFORCED CLINICAL HEADER */}
+        {/* HEADER */}
         <header className="flex justify-between items-center text-left">
           <div className="flex items-center gap-4 md:gap-8">
             <button onClick={() => router.push('/dashboard')} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#E1784F] hover:bg-[#E1784F] hover:text-white transition-all">
@@ -124,55 +133,52 @@ export default function IngredientCheckerPage() {
                </h1>
                <div className="flex items-center gap-2">
                  <Sparkles size={12} className="text-[#4DB6AC]" />
-                 <span className="text-[9px] md:text-[11px] font-black text-muted-foreground uppercase tracking-[0.3em] italic">Ingredient Intelligence</span>
+                 <span className="text-[9px] md:text-[11px] font-black text-muted-foreground uppercase tracking-[0.3em] italic">Aesthetic Intelligence</span>
                </div>
             </div>
-          </div>
-          <div className="hidden lg:flex items-center gap-3 px-5 py-2.5 rounded-full bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 text-[#4DB6AC]">
-             <ShieldCheck size={16} />
-             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Verified Protocol</span>
           </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-start">
           
-          {/* 📸 SMART CAMERA PORTAL */}
+          {/* CAMERA PORTAL */}
           <div className="relative w-full aspect-[4/5] bg-[#0A0A0A] rounded-[2.5rem] md:rounded-[4rem] border-4 md:border-[12px] border-white/5 overflow-hidden shadow-2xl group">
             <AnimatePresence mode="wait">
               {isCapturing ? (
                 <div className="relative w-full h-full">
                   <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
-                  {/* Scanner Grid Overlay */}
                   <div className="absolute inset-0 border-[30px] md:border-[60px] border-black/60 pointer-events-none">
                     <div className="w-full h-full border-2 border-dashed border-[#E1784F]/40 rounded-3xl relative">
-                       <motion.div 
-                         animate={{ top: ["0%", "100%", "0%"] }} 
-                         transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-                         className="absolute left-0 right-0 h-0.5 bg-[#E1784F] shadow-[0_0_15px_#E1784F]" 
-                       />
+                       <motion.div animate={{ top: ["0%", "100%", "0%"] }} transition={{ repeat: Infinity, duration: 3, ease: "linear" }} className="absolute left-0 right-0 h-0.5 bg-[#E1784F] shadow-[0_0_15px_#E1784F]" />
                     </div>
                   </div>
                   <button onClick={capture} className="absolute bottom-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full border-4 border-white/20 bg-white/10 backdrop-blur-md flex items-center justify-center active:scale-90 transition-all">
-                    <div className="w-14 h-14 rounded-full bg-[#E1784F] shadow-lg shadow-[#E1784F]/40" />
+                    <div className="w-14 h-14 rounded-full bg-[#E1784F]" />
                   </button>
                 </div>
               ) : imgSource ? (
-                <motion.div key="img" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative w-full h-full">
-                  <img src={imgSource} className="w-full h-full object-cover" alt="Captured Label" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                </motion.div>
+                <div className="relative w-full h-full">
+                  <img src={imgSource} className="w-full h-full object-cover" alt="Captured" />
+                </div>
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-6">
-                  <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/10 group-hover:border-[#E1784F]/40 transition-all">
-                    <Camera className="text-white/20 w-8 h-8 group-hover:text-[#E1784F] transition-all" />
+                  <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/10">
+                    <Camera className="text-[#E1784F] w-8 h-8" />
                   </div>
-                  <div className="space-y-2">
-                    <p className="text-white font-black uppercase italic text-2xl tracking-tighter">Scan Product Label</p>
-                    <p className="text-white/30 text-[9px] font-black uppercase tracking-widest leading-relaxed max-w-[200px] mx-auto">Place ingredients clearly within the frame for AI decoding.</p>
-                  </div>
-                  <button onClick={startCamera} className="bg-[#E1784F] text-white font-black px-10 py-5 rounded-2xl tracking-[0.2em] text-[10px] uppercase shadow-2xl active:scale-95 transition-all">
-                    Initiate Lens
+                  <button onClick={startCamera} className="bg-[#E1784F] text-white font-black px-10 py-5 rounded-2xl tracking-[0.2em] text-[10px] uppercase shadow-2xl">
+                    Open AI Lens
                   </button>
+                  <button onClick={() => fileInputRef.current?.click()} className="text-[9px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                    <Upload size={14}/> or Upload Photo
+                  </button>
+                  <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if(file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => setImgSource(reader.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }} />
                 </div>
               )}
             </AnimatePresence>
@@ -180,86 +186,67 @@ export default function IngredientCheckerPage() {
             {isAnalyzing && (
               <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-12 space-y-6 z-50">
                 <Loader2 className="animate-spin text-[#4DB6AC] w-14 h-14" />
-                <div className="space-y-2 text-center">
-                  <p className="text-[#4DB6AC] font-black uppercase text-[10px] tracking-[0.4em] animate-pulse italic">Sequencing: {scanProgress}%</p>
-                  <p className="text-white/20 text-[8px] font-black uppercase tracking-widest">Running Melanin-Safety cross-check</p>
-                </div>
+                <p className="text-[#4DB6AC] font-black uppercase text-[10px] tracking-[0.4em] animate-pulse italic">Decoding: {scanProgress}%</p>
               </div>
             )}
           </div>
 
-          {/* 📊 REAL-TIME RESULTS PANEL */}
+          {/* RESULTS PANEL */}
           <div className="space-y-8 text-left">
-            {errorDetails && (
-                <div className="p-5 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-[10px] font-black uppercase tracking-widest text-center italic">
-                    {errorDetails}
-                </div>
-            )}
-
             <AnimatePresence mode="wait">
               {results ? (
                 <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-8">
-                  <div className={`p-8 md:p-12 rounded-[3rem] border ${results.safetyScore < 60 ? 'bg-red-500/5 border-red-500/20' : 'bg-[#4DB6AC]/5 border-[#4DB6AC]/20'}`}>
+                  
+                  {/* 👶 BABY-SAFE BADGE (RECTIFIED FOR MOTHERS) */}
+                  {results.isChildSafe && (
+                    <div className="flex items-center gap-3 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 p-4 rounded-2xl text-[#4DB6AC]">
+                       <Baby size={20} />
+                       <span className="text-[10px] font-black uppercase tracking-widest italic">Pediatric Approved: Safe for Infants</span>
+                    </div>
+                  )}
+
+                  <div className={`p-8 md:p-12 rounded-[3rem] border ${results.safetyScore < 70 ? 'bg-red-500/5 border-red-500/20' : 'bg-[#4DB6AC]/5 border-[#4DB6AC]/20'}`}>
                     <div className="flex justify-between items-start mb-12">
                        <div className="space-y-2">
-                          <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-foreground leading-none">{results.riskLevel}</h2>
-                          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-50">Safety Profile</p>
+                          <h2 className="text-4xl font-black italic uppercase tracking-tighter text-foreground leading-none">{results.riskLevel}</h2>
+                          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-50">Formula Quality</p>
                        </div>
-                       <div className={`text-5xl md:text-7xl font-black italic tracking-tighter ${results.safetyScore < 60 ? 'text-red-500' : 'text-[#4DB6AC]'}`}>
-                           {results.safetyScore}<span className="text-sm md:text-lg">/100</span>
+                       <div className={`text-5xl font-black italic tracking-tighter ${results.safetyScore < 70 ? 'text-red-500' : 'text-[#4DB6AC]'}`}>
+                           {results.safetyScore}<span className="text-sm">/100</span>
                        </div>
                     </div>
                     
                     <div className="space-y-4">
                       {results.flagged.length > 0 ? results.flagged.map((ing: any, i: number) => (
                         <div key={i} className="p-6 bg-white/5 rounded-3xl border border-white/5 flex gap-4 items-start">
-                          <div className="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center text-red-500 shrink-0">
-                            <AlertTriangle size={18} />
-                          </div>
+                          <AlertTriangle size={18} className="text-red-500 shrink-0" />
                           <div>
                             <p className="font-black text-xs uppercase tracking-widest text-foreground">{ing.name}</p>
-                            <p className="text-[10px] md:text-xs text-muted-foreground font-medium leading-relaxed mt-2">{ing.note}</p>
+                            <p className="text-[10px] text-muted-foreground font-medium italic mt-1">{ing.description || ing.concerns?.[0] || 'Aesthetic caution advised'}</p>
                           </div>
                         </div>
                       )) : (
                         <div className="p-8 bg-[#4DB6AC]/10 rounded-[2rem] border border-[#4DB6AC]/20 flex gap-4 items-center">
-                            <div className="w-10 h-10 bg-[#4DB6AC] rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg">
-                                <CheckCircle2 size={20} />
-                            </div>
-                            <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-[#4DB6AC]">This formula is melanin-approved.</p>
+                            <CheckCircle2 size={24} className="text-[#4DB6AC]" />
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#4DB6AC]">This formula is family-safe.</p>
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button onClick={() => setResults(null)} className="h-20 bg-white/5 text-muted-foreground border border-white/5 rounded-[1.8rem] font-black uppercase text-[11px] tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-3">
-                       <RotateCcw size={16} /> New Scan
+                    <button onClick={() => setResults(null)} className="h-20 bg-white/5 text-muted-foreground border border-white/5 rounded-[1.8rem] font-black uppercase text-[11px] tracking-widest">
+                       <RotateCcw size={16} className="inline mr-2" /> Reset
                     </button>
-                    <button onClick={() => router.push('/marketplace')} className="h-20 bg-[#E1784F] text-white rounded-[1.8rem] font-black uppercase text-[11px] tracking-widest shadow-2xl shadow-[#E1784F]/20 active:scale-95 transition-all flex items-center justify-center gap-3">
-                      Safe Alternatives <ArrowRight size={16} />
+                    <button onClick={() => router.push('/marketplace')} className="h-20 bg-[#E1784F] text-white rounded-[1.8rem] font-black uppercase text-[11px] tracking-widest shadow-2xl flex items-center justify-center gap-3">
+                      Shop Safe <ArrowRight size={16} />
                     </button>
                   </div>
                 </motion.div>
-              ) : imgSource && !isAnalyzing ? (
-                <div className="space-y-6 pt-6">
-                  <button onClick={handleAnalyze} className="w-full bg-foreground text-background font-black h-20 md:h-24 rounded-[2rem] text-xs md:text-sm tracking-[0.4em] uppercase shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-4">
-                    Decode Profile <Zap size={18} fill="currentColor" />
-                  </button>
-                  <button onClick={() => setImgSource(null)} className="w-full text-muted-foreground font-black uppercase text-[10px] tracking-widest hover:text-[#E1784F] transition-colors">
-                    Reset Camera Lens
-                  </button>
-                </div>
               ) : (
-                 <div className="pt-20 lg:pt-32 text-center space-y-6 opacity-30">
-                    <div className="relative mx-auto w-24 h-24">
-                       <Activity size={60} className="mx-auto text-foreground animate-pulse" />
-                       <div className="absolute inset-0 bg-[#E1784F]/20 blur-3xl rounded-full" />
-                    </div>
-                    <div className="space-y-2">
-                      <p className="font-black uppercase tracking-[0.4em] text-[10px] text-foreground">Awaiting Input Signal</p>
-                      <p className="text-[8px] font-black uppercase tracking-widest max-w-[200px] mx-auto leading-relaxed">System ready for label analysis and ingredient cross-reference.</p>
-                    </div>
+                 <div className="pt-20 text-center space-y-6 opacity-30">
+                    <Activity size={40} className="mx-auto text-foreground animate-pulse" />
+                    <p className="font-black uppercase tracking-[0.4em] text-[10px] text-foreground">Syncing Aesthetic Node</p>
                  </div>
               )}
             </AnimatePresence>

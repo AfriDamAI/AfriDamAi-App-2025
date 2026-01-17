@@ -21,7 +21,8 @@ import {
   ShieldCheck,
   Scan,
   Loader2,
-  Upload
+  Upload,
+  Info
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -105,7 +106,10 @@ export default function UnifiedScanner() {
       formData.append('file', file);
       formData.append('flag', 'aesthetic_analysis');
 
-      const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyzer/process-request`, {
+      /** * 🚀 OGA FIX: SYNCED WITH TOBI'S BACKEND
+       * Path changed from /analyzer to /ai to match his latest deployment.
+       */
+      const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/analyze-skin`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         body: formData,
@@ -114,9 +118,13 @@ export default function UnifiedScanner() {
       if (!apiResponse.ok) throw new Error("Cloud Sync Failed");
 
       const data = await apiResponse.json();
+      
+      // Handle the unwrapped resultData from our interceptor logic
+      const payload = data.resultData || data;
+
       setResults({ 
-        finding: data.description || "Aesthetic Analysis Complete", 
-        predictions: data.predictions || {} 
+        finding: payload.description || "Aesthetic Analysis Complete", 
+        predictions: payload.predictions || {} 
       });
       setStatus("Analysis Verified")
     } catch (err: any) {
@@ -167,7 +175,6 @@ export default function UnifiedScanner() {
                   {isCapturing ? (
                     <div className="relative w-full h-full">
                         <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
-                        {/* Aesthetic Targeting Reticle */}
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                             <div className="w-2/3 h-2/3 border-2 border-dashed border-[#E1784F]/30 rounded-full animate-[spin_15s_linear_infinite]" />
                             <div className="absolute inset-0 border-[40px] md:border-[80px] border-black/50" />
@@ -256,12 +263,6 @@ export default function UnifiedScanner() {
                   </button>
                 )}
               </div>
-
-              {errorDetails && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-8 bg-red-500/10 border border-red-500/20 rounded-[2rem] text-red-500 text-[10px] font-black uppercase tracking-[0.4em] text-center italic">
-                    {errorDetails}
-                </motion.div>
-              )}
             </div>
           </div>
         ) : (
@@ -295,6 +296,14 @@ export default function UnifiedScanner() {
                 </div>
               </div>
 
+              {/* 🛡️ GOOGLE PLAY COMPLIANCE: AESTHETIC DISCLAIMER */}
+              <div className="p-6 bg-blue-500/5 border border-blue-500/20 rounded-3xl flex gap-4 items-start mb-12">
+                 <Info size={20} className="text-blue-500 mt-1 shrink-0" />
+                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
+                   Disclaimer: This aesthetic evaluation is for skincare beauty and wellness purposes only. It is not a medical diagnosis. Always consult a professional for clinical concerns.
+                 </p>
+              </div>
+
               {/* UPSELL: Aesthetic Consultation */}
               <div className="p-10 md:p-16 bg-[#E1784F] text-white rounded-[3.5rem] flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl relative overflow-hidden group">
                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -313,7 +322,7 @@ export default function UnifiedScanner() {
               <button onClick={() => setResults(null)} className="flex-1 h-24 bg-white/5 border border-white/10 rounded-[2rem] font-black uppercase text-xs tracking-[0.4em] text-muted-foreground hover:bg-white/10 transition-all flex items-center justify-center gap-4">
                  <RotateCcw size={20} /> NEW ANALYSIS
               </button>
-              <button onClick={() => router.push('/ecommerce')} className="flex-1 h-24 bg-foreground text-background rounded-[2rem] font-black uppercase text-xs tracking-[0.5em] shadow-2xl transition-all flex items-center justify-center gap-4">
+              <button onClick={() => router.push('/marketplace')} className="flex-1 h-24 bg-foreground text-background rounded-[2rem] font-black uppercase text-xs tracking-[0.5em] shadow-2xl transition-all flex items-center justify-center gap-4">
                  BROWSE BEAUTY SHOP <ShoppingBag size={20} />
               </button>
             </div>

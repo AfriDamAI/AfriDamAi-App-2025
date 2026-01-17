@@ -1,5 +1,11 @@
 "use client"
 
+/**
+ * 🛡️ AFRIDAM NEURAL CORE: INGREDIENT NLP ENGINE
+ * Specialized for Melanin-rich skin and Pediatric safety.
+ */
+
+// 🛡️ RE-ENFORCED: Syncing with your local database file
 import { findIngredient } from "./ingredient-database"
 
 export interface AnalyzedIngredient {
@@ -19,6 +25,7 @@ export interface IngredientAnalysisResult {
   recommendations: string[]
   skinTypeCompatibility: Record<string, string>
   summary: string
+  isChildSafe?: boolean // 👶 NEW: Supporting maternal safety badges
 }
 
 /**
@@ -82,7 +89,7 @@ export function calculateSafetyScore(analyzedIngredients: AnalyzedIngredient[]):
     }
   }
 
-  // Penalize for unknown ingredients to ensure clinical caution
+  // Penalize for unknown ingredients to ensure caution
   const unknownCount = analyzedIngredients.length - analyzedCount
   score -= unknownCount * 2
 
@@ -144,12 +151,12 @@ export function generateRecommendations(
 
   // Patch test recommendation
   if (irritants.length > 0 || analyzedIngredients.some((ing) => ing.safety === "caution")) {
-    recommendations.push("Patch test before full application to check for sensitivity")
+    recommendations.push("Perform a 24-hour patch test before full application to check for sensitivity")
   }
 
   // Frequency recommendation
   if (irritants.some(i => ["salicylic acid", "retinol", "benzoyl peroxide"].includes(i.toLowerCase()))) {
-    recommendations.push("Start with 2-3 times per week usage and gradually increase")
+    recommendations.push("Introduce slowly: Start with 2 nights per week to prevent irritation")
   }
 
   // 🛡️ RE-ENFORCED: SPF and PIH Prevention for Melanin-rich skin
@@ -158,27 +165,22 @@ export function generateRecommendations(
     analyzedIngredients.some((ing) => ing.name.toLowerCase().includes("retinol")) ||
     analyzedIngredients.some((ing) => ing.name.toLowerCase().includes("acid"))
   ) {
-    recommendations.push("Apply SPF 30+ daily to prevent hyperpigmentation (PIH) while using actives")
+    recommendations.push("Apply SPF 30+ daily to protect your glow and prevent dark spots (PIH)")
   }
 
   // Allergen warning
   if (allergens.length > 0) {
-    recommendations.push(`Risk of reaction. Avoid if allergic to: ${allergens.join(", ")}`)
+    recommendations.push(`Aesthetic Alert: Avoid if sensitive to: ${allergens.join(", ")}`)
   }
 
-  // Combination warning
-  if (irritants.length > 1) {
-    recommendations.push("Caution: Multiple actives detected. Avoid mixing with other exfoliants")
-  }
-
-  // Pregnancy warning
+  // Pregnancy/Child safety warning
   if (
     analyzedIngredients.some((ing) => ["retinol", "salicylic acid", "hydroquinone"].includes(ing.name.toLowerCase()))
   ) {
-    recommendations.push("Clinical Alert: Consult your healthcare provider if pregnant or nursing")
+    recommendations.push("Maternal Care: Consult a professional if nursing, pregnant, or using on children")
   }
 
-  return recommendations.length > 0 ? recommendations : ["Formulation appears stable for general application"]
+  return recommendations.length > 0 ? recommendations : ["This formulation appears well-balanced for your skin diary"]
 }
 
 /**
@@ -191,13 +193,13 @@ export function generateSummary(
   unknownCount: number,
 ): string {
   if (safetyScore >= 85) {
-    return "Clinical Grade: This product appears to be safe for most phenotypes with minimal concerns."
+    return "Aesthetic Grade: This product is highly compatible with your skin's natural glow."
   } else if (safetyScore >= 70) {
-    return "Balanced: This product is generally safe but contains components that may cause sensitivity."
+    return "Balanced: Generally safe, but contains active components that require a patch test."
   } else if (safetyScore >= 50) {
-    return "Active Potency: This product contains multiple irritants. Clinical patch test highly recommended."
+    return "High Potency: Contains multiple irritants. Use with caution to prevent sensitivity."
   } else {
-    return "High Risk: Significant irritant potential detected. Consult our Specialist Node before use."
+    return "High Risk: Significant irritant potential detected. Consult an expert before application."
   }
 }
 
@@ -205,13 +207,9 @@ export function generateSummary(
  * Perform complete ingredient analysis
  */
 export function analyzeIngredients(ingredientText: string): IngredientAnalysisResult {
-  // Parse ingredients
   const ingredientNames = parseIngredients(ingredientText)
-
-  // Analyze each ingredient
   const analyzedIngredients = ingredientNames.map(analyzeIngredient)
 
-  // Calculate metrics
   const safetyScore = calculateSafetyScore(analyzedIngredients)
   const allergens = extractAllergens(analyzedIngredients)
   const irritants = extractIrritants(analyzedIngredients)
@@ -220,6 +218,9 @@ export function analyzeIngredients(ingredientText: string): IngredientAnalysisRe
 
   const unknownCount = analyzedIngredients.filter((ing) => !ing.found).length
   const summary = generateSummary(safetyScore, allergens, irritants, unknownCount)
+
+  // 👶 NEW: Logic to determine if the whole batch is safe for children
+  const isChildSafe = analyzedIngredients.every(ing => ing.profile?.isChildSafe !== false)
 
   return {
     totalIngredients: ingredientNames.length,
@@ -230,5 +231,6 @@ export function analyzeIngredients(ingredientText: string): IngredientAnalysisRe
     recommendations,
     skinTypeCompatibility,
     summary,
+    isChildSafe
   }
 }
