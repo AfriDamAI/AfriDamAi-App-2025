@@ -2,10 +2,16 @@ import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+/** * 🛡️ OGA FIX: Prefix Alignment Logic
+ * Ensures that the /api prefix from Tobi's main.ts is handled correctly 
+ * regardless of whether it's included in the Vercel Env Variable or not.
+ */
 const cleanBaseUrl = rawBaseUrl.endsWith("/") ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
+const finalBaseUrl = cleanBaseUrl.endsWith("/api") ? cleanBaseUrl : `${cleanBaseUrl}/api`;
 
 const apiClient = axios.create({
-  baseURL: cleanBaseUrl,
+  baseURL: finalBaseUrl,
   headers: {
     "Content-Type": "application/json",
   }
@@ -41,6 +47,7 @@ export const setAuthToken = (token: string | null) => {
 /** 🛡️ RESPONSE INTERCEPTOR **/
 apiClient.interceptors.response.use(
   (response) => {
+    // 🛡️ OGA FIX: Unified data normalization for NestJS resultData wrapper
     if (response.data && Object.prototype.hasOwnProperty.call(response.data, 'resultData')) {
         return { ...response, data: response.data.resultData };
     }
@@ -84,15 +91,12 @@ export const getUser = async (id: string) => {
   return response.data;
 };
 
-// 🛡️ SYNCED: This is exported as updateUser to match the AuthProvider import
 export const updateUser = async (id: string, updates: any) => {
   const response = await apiClient.put(`/users/${id}`, updates);
   return response.data;
 };
 
-/** 🔬 AI SERVICE MODULE - RECTIFIED FOR TOBI'S LATEST PUSH **/
-
-// 🛡️ OGA FIX: Updated path from /analyzer to /ai as per Tobi's WhatsApp
+/** 🔬 AI SERVICE MODULE **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   if (typeof file === 'string') {
@@ -103,7 +107,6 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
   
-  // 🚀 PATH UPDATED TO MATCH NEW AI MODULE (Revision 17 Truth)
   const response = await apiClient.post("/ai/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
@@ -111,13 +114,11 @@ export async function uploadImage(file: File | string): Promise<any> {
   return response.data;
 }
 
-// 👶 NEW: Tobi's Ingredient Analysis Node
 export const analyzeIngredients = async (ingredients: string) => {
   const response = await apiClient.post("/ai/ingredient-check", { ingredients });
   return response.data;
 };
 
-// 💬 NEW: Tobi's Aesthetic Chatbot Node
 export const sendChatMessage = async (message: string) => {
   const response = await apiClient.post("/ai/chat", { message });
   return response.data;
