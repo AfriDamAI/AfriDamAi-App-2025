@@ -84,6 +84,7 @@ export const getUser = async (id: string) => {
   return response.data;
 };
 
+// 🛡️ SYNCED: This is exported as updateUser to match the AuthProvider import
 export const updateUser = async (id: string, updates: any) => {
   const response = await apiClient.put(`/users/${id}`, updates);
   return response.data;
@@ -102,8 +103,8 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
   
-  // 🚀 PATH UPDATED TO MATCH NEW AI MODULE
-  const response = await apiClient.post("/ai/analyze-skin", formData, {
+  // 🚀 PATH UPDATED TO MATCH NEW AI MODULE (Revision 17 Truth)
+  const response = await apiClient.post("/ai/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   

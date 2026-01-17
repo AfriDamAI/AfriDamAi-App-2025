@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { X, CheckCircle2, Globe, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/providers/auth-provider" // 🛡️ SYNCED: Lowercase alias path
+import { useAuth } from "@/providers/auth-provider"
 import { motion } from "framer-motion"
 
 const AFRICAN_COUNTRIES = [
@@ -36,7 +36,7 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
   const [password, setPassword] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
-  const [sex] = useState("female") // Default per your initial logic
+  const [sex] = useState("female") 
   const [nationality, setNationality] = useState("Nigeria")
   const [countryCode, setCountryCode] = useState("+234") 
   const [phoneNo, setPhoneNo] = useState("")
@@ -67,7 +67,6 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
   useEffect(() => {
     if (user && isOpen) {
       onClose();
-      // 🛡️ OGA FIX: We push to dashboard, and AuthGuard intercepts if onboarding is needed
       router.push('/dashboard'); 
     }
   }, [user, isOpen, router, onClose]);
@@ -237,7 +236,7 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
             )}
           </form>
         </div>
-      </div >
+      </motion.div>
     </div>
   )
 }
