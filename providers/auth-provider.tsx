@@ -11,7 +11,7 @@ import {
   register, 
   setAuthToken, 
   getUser, 
-  updateUserProfile as updateUserProfileApi, // 🚀 OGA FIX: Pointing to the unified profile node
+  updateUser as updateUserProfileApi, // 🚀 OGA FIX: Matches the real export in lib/api-client.ts
   forgotPassword as forgotPasswordApi 
 } from "@/lib/api-client" 
 
