@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
+
 /** * 🛡️ OGA FIX: Final Path Sync
- * Updated to match the physical filename in GitHub: skin-analysis-services.ts
+ * This path matches the physical filename in your lib folder: skin-analysis-services.ts
+ * Standardizing to absolute alias (@/) to prevent Vercel build ghosts.
  */
 import { performSkinAnalysis } from "@/lib/skin-analysis-services"
 
