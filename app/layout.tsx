@@ -6,9 +6,16 @@ import "./globals.css"
 // 🛡️ FIXED: Lowercase pathing for Linux build stability
 import { ThemeProvider } from "@/providers/theme-provider"
 import { AuthProvider } from "@/providers/auth-provider"
-import { AuthGuard } from "@/components/auth-guard" // 🚀 OGA FIX: Points to our new dedicated traffic controller
+import { AuthGuard } from "@/components/auth-guard" 
 import { AppWrapper } from "@/components/app-wrapper"
-import { AIChatBot } from "@/components/ai/ai-chatbot" // 🛡️ SYNCED: Matches our component rename
+
+/**
+ * 🚀 OGA FIX: Path alignment for Vercel
+ * 1. Removed non-existent /AI/ or /ai/ folder.
+ * 2. Matched exact filename from VS Code: ai-chat-bot.
+ */
+import { AIChatBot } from "@/components/ai-chat-bot" 
+
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
