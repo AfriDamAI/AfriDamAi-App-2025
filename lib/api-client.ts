@@ -1,17 +1,14 @@
 import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
-const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
-/** * 🛡️ OGA FIX: Prefix Alignment Logic
- * Ensures that the /api prefix from Tobi's main.ts is handled correctly 
- * regardless of whether it's included in the Vercel Env Variable or not.
+/** * 🛡️ OGA FIX: Simple & Direct Pathing
+ * We use the Vercel variable exactly as provided. 
+ * Ensure NEXT_PUBLIC_API_URL on Vercel ends with /api
  */
-const cleanBaseUrl = rawBaseUrl.endsWith("/") ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
-const finalBaseUrl = cleanBaseUrl.endsWith("/api") ? cleanBaseUrl : `${cleanBaseUrl}/api`;
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 const apiClient = axios.create({
-  baseURL: finalBaseUrl,
+  baseURL,
   headers: {
     "Content-Type": "application/json",
   }
@@ -47,8 +44,12 @@ export const setAuthToken = (token: string | null) => {
 /** 🛡️ RESPONSE INTERCEPTOR **/
 apiClient.interceptors.response.use(
   (response) => {
-    // 🛡️ OGA FIX: Unified data normalization for NestJS resultData wrapper
-    if (response.data && Object.prototype.hasOwnProperty.call(response.data, 'resultData')) {
+    /**
+     * 🛡️ OGA FIX: NestJS Wrapper Check
+     * Tobi's backend wraps data in 'resultData'. 
+     * We peel that layer off here so the rest of the app stays clean.
+     */
+    if (response.data && response.data.resultData) {
         return { ...response, data: response.data.resultData };
     }
     return response;
