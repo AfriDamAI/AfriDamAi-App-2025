@@ -5,6 +5,7 @@ import { PricingTable } from "@/components/pricing-table"
 import { ChevronLeft, ShieldCheck, Star, Zap, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+// 🛡️ FIXED: Ensuring standard lowercase paths for Linux build compatibility
 import { useTheme } from "@/providers/theme-provider"
 import { useAuth } from "@/providers/auth-provider"
 
@@ -21,6 +22,7 @@ export default function PricingPage() {
     setIsProcessing(true);
 
     try {
+      // 🚀 HANDSHAKE: Hits the new /api/payments endpoint we discussed
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/initialize`, {
         method: 'POST',
         headers: { 
@@ -30,7 +32,7 @@ export default function PricingPage() {
         body: JSON.stringify({ 
           plan: planType, 
           amount: amount,
-          currency: "USD" // Or NGN based on your Flutterwave setup
+          currency: "USD" 
         })
       });
 
@@ -76,6 +78,7 @@ export default function PricingPage() {
                 <ShieldCheck size={14} className="text-[#4DB6AC]" />
                 <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Secure SSL Encrypted Payment</span>
             </div>
+            {/* 🛡️ Ensure logo.png exists in /public/logo.png */}
             <img 
               src="/logo.png" 
               alt="AfriDam" 
@@ -113,7 +116,7 @@ export default function PricingPage() {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="relative"
         >
-          {/* 🛡️ RE-ENFORCED: Passing the real payment handler to the component */}
+          {/* 🛡️ PASSING HANDLER: Connects the table buttons to Flutterwave */}
           <PricingTable onUpgrade={handlePaymentInit} isProcessing={isProcessing} />
           
           {isProcessing && (
@@ -149,7 +152,6 @@ export default function PricingPage() {
         </div>
       </main>
 
-      {/* Decorative Bottom Glow */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-64 bg-gradient-to-t from-[#E1784F]/5 to-transparent pointer-events-none" />
     </div>
   )
