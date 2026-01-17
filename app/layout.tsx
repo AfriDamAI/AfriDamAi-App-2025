@@ -10,8 +10,8 @@ import { AuthGuard } from "@/components/auth-guard"
 import { AppWrapper } from "@/components/app-wrapper"
 
 /**
- * 🚀 OGA FINAL FIX: Path alignment for Vercel
- * Pointing to the physical file found in components/ai/
+ * 🚀 OGA FIX: Neural Chatbot Handshake
+ * Path matched to your 'ai' folder and 'ai-chat-bot' file.
  */
 import { AIChatBot } from "@/components/ai/ai-chat-bot" 
 
