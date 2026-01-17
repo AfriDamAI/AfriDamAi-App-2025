@@ -10,11 +10,10 @@ import { AuthGuard } from "@/components/auth-guard"
 import { AppWrapper } from "@/components/app-wrapper"
 
 /**
- * 🚀 OGA FIX: Path alignment for Vercel
- * 1. Removed non-existent /AI/ or /ai/ folder.
- * 2. Matched exact filename from VS Code: ai-chat-bot.
+ * 🚀 OGA FINAL FIX: Path alignment for Vercel
+ * Pointing to the physical file found in components/ai/
  */
-import { AIChatBot } from "@/components/ai-chat-bot" 
+import { AIChatBot } from "@/components/ai/ai-chat-bot" 
 
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
