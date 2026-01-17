@@ -11,7 +11,7 @@ import {
   register, 
   setAuthToken, 
   getUser, 
-  updateUser as updateUserProfileApi, // 🚀 OGA FIX: Matches the real export in lib/api-client.ts
+  updateUser as updateUserProfileApi, 
   forgotPassword as forgotPasswordApi 
 } from "@/lib/api-client" 
 
@@ -62,8 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await getUser(userId);
       const userData = extractUserData(response);
-      setUser(userData);
-      return userData;
+      
+      if (userData) {
+        setUser(userData);
+        return userData;
+      }
+      return null;
     } catch (err) {
       console.error("Aesthetic Node Sync Failed:", err);
       return null;
@@ -81,7 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const decoded: any = jwtDecode(token);
           const currentTime = Date.now() / 1000;
           
-          // 🛡️ RE-ENFORCED: Automatic Session Expiry Check
           if (decoded.exp && decoded.exp < currentTime) {
             signOut();
           } else {
@@ -103,23 +106,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (credentials: UserLoginDto) => {
+    setIsLoading(true); // 🛡️ Keep loading TRUE during the entire handshake
     try {
-      setIsLoading(true);
       const data = await login(credentials);
       
-      // Handle various API return structures from Tobi's backend
       const accessToken = data.resultData?.accessToken || data.accessToken || data.data?.accessToken;
       
       if (!accessToken) throw new Error("Sync Failed: Invalid Token Payload");
 
+      // 🔐 SECURING THE TOKEN IMMEDIATELY
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
 
       const decoded: any = jwtDecode(accessToken);
       const userId = decoded.sub || decoded.id || decoded.userId;
       
+      // 🚀 WAIT for user data before letting the Guard move
       await fetchUserData(userId);
     } catch (error: any) {
+      localStorage.removeItem("token");
+      setAuthToken(null);
       throw error;
     } finally {
       setIsLoading(false);
@@ -130,7 +136,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       await register(userData);
-      // Auto-login after successful registration
       await signIn({ email: userData.email, password: userData.password });
     } catch (error: any) {
       throw error;
@@ -156,16 +161,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateUserProfile = async (updates: Partial<any>): Promise<User | null> => {
     try {
-      /** * 🚀 OGA FIX: PATH ALIGNMENT
-       * Tobi's new schema expects profile updates through the dedicated /profile/update node
-       */
       const response = await updateUserProfileApi(updates);
       const updatedData = extractUserData(response);
       
       setUser(prev => {
         if (!prev) return updatedData;
-        // 🛡️ OGA FIX: Logic Safeguard 
-        // Ensure we preserve the main User ID while merging Profile updates
         return { ...prev, ...updatedData };
       });
       return updatedData;
@@ -180,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /**
    * 🛡️ THE NUCLEAR STABILIZER
-   * Prevents premature redirection by verifying loading state
+   * Only calculates once we are sure loading is done and user exists.
    */
   const requiresOnboarding = useMemo(() => {
     if (isLoading || !user) return false;
