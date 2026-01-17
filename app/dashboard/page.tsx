@@ -43,8 +43,8 @@ export default function DashboardPage() {
   const [recentScans, setRecentScans] = useState<ScanRecord[]>([])
   const [dismissedOnboarding, setDismissedOnboarding] = useState(false)
 
-  // 🛡️ RE-ENFORCED: Aesthetic Context Logic
-  const requiresOnboarding = user?.onboardingCompleted === false;
+  // 🛡️ RE-ENFORCED: Syncing with Tobi's Profile Node
+  const requiresOnboarding = user?.profile?.onboardingCompleted === false || user?.onboardingCompleted === false;
 
   useEffect(() => {
     if (!theme) setTheme('light')
