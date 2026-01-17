@@ -11,9 +11,9 @@ import { AppWrapper } from "@/components/app-wrapper"
 
 /**
  * 🚀 OGA FIX: Neural Chatbot Handshake
- * Path matched to your 'ai' folder and 'ai-chat-bot' file.
+ * Path matched to your verified 'ai' folder and 'ai-chatbot.tsx' file.
  */
-import { AIChatBot } from "@/components/ai/ai-chat-bot" 
+import { AIChatBot } from "@/components/ai/ai-chatbot" 
 
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
