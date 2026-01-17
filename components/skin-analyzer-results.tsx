@@ -3,7 +3,14 @@
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { motion } from "framer-motion"
-import { AlertCircle, CheckCircle2, ShoppingBag, ShieldAlert, ArrowRight } from "lucide-react"
+import { 
+  CheckCircle2, 
+  ShoppingBag, 
+  ShieldAlert, 
+  ArrowRight, 
+  Sparkles,
+  Info
+} from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface SkinAnalysisResultsProps {
@@ -11,15 +18,15 @@ interface SkinAnalysisResultsProps {
     finding?: string;
     predictions?: Record<string, number>;
     status?: string;
-    overallHealth?: number;
+    overallGlow?: number; // 🛡️ RE-ENFORCED: Aesthetic metric
   }
 }
 
 export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) {
   const router = useRouter();
-  const healthScore = data.overallHealth || 85;
+  const glowScore = data.overallGlow || 85;
 
-  const getSeverityStyles = (confidence: number) => {
+  const getIntensityStyles = (confidence: number) => {
     if (confidence < 0.3) return "bg-green-500/10 text-green-500 border-green-500/20"
     if (confidence < 0.6) return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
     return "bg-[#E1784F]/10 text-[#E1784F] border-[#E1784F]/20"
@@ -28,25 +35,25 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
   return (
     <div className="space-y-8 animate-in fade-in duration-700 text-left">
       
-      {/* 1. HEALTH SCORE CARD */}
-      <Card className="p-8 bg-card border-border backdrop-blur-xl relative overflow-hidden rounded-[2.5rem]">
+      {/* 🛡️ 1. GLOW VITALITY CARD */}
+      <Card className="p-8 bg-card border-border backdrop-blur-xl relative overflow-hidden rounded-[2.5rem] shadow-2xl">
         <div className="absolute top-0 right-0 p-4 opacity-5">
            <CheckCircle2 size={120} />
         </div>
         <div className="flex items-center justify-between mb-6 relative z-10">
           <div>
-            <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground">Skin Health Score</h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">Melanin Vitality Index</p>
+            <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground leading-none">Overall Glow</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">Vitality Index</p>
           </div>
-          <div className="text-6xl font-black italic text-[#4DB6AC]">{healthScore}%</div>
+          <div className="text-6xl font-black italic text-[#4DB6AC]">{glowScore}%</div>
         </div>
-        <Progress value={healthScore} className="h-3 bg-muted" />
+        <Progress value={glowScore} className="h-3 bg-muted" />
       </Card>
 
-      {/* 2. DETECTED INDICATORS (With Empty State Protection) */}
+      {/* 🛡️ 2. DETECTED OBSERVATIONS */}
       <div className="space-y-6">
         <h3 className="text-lg font-black italic uppercase tracking-tighter text-[#E1784F] flex items-center gap-2">
-          <AlertCircle size={18} /> Detected Indicators
+          <Sparkles size={18} /> Aesthetic Indicators
         </h3>
         
         <div className="grid gap-4">
@@ -64,9 +71,9 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
                       <h4 className="text-lg font-black uppercase italic tracking-tight text-foreground group-hover:text-[#4DB6AC] transition-colors">
                         {name.replace(/_/g, ' ')}
                       </h4>
-                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1">Phenotype Detection Confidence</p>
+                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1">Glow Analysis Confidence</p>
                     </div>
-                    <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${getSeverityStyles(confidence)}`}>
+                    <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${getIntensityStyles(confidence)}`}>
                       {(confidence * 100).toFixed(1)}% Match
                     </span>
                   </div>
@@ -76,48 +83,48 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
             ))
           ) : (
             <div className="p-10 text-center border-2 border-dashed border-border rounded-3xl opacity-40">
-              <p className="text-[10px] font-black uppercase tracking-widest">No major anomalies detected in scan</p>
+              <p className="text-[10px] font-black uppercase tracking-widest">No significant indicators detected in scan</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* 3. AI CLINICAL SUMMARY */}
+      {/* 🛡️ 3. AESTHETIC SUMMARY */}
       <div className="space-y-4">
-        <h3 className="text-lg font-black italic uppercase tracking-tighter text-[#E1784F]">Clinical Summary</h3>
+        <h3 className="text-lg font-black italic uppercase tracking-tighter text-[#E1784F]">AI Neural Insight</h3>
         <Card className="p-8 bg-[#E1784F]/5 border-[#E1784F]/20 rounded-[2rem]">
-          <p className="text-sm text-foreground leading-relaxed italic font-medium">
-            "{data.finding || "Analysis complete. Skin appears within normal physiological parameters for this phenotype. Continue with regular hydration and sun protection."}"
+          <p className="text-sm text-foreground leading-relaxed italic font-medium leading-relaxed">
+            "{data.finding || "Evaluation complete. Skin texture appears consistent for your melanin profile. Maintain current hydration and sun protection routines to protect your glow."}"
           </p>
         </Card>
       </div>
 
-      {/* 4. RE-ENFORCED CALL TO ACTION (FIXED LINK) */}
+      {/* 🛡️ 4. CARE HUB CTA */}
       <Card className="p-8 bg-gradient-to-r from-[#E1784F] to-[#ff8e5e] border-none rounded-[3rem] shadow-2xl shadow-[#E1784F]/20">
         <div className="flex flex-col md:flex-row items-center gap-8">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
              <ShoppingBag className="text-white" size={32} />
           </div>
           <div className="space-y-1 text-center md:text-left flex-1">
-            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white">Curated Solutions</h4>
-            <p className="text-white/80 text-[10px] font-black uppercase tracking-[0.2em]">View products matched to your melanin profile</p>
+            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white">The Care Hub</h4>
+            <p className="text-white/80 text-[10px] font-black uppercase tracking-[0.2em]">Products curated for your safety profile</p>
           </div>
           <button 
             onClick={() => router.push('/marketplace')}
-            className="w-full md:w-auto px-10 h-16 bg-black text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] hover:scale-105 transition-all flex items-center justify-center gap-3"
+            className="w-full md:w-auto px-10 h-16 bg-black text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] hover:scale-105 transition-all flex items-center justify-center gap-3 shadow-xl"
           >
-            Open Shop <ArrowRight size={14} />
+            Enter Hub <ArrowRight size={14} />
           </button>
         </div>
       </Card>
 
-      {/* 5. 🛡️ PLAY STORE PROTECTION LAYER (DISCLAIMER) */}
-      <div className="p-8 bg-muted/50 border border-border rounded-[2rem] flex items-start gap-5">
-        <ShieldAlert size={24} className="text-[#E1784F] shrink-0" />
+      {/* 🛡️ 5. PLAY STORE PROTECTION LAYER (DISCLAIMER) */}
+      <div className="p-8 bg-muted/50 border border-border rounded-[2rem] flex items-start gap-5 opacity-70">
+        <Info size={24} className="text-[#E1784F] shrink-0 mt-1" />
         <div className="space-y-2">
-          <p className="text-[10px] font-black text-foreground uppercase tracking-widest">Medical Disclaimer</p>
+          <p className="text-[10px] font-black text-foreground uppercase tracking-widest">Aesthetic Disclaimer</p>
           <p className="text-[10px] font-bold leading-relaxed text-muted-foreground uppercase tracking-tight">
-            AfriDam AI analysis is for informational and educational guidance only. This technology is not a substitute for a clinical diagnosis by a licensed dermatologist. If you notice persistent changes, please consult our Expert Hub for a verified medical session.
+            AfriDam AI is for beauty and skincare wellness guidance only. It is not a clinical medical diagnosis. If you notice persistent changes or have medical concerns, consult a licensed professional or book a session in our Expert Hub.
           </p>
         </div>
       </div>

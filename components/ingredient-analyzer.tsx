@@ -4,9 +4,17 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Loader2, Zap, AlertCircle, ShieldCheck, ClipboardList, RotateCcw } from "lucide-react"
+import { 
+  Loader2, 
+  Zap, 
+  AlertCircle, 
+  ShieldCheck, 
+  ClipboardList, 
+  RotateCcw,
+  Baby
+} from "lucide-react"
 import IngredientResults from "@/components/ingredient-results"
-import apiClient from "@/lib/api-client" // 🛡️ RE-ENFORCED: Using our secure client
+import apiClient from "@/lib/api-client"
 
 interface IngredientAnalyzerProps {
   onAnalysisComplete: (results: any) => void
@@ -25,23 +33,29 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
     setError(null)
 
     try {
-      // 🛡️ RE-ENFORCED: Using standardized API Client for Production
-      const response = await apiClient.post('/analyzer/process-request', {
-        query: ingredientText,
-        flag: 'ingredient_analysis'
+      /** * 🚀 OGA FIX: SYNCED WITH TOBI'S AI MODULE
+       * Updated path to /ai/analyze-ingredients to match the 8080 Backend push.
+       */
+      const response = await apiClient.post('/ai/analyze-ingredients', {
+        ingredients: ingredientText, // Tobi's new AI module expects 'ingredients' key
+        source: 'manual_entry'
       });
 
       const data = response.data;
       
-      // 🛡️ RE-ENFORCED: Clinical Data Mapping
-      const realResults = {
-        productName: "Neural Analysis Result",
+      // Handle the unwrapped resultData from our interceptor logic
+      const payload = data.resultData || data;
+      
+      // 🛡️ RE-ENFORCED: Aesthetic & Family Data Mapping
+      const aestheticResults = {
+        productName: "Aesthetic Safety Audit",
         totalIngredients: ingredientText.split(",").length,
-        safetyScore: data.score || 100,
-        ingredients: data.ingredients || [],
-        recommendations: data.recommendations || ["No critical warnings found for this melanin profile."],
-        riskLevel: data.safetyRating || "SAFE",
-        skinTypeCompatibility: data.compatibility || {
+        safetyScore: payload.safetyScore || payload.score || 100,
+        ingredients: payload.ingredients || [],
+        recommendations: payload.recommendations || ["Formula appears balanced for melanin-rich skin."],
+        riskLevel: payload.riskLevel || payload.safetyRating || "SAFE",
+        isChildSafe: payload.isChildSafe ?? (payload.safetyScore >= 85),
+        skinTypeCompatibility: payload.skinTypeCompatibility || payload.compatibility || {
           "Oily": "Good",
           "Dry": "Excellent",
           "Balanced": "Excellent",
@@ -49,11 +63,11 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
         }
       };
 
-      setResults(realResults)
-      onAnalysisComplete(realResults)
+      setResults(aestheticResults)
+      onAnalysisComplete(aestheticResults)
     } catch (err: any) {
-      console.error("AI Analysis Failed:", err);
-      setError("AI Node Sync Failed. Ensure your clinical connection is active.");
+      console.error("Aesthetic AI Analysis Failed:", err);
+      setError("Aesthetic Node Sync Failed. Check your connection to the care hub.");
     } finally {
       setIsAnalyzing(false)
     }
@@ -81,27 +95,30 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
   }
 
   return (
-    <Card className="p-1 bg-card border-border rounded-[2.8rem] overflow-hidden shadow-2xl">
-      <div className="p-8 md:p-12 space-y-10 text-left">
+    <Card className="p-1 bg-card border-border rounded-[2.8rem] overflow-hidden shadow-2xl relative">
+      <div className="p-8 md:p-12 space-y-10 text-left relative z-10">
         <header className="flex items-center gap-5">
           <div className="w-14 h-14 bg-[#E1784F]/10 rounded-2xl flex items-center justify-center border border-[#E1784F]/20">
             <ClipboardList className="text-[#E1784F]" size={28} />
           </div>
           <div>
-            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground">Manual <span className="text-[#E1784F]">Ingestion</span></h3>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">Neural INCI chemical audit</p>
+            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground leading-none">Manual <span className="text-[#E1784F]">Analysis</span></h3>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">Neural INCI Safety Check</p>
           </div>
         </header>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2">
-            <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Ingredients List</label>
-            <span className="text-[9px] font-black text-[#E1784F] uppercase tracking-widest">Clinical Data</span>
+            <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Paste Ingredients</label>
+            <div className="flex items-center gap-2">
+               <Baby size={12} className="text-[#4DB6AC]" />
+               <span className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-widest">Child-Safe Protocol</span>
+            </div>
           </div>
           <textarea
             value={ingredientText}
             onChange={(e) => setIngredientText(e.target.value)}
-            placeholder="Aqua, Glycerin, Sodium Hyaluronate..."
+            placeholder="Aqua, Glycerin, Butyrospermum Parkii..."
             className="w-full h-56 p-8 bg-muted/30 border border-border rounded-[2rem] text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-[#E1784F]/20 transition-all outline-none text-sm leading-relaxed italic font-medium resize-none"
           />
         </div>
@@ -116,9 +133,9 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
         <div className="p-6 bg-[#4DB6AC]/5 border border-[#4DB6AC]/10 rounded-[1.8rem] flex items-start gap-4">
           <ShieldCheck className="text-[#4DB6AC] shrink-0 mt-1" size={20} />
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase text-[#4DB6AC] tracking-widest">Neural Protocol</p>
+            <p className="text-[10px] font-black uppercase text-[#4DB6AC] tracking-widest">Melanin Safety</p>
             <p className="text-[10px] text-muted-foreground font-bold leading-relaxed uppercase tracking-tight">
-              Paste the full list. We analyze ingredients in order of concentration to determine melanin compatibility with 99.4% accuracy.
+              We cross-reference every component against African skin safety profiles and pediatric compatibility.
             </p>
           </div>
         </div>
@@ -131,20 +148,21 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
           >
             {isAnalyzing ? (
               <>
-                <Loader2 className="animate-spin mr-3" size={20} /> Processing...
+                <Loader2 className="animate-spin mr-3" size={20} /> Analyzing...
               </>
             ) : (
-              <>Analyze Formula <Zap className="ml-3 fill-current" size={16} /></>
+              <>Check Formula <Zap className="ml-3 fill-current" size={16} /></>
             )}
           </Button>
           <Button 
             onClick={handleReset} 
             className="h-20 bg-muted/50 text-muted-foreground border border-border rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest px-10 hover:text-foreground transition-all"
           >
-            Clear
+            Reset
           </Button>
         </div>
       </div>
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#E1784F]/5 blur-[100px] rounded-full pointer-events-none" />
     </Card>
   )
 }

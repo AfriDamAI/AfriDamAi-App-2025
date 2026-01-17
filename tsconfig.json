@@ -19,17 +19,14 @@
       }
     ],
     "paths": {
-      // 🛡️ RE-ENFORCED: Standard Alias Mapping
-      "@/*": ["./*"] 
+      " @/*": ["./*"]
     }
   },
   "include": [
-    "next-env.d.ts", 
-    "**/*.ts", 
-    "**/*.tsx", 
-    ".next/types/**/*.ts",
-    "lib/**/*.ts",
-    "providers/**/*.tsx"
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

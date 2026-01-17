@@ -11,7 +11,7 @@ import {
   register, 
   setAuthToken, 
   getUser, 
-  updateUser, 
+  updateUserProfile as updateUserProfileApi, // 🚀 OGA FIX: Pointing to the unified profile node
   forgotPassword as forgotPasswordApi 
 } from "@/lib/api-client" 
 
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData);
       return userData;
     } catch (err) {
-      console.error("Clinical Node Sync Failed:", err);
+      console.error("Aesthetic Node Sync Failed:", err);
       return null;
     }
   };
@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       const data = await login(credentials);
       
-      // Handle various API return structures
+      // Handle various API return structures from Tobi's backend
       const accessToken = data.resultData?.accessToken || data.accessToken || data.data?.accessToken;
       
       if (!accessToken) throw new Error("Sync Failed: Invalid Token Payload");
@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       await register(userData);
-      // Auto-login after successful clinical registration
+      // Auto-login after successful registration
       await signIn({ email: userData.email, password: userData.password });
     } catch (error: any) {
       throw error;
@@ -141,7 +141,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const forgotPassword = async (email: string) => {
     try {
-      // 🛡️ RE-ENFORCED: Calling the verified clinical email node
       await forgotPasswordApi(email);
     } catch (error: any) {
       throw error;
@@ -156,9 +155,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const updateUserProfile = async (updates: Partial<any>): Promise<User | null> => {
-    if (!user?.id) return null;
     try {
-      const response = await updateUser(user.id, updates);
+      /** * 🚀 OGA FIX: PATH ALIGNMENT
+       * Tobi's new schema expects profile updates through the dedicated /profile/update node
+       * which handles the aesthetic and identity fields simultaneously.
+       */
+      const response = await updateUserProfileApi(updates);
       const updatedUser = extractUserData(response);
       
       setUser(prev => {

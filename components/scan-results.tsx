@@ -4,9 +4,9 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
-import { RotateCcw, Save, ShieldCheck, Zap, Loader2, CheckCircle2 } from "lucide-react"
+import { RotateCcw, Save, ShieldCheck, Zap, Loader2, CheckCircle2, Sparkles, Info } from "lucide-react"
 import Image from "next/image"
-import { updateUser } from "@/lib/api-client" // 🛡️ Linked to Backend
+import apiClient from "@/lib/api-client" // 🛡️ RE-ENFORCED: Unified Client
 
 interface ScanResultsProps {
   result: {
@@ -14,7 +14,7 @@ interface ScanResultsProps {
     predictions?: Record<string, number>;
     finding?: string;
     status?: string;
-    id?: string; // 🛡️ Added for database reference
+    id?: string; // 🛡️ Tobi's Cloud ID
   }
   onNewScan: () => void
 }
@@ -23,13 +23,21 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
 
-  // 🛡️ RE-ENFORCED: Real Cloud Save Logic
+  // 🛡️ RE-ENFORCED: Real Cloud Save Handshake
   const handleSaveToCloud = async () => {
+    if (!result.id && !result.image) return;
     setIsSaving(true)
     try {
-      // In a real flow, we'd send this to a /scan-history endpoint
-      // For now, we simulate the handshake with our existing API
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      /** * 🚀 OGA FIX: SYNCED WITH TOBI'S AI MODULE
+       * Forwarding the scan results to the user's permanent history node.
+       */
+      await apiClient.post("/ai/save-scan", {
+        scanId: result.id,
+        finding: result.finding,
+        predictions: result.predictions,
+        timestamp: new Date().toISOString()
+      });
+      
       setIsSaved(true)
     } catch (err) {
       console.error("Cloud Save Error:", err)
@@ -42,43 +50,43 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
     <motion.div 
       initial={{ opacity: 0, y: 20 }} 
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-10 max-w-2xl mx-auto pb-24"
+      className="space-y-10 max-w-2xl mx-auto pb-24 text-left"
     >
-      {/* 📊 1. HEADER REPORT NODE */}
+      {/* 📊 1. HEADER: AESTHETIC FOCUS */}
       <div className="text-center space-y-3">
-        <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white">
-          Clinical <span className="text-[#E1784F]">Report</span>
+        <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white leading-none">
+          Glow <span className="text-[#E1784F]">Profile</span>
         </h1>
         <div className="flex items-center justify-center gap-3 text-[#4DB6AC]">
-          <ShieldCheck size={16} />
-          <p className="text-[10px] font-black uppercase tracking-[0.4em]">Verified by Neural Node v2.0</p>
+          <Sparkles size={16} />
+          <p className="text-[10px] font-black uppercase tracking-[0.4em]">Optimized by AfriDam AI</p>
         </div>
       </div>
 
       {/* 🖼️ 2. ANALYZED SAMPLE */}
       {result.image && (
-        <Card className="p-3 bg-white/5 border-white/10 rounded-[3.5rem] overflow-hidden backdrop-blur-md">
+        <Card className="p-3 bg-white/5 border-white/10 rounded-[3.5rem] overflow-hidden backdrop-blur-md shadow-2xl">
           <div className="relative aspect-square rounded-[2.8rem] overflow-hidden border border-white/5">
              <Image 
                src={result.image || "/placeholder.svg"} 
-               alt="Analyzed Skin Sample" 
+               alt="Aesthetic Scan" 
                fill
                className="object-cover" 
              />
              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
              <div className="absolute bottom-8 left-8">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">Sample Captured Successfully</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">High-Resolution Capture Verified</p>
              </div>
           </div>
         </Card>
       )}
 
-      {/* 🧠 3. PREDICTIONS GRID */}
+      {/* 🧠 3. DERMAL INDICATORS */}
       <div className="grid grid-cols-1 gap-6">
         {result.predictions && Object.entries(result.predictions).length > 0 && (
           <Card className="p-10 bg-white/5 border-white/10 backdrop-blur-2xl rounded-[3rem]">
             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F] mb-8 flex items-center gap-3">
-              <Zap size={14} className="fill-current" /> Dermal Indicators
+              <Zap size={14} className="fill-current" /> Aesthetic Analysis
             </h2>
             <div className="space-y-4">
               {Object.entries(result.predictions).map(([name, confidence]: [string, any], index) => {
@@ -100,9 +108,9 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
 
         {/* 📜 4. AI INTERPRETATION */}
         <Card className="p-10 bg-white/5 border-white/10 rounded-[3rem]">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F] mb-6">Neural Interpretation</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F] mb-6">Neural Insight</h2>
           <p className="text-sm md:text-base text-white/80 leading-relaxed font-medium italic">
-            "{result.finding || "Analysis confirms stable skin phenotype with no critical immediate actions required. Continue routine hydration."}"
+            "{result.finding || "Evaluation complete. No significant aesthetic barriers detected. Maintain your current hydration and protection routine."}"
           </p>
         </Card>
       </div>
@@ -113,7 +121,7 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
           onClick={onNewScan} 
           className="flex-1 h-20 bg-white text-black hover:bg-white/90 rounded-[1.8rem] font-black uppercase text-[11px] tracking-widest transition-all shadow-xl active:scale-95"
         >
-          <RotateCcw className="mr-3" size={18} /> New Scan
+          <RotateCcw className="mr-3" size={18} /> New Analysis
         </Button>
         
         <Button 
@@ -129,14 +137,15 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
           ) : (
             <Save className="mr-3" size={18} />
           )}
-          {isSaving ? "Syncing..." : isSaved ? "Saved to Cloud" : "Save to Cloud"}
+          {isSaving ? "Syncing..." : isSaved ? "In Care Diary" : "Save to Diary"}
         </Button>
       </div>
 
-      {/* 🛡️ CLINICAL DISCLAIMER (Google Play Requirement) */}
-      <div className="pt-10 opacity-30 text-center">
-         <p className="text-[8px] font-bold uppercase tracking-[0.2em] max-w-md mx-auto leading-loose text-white">
-           This analysis is for informational guidance only and is not a clinical diagnosis. Always consult with a licensed professional for medical concerns.
+      {/* 🛡️ GOOGLE PLAY COMPLIANCE DISCLAIMER */}
+      <div className="p-8 bg-white/5 border border-white/5 rounded-3xl flex gap-4 items-start opacity-40">
+         <Info size={18} className="text-[#E1784F] shrink-0 mt-1" />
+         <p className="text-[8px] font-bold uppercase tracking-[0.2em] leading-loose text-white">
+           Disclaimer: This aesthetic evaluation is for skincare beauty and wellness purposes only. It is not a medical diagnosis. Always consult with a licensed professional for clinical concerns.
          </p>
       </div>
     </motion.div>

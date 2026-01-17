@@ -3,7 +3,7 @@
 import type React from "react"
 import { useEffect, useState, useLayoutEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, ShieldCheck, Zap, Cpu, Cloud } from "lucide-react"
+import { Loader2, ShieldCheck, Zap, Cpu, Sparkles } from "lucide-react"
 import { isModelLoaded, loadModel } from "@/lib/tensorflow-model"
 
 interface SkinAnalysisLoaderProps {
@@ -26,12 +26,12 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
 
     const initializeEngine = async () => {
       try {
-        setLoadingStep("Connecting to AI Node...")
+        setLoadingStep("Syncing Aesthetic Node...")
         
-        // 🛡️ RE-ENFORCED: Smart Hardware Check
+        // 🛡️ RE-ENFORCED: Hardware Handshake
         if (typeof window !== "undefined") {
           try {
-            // Give local model 2 seconds to load; if not, fallback to Cloud
+            // Give local TensorFlow model 2.5 seconds to load
             const modelPromise = loadModel();
             const timeoutPromise = new Promise((_, reject) => 
               setTimeout(() => reject(new Error("Timeout")), 2500)
@@ -42,14 +42,14 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
             setLoadingStep("Hardware Acceleration Active");
             setEngineType("local");
           } catch (e) {
-            // Fail silently and move to Cloud mode
-            setLoadingStep("Neural Cloud Sync Active");
+            // Fail silently and move to Tobi's Cloud AI mode
+            setLoadingStep("Aesthetic Cloud Sync Active");
             setEngineType("cloud");
           }
         }
         
-        // Beautiful brand transition delay
-        await new Promise(r => setTimeout(r, 1200))
+        // Premium brand transition delay
+        await new Promise(r => setTimeout(r, 1500))
         setIsReady(true)
       } catch (err) {
         console.error("AI Initialization Error:", err)
@@ -64,7 +64,7 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
     return (
       <div className="fixed inset-0 z-[999] bg-[#0A0A0A] flex flex-col items-center justify-center p-6 text-center">
         {/* Animated Background Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(225,120,79,0.12),transparent_70%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(225,120,79,0.15),transparent_70%)] pointer-events-none" />
         
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -78,7 +78,7 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
               {engineType === "local" ? (
                 <Cpu className="w-12 h-12 text-[#E1784F]" />
               ) : (
-                <Zap className="w-12 h-12 text-[#E1784F]" />
+                <Sparkles className="w-12 h-12 text-[#E1784F]" />
               )}
             </div>
             
@@ -102,7 +102,7 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
                 </p>
               </div>
               <p className="text-[8px] font-bold text-white/20 uppercase tracking-[0.5em]">
-                Secure Clinical Pipeline v2.0
+                Secure Aesthetic Pipeline v2.6
               </p>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
         >
           <ShieldCheck size={16} className="text-[#4DB6AC]" />
           <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/50">
-            End-to-End Encryption Enabled
+            Privacy-First Analysis Enabled
           </span>
         </motion.div>
       </div>

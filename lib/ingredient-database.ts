@@ -1,8 +1,9 @@
 "use client"
 
 /**
- * 🔬 AFRIDAM AI CLINICAL INTELLIGENCE
+ * 🛡️ AFRIDAM AESTHETIC INTELLIGENCE
  * Comprehensive ingredient database with melanin-specific safety profiles.
+ * Optimized for Skincare, Women, and Pediatric Safety.
  */
 
 export interface IngredientProfile {
@@ -10,6 +11,7 @@ export interface IngredientProfile {
   aliases: string[]
   type: string
   safetyRating: "safe" | "caution" | "avoid"
+  isChildSafe?: boolean // 👶 NEW: Supporting maternal safety checks
   commonConcerns: string[]
   allergenPotential: boolean
   irritantPotential: boolean
@@ -32,6 +34,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["aqua", "h2o"],
     type: "solvent",
     safetyRating: "safe",
+    isChildSafe: true,
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
@@ -50,6 +53,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["glycerol", "propane-1,2,3-triol"],
     type: "humectant",
     safetyRating: "safe",
+    isChildSafe: true,
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
@@ -68,6 +72,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["bha", "2-hydroxybenzoic acid"],
     type: "exfoliant",
     safetyRating: "caution",
+    isChildSafe: false,
     commonConcerns: ["May cause irritation in sensitive skin", "Avoid if pregnant", "Can cause dryness", "Risk of hyperpigmentation if overused on dark skin"],
     allergenPotential: false,
     irritantPotential: true,
@@ -87,6 +92,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["parfum", "essential oils", "fragrance blend"],
     type: "fragrance",
     safetyRating: "caution",
+    isChildSafe: false,
     commonConcerns: ["Common allergen", "May irritate sensitive skin", "Can cause photosensitivity"],
     allergenPotential: true,
     irritantPotential: true,
@@ -105,6 +111,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["phenoxyethanol", "preservative"],
     type: "preservative",
     safetyRating: "safe",
+    isChildSafe: true,
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
@@ -123,6 +130,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["vitamin b3", "nicotinamide"],
     type: "vitamin",
     safetyRating: "safe",
+    isChildSafe: true,
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
@@ -141,6 +149,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["sodium hyaluronate", "ha"],
     type: "humectant",
     safetyRating: "safe",
+    isChildSafe: true,
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
@@ -159,6 +168,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["ascorbic acid", "l-ascorbic acid"],
     type: "antioxidant",
     safetyRating: "safe",
+    isChildSafe: true,
     commonConcerns: ["Can be unstable", "May cause irritation at high concentrations"],
     allergenPotential: false,
     irritantPotential: false,
@@ -177,6 +187,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["vitamin a", "retinyl palmitate"],
     type: "vitamin",
     safetyRating: "caution",
+    isChildSafe: false,
     commonConcerns: ["Avoid during pregnancy", "Can cause photosensitivity", "May cause irritation"],
     allergenPotential: false,
     irritantPotential: true,
@@ -195,6 +206,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["bpo"],
     type: "acne-fighter",
     safetyRating: "caution",
+    isChildSafe: false,
     commonConcerns: ["Can cause dryness", "May bleach fabrics", "Can cause irritation"],
     allergenPotential: false,
     irritantPotential: true,
@@ -208,12 +220,12 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     description: "Powerful acne-fighting ingredient",
     benefits: ["Acne treatment", "Antibacterial"],
   },
-  // 🛡️ RE-ENFORCED: Melanin-Centric Additions
   sheabutter: {
     name: "Shea Butter",
     aliases: ["butyrospermum parkii", "vitellaria paradoxa"],
     type: "emollient",
     safetyRating: "safe",
+    isChildSafe: true,
     commonConcerns: ["May be heavy for extremely oily skin"],
     allergenPotential: false,
     irritantPotential: false,
@@ -232,6 +244,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     aliases: ["quinol", "1,4-dihydroxybenzene"],
     type: "lightening agent",
     safetyRating: "avoid",
+    isChildSafe: false,
     commonConcerns: ["Risk of exogenous ochronosis on dark skin", "Significant irritation risk", "Strictly medical use only"],
     allergenPotential: true,
     irritantPotential: true,
@@ -271,11 +284,49 @@ Object.entries(ingredientDatabase).forEach(([key, profile]) => {
 export function findIngredient(name: string): IngredientProfile | null {
   const normalized = normalizeIngredientName(name)
 
-  // Direct lookup via alias map (Optimized)
   const databaseKey = aliasMap[normalized]
   if (databaseKey && ingredientDatabase[databaseKey]) {
     return ingredientDatabase[databaseKey]
   }
 
   return null
+}
+
+/**
+ * 🔬 NEW: Local Engine Bridge
+ * Required by performIngredientAnalysis in ingredient-checker.ts
+ */
+export function analyzeIngredients(text: string) {
+  const ingredientsToSearch = text.split(/,|\n/).map(i => i.trim()).filter(i => i.length > 0)
+  const analyzedIngredients = ingredientsToSearch
+    .map(name => {
+      const profile = findIngredient(name)
+      if (profile) {
+        return {
+          name: profile.name,
+          safety: profile.safetyRating,
+          profile: profile,
+          concerns: profile.commonConcerns
+        }
+      }
+      return null
+    })
+    .filter(Boolean)
+
+  const totalIngredients = analyzedIngredients.length
+  const safeCount = analyzedIngredients.filter(i => i?.safety === "safe").length
+  const safetyScore = totalIngredients > 0 ? Math.round((safeCount / totalIngredients) * 100) : 100
+
+  return {
+    totalIngredients,
+    safetyScore,
+    analyzedIngredients,
+    summary: safetyScore > 80 ? "This formula appears balanced and safe for regular use." : "Caution advised. Flagged ingredients detected.",
+    recommendations: ["Perform a 24-hour patch test before full application."],
+    skinTypeCompatibility: {
+      "Oily": "Good",
+      "Dry": "Good",
+      "Sensitive": "Caution"
+    }
+  }
 }
