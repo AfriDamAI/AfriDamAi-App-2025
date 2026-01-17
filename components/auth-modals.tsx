@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { X, CheckCircle2, Globe, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/providers/auth-provider"
+import { useAuth } from "@/providers/auth-provider" // 🛡️ SYNCED: Lowercase path
 import { motion } from "framer-motion"
 
 const AFRICAN_COUNTRIES = [
@@ -67,6 +67,7 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
   useEffect(() => {
     if (user && isOpen) {
       onClose();
+      // 🛡️ Handing over control to the AuthGuard in layout.tsx
       router.push('/dashboard'); 
     }
   }, [user, isOpen, router, onClose]);
