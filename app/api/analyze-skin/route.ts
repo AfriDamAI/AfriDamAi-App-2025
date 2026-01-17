@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
-/** * 🛡️ OGA FIX: Points to our verified hybrid service 
- * that combines local TensorFlow with Tobi's Cloud AI.
+/** * 🛡️ OGA FIX: Final Path Sync
+ * Updated to match the physical filename in GitHub: skin-analysis-services.ts
  */
-import { performSkinAnalysis } from "@/lib/skin-analysis-service"
+import { performSkinAnalysis } from "@/lib/skin-analysis-services"
 
 interface AnalysisRequest {
   imageId: string
@@ -23,9 +23,7 @@ export async function POST(request: NextRequest) {
 
     /**
      * 🔬 NEURAL HYBRID EXECUTION
-     * We pass the data to our service which:
-     * 1. Runs local TensorFlow (Fast results)
-     * 2. Calls Tobi's new /ai/analyze-skin/enrich (Deep results)
+     * Handshake with the hybrid scanner logic
      */
     const analysisResult = await performSkinAnalysis(
       body.imageData || "", 
