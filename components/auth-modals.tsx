@@ -2,10 +2,10 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { X, CheckCircle2, ChevronDown, Globe, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react"
+import { X, CheckCircle2, Globe, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/providers/auth-provider"
-import { motion, AnimatePresence } from "framer-motion"
+import { useAuth } from "@/providers/auth-provider" // 🛡️ SYNCED: Lowercase alias path
+import { motion } from "framer-motion"
 
 const AFRICAN_COUNTRIES = [
   { name: "Nigeria", code: "+234" },
@@ -28,7 +28,7 @@ interface AuthModalsProps {
 
 export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsProps) {
   const router = useRouter()
-  const { signIn, signUp, user, forgotPassword } = useAuth() // 🛡️ Re-enforced with forgotPassword
+  const { signIn, signUp, user, forgotPassword } = useAuth() 
   
   const [authView, setAuthView] = useState<"signin" | "signup" | "forgot">(initialType)
   const [showPassword, setShowPassword] = useState(false)
@@ -36,13 +36,13 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
   const [password, setPassword] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
-  const [sex, setSex] = useState("female")
+  const [sex] = useState("female") // Default per your initial logic
   const [nationality, setNationality] = useState("Nigeria")
-  const [countryCode, setCountryCode] = useState("+234") // 🛡️ Added country code state
+  const [countryCode, setCountryCode] = useState("+234") 
   const [phoneNo, setPhoneNo] = useState("")
   const [agreedToTerms, setAgreedToTerms] = useState(false) 
   const [error, setError] = useState("")
-  const [success, setSuccess] = useState("") // 🛡️ Added success state
+  const [success, setSuccess] = useState("") 
   const [isLoading, setIsLoading] = useState(false)
 
   const resetStates = () => {
@@ -67,6 +67,7 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
   useEffect(() => {
     if (user && isOpen) {
       onClose();
+      // 🛡️ OGA FIX: We push to dashboard, and AuthGuard intercepts if onboarding is needed
       router.push('/dashboard'); 
     }
   }, [user, isOpen, router, onClose]);
@@ -87,13 +88,11 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
       if (authView === "signin") {
         await signIn({ email, password })
       } else if (authView === "signup") {
-        // 🛡️ RE-ENFORCED: Combine code and number
         const fullPhone = `${countryCode}${phoneNo.replace(/\D/g, '')}`; 
         await signUp({
           firstName, lastName, email, sex, phoneNo: fullPhone, password, nationality
         })
       } else if (authView === "forgot") {
-        // 🛡️ RE-ENFORCED: Call real service
         await forgotPassword(email)
         setSuccess("RECOVERY LINK DISPATCHED IF ACCOUNT EXISTS.")
         setEmail("")
@@ -227,9 +226,18 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
             >
               {authView === "signin" ? "New here? Create Account" : "Already a member? Login"}
             </button>
+            {authView === "signin" && (
+              <button 
+                type="button"
+                onClick={() => setAuthView("forgot")}
+                className="w-full text-center text-[9px] font-black uppercase tracking-widest text-[#E1784F] opacity-70 hover:opacity-100 transition-opacity"
+              >
+                Forgot Password?
+              </button>
+            )}
           </form>
         </div>
-      </motion.div>
+      </div >
     </div>
   )
 }

@@ -158,16 +158,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       /** * 🚀 OGA FIX: PATH ALIGNMENT
        * Tobi's new schema expects profile updates through the dedicated /profile/update node
-       * which handles the aesthetic and identity fields simultaneously.
        */
       const response = await updateUserProfileApi(updates);
-      const updatedUser = extractUserData(response);
+      const updatedData = extractUserData(response);
       
       setUser(prev => {
-        if (!prev) return updatedUser;
-        return { ...prev, ...updatedUser };
+        if (!prev) return updatedData;
+        // 🛡️ OGA FIX: Logic Safeguard 
+        // Ensure we preserve the main User ID while merging Profile updates
+        return { ...prev, ...updatedData };
       });
-      return updatedUser;
+      return updatedData;
     } catch (error) {
       throw error;
     }

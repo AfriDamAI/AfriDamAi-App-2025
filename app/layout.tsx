@@ -1,15 +1,15 @@
 "use client"
 
 import type React from "react"
-import { useEffect } from "react"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 // 🛡️ FIXED: Lowercase pathing for Linux build stability
 import { ThemeProvider } from "@/providers/theme-provider"
-import { AuthProvider, useAuth } from "@/providers/auth-provider"
+import { AuthProvider } from "@/providers/auth-provider"
+import { AuthGuard } from "@/components/auth-guard" // 🚀 OGA FIX: Points to our new dedicated traffic controller
 import { AppWrapper } from "@/components/app-wrapper"
 import { AIChatBot } from "@/components/ai/ai-chatbot" // 🛡️ SYNCED: Matches our component rename
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
 const geistSans = Geist({
@@ -20,24 +20,6 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 })
-
-/**
- * 🛡️ AUTH GUARD: 
- * Prevents logged-in users from seeing the landing page.
- */
-function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isSignedIn, isLoading } = useAuth();
-  const pathname = usePathname();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && isSignedIn && pathname === "/") {
-      router.replace("/dashboard");
-    }
-  }, [isSignedIn, isLoading, pathname, router]);
-
-  return <>{children}</>;
-}
 
 export default function RootLayout({
   children,
@@ -90,4 +72,4 @@ export default function RootLayout({
       </body>
     </html>
   )
-}// Fresh build trigger
+}
