@@ -4,10 +4,11 @@ import type React from "react"
 import { useEffect } from "react"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
+// 🛡️ FIXED: Lowercase pathing for Linux build stability
 import { ThemeProvider } from "@/providers/theme-provider"
 import { AuthProvider, useAuth } from "@/providers/auth-provider"
 import { AppWrapper } from "@/components/app-wrapper"
-import { AIChatBot } from "@/components/ai-chat-bot"
+import { AIChatBot } from "@/components/ai/ai-chatbot" // 🛡️ SYNCED: Matches our component rename
 import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -49,13 +50,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <head>
-        {/* 📱 MOBILE OPTIMIZATION: Removed user-scalable=0 to allow natural feel */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" /> 
         <title>AfriDam AI | Your Skin, Decoded</title>
         <meta name="description" content="AI dermatology for melanin-rich skin." />
         <meta name="theme-color" content="#1C1A19" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground selection:bg-[#E1784F]/30 min-h-[100svh] relative overflow-x-hidden uppercase-tracking`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground selection:bg-[#E1784F]/30 min-h-[100svh] relative overflow-x-hidden`}>
         
         {/* 🛡️ BACKGROUND TEXTURE */}
         <div className="fixed inset-0 z-[-1] pointer-events-none opacity-[0.02] dark:opacity-[0.04] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
