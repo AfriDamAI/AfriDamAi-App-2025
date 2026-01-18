@@ -3,7 +3,6 @@ import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /** * 🛡️ OGA FIX: Simple & Direct Pathing
  * Ensure NEXT_PUBLIC_API_URL on Vercel is: https://afridamai-backend.onrender.com/api
- * (No trailing slash, no /v1 at the end of the Vercel variable)
  */
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
@@ -44,7 +43,6 @@ export const setAuthToken = (token: string | null) => {
 /** 🛡️ RESPONSE INTERCEPTOR **/
 apiClient.interceptors.response.use(
   (response) => {
-    // Peeling off NestJS 'resultData' wrapper if it exists
     if (response.data && response.data.resultData) {
         return { ...response, data: response.data.resultData };
     }
@@ -61,7 +59,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-/** 🔑 AUTH ENDPOINTS (Paths verified via Swagger) **/
+/** 🔑 AUTH ENDPOINTS **/
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
   const response = await apiClient.post("/auth/user/login", credentials);
   return response.data;
@@ -93,9 +91,11 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** 🔬 AI SERVICE MODULE (Updated to v1 paths per Swagger) **/
+/** 🔬 AI SERVICE MODULE **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
+  
+  // Handle File Input
   if (typeof file === 'string') {
     const res = await fetch(file);
     const blob = await res.blob();
@@ -103,6 +103,17 @@ export async function uploadImage(file: File | string): Promise<any> {
   } else {
     formData.append("file", file);
   }
+
+  /** * 🛡️ TOBI'S FIX: Permanent more_info integration
+   * We automate this so the user doesn't have to fill out a long form.
+   */
+  const moreInfo = {
+    skinType: "not_specified",
+    duration: "recent",
+    symptoms: ["routine_check"],
+    history: "none"
+  };
+  formData.append("more_info", JSON.stringify(moreInfo));
   
   // Swagger: POST /api/v1/scan
   const response = await apiClient.post("/v1/scan", formData, {
@@ -113,13 +124,11 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
-  // Swagger: POST /api/v1/ingredients-analysis
   const response = await apiClient.post("/v1/ingredients-analysis", { ingredients });
   return response.data;
 };
 
 export const sendChatMessage = async (message: string) => {
-  // Swagger: POST /api/v1/chatbot
   const response = await apiClient.post("/v1/chatbot", { message });
   return response.data;
 };
