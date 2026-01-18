@@ -2,8 +2,8 @@ import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /** * 🛡️ OGA FIX: Simple & Direct Pathing
- * We use the Vercel variable exactly as provided. 
- * Ensure NEXT_PUBLIC_API_URL on Vercel ends with /api
+ * Ensure NEXT_PUBLIC_API_URL on Vercel is: https://afridamai-backend.onrender.com/api
+ * (No trailing slash, no /v1 at the end of the Vercel variable)
  */
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
@@ -44,11 +44,7 @@ export const setAuthToken = (token: string | null) => {
 /** 🛡️ RESPONSE INTERCEPTOR **/
 apiClient.interceptors.response.use(
   (response) => {
-    /**
-     * 🛡️ OGA FIX: NestJS Wrapper Check
-     * Tobi's backend wraps data in 'resultData'. 
-     * We peel that layer off here so the rest of the app stays clean.
-     */
+    // Peeling off NestJS 'resultData' wrapper if it exists
     if (response.data && response.data.resultData) {
         return { ...response, data: response.data.resultData };
     }
@@ -65,7 +61,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-/** 🔑 AUTH ENDPOINTS **/
+/** 🔑 AUTH ENDPOINTS (Paths verified via Swagger) **/
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
   const response = await apiClient.post("/auth/user/login", credentials);
   return response.data;
@@ -77,7 +73,7 @@ export const register = async (userData: CreateUserDto) => {
 };
 
 export const forgotPassword = async (email: string) => {
-  const response = await apiClient.post("/auth/user/forgot-password", { email });
+  const response = await apiClient.post("/auth/forgot-password", { email });
   return response.data;
 };
 
@@ -97,7 +93,7 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** 🔬 AI SERVICE MODULE **/
+/** 🔬 AI SERVICE MODULE (Updated to v1 paths per Swagger) **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   if (typeof file === 'string') {
@@ -108,7 +104,8 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
   
-  const response = await apiClient.post("/ai/upload", formData, {
+  // Swagger: POST /api/v1/scan
+  const response = await apiClient.post("/v1/scan", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   
@@ -116,18 +113,20 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
-  const response = await apiClient.post("/ai/ingredient-check", { ingredients });
+  // Swagger: POST /api/v1/ingredients-analysis
+  const response = await apiClient.post("/v1/ingredients-analysis", { ingredients });
   return response.data;
 };
 
 export const sendChatMessage = async (message: string) => {
-  const response = await apiClient.post("/ai/chat", { message });
+  // Swagger: POST /api/v1/chatbot
+  const response = await apiClient.post("/v1/chatbot", { message });
   return response.data;
 };
 
 /** 💳 PAYMENTS **/
 export const initializePayment = async (data: { plan: string, amount: number }) => {
-  const response = await apiClient.post("/payments/initialize", data);
+  const response = await apiClient.post("/transactions/initiate", data);
   return response.data;
 };
 
