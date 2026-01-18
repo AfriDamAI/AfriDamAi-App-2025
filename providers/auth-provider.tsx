@@ -179,19 +179,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   /**
-   * 🛡️ THE NUCLEAR STABILIZER
-   * Only calculates once we are sure loading is done and user exists.
+   * 🛡️ THE NUCLEAR STABILIZER (EMERGENCY BYPASS)
+   * Forced to FALSE for launch. This prevents the dashboard from redirecting 
+   * users back to onboarding in a fresh database environment.
    */
   const requiresOnboarding = useMemo(() => {
-    if (isLoading || !user) return false;
-    
-    const isDone = 
-      user.onboardingCompleted === true || 
-      user.profile?.onboardingCompleted === true || 
-      user.profile?.hasCompletedOnboarding === true;
-
-    return !isDone;
-  }, [user, isLoading]);
+    return false; // 🚀 BYPASS ACTIVE: All users proceed directly to Dashboard
+  }, []);
 
   const contextValue = useMemo(() => ({
     user,
