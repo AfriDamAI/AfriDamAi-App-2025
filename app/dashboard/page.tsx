@@ -1,9 +1,3 @@
-/**
- * 🛡️ AFRIDAM CARE HUB: DASHBOARD
- * Version: 2026.1.1 (Mobile-First Polish)
- * Focus: World-class UI with sharp, non-cluttered navigation
- */
-
 "use client"
 
 import { useEffect, useState } from "react"
@@ -46,7 +40,11 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("home")
   const [recentScans, setRecentScans] = useState<ScanRecord[]>([])
 
-  const requiresOnboarding = user?.onboardingCompleted === false || user?.profile?.onboardingCompleted === false;
+  /**
+   * 🛡️ SINCERITY FIX: 
+   * We check if onboarding is explicitly NOT true. This covers null, undefined, or false.
+   */
+  const requiresOnboarding = user && user.onboardingCompleted !== true;
 
   useEffect(() => {
     if (!theme) setTheme('light')
@@ -60,12 +58,24 @@ export default function DashboardPage() {
     }
   }, [user, isLoading, router, theme, setTheme])
 
-  const handleCompleteOnboarding = async (surveyData: any) => {
+  /**
+   * 🛡️ THE SUBMISSION HANDSHAKE
+   */
+  const handleCompleteOnboarding = async (surveyData: any = {}) => {
     try {
-      await updateUser(user.id, { ...surveyData, onboardingCompleted: true });
+      // 1. Update the database
+      await updateUser(user.id, { 
+        ...surveyData, 
+        onboardingCompleted: true 
+      });
+      
+      // 2. WAIT for the auth provider to refresh the user state
       await mutate();
+      
+      // 3. Force a refresh of the home view
+      setActiveTab("home");
     } catch (err) {
-      console.error("Profile sync failed:", err);
+      console.error("Critical: Profile sync failed. Check connection.");
     }
   }
 
@@ -84,7 +94,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-[100svh] bg-background text-foreground flex flex-col md:flex-row font-sans selection:bg-[#E1784F]/30 overflow-x-hidden">
       
-      {/* --- DESKTOP SIDEBAR --- */}
+      {/* --- SIDEBAR --- */}
       <aside className="w-72 border-r border-border p-8 space-y-10 bg-card/50 backdrop-blur-3xl z-20 sticky top-0 h-screen hidden md:flex flex-col">
         <div className="px-2 cursor-pointer" onClick={() => router.push('/')}>
            <img src="/logo.png" alt="AfriDam AI" className="h-10 w-auto object-contain" />
@@ -119,8 +129,8 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* --- 📱 MOBILE SHARP DOCK (REFINED) --- */}
-      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] bg-card/80 backdrop-blur-2xl border border-[#E1784F]/20 z-50 rounded-[2rem] px-8 py-4 shadow-2xl md:hidden">
+      {/* --- MOBILE DOCK --- */}
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] bg-card/90 backdrop-blur-xl border border-[#E1784F]/20 z-[100] rounded-[2rem] px-8 py-4 shadow-2xl md:hidden">
         <div className="flex justify-between items-center">
           {[
             { id: "home", icon: LayoutDashboard, label: "Home" },
@@ -140,7 +150,7 @@ export default function DashboardPage() {
       </nav>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 p-5 md:p-12 lg:p-16 min-h-[100svh] overflow-y-auto relative bg-background pb-40 md:pb-12 scroll-smooth">
+      <main className="flex-1 p-5 md:p-12 lg:p-16 min-h-[100svh] overflow-y-auto relative bg-background pb-44 md:pb-12 scroll-smooth">
         <div className="absolute top-0 left-0 w-full h-[300px] bg-[radial-gradient(circle_at_50%_0%,rgba(225,120,79,0.05),transparent_70%)] pointer-events-none" />
         
         <header className="flex justify-between items-center mb-10 relative z-10 text-left">
@@ -158,50 +168,62 @@ export default function DashboardPage() {
             
             {activeTab === "home" && (
               <>
-                {requiresOnboarding && (
-                  <motion.section variants={itemVariants} className="bg-white dark:bg-card border border-gray-100 dark:border-border p-8 rounded-[2.5rem] shadow-sm space-y-6 text-left">
-                    <h3 className="text-xl font-bold">Start your Journey</h3>
+                {/* 🛡️ INTEGRATED ONBOARDING (Force Swap) */}
+                {requiresOnboarding ? (
+                  <motion.section variants={itemVariants} className="bg-white dark:bg-card border-2 border-[#E1784F]/10 p-8 rounded-[2.5rem] shadow-xl space-y-6 text-left relative z-20">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-xl font-bold">Set up your wellness profile</h3>
+                      {/* 🛡️ SKIP OPTION ADDED */}
+                      <button 
+                        onClick={() => handleCompleteOnboarding()} 
+                        className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-[#E1784F]"
+                      >
+                        Skip for now
+                      </button>
+                    </div>
                     <OnboardingSurvey onComplete={handleCompleteOnboarding} />
                   </motion.section>
+                ) : (
+                  <>
+                    {/* WELLNESS CHAT */}
+                    <motion.section variants={itemVariants} className="p-6 md:p-8 bg-card border border-[#E1784F]/20 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+                      <div className="flex items-center gap-5 text-left relative z-10">
+                        <div className="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center text-[#E1784F]"><HeartPulse size={24} /></div>
+                        <div>
+                          <h3 className="text-lg md:text-xl font-bold">Wellness Chat</h3>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Speak with our care team for advice.</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setActiveTab('appointment')} className="w-full md:w-auto px-8 py-3 bg-[#E1784F] text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg">Start Chat</button>
+                    </motion.section>
+
+                    {/* SCANNER CARD */}
+                    <motion.section variants={itemVariants} onClick={() => router.push('/ai-scanner')} className="relative overflow-hidden bg-gradient-to-br from-[#E1784F] to-[#C55A32] p-6 md:p-10 rounded-[2.5rem] flex items-center justify-between cursor-pointer group shadow-xl">
+                      <div className="flex items-center gap-4 text-left relative z-10 text-white">
+                        <div className="w-12 h-12 md:w-16 md:h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center"><Camera size={24} /></div>
+                        <div>
+                          <h3 className="text-xl md:text-2xl font-bold">Skin Check</h3>
+                          <p className="text-white/70 text-[9px] font-bold uppercase">Check your glow today</p>
+                        </div>
+                      </div>
+                      <div className="w-10 h-10 bg-white text-[#E1784F] rounded-xl flex items-center justify-center group-hover:translate-x-1 transition-transform"><ArrowRight size={18} /></div>
+                    </motion.section>
+
+                    {/* TOOLS GRID */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                      <motion.div variants={itemVariants} onClick={() => router.push('/ai-checker')} className="p-8 bg-card/40 border border-border rounded-[2.5rem] space-y-4 hover:border-[#4DB6AC]/50 cursor-pointer shadow-sm">
+                        <div className="w-10 h-10 bg-[#4DB6AC]/10 text-[#4DB6AC] rounded-xl flex items-center justify-center"><Sparkles size={18}/></div>
+                        <h4 className="font-bold uppercase tracking-tight">Safety Scan</h4>
+                        <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-widest">Safe skincare for all skin types.</p>
+                      </motion.div>
+                      <motion.div variants={itemVariants} onClick={() => router.push('/marketplace')} className="p-8 bg-card/40 border border-border rounded-[2.5rem] space-y-4 hover:border-blue-400/50 cursor-pointer shadow-sm">
+                        <div className="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><ShoppingBag size={18}/></div>
+                        <h4 className="font-bold uppercase tracking-tight">Care Shop</h4>
+                        <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-widest">Shop our curated skincare products.</p>
+                      </motion.div>
+                    </div>
+                  </>
                 )}
-
-                {/* WELLNESS CHAT */}
-                <motion.section variants={itemVariants} className="p-6 md:p-8 bg-card border border-[#E1784F]/20 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
-                  <div className="flex items-center gap-5 text-left relative z-10">
-                    <div className="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center text-[#E1784F]"><HeartPulse size={24} /></div>
-                    <div>
-                      <h3 className="text-lg md:text-xl font-bold">Wellness Chat</h3>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Speak with our care team for advice.</p>
-                    </div>
-                  </div>
-                  <button onClick={() => setActiveTab('appointment')} className="w-full md:w-auto px-8 py-3 bg-[#E1784F] text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">Start Chat</button>
-                </motion.section>
-
-                {/* SCANNER CARD */}
-                <motion.section variants={itemVariants} onClick={() => router.push('/ai-scanner')} className="relative overflow-hidden bg-gradient-to-br from-[#E1784F] to-[#C55A32] p-6 md:p-10 rounded-[2.5rem] flex items-center justify-between cursor-pointer group shadow-xl">
-                  <div className="flex items-center gap-4 text-left relative z-10 text-white">
-                    <div className="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center"><Camera size={24} /></div>
-                    <div>
-                      <h3 className="text-xl md:text-2xl font-bold">Skin Check</h3>
-                      <p className="text-white/70 text-[9px] font-bold uppercase">Check your glow today</p>
-                    </div>
-                  </div>
-                  <div className="w-10 h-10 bg-white text-[#E1784F] rounded-xl flex items-center justify-center group-hover:translate-x-1 transition-transform"><ArrowRight size={18} /></div>
-                </motion.section>
-
-                {/* TOOLS GRID */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                  <motion.div variants={itemVariants} onClick={() => router.push('/ai-checker')} className="p-8 bg-card/40 border border-border rounded-[2.5rem] space-y-4 hover:border-[#4DB6AC]/50 cursor-pointer shadow-sm">
-                    <div className="w-10 h-10 bg-[#4DB6AC]/10 text-[#4DB6AC] rounded-xl flex items-center justify-center"><Sparkles size={18}/></div>
-                    <h4 className="font-bold uppercase tracking-tight">Safety Scan</h4>
-                    <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-widest">Safe family skincare.</p>
-                  </motion.div>
-                  <motion.div variants={itemVariants} onClick={() => router.push('/marketplace')} className="p-8 bg-card/40 border border-border rounded-[2.5rem] space-y-4 hover:border-blue-400/50 cursor-pointer shadow-sm">
-                    <div className="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><ShoppingBag size={18}/></div>
-                    <h4 className="font-bold uppercase tracking-tight">Care Shop</h4>
-                    <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-widest">Restoration products.</p>
-                  </motion.div>
-                </div>
               </>
             )}
 
@@ -215,7 +237,7 @@ export default function DashboardPage() {
               </motion.div>
             )}
 
-            <footer className="mt-12 pt-8 border-t border-border/40 flex flex-col items-center gap-4 pb-20 md:pb-4">
+            <footer className="mt-12 pt-8 border-t border-border/40 flex flex-col items-center gap-4 pb-24 md:pb-4">
                <p className="text-[7px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 text-center italic">
                  AfriDam is a skin wellness support tool. Not for medical diagnosis.
                </p>

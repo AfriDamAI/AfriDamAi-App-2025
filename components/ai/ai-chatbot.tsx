@@ -1,9 +1,16 @@
+/**
+ * 🛡️ AFRIDAM WELLNESS ASSISTANT
+ * Version: 2026.1.2 (Universal & Inclusive)
+ * Focus: Clean, professional support for all skin types.
+ */
+
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageSquare, X, Send, Sparkles, User, Bot, Zap, ShieldCheck, Info } from "lucide-react"
+import { MessageSquare, X, Send, User, Bot, Zap, ShieldCheck, Info } from "lucide-react"
 import { useTheme } from "@/providers/theme-provider"
+import { sendChatMessage } from "@/lib/api-client"
 
 interface Message {
   id: string
@@ -18,12 +25,11 @@ export function AIChatBot() {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   
-  // 🛡️ RE-ENFORCED: Clinical Disclaimer in the first message
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       role: "assistant",
-      content: "Welcome to AfriDam Clinical Node. I am an AI assistant designed to help you navigate our services. I cannot provide medical diagnoses. For clinical issues, I can connect you with a specialist for $15. How can I assist your glow today?",
+      content: "Hello! I am your AfriDam Wellness Assistant. How can I support your skin journey today?",
       timestamp: new Date()
     }
   ]);
@@ -48,97 +54,93 @@ export function AIChatBot() {
     };
 
     setMessages(prev => [...prev, userMsg]);
+    const currentInput = input;
     setInput("");
     setIsTyping(true);
     
-    // Simulate API Response Logic
-    setTimeout(() => {
+    try {
+      // 🚀 THE HANDSHAKE: Talking to the actual AI backend
+      const response = await sendChatMessage(currentInput);
+      const payload = response.resultData || response;
+
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "Understood. Based on your input, I recommend running a Neural Skin Scan for high-precision metrics. Would you like to start a scan or book an urgent specialist chat?",
+        content: payload.reply || payload.content || "I'm here to help. Could you please clarify your request?",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, assistantMsg]);
+    } catch (err) {
+      setMessages(prev => [...prev, {
+        id: "error",
+        role: "assistant",
+        content: "I'm having trouble connecting to the wellness hub. Please check your internet and try again.",
+        timestamp: new Date()
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1800);
+    }
   };
 
   return (
     <>
-      {/* 🚀 1. FLOATING TOGGLE */}
+      {/* 🚀 1. FLOATING TOGGLE - Positioned to avoid nav bar collision */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[999] w-16 h-16 bg-[#4DB6AC] text-white rounded-[1.8rem] shadow-[0_20px_50px_rgba(77,182,172,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all group"
+        className="fixed bottom-24 right-6 md:bottom-10 md:right-10 z-[999] w-14 h-14 bg-[#4DB6AC] text-white rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all"
       >
-        {isOpen ? <X size={24} /> : (
-          <div className="relative">
-            <MessageSquare size={24} className="fill-white/20" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#E1784F] rounded-full border-2 border-[#4DB6AC] animate-ping" />
-          </div>
-        )}
+        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
       </button>
 
       {/* 🏛️ 2. CHAT CONSOLE */}
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: 50, scale: 0.9, transformOrigin: "bottom right" }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className={`fixed bottom-24 right-6 md:right-10 z-[998] w-[calc(100vw-3rem)] md:w-[420px] max-h-[70vh] md:h-[650px] rounded-[3rem] shadow-[0_40px_120px_rgba(0,0,0,0.4)] border flex flex-col overflow-hidden backdrop-blur-3xl transition-all ${
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className={`fixed bottom-[100px] right-4 left-4 md:left-auto md:right-10 z-[998] md:w-[400px] h-[500px] md:h-[600px] rounded-[2.5rem] shadow-2xl border flex flex-col overflow-hidden backdrop-blur-3xl ${
               isDark ? 'bg-[#151312]/98 border-white/10' : 'bg-white/98 border-black/5'
             }`}
           >
-            {/* Header: Identity Bar */}
-            <div className="p-8 bg-[#1C1A19] text-white relative">
-              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(225,120,79,0.15),transparent_70%)]" />
-              <div className="flex items-center justify-between relative z-10">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#4DB6AC] flex items-center justify-center shadow-lg shadow-[#4DB6AC]/20">
-                    <Zap className="w-6 h-6 text-white" fill="white" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="font-black italic uppercase text-xs tracking-[0.3em]">Neural Concierge</h3>
-                    <p className="text-[8px] font-black uppercase text-[#4DB6AC] tracking-widest flex items-center gap-2 mt-1">
-                      <span className="w-1.5 h-1.5 bg-[#4DB6AC] rounded-full animate-pulse" />
-                      Protocol Online
-                    </p>
-                  </div>
+            {/* Header */}
+            <div className="p-6 bg-[#1C1A19] text-white">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[#4DB6AC] flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-white" />
                 </div>
-                <button onClick={() => setIsOpen(false)} className="text-white/20 hover:text-white transition-colors">
-                  <X size={20} />
-                </button>
+                <div className="text-left">
+                  <h3 className="font-bold text-sm">Wellness Assistant</h3>
+                  <p className="text-[9px] text-[#4DB6AC] uppercase tracking-widest flex items-center gap-1.5 mt-0.5">
+                    <span className="w-1.5 h-1.5 bg-[#4DB6AC] rounded-full animate-pulse" />
+                    Online
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Warning Banner: Play Store Compliance */}
-            <div className="bg-[#E1784F]/10 px-8 py-3 flex items-center gap-3 border-y border-[#E1784F]/10">
-               <Info size={12} className="text-[#E1784F]" />
-               <p className="text-[7px] font-black uppercase tracking-widest text-[#E1784F]">
-                 Advisory: Non-Diagnostic AI Assistant
+            {/* Compliance Banner */}
+            <div className="bg-muted/50 px-6 py-2 flex items-center gap-2 border-b border-border">
+               <Info size={10} className="text-muted-foreground" />
+               <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tight">
+                 Information provided is for wellness support only.
                </p>
             </div>
 
             {/* Message Stream */}
-            <div 
-              ref={scrollRef}
-              className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar scroll-smooth"
-            >
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${
-                      msg.role === 'assistant' 
-                        ? 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20 text-[#4DB6AC]' 
-                        : 'bg-[#E1784F]/10 border-[#E1784F]/20 text-[#E1784F]'
+                  <div className={`max-w-[85%] flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
+                      msg.role === 'assistant' ? 'bg-[#4DB6AC]/10 text-[#4DB6AC]' : 'bg-[#E1784F]/10 text-[#E1784F]'
                     }`}>
                       {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
                     </div>
-                    <div className={`p-5 rounded-2xl text-[11px] font-bold leading-relaxed shadow-sm tracking-tight ${
+                    <div className={`p-4 rounded-2xl text-xs font-medium leading-relaxed ${
                       msg.role === 'assistant' 
                         ? (isDark ? 'bg-white/5 text-gray-300' : 'bg-black/5 text-gray-700')
-                        : 'bg-[#E1784F] text-white shadow-lg shadow-[#E1784F]/20'
+                        : 'bg-[#E1784F] text-white shadow-lg'
                     }`}>
                       {msg.content}
                     </div>
@@ -146,37 +148,29 @@ export function AIChatBot() {
                 </div>
               ))}
               {isTyping && (
-                <div className="flex justify-start pl-12">
-                  <div className="flex gap-1.5">
-                    <span className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce" />
-                    <span className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce [animation-delay:0.2s]" />
-                    <span className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce [animation-delay:0.4s]" />
-                  </div>
+                <div className="flex justify-start pl-10">
+                   <Loader2 className="w-4 h-4 animate-spin text-[#4DB6AC]" />
                 </div>
               )}
             </div>
 
-            {/* Terminal: Input Bar */}
-            <div className="p-8 pt-0">
-              <div className="relative group">
+            {/* Input Bar */}
+            <div className="p-6 pt-0">
+              <div className="relative">
                 <input 
                   type="text" 
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Clinical Query..." 
-                  className={`w-full bg-muted/30 border border-border rounded-2xl px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:border-[#4DB6AC] transition-all placeholder:opacity-30`}
+                  placeholder="Ask a question..." 
+                  className="w-full bg-muted/50 border border-border rounded-xl px-4 py-4 text-sm outline-none focus:border-[#4DB6AC] transition-all"
                 />
                 <button 
                   onClick={handleSendMessage}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#E1784F] text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#E1784F] text-white rounded-lg flex items-center justify-center active:scale-95 transition-all"
                 >
                   <Send size={16} />
                 </button>
-              </div>
-              <div className="mt-6 flex items-center justify-center gap-3 opacity-20">
-                 <ShieldCheck size={12} />
-                 <p className="text-[7px] font-black uppercase tracking-[0.5em]">Neural Link Encrypted</p>
               </div>
             </div>
           </motion.div>
