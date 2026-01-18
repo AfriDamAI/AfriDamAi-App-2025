@@ -91,11 +91,20 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
+/** 🛡️ TOBI'S UNIFIED CONTEXT 
+ * This is the 'UserContextDto' the AI team needs for all endpoints.
+ **/
+const defaultAiContext = {
+  skinType: "not_specified",
+  duration: "recent",
+  symptoms: ["routine_check"],
+  history: "none"
+};
+
 /** 🔬 AI SERVICE MODULE **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   
-  // Handle File Input
   if (typeof file === 'string') {
     const res = await fetch(file);
     const blob = await res.blob();
@@ -104,18 +113,9 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
 
-  /** * 🛡️ TOBI'S FIX: Permanent more_info integration
-   * We automate this so the user doesn't have to fill out a long form.
-   */
-  const moreInfo = {
-    skinType: "not_specified",
-    duration: "recent",
-    symptoms: ["routine_check"],
-    history: "none"
-  };
-  formData.append("more_info", JSON.stringify(moreInfo));
+  // AI Team requirement: more_info must be a string for multipart/form-data
+  formData.append("more_info", JSON.stringify(defaultAiContext));
   
-  // Swagger: POST /api/v1/scan
   const response = await apiClient.post("/v1/scan", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
@@ -124,12 +124,20 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
-  const response = await apiClient.post("/v1/ingredients-analysis", { ingredients });
+  // AI Team requirement: IngredientsAnalysisRequestDto
+  const response = await apiClient.post("/v1/ingredients-analysis", { 
+    ingredients,
+    context: defaultAiContext 
+  });
   return response.data;
 };
 
 export const sendChatMessage = async (message: string) => {
-  const response = await apiClient.post("/v1/chatbot", { message });
+  // AI Team requirement: ChatbotRequestDto
+  const response = await apiClient.post("/v1/chatbot", { 
+    message,
+    context: defaultAiContext 
+  });
   return response.data;
 };
 
