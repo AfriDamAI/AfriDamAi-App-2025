@@ -1,14 +1,14 @@
 /**
  * 🛡️ AFRIDAM WELLNESS ASSISTANT
- * Version: 2026.1.2 (Universal & Inclusive)
- * Focus: Clean, professional support for all skin types.
+ * Version: 2026.1.3 (Synced & Mobile-Optimized)
+ * Handshake: Fully synced with archived api-client.ts
  */
 
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageSquare, X, Send, User, Bot, Zap, ShieldCheck, Info } from "lucide-react"
+import { MessageSquare, X, Send, User, Bot, Zap, Info } from "lucide-react"
 import { useTheme } from "@/providers/theme-provider"
 import { sendChatMessage } from "@/lib/api-client"
 
@@ -16,7 +16,6 @@ interface Message {
   id: string
   role: "user" | "assistant"
   content: string
-  timestamp: Date
 }
 
 export function AIChatBot() {
@@ -29,8 +28,7 @@ export function AIChatBot() {
     {
       id: "1",
       role: "assistant",
-      content: "Hello! I am your AfriDam Wellness Assistant. How can I support your skin journey today?",
-      timestamp: new Date()
+      content: "Hello! I am your AfriDam Wellness Assistant. How can I help you care for your skin today?"
     }
   ]);
 
@@ -44,13 +42,12 @@ export function AIChatBot() {
   }, [messages, isTyping]);
 
   const handleSendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
 
     const userMsg: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input,
-      timestamp: new Date()
+      content: input
     };
 
     setMessages(prev => [...prev, userMsg]);
@@ -59,23 +56,23 @@ export function AIChatBot() {
     setIsTyping(true);
     
     try {
-      // 🚀 THE HANDSHAKE: Talking to the actual AI backend
+      // 🛡️ REFERENCE: Using archived api-client.ts
       const response = await sendChatMessage(currentInput);
-      const payload = response.resultData || response;
+      
+      // Robust handshake to find the text in Tobi's backend response
+      const replyText = response?.reply || response?.resultData?.reply || response?.content || "I'm here to support you. Could you tell me a bit more?";
 
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: payload.reply || payload.content || "I'm here to help. Could you please clarify your request?",
-        timestamp: new Date()
+        content: replyText
       };
       setMessages(prev => [...prev, assistantMsg]);
     } catch (err) {
       setMessages(prev => [...prev, {
         id: "error",
         role: "assistant",
-        content: "I'm having trouble connecting to the wellness hub. Please check your internet and try again.",
-        timestamp: new Date()
+        content: "I'm having a moment to connect. Please try again in a second."
       }]);
     } finally {
       setIsTyping(false);
@@ -84,10 +81,10 @@ export function AIChatBot() {
 
   return (
     <>
-      {/* 🚀 1. FLOATING TOGGLE - Positioned to avoid nav bar collision */}
+      {/* 🚀 1. FLOATING TOGGLE - High enough to clear the mobile dock */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-24 right-6 md:bottom-10 md:right-10 z-[999] w-14 h-14 bg-[#4DB6AC] text-white rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all"
+        className="fixed bottom-28 right-6 md:bottom-10 md:right-10 z-[999] w-14 h-14 bg-[#4DB6AC] text-white rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-all"
       >
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
       </button>
@@ -96,35 +93,31 @@ export function AIChatBot() {
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className={`fixed bottom-[100px] right-4 left-4 md:left-auto md:right-10 z-[998] md:w-[400px] h-[500px] md:h-[600px] rounded-[2.5rem] shadow-2xl border flex flex-col overflow-hidden backdrop-blur-3xl ${
+            exit={{ opacity: 0, y: 40, scale: 0.95 }}
+            className={`fixed bottom-24 right-4 left-4 md:left-auto md:right-10 z-[998] md:w-[380px] h-[70vh] md:h-[550px] rounded-[2.5rem] shadow-2xl border flex flex-col overflow-hidden backdrop-blur-3xl ${
               isDark ? 'bg-[#151312]/98 border-white/10' : 'bg-white/98 border-black/5'
             }`}
           >
             {/* Header */}
-            <div className="p-6 bg-[#1C1A19] text-white">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-[#4DB6AC] flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-sm">Wellness Assistant</h3>
-                  <p className="text-[9px] text-[#4DB6AC] uppercase tracking-widest flex items-center gap-1.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 bg-[#4DB6AC] rounded-full animate-pulse" />
-                    Online
-                  </p>
+            <div className="p-6 bg-[#1C1A19] text-white flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-[#4DB6AC] flex items-center justify-center shadow-lg">
+                <Zap size={20} />
+              </div>
+              <div className="text-left">
+                <h3 className="font-black italic uppercase tracking-tighter">Assistant</h3>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="w-1.5 h-1.5 bg-[#4DB6AC] rounded-full animate-pulse" />
+                  <span className="text-[8px] font-black uppercase tracking-widest text-[#4DB6AC]">Wellness Ready</span>
                 </div>
               </div>
             </div>
 
-            {/* Compliance Banner */}
-            <div className="bg-muted/50 px-6 py-2 flex items-center gap-2 border-b border-border">
+            {/* Disclaimer */}
+            <div className="px-6 py-2 bg-muted/30 border-b border-border flex items-center gap-2">
                <Info size={10} className="text-muted-foreground" />
-               <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tight">
-                 Information provided is for wellness support only.
-               </p>
+               <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">Support guidance only • Privacy First</p>
             </div>
 
             {/* Message Stream */}
@@ -132,15 +125,15 @@ export function AIChatBot() {
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${
                       msg.role === 'assistant' ? 'bg-[#4DB6AC]/10 text-[#4DB6AC]' : 'bg-[#E1784F]/10 text-[#E1784F]'
                     }`}>
-                      {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
+                      {msg.role === 'assistant' ? <Bot size={16} /> : <User size={16} />}
                     </div>
-                    <div className={`p-4 rounded-2xl text-xs font-medium leading-relaxed ${
+                    <div className={`p-4 rounded-2xl text-xs font-bold leading-relaxed ${
                       msg.role === 'assistant' 
                         ? (isDark ? 'bg-white/5 text-gray-300' : 'bg-black/5 text-gray-700')
-                        : 'bg-[#E1784F] text-white shadow-lg'
+                        : 'bg-[#E1784F] text-white shadow-xl'
                     }`}>
                       {msg.content}
                     </div>
@@ -148,28 +141,30 @@ export function AIChatBot() {
                 </div>
               ))}
               {isTyping && (
-                <div className="flex justify-start pl-10">
-                   <Loader2 className="w-4 h-4 animate-spin text-[#4DB6AC]" />
+                <div className="flex items-center gap-2 pl-12">
+                   <div className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce" />
+                   <div className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce [animation-delay:0.2s]" />
+                   <div className="w-1 h-1 bg-[#4DB6AC] rounded-full animate-bounce [animation-delay:0.4s]" />
                 </div>
               )}
             </div>
 
             {/* Input Bar */}
-            <div className="p-6 pt-0">
-              <div className="relative">
+            <div className="p-4 md:p-6 pt-0">
+              <div className="relative flex items-center">
                 <input 
                   type="text" 
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Ask a question..." 
-                  className="w-full bg-muted/50 border border-border rounded-xl px-4 py-4 text-sm outline-none focus:border-[#4DB6AC] transition-all"
+                  placeholder="Ask about your skin..." 
+                  className="w-full bg-muted/40 border border-border rounded-2xl px-5 py-4 text-xs font-bold outline-none focus:border-[#4DB6AC] transition-all"
                 />
                 <button 
                   onClick={handleSendMessage}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#E1784F] text-white rounded-lg flex items-center justify-center active:scale-95 transition-all"
+                  className="absolute right-2 w-10 h-10 bg-[#E1784F] text-white rounded-xl flex items-center justify-center active:scale-95 shadow-lg"
                 >
-                  <Send size={16} />
+                  <Send size={14} />
                 </button>
               </div>
             </div>

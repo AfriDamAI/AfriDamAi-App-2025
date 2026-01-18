@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM INGREDIENT CHECKER
- * Version: 2026.1.1 (Hybrid Text & Photo Scan)
- * Focus: Helping mothers find safe skincare for their families.
+ * Version: 2026.1.2 (Sleek Mobile-First Refactor)
+ * Handshake: Fully synced with archived api-client.ts
  */
 
 "use client"
@@ -11,18 +11,8 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
-  Loader2, 
-  ChevronLeft,
-  Activity,
-  CheckCircle2,
-  Zap,
-  Camera,
-  RotateCcw,
-  AlertTriangle,
-  Search,
-  Upload,
-  Baby,
-  Info
+  Loader2, ChevronLeft, Activity, CheckCircle2, Zap, Camera,
+  RotateCcw, AlertTriangle, Upload, Baby, Info, ShoppingBag
 } from "lucide-react"
 import { analyzeIngredients } from "@/lib/api-client"
 
@@ -38,7 +28,7 @@ export default function IngredientCheckerPage() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<any>(null);
-  const [status, setStatus] = useState("Ready for Check");
+  const [status, setStatus] = useState("Ready");
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/");
@@ -46,16 +36,15 @@ export default function IngredientCheckerPage() {
 
   const startCamera = async () => {
     setIsCapturing(true);
-    setStatus("Starting camera...");
+    setStatus("Opening Lens");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "environment", width: { ideal: 1080 } } 
+        video: { facingMode: "environment", width: 500, height: 500 } 
       });
       if (videoRef.current) videoRef.current.srcObject = stream;
-      setStatus("Camera is On");
     } catch (err) {
       setIsCapturing(false);
-      setStatus("Camera Offline");
+      setStatus("Camera Error");
     }
   };
 
@@ -65,136 +54,120 @@ export default function IngredientCheckerPage() {
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
       canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0);
-      setImgSource(canvas.toDataURL("image/jpeg"));
+      setImgSource(canvas.toDataURL("image/jpeg", 0.8));
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach(t => t.stop());
       setIsCapturing(false);
-      setStatus("Photo Ready");
+      setStatus("Label Captured");
     }
   };
 
   const handleAnalyze = async () => {
-    // Check if we have an image OR text to analyze
     const input = imgSource || manualText;
     if (!input) return;
 
     setIsAnalyzing(true);
-    setStatus("Checking safety scores...");
+    setStatus("Analyzing...");
 
     try {
-      // 🚀 THE HANDSHAKE: Works for both manual text and image blobs
+      // 🛡️ REFERENCE: Using archived api-client.ts
       const data = await analyzeIngredients(input);
-      const payload = data.resultData || data;
+      
+      // Robust mapping to catch Tobi's backend data
+      const payload = data?.resultData || data;
       
       setResults({
-        riskLevel: payload.riskLevel || "CHECK COMPLETE",
-        safetyScore: payload.safetyScore || 100,
-        flagged: payload.ingredients?.filter((ing: any) => ing.safety !== 'safe') || [],
-        isChildSafe: payload.isChildSafe ?? true
+        riskLevel: payload?.riskLevel || "Balanced",
+        safetyScore: payload?.safetyScore || 100,
+        isChildSafe: payload?.isChildSafe ?? true,
+        summary: payload?.description || "This product appears safe for regular use."
       });
 
-      setStatus("Analysis Finished");
+      setStatus("Complete");
     } catch (err) {
-      setStatus("Check Failed. Please try again.");
+      setStatus("Connection Error");
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  if (authLoading || !user) return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center text-[#E1784F] gap-4">
-       <Loader2 className="animate-spin w-10 h-10" />
-       <p className="font-bold uppercase text-[10px] tracking-widest">Opening Safety Hub...</p>
-    </div>
-  );
+  if (authLoading || !user) return null;
 
   return (
-    <main className="min-h-[100svh] bg-white text-foreground px-5 py-10 overflow-x-hidden relative">
-      <div className="max-w-xl mx-auto space-y-8 relative z-10">
+    <main className="min-h-[100svh] bg-white px-6 py-8 relative">
+      <div className="max-w-md mx-auto space-y-6">
         
         {/* HEADER */}
-        <header className="flex items-center gap-4">
-          <button onClick={() => router.push('/dashboard')} className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[#E1784F] active:scale-95 transition-all shadow-sm">
-            <ChevronLeft size={20} />
-          </button>
-          <div className="text-left">
-             <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-               Safety <span className="text-[#E1784F]">Check</span>
-             </h1>
-             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{status}</p>
+        <header className="flex items-center justify-between">
+          <button onClick={() => router.push('/dashboard')} className="p-2 text-gray-400"><ChevronLeft /></button>
+          <div className="text-center">
+             <h1 className="text-xl font-black uppercase tracking-widest italic">Safety <span className="text-[#E1784F]">Check</span></h1>
+             <p className="text-[8px] font-bold text-gray-300 uppercase tracking-[0.2em]">{status}</p>
           </div>
+          <div className="w-8" />
         </header>
 
         {!results ? (
-          <div className="flex flex-col gap-8">
+          <div className="space-y-6">
             
-            {/* 📝 OPTION 1: MANUAL TEXT ENTRY */}
-            <div className="space-y-4">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] px-2">Paste Ingredient List</label>
+            {/* MANUAL ENTRY - Shrunk for Mobile */}
+            <div className="space-y-2">
+              <label className="text-[9px] font-black text-gray-300 uppercase tracking-widest px-2">Paste Ingredients</label>
               <textarea 
                 value={manualText}
                 onChange={(e) => setManualText(e.target.value)}
-                placeholder="e.g. Aqua, Glycerin, Shea Butter..."
-                className="w-full h-32 p-6 bg-gray-50 border border-gray-100 rounded-[2rem] text-sm focus:ring-2 focus:ring-[#E1784F]/20 outline-none transition-all resize-none"
+                placeholder="Aqua, Glycerin..."
+                className="w-full h-24 p-5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:ring-1 focus:ring-[#E1784F] outline-none transition-all resize-none"
               />
             </div>
 
-            <div className="relative flex items-center">
+            <div className="relative flex items-center py-2">
               <div className="flex-grow border-t border-gray-100"></div>
-              <span className="flex-shrink mx-4 text-[9px] font-bold text-gray-300 uppercase">OR SCAN LABEL</span>
+              <span className="mx-4 text-[7px] font-black text-gray-200 uppercase tracking-widest">Or Use Camera</span>
               <div className="flex-grow border-t border-gray-100"></div>
             </div>
 
-            {/* 📸 OPTION 2: CAMERA SECTION */}
-            <div className="relative w-full aspect-[4/5] bg-gray-50 rounded-[3rem] border-4 border-white overflow-hidden shadow-lg group">
+            {/* AI LENS - Compact Square */}
+            <div className="relative aspect-square w-full max-w-[280px] mx-auto overflow-hidden rounded-[2.5rem] border-[6px] border-gray-50 shadow-2xl bg-gray-50">
               <AnimatePresence mode="wait">
                 {isCapturing ? (
                   <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
                 ) : imgSource ? (
-                  <img src={imgSource} className="w-full h-full object-cover" alt="Captured Label" />
+                  <div className="relative w-full h-full">
+                    <img src={imgSource} className={`w-full h-full object-cover transition-all duration-700 ${isAnalyzing ? 'blur-md grayscale' : ''}`} alt="Label" />
+                    {isAnalyzing && (
+                       <div className="absolute inset-0 bg-black/20 flex flex-col items-center justify-center">
+                          <motion.div 
+                            animate={{ top: ["0%", "100%", "0%"] }} 
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="absolute left-0 right-0 h-1 bg-[#4DB6AC] shadow-[0_0_15px_#4DB6AC] z-50"
+                          />
+                          <Loader2 className="animate-spin text-white w-8 h-8" />
+                       </div>
+                    )}
+                  </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full p-12 text-center space-y-6">
-                    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-sm">
-                      <Camera className="text-[#E1784F] w-8 h-8 opacity-30" />
-                    </div>
-                    <button onClick={startCamera} className="h-14 bg-white text-[#E1784F] border border-[#E1784F]/20 font-bold px-8 rounded-2xl tracking-widest text-[10px] uppercase shadow-sm">
-                      Open AI Lens
-                    </button>
+                  <div className="flex flex-col items-center justify-center h-full text-gray-200 gap-4">
+                    <Camera size={32} strokeWidth={1} />
+                    <button onClick={startCamera} className="text-[8px] font-black uppercase tracking-widest bg-white px-4 py-2 rounded-full text-gray-400 border border-gray-100">Open Lens</button>
                   </div>
                 )}
               </AnimatePresence>
-
-              {/* 🛡️ SCANNING LASER */}
-              {isAnalyzing && (
-                <div className="absolute inset-0 bg-black/60 z-50 flex flex-col items-center justify-center">
-                   <motion.div 
-                    initial={{ top: "0%" }} 
-                    animate={{ top: "100%" }} 
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                    className="absolute left-0 right-0 h-1 bg-[#4DB6AC] shadow-[0_0_20px_#4DB6AC] z-40"
-                  />
-                  <Loader2 className="animate-spin text-white w-12 h-12 mb-4" />
-                  <p className="text-white font-bold text-[10px] uppercase tracking-widest animate-pulse">Analyzing Ingredients...</p>
-                </div>
-              )}
             </div>
 
-            {/* ACTION BUTTONS */}
-            <div className="space-y-3">
+            {/* ACTIONS */}
+            <div className="grid gap-3 pt-4">
               {isCapturing ? (
-                <button onClick={capture} className="w-20 h-20 mx-auto rounded-full border-4 border-[#E1784F] bg-white flex items-center justify-center active:scale-90 transition-all shadow-lg">
-                  <div className="w-14 h-14 rounded-full bg-[#E1784F]" />
+                <button onClick={capture} className="w-16 h-16 mx-auto rounded-full border-4 border-[#E1784F] bg-white flex items-center justify-center shadow-xl">
+                  <div className="w-10 h-10 rounded-full bg-[#E1784F]" />
                 </button>
               ) : (imgSource || manualText) && !isAnalyzing ? (
-                <>
-                  <button onClick={handleAnalyze} className="w-full h-16 bg-[#1A1A1A] text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest flex items-center justify-center gap-2 active:scale-95 shadow-lg">
-                    Start Safety Check <Zap size={16} />
-                  </button>
-                  <button onClick={() => { setImgSource(null); setManualText(""); }} className="w-full h-16 bg-white text-gray-400 border border-gray-100 rounded-2xl font-bold uppercase text-[11px] tracking-widest">Clear Input</button>
-                </>
+                <button onClick={handleAnalyze} className="w-full py-5 bg-[#1A1A1A] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 shadow-xl">
+                  Analyze Safety <Zap size={14} fill="currentColor" />
+                </button>
               ) : !isAnalyzing && (
-                <button onClick={() => fileInputRef.current?.click()} className="w-full h-16 bg-white text-gray-500 border border-gray-200 rounded-2xl font-bold uppercase text-[11px] tracking-widest flex items-center justify-center gap-2">
-                    <Upload size={14} /> Upload from Phone
+                <button onClick={() => fileInputRef.current?.click()} className="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center justify-center gap-2">
+                    <Upload size={12} /> Upload Photo
                 </button>
               )}
               <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
@@ -208,42 +181,35 @@ export default function IngredientCheckerPage() {
             </div>
           </div>
         ) : (
-          /* RESULTS VIEW */
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 pb-20">
-            <div className="p-8 bg-white border border-gray-100 rounded-[3rem] shadow-sm text-center relative overflow-hidden">
-              <div className="flex flex-col items-center gap-4 mb-8">
-                <div className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-sm ${results.safetyScore < 70 ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-500'}`}>
-                   {results.safetyScore < 70 ? <AlertTriangle size={36} /> : <CheckCircle2 size={36} />}
+          /* RESULTS VIEW - Soft & Standard */
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+            <div className="p-8 bg-gray-50 rounded-[3rem] text-center border border-gray-100 shadow-sm">
+              <div className="flex flex-col items-center gap-4 mb-6">
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${results.safetyScore < 70 ? 'bg-red-50 text-red-500' : 'bg-[#4DB6AC]/10 text-[#4DB6AC]'}`}>
+                   {results.safetyScore < 70 ? <AlertTriangle size={28} /> : <CheckCircle2 size={28} />}
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900">Analysis Done</h2>
+                <h2 className="text-xl font-black italic uppercase tracking-tighter">Family Safety Score</h2>
               </div>
 
               {results.isChildSafe && (
-                <div className="flex items-center gap-3 bg-green-50 border border-green-100 p-4 rounded-2xl text-green-700 mb-6 justify-center">
-                   <Baby size={18} />
-                   <span className="text-[10px] font-bold uppercase tracking-widest">Safe for your Baby</span>
+                <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-[#4DB6AC] border border-[#4DB6AC]/10 mb-6">
+                   <Baby size={14} />
+                   <span className="text-[8px] font-black uppercase tracking-widest">Safe for Children</span>
                 </div>
               )}
 
-              <div className="p-6 bg-gray-50 rounded-3xl mb-8">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#E1784F] mb-2">Safety Score</p>
-                <div className="text-5xl font-bold text-gray-900 leading-tight">{results.safetyScore}<span className="text-sm">/100</span></div>
+              <div className="mb-8">
+                <p className="text-[4rem] font-black text-gray-900 leading-none tracking-tighter">{results.safetyScore}<span className="text-xs opacity-20 ml-1">/100</span></p>
+                <p className="text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-widest italic">{results.summary}</p>
               </div>
 
-              <div className="p-5 bg-blue-50 border border-blue-100 rounded-2xl flex gap-3 items-start mb-8 text-left">
-                 <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
-                 <p className="text-[10px] font-medium text-blue-800 leading-relaxed uppercase tracking-tight">
-                   Disclaimer: This check is for wellness purposes. It is not a medical diagnosis.
-                 </p>
-              </div>
-
-              <button onClick={() => router.push('/marketplace')} className="w-full h-16 bg-[#E1784F] text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest shadow-md flex items-center justify-center gap-2">
-                 SHOP SAFE CARE <ShoppingBag size={16} />
+              <button onClick={() => router.push('/marketplace')} className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl flex items-center justify-center gap-2">
+                 SHOP SAFE CARE <ShoppingBag size={14} />
               </button>
             </div>
             
-            <button onClick={() => setResults(null)} className="w-full h-16 bg-white border border-gray-200 rounded-2xl font-bold uppercase text-[11px] tracking-widest text-gray-400">
-                NEW SCAN
+            <button onClick={() => {setResults(null); setImgSource(null); setManualText("");}} className="w-full text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center justify-center gap-2">
+                <RotateCcw size={12} /> New Analysis
             </button>
           </motion.div>
         )}

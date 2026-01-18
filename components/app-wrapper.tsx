@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM APP WRAPPER
- * Version: 2026.1.0
- * Focus: Clean, Mobile-First Navigation & Viewport Management
+ * Version: 2026.1.1 (Clean Architecture)
+ * Focus: High-End Navigation & Seamless Viewport Management
  */
 
 "use client"
@@ -16,65 +16,54 @@ import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
   const [authModal, setAuthModal] = useState<{ isOpen: boolean; type: "signin" | "signup" }>({
     isOpen: false,
     type: "signin",
   })
-  
-  const pathname = usePathname()
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
 
   /**
-   * 🛡️ RE-ENFORCED: Clean Viewport Sync
-   * We hide the footer on scan pages to give mothers full focus on the camera.
-   * OGA FIX: Ensure these match your actual folder names.
+   * 🛡️ VIEWPORT SYNC
+   * We hide the footer on active tool pages to maintain a clean, mobile-first focus.
    */
   const hideFooterRoutes = [
     "/dashboard", 
     "/profile", 
-    "/scan",         // Matches the Skin Check folder
-    "/ingredients",  // Matches the Safety Scan folder
-    "/ai-scanner",   // Fallback
-    "/ai-checker"    // Fallback
+    "/ai-scanner",   
+    "/ai-checker",
+    "/marketplace",
+    "/history"
   ];
   
   const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route));
 
-  const handleSignIn = () => {
-    setAuthModal({ isOpen: true, type: "signin" })
-  }
-
-  const handleSignUp = () => {
-    setAuthModal({ isOpen: true, type: "signup" })
-  }
+  const handleSignIn = () => setAuthModal({ isOpen: true, type: "signin" });
+  const handleSignUp = () => setAuthModal({ isOpen: true, type: "signup" });
+  const handleViewProfile = () => setProfileSidebarOpen(true);
 
   const handleCloseModal = useCallback(() => {
-    setAuthModal({ isOpen: false, type: "signin" });
-    document.body.style.overflow = 'unset'; // Restore scroll
+    setAuthModal(prev => ({ ...prev, isOpen: false }));
+    document.body.style.overflow = 'unset'; 
   }, []);
 
-  const handleViewProfile = () => {
-    setProfileSidebarOpen(true)
-  }
-
-  // 🛡️ RE-ENFORCED: Mobile-First Scroll Lock
-  // Prevents the background from moving when a mother is using a popup/modal
+  /**
+   * 🛡️ ROUTE PROTECTION & CLEANUP
+   * Resets scroll and closes overlays whenever the user navigates.
+   */
   useEffect(() => {
     setProfileSidebarOpen(false);
     setAuthModal(prev => ({ ...prev, isOpen: false }));
-    
-    // Close everything and reset scroll when the page changes
     document.body.style.overflow = 'unset';
   }, [pathname]);
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-background">
+    <div className="relative min-h-screen flex flex-col bg-background selection:bg-[#E1784F]/20">
       
-      {/* 🏛️ 1. HEADER LAYER: Care & Wellness Navigation */}
+      {/* 🏛️ 1. NAVIGATION LAYER */}
       <motion.header 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
         className="sticky top-0 z-[100]"
       >
         <Navigation 
@@ -84,15 +73,15 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
         />
       </motion.header>
       
-      {/* 🚀 2. MAIN CONTENT AREA */}
+      {/* 🚀 2. DYNAMIC CONTENT AREA */}
       <main className="flex-grow relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={pathname}
-            initial={{ opacity: 0, y: 5 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="w-full h-full"
           >
             {children}
@@ -100,24 +89,25 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
         </AnimatePresence>
       </main>
       
-      {/* 🎯 3. FOOTER: Public Content Only */}
+      {/* 🎯 3. PUBLIC FOOTER */}
       {showFooter && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-20">
           <Footer onSignUpClick={handleSignUp} />
         </motion.div>
       )}
       
-      {/* 🛡️ 4. GLOBAL AUTH MODALS */}
+      {/* 🛡️ 4. ACCESS MODALS */}
       <AnimatePresence>
         {authModal.isOpen && (
           <AuthModals 
+            isOpen={authModal.isOpen}
             onClose={handleCloseModal} 
             type={authModal.type} 
           />
         )}
       </AnimatePresence>
       
-      {/* 👤 5. PROFILE SIDEBAR */}
+      {/* 👤 5. WELLNESS SIDEBAR */}
       <AnimatePresence>
         {profileSidebarOpen && (
           <ProfileSidebar 
