@@ -19,6 +19,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     const isPublicPath = pathname === "/" || pathname === "/pricing" || pathname === "/contact"
 
+    /**
+     * 🚀 EMERGENCY LAUNCH FIX: 
+     * We are stripping the 'requiresOnboarding' check here to prevent the redirect loop.
+     * The guard now only cares if you are logged in or not.
+     */
+
     // 1. If NOT signed in and trying to access private dashboard area -> Go Home
     if (!isSignedIn && !isPublicPath) {
       router.replace("/")
