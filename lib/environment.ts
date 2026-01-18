@@ -2,19 +2,24 @@
 
 /**
  * 🛡️ OGA FIX: Robust Production URL Handling
- * This logic ensures that even if we forget the '/api' or the trailing slash,
- * the app stays connected to the correct Cloud Run instance.
+ * Updated for the Render Migration.
+ * This logic ensures we always have a clean URL without trailing slashes,
+ * and maintains the '/api' suffix required for the AfriDam Backend.
  */
 
 const getBackendUrl = () => {
-    const url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+    // 1. Get the URL from environment variables
+    let url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
     
-    // Ensure the URL ends with /api for Nathan and other users
-    if (url.includes('run.app') && !url.endsWith('/api')) {
-        return `${url.replace(/\/$/, "")}/api`;
+    // 2. Remove any trailing slash first to avoid //api
+    url = url.replace(/\/$/, "");
+
+    // 3. Ensure it ends with /api (Works for Render, Google, or Localhost)
+    if (!url.endsWith('/api')) {
+        return `${url}/api`;
     }
     
-    return url.endsWith("/") ? url.slice(0, -1) : url;
+    return url;
 };
 
 export const environment = {
