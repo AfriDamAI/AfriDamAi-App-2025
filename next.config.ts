@@ -28,11 +28,11 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             /**
              * 🛠️ OGA FIX: Whitelisting Production Nodes
-             * 1. connect-src: Whitelists your specific Google Cloud Run Backend.
+             * 1. connect-src: Updated to allow your new Render Backend and Google AI.
              * 2. img-src: Allows 'blob:' and 'data:' for local AI scan previews.
              * 3. media-src: Essential for the live camera stream.
              */
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https: https://afridam-backend-api-131829695574.us-central1.run.app;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https: https://afridamai-backend.onrender.com https://afridam-ai2-api-131829695574.us-central1.run.app;",
           },
           {
             key: 'Strict-Transport-Security',
