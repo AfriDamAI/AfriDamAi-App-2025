@@ -25,6 +25,7 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"], // 🛡️ OGA FIX: Added subset to resolve Vercel build error
 })
 
 export default function RootLayout({
