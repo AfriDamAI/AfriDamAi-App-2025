@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM NEURAL CORE: AESTHETIC SCANNER
- * Version: 2026.1.0 (Skincare & Beauty Focused)
- * Target: Women & Children's Skin Safety
+ * 🛡️ AFRIDAM SKIN WELLNESS: FAMILY SCANNER
+ * Version: 2026.1.0 (Simple, Safe, Professional)
+ * Target: African Women, Children & Families
  */
 
 "use client"
@@ -10,7 +10,6 @@ import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { 
-  Camera, 
   ChevronLeft, 
   Activity,
   CheckCircle2,
@@ -27,6 +26,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useAuth } from "@/providers/auth-provider"
+import { uploadImage } from "@/lib/api-client"
 
 export default function UnifiedScanner() {
   const router = useRouter()
@@ -36,14 +36,13 @@ export default function UnifiedScanner() {
   const [isCapturing, setIsCapturing] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState<any>(null)
-  const [status, setStatus] = useState("Aesthetic Node Ready")
+  const [status, setStatus] = useState("Ready for Check")
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
-  // 🛡️ RE-ENFORCED: Data Privacy Guard
   useEffect(() => {
     if (!authLoading && !user) router.push("/");
   }, [user, authLoading, router]);
@@ -51,7 +50,7 @@ export default function UnifiedScanner() {
   const startCamera = async () => {
     setErrorDetails(null)
     setIsCapturing(true)
-    setStatus("Syncing Hardware...")
+    setStatus("Starting camera...")
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -65,12 +64,12 @@ export default function UnifiedScanner() {
       streamRef.current = stream
       if (videoRef.current) {
         videoRef.current.srcObject = stream
-        setStatus("Lens Online")
+        setStatus("Camera is On")
       }
     } catch (err: any) {
       setIsCapturing(false)
-      setErrorDetails("CAMERA_ACCESS_DENIED: Check browser permissions.");
-      setStatus("Hardware Offline")
+      setErrorDetails("Could not open camera. Please check your phone settings.");
+      setStatus("Camera Offline")
     }
   }
 
@@ -81,7 +80,6 @@ export default function UnifiedScanner() {
       canvas.height = videoRef.current.videoHeight
       const ctx = canvas.getContext("2d")
       if (ctx) {
-        // Mirror the image to match the video preview
         ctx.translate(canvas.width, 0)
         ctx.scale(-1, 1)
         ctx.drawImage(videoRef.current, 0, 0)
@@ -89,241 +87,172 @@ export default function UnifiedScanner() {
       setImgSource(canvas.toDataURL("image/jpeg", 0.9))
       if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
       setIsCapturing(false)
-      setStatus("Sample Isolated")
+      setStatus("Photo Ready")
     }
   }
 
   const analyze = async () => {
     if (!imgSource) return;
     setIsAnalyzing(true)
-    setStatus("Analyzing Texture...")
+    setStatus("Checking your skin...")
     
     try {
-      const response = await fetch(imgSource);
-      const blob = await response.blob();
-      const file = new File([blob], "scan.jpg", { type: "image/jpeg" });
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('flag', 'aesthetic_analysis');
-
-      /** * 🚀 OGA FIX: SYNCED WITH TOBI'S BACKEND
-       * Path changed from /analyzer to /ai to match his latest deployment.
-       */
-      const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/analyze-skin`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-        body: formData,
-      });
-
-      if (!apiResponse.ok) throw new Error("Cloud Sync Failed");
-
-      const data = await apiResponse.json();
-      
-      // Handle the unwrapped resultData from our interceptor logic
+      // 🚀 OGA FIX: Integrated with lib/api-client.ts to fix the unresponsive button
+      const data = await uploadImage(imgSource);
       const payload = data.resultData || data;
 
       setResults({ 
-        finding: payload.description || "Aesthetic Analysis Complete", 
+        finding: payload.description || "Check Complete", 
         predictions: payload.predictions || {} 
       });
-      setStatus("Analysis Verified")
+      setStatus("Check Finished")
     } catch (err: any) {
-      setErrorDetails("NEURAL_SYNC_ERROR: Please check connection.");
+      setErrorDetails("Connection error. Please try again.");
     } finally {
       setIsAnalyzing(false)
     }
   }
 
   if (authLoading || !user) return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center text-[#E1784F] gap-6">
-       <Loader2 className="animate-spin w-12 h-12" />
-       <p className="font-black uppercase text-[10px] tracking-[0.5em] italic">Initializing Aesthetic Node...</p>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center text-[#E1784F] gap-4">
+       <Loader2 className="animate-spin w-10 h-10" />
+       <p className="font-bold uppercase text-[10px] tracking-widest">Opening Scanner...</p>
     </div>
   );
 
   return (
-    <main className="min-h-[100svh] bg-background text-foreground px-6 py-12 md:p-16 lg:p-20 overflow-x-hidden relative">
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,rgba(225,120,79,0.1),transparent_70%)] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto space-y-12 md:space-y-20 relative z-10">
+    <main className="min-h-[100svh] bg-white text-foreground px-5 py-10 md:p-16 overflow-x-hidden relative">
+      <div className="max-w-4xl mx-auto space-y-8 relative z-10">
         
-        {/* HEADER */}
-        <header className="flex justify-between items-center text-left">
-          <div className="flex items-center gap-6">
-            <button onClick={() => router.push('/dashboard')} className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#E1784F] hover:bg-[#E1784F] hover:text-white transition-all shadow-xl">
-              <ChevronLeft size={24} />
-            </button>
-            <div className="space-y-1">
-               <h1 className="text-4xl md:text-7xl lg:text-8xl font-black italic tracking-tighter uppercase leading-none text-foreground">
-                 Skin <span className="text-[#E1784F]">Health</span>
-               </h1>
-               <div className="flex items-center gap-2">
-                 <ShieldCheck size={14} className="text-[#4DB6AC]" />
-                 <span className="text-[10px] md:text-xs font-black text-muted-foreground uppercase tracking-[0.4em] italic">{status}</span>
-               </div>
-            </div>
+        {/* RELATABLE HEADER */}
+        <header className="flex items-center gap-4">
+          <button onClick={() => router.push('/dashboard')} className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[#E1784F] active:scale-95 transition-all">
+            <ChevronLeft size={20} />
+          </button>
+          <div className="space-y-0.5">
+             <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-gray-900">
+               Skin <span className="text-[#E1784F]">Check</span>
+             </h1>
+             <div className="flex items-center gap-2">
+               <ShieldCheck size={12} className="text-[#4DB6AC]" />
+               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{status}</span>
+             </div>
           </div>
         </header>
 
         {!results ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
+          <div className="flex flex-col gap-8">
             
-            {/* 📸 LENS PORTAL */}
-            <div className="w-full lg:col-span-7 relative">
-              <div className="bg-[#0A0A0A] border-8 md:border-[16px] border-white/5 overflow-hidden aspect-square relative rounded-[3rem] md:rounded-[5rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)]">
+            {/* 📸 LENS PORTAL - Optimized for Mobile */}
+            <div className="w-full relative">
+              <div className="bg-[#F8F8F8] border-4 border-white overflow-hidden aspect-[4/5] relative rounded-[2.5rem] shadow-xl">
                 <AnimatePresence mode="wait">
                   {isCapturing ? (
-                    <div className="relative w-full h-full">
-                        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="w-2/3 h-2/3 border-2 border-dashed border-[#E1784F]/30 rounded-full animate-[spin_15s_linear_infinite]" />
-                            <div className="absolute inset-0 border-[40px] md:border-[80px] border-black/50" />
-                        </div>
-                    </div>
+                    <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
                   ) : imgSource ? (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full relative">
-                        <img src={imgSource} className="w-full h-full object-cover" alt="Captured" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    </motion.div>
+                    <div className="w-full h-full relative">
+                        <img src={imgSource} className="w-full h-full object-cover" alt="User Photo" />
+                    </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full p-12 text-center space-y-10">
-                      <div className="w-32 h-32 rounded-[3rem] bg-white/5 border border-white/10 flex items-center justify-center">
-                        <Scan className="w-12 h-12 text-[#E1784F]" />
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6">
+                      <div className="w-20 h-20 rounded-3xl bg-white border border-gray-100 flex items-center justify-center shadow-sm">
+                        <Scan className="w-8 h-8 text-[#E1784F]" />
                       </div>
-                      <div className="space-y-3">
-                        <h3 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-white">Beauty Lens Ready</h3>
-                        <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.3em] leading-loose max-w-[240px] mx-auto">Analyze your glow and texture in real-time.</p>
-                      </div>
-                      <div className="flex flex-col gap-4 w-full max-w-sm">
-                        <button onClick={startCamera} className="h-20 bg-[#E1784F] text-white rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.4em] shadow-2xl active:scale-95 transition-all">Enable Beauty-Stream</button>
-                        <button onClick={() => fileInputRef.current?.click()} className="h-20 bg-white/5 text-white/40 border border-white/10 rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.4em] flex items-center justify-center gap-3">
-                            <Upload size={16} /> Upload Archive
-                        </button>
-                        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if(file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => setImgSource(reader.result as string);
-                            reader.readAsDataURL(file);
-                          }
-                        }} />
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-gray-900">Take a Photo</h3>
+                        <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-[200px] mx-auto uppercase tracking-wide">Take a clear photo of the skin area you want to check.</p>
                       </div>
                     </div>
                   )}
                 </AnimatePresence>
 
                 {isAnalyzing && (
-                  <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl z-50 flex flex-col items-center justify-center space-y-8">
-                     <Loader2 className="animate-spin text-[#4DB6AC] w-20 h-20" />
-                     <p className="text-[#4DB6AC] font-black uppercase text-[11px] tracking-[0.5em] animate-pulse italic">Sequencing Beauty Matrix...</p>
-                     <motion.div 
-                        initial={{ top: "0%" }} animate={{ top: "100%" }} transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-                        className="absolute left-0 right-0 h-[2px] bg-[#4DB6AC] shadow-[0_0_30px_#4DB6AC] z-40"
-                      />
+                  <div className="absolute inset-0 bg-white/90 backdrop-blur-md z-50 flex flex-col items-center justify-center space-y-4">
+                     <Loader2 className="animate-spin text-[#E1784F] w-12 h-12" />
+                     <p className="text-[#E1784F] font-bold text-[10px] uppercase tracking-widest animate-pulse">Checking your skin...</p>
                   </div>
                 )}
               </div>
 
-              {isCapturing && (
-                <button onClick={capture} className="absolute bottom-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full bg-white p-1 shadow-[0_20px_60px_rgba(0,0,0,0.5)] active:scale-90 transition-all z-30">
-                  <div className="w-full h-full rounded-full border-4 border-[#E1784F] bg-white flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-[#E1784F] shadow-inner animate-pulse" />
-                  </div>
-                </button>
-              )}
+              {/* ACTION BUTTONS */}
+              <div className="space-y-3 mt-4">
+                {isCapturing ? (
+                  <button onClick={capture} className="w-20 h-20 mx-auto rounded-full border-4 border-[#E1784F] bg-white flex items-center justify-center active:scale-90 transition-all shadow-lg" />
+                ) : imgSource && !isAnalyzing ? (
+                  <>
+                    <button onClick={analyze} className="w-full h-16 bg-[#1A1A1A] text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest flex items-center justify-center gap-2 active:scale-95 shadow-lg">
+                      Start Skin Check <Zap size={16} />
+                    </button>
+                    <button onClick={() => { setImgSource(null); startCamera(); }} className="w-full h-16 bg-white text-gray-400 border border-gray-100 rounded-2xl font-bold uppercase text-[11px] tracking-widest">Retake Photo</button>
+                  </>
+                ) : !isAnalyzing && (
+                  <>
+                    <button onClick={startCamera} className="w-full h-16 bg-[#E1784F] text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest shadow-md active:scale-95 transition-all">Enable Camera</button>
+                    <button onClick={() => fileInputRef.current?.click()} className="w-full h-16 bg-white text-gray-500 border border-gray-200 rounded-2xl font-bold uppercase text-[11px] tracking-widest flex items-center justify-center gap-2">
+                        <Upload size={14} /> Upload from Phone
+                    </button>
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if(file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => setImgSource(reader.result as string);
+                        reader.readAsDataURL(file);
+                      }
+                    }} />
+                  </>
+                )}
+              </div>
             </div>
 
-            {/* AESTHETIC FRAMEWORK SIDEBAR */}
-            <div className="w-full lg:col-span-5 space-y-10">
-              <div className="p-12 bg-card/40 border border-border rounded-[4rem] space-y-12 backdrop-blur-3xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/5 blur-3xl rounded-full" />
-                <div className="flex items-center gap-4 text-[#E1784F]">
-                  <Activity size={24} />
-                  <h4 className="font-black uppercase italic text-lg tracking-[0.2em]">Aesthetic Framework</h4>
-                </div>
-                
-                <div className="space-y-10">
-                  {[
-                    { t: "Neural Analysis", d: "Texture optimization for melanin-rich skin." },
-                    { t: "Maternal Safety", d: "Formulation safety scores for mothers & children." }
-                  ].map((item, i) => (
-                    <div key={i} className="flex gap-8 items-start">
-                      <span className="text-[#4DB6AC] font-black text-xs pt-1">0{i+1}</span>
-                      <div className="space-y-2">
-                         <p className="text-[11px] font-black uppercase tracking-[0.3em] text-foreground">{item.t}</p>
-                         <p className="text-xs font-bold text-muted-foreground leading-relaxed italic">{item.d}</p>
-                      </div>
+            {/* RELATABLE BENEFITS */}
+            <div className="space-y-4">
+                {[
+                  { t: "Skin Care Check", d: "Designed specifically for melanin-rich African skin." },
+                  { t: "Safe for Family", d: "Skin wellness scores for mothers and children." }
+                ].map((item, i) => (
+                  <div key={i} className="p-6 bg-gray-50 rounded-3xl flex gap-4 items-start">
+                    <Activity size={18} className="text-[#E1784F] mt-1" />
+                    <div className="space-y-1">
+                       <p className="text-[11px] font-bold uppercase tracking-wide text-gray-900">{item.t}</p>
+                       <p className="text-xs text-gray-500 leading-relaxed font-medium">{item.d}</p>
                     </div>
-                  ))}
-                </div>
-
-                {imgSource && !isAnalyzing && (
-                  <button onClick={analyze} className="w-full h-24 bg-foreground text-background rounded-[2rem] font-black uppercase text-xs tracking-[0.5em] transition-all flex items-center justify-center gap-4 active:scale-95 shadow-2xl">
-                    ANALYZE GLOW <Zap size={20} fill="currentColor" />
-                  </button>
-                )}
-              </div>
+                  </div>
+                ))}
             </div>
           </div>
         ) : (
-          /* AESTHETIC RESULTS VIEW */
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="space-y-10 pb-20">
-            <div className="p-12 md:p-24 bg-card border border-border rounded-[4rem] md:rounded-[6rem] backdrop-blur-3xl text-left relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-[#4DB6AC]/5 blur-[100px] rounded-full" />
-              
-              <div className="flex flex-col md:flex-row md:items-center gap-8 mb-16">
-                <div className="w-20 h-20 bg-[#4DB6AC]/10 rounded-[2rem] border border-[#4DB6AC]/30 flex items-center justify-center text-[#4DB6AC] shadow-xl">
-                  <CheckCircle2 size={40} strokeWidth={2.5} />
-                </div>
-                <div>
-                  <h2 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter text-foreground leading-none">Analysis <span className="text-[#4DB6AC]">Synchronized</span></h2>
-                  <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.5em] mt-2">Aesthetic Evaluation Finalized</p>
-                </div>
+          /* SIMPLE RESULTS VIEW */
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 pb-20">
+            <div className="p-8 md:p-12 bg-white border border-gray-100 rounded-[3rem] shadow-sm text-center relative overflow-hidden">
+              <div className="flex flex-col items-center gap-4 mb-8">
+                <CheckCircle2 size={48} className="text-green-500" />
+                <h2 className="text-3xl font-bold text-gray-900">Check Finished</h2>
               </div>
 
-              <div className="p-10 md:p-16 bg-white/5 rounded-[3rem] border border-white/5 space-y-10 mb-12">
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-[0.5em] text-[#E1784F] mb-4">Aesthetic Evaluation</p>
-                  <h4 className="text-3xl md:text-5xl lg:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] text-foreground">{results.finding}</h4>
-                </div>
-                
-                <div className="flex flex-wrap gap-4">
-                  {results.predictions && Object.entries(results.predictions).map(([name, score]: any) => (
-                    <div key={name} className="px-8 py-4 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 text-[#4DB6AC] font-black text-[10px] uppercase rounded-2xl tracking-widest italic">
-                      {name}: {(score * 100).toFixed(1)}% Match
-                    </div>
-                  ))}
-                </div>
+              <div className="p-6 bg-gray-50 rounded-3xl mb-8">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#E1784F] mb-2">Our Results</p>
+                <h4 className="text-2xl font-bold text-gray-900 leading-tight">{results.finding}</h4>
               </div>
 
-              {/* 🛡️ GOOGLE PLAY COMPLIANCE: AESTHETIC DISCLAIMER */}
-              <div className="p-6 bg-blue-500/5 border border-blue-500/20 rounded-3xl flex gap-4 items-start mb-12">
-                 <Info size={20} className="text-blue-500 mt-1 shrink-0" />
-                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
-                   Disclaimer: This aesthetic evaluation is for skincare beauty and wellness purposes only. It is not a medical diagnosis. Always consult a professional for clinical concerns.
+              {/* COMPLIANCE DISCLAIMER (SIMPLE & PROFESSIONAL) */}
+              <div className="p-5 bg-blue-50 border border-blue-100 rounded-2xl flex gap-3 items-start mb-8 text-left">
+                 <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
+                 <p className="text-[10px] font-medium text-blue-800 leading-relaxed">
+                   Disclaimer: This check is for beauty and wellness purposes. It is not a medical diagnosis. Always see a professional for health concerns.
                  </p>
               </div>
 
-              {/* UPSELL: Aesthetic Consultation */}
-              <div className="p-10 md:p-16 bg-[#E1784F] text-white rounded-[3.5rem] flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl relative overflow-hidden group">
-                 <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                 <div className="flex items-center gap-8 text-left relative z-10">
-                    <div className="w-20 h-20 bg-white/20 rounded-[2rem] flex items-center justify-center shadow-inner"><Stethoscope size={36}/></div>
-                    <div className="space-y-2">
-                       <p className="text-3xl md:text-4xl font-black italic uppercase leading-none">Aesthetic Consultant</p>
-                       <p className="text-[11px] font-bold uppercase opacity-80 tracking-widest max-w-sm">Discuss your beauty routine and safety with a board-certified professional.</p>
-                    </div>
-                 </div>
-                 <button onClick={() => router.push('/appointment')} className="w-full lg:w-auto h-24 px-16 bg-black text-white rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.5em] shadow-2xl active:scale-95 transition-all relative z-10">START CONSULTATION</button>
-              </div>
+              <button onClick={() => router.push('/appointment')} className="w-full h-16 bg-[#E1784F] text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+                <Stethoscope size={16} /> Talk to a Professional
+              </button>
             </div>
             
-            <div className="flex flex-col md:flex-row gap-8">
-              <button onClick={() => setResults(null)} className="flex-1 h-24 bg-white/5 border border-white/10 rounded-[2rem] font-black uppercase text-xs tracking-[0.4em] text-muted-foreground hover:bg-white/10 transition-all flex items-center justify-center gap-4">
-                 <RotateCcw size={20} /> NEW ANALYSIS
+            <div className="flex flex-col gap-3">
+              <button onClick={() => setResults(null)} className="w-full h-16 bg-white border border-gray-200 rounded-2xl font-bold uppercase text-[11px] tracking-widest text-gray-400">
+                 NEW SCAN
               </button>
-              <button onClick={() => router.push('/marketplace')} className="flex-1 h-24 bg-foreground text-background rounded-[2rem] font-black uppercase text-xs tracking-[0.5em] shadow-2xl transition-all flex items-center justify-center gap-4">
-                 BROWSE BEAUTY SHOP <ShoppingBag size={20} />
+              <button onClick={() => router.push('/marketplace')} className="w-full h-16 bg-[#1A1A1A] text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest shadow-lg">
+                 SHOP SKIN CARE
               </button>
             </div>
           </motion.div>
