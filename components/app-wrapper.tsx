@@ -1,3 +1,9 @@
+/**
+ * 🛡️ AFRIDAM APP WRAPPER
+ * Version: 2026.1.0
+ * Focus: Clean, Mobile-First Navigation & Viewport Management
+ */
+
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
@@ -18,9 +24,20 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
 
-  // 🛡️ RE-ENFORCED: Strategic Footer Logic
-  // Hide footer only inside the "App/Portal" environment to keep it clean
-  const hideFooterRoutes = ["/dashboard", "/profile", "/ai-scanner", "/ai-checker"];
+  /**
+   * 🛡️ RE-ENFORCED: Clean Viewport Sync
+   * We hide the footer on scan pages to give mothers full focus on the camera.
+   * OGA FIX: Ensure these match your actual folder names.
+   */
+  const hideFooterRoutes = [
+    "/dashboard", 
+    "/profile", 
+    "/scan",         // Matches the Skin Check folder
+    "/ingredients",  // Matches the Safety Scan folder
+    "/ai-scanner",   // Fallback
+    "/ai-checker"    // Fallback
+  ];
+  
   const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route));
 
   const handleSignIn = () => {
@@ -33,23 +50,27 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
 
   const handleCloseModal = useCallback(() => {
     setAuthModal({ isOpen: false, type: "signin" });
+    document.body.style.overflow = 'unset'; // Restore scroll
   }, []);
 
   const handleViewProfile = () => {
     setProfileSidebarOpen(true)
   }
 
-  // 🛡️ RE-ENFORCED: Reset scroll lock if path changes while menu is open
+  // 🛡️ RE-ENFORCED: Mobile-First Scroll Lock
+  // Prevents the background from moving when a mother is using a popup/modal
   useEffect(() => {
     setProfileSidebarOpen(false);
     setAuthModal(prev => ({ ...prev, isOpen: false }));
+    
+    // Close everything and reset scroll when the page changes
     document.body.style.overflow = 'unset';
   }, [pathname]);
 
   return (
     <div className="relative min-h-screen flex flex-col bg-background">
       
-      {/* 🏛️ 1. HEADER LAYER: Clinical Navigation */}
+      {/* 🏛️ 1. HEADER LAYER: Care & Wellness Navigation */}
       <motion.header 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -72,13 +93,14 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
             transition={{ duration: 0.3 }}
+            className="w-full h-full"
           >
             {children}
           </motion.div>
         </AnimatePresence>
       </main>
       
-      {/* 🎯 3. FOOTER: Public Only */}
+      {/* 🎯 3. FOOTER: Public Content Only */}
       {showFooter && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <Footer onSignUpClick={handleSignUp} />
@@ -100,7 +122,10 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
         {profileSidebarOpen && (
           <ProfileSidebar 
             isOpen={profileSidebarOpen} 
-            onClose={() => setProfileSidebarOpen(false)} 
+            onClose={() => {
+              setProfileSidebarOpen(false);
+              document.body.style.overflow = 'unset';
+            }} 
           />
         )}
       </AnimatePresence>
