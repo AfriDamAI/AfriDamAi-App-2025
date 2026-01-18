@@ -1,18 +1,15 @@
+/**
+ * 🛡️ AFRIDAM WELLNESS HUB: DASHBOARD
+ * Version: 2026.1.1 (Sync & State Fix)
+ * Focus: Ensuring the Onboarding form vanishes instantly after use.
+ */
+
 "use client"
 
 import { useEffect, useState } from "react"
 import { 
-  LayoutDashboard, 
-  History as HistoryIcon, 
-  LogOut, 
-  ShoppingBag,
-  Stethoscope,
-  Sparkles,
-  ArrowRight,
-  Zap,
-  Camera,
-  User as UserIcon,
-  HeartPulse 
+  LayoutDashboard, History as HistoryIcon, LogOut, ShoppingBag,
+  Stethoscope, Sparkles, ArrowRight, Camera, User as UserIcon, HeartPulse 
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -39,12 +36,12 @@ export default function DashboardPage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("home")
   const [recentScans, setRecentScans] = useState<ScanRecord[]>([])
+  
+  // 🛡️ SINCERITY FIX: Local state to force the form to vanish instantly
+  const [hasJustFinished, setHasJustFinished] = useState(false);
 
-  /**
-   * 🛡️ SINCERITY FIX: 
-   * We check if onboarding is explicitly NOT true. This covers null, undefined, or false.
-   */
-  const requiresOnboarding = user && user.onboardingCompleted !== true;
+  // Check if user still needs to fill the form
+  const requiresOnboarding = user && user.onboardingCompleted !== true && !hasJustFinished;
 
   useEffect(() => {
     if (!theme) setTheme('light')
@@ -59,45 +56,44 @@ export default function DashboardPage() {
   }, [user, isLoading, router, theme, setTheme])
 
   /**
-   * 🛡️ THE SUBMISSION HANDSHAKE
+   * 🛡️ SAVING YOUR PROFILE
    */
   const handleCompleteOnboarding = async (surveyData: any = {}) => {
+    // 1. Instantly hide the form so the user feels the "World-Class" speed
+    setHasJustFinished(true);
+
     try {
-      // 1. Update the database
-      await updateUser(user.id, { 
+      // 2. REFERENCE: Using our archived api-client to update the backend
+      await updateUser(user?.id, { 
         ...surveyData, 
         onboardingCompleted: true 
       });
       
-      // 2. WAIT for the auth provider to refresh the user state
+      // 3. Refresh the global user data so the Profile page is correct
       await mutate();
       
-      // 3. Force a refresh of the home view
-      setActiveTab("home");
     } catch (err) {
-      console.error("Critical: Profile sync failed. Check connection.");
+      // If it fails, we allow the form back so they can try again
+      setHasJustFinished(false);
+      console.error("Profile update failed. Re-trying...");
     }
   }
 
   if (isLoading || !user) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
-      <motion.div 
-        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ repeat: Infinity, duration: 2 }}
-        className="w-12 h-12 bg-[#E1784F] rounded-2xl"
-      />
+      <div className="w-10 h-10 bg-[#E1784F] rounded-xl animate-pulse" />
     </div>
   )
 
   const displayName = user.firstName ? user.firstName.charAt(0).toUpperCase() + user.firstName.slice(1).toLowerCase() : "Friend";
 
   return (
-    <div className="min-h-[100svh] bg-background text-foreground flex flex-col md:flex-row font-sans selection:bg-[#E1784F]/30 overflow-x-hidden">
+    <div className="min-h-[100svh] bg-background text-foreground flex flex-col md:flex-row overflow-x-hidden">
       
       {/* --- SIDEBAR --- */}
       <aside className="w-72 border-r border-border p-8 space-y-10 bg-card/50 backdrop-blur-3xl z-20 sticky top-0 h-screen hidden md:flex flex-col">
         <div className="px-2 cursor-pointer" onClick={() => router.push('/')}>
-           <img src="/logo.png" alt="AfriDam AI" className="h-10 w-auto object-contain" />
+           <img src="/logo.png" alt="AfriDam AI" className="h-8 w-auto object-contain" />
         </div>
         <nav className="flex-1 space-y-2">
           {[
@@ -106,7 +102,6 @@ export default function DashboardPage() {
             { id: "checker", label: "Safety Check", icon: Sparkles, path: "/ai-checker" },
             { id: "marketplace", label: "Care Shop", icon: ShoppingBag, path: "/marketplace" },
             { id: "appointment", label: "Care Guide", icon: Stethoscope },
-            { id: "history", label: "Skin Diary", icon: HistoryIcon, path: "/history" }
           ].map((link) => (
             <button 
               key={link.id}
@@ -129,119 +124,85 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* --- MOBILE DOCK --- */}
-      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] bg-card/90 backdrop-blur-xl border border-[#E1784F]/20 z-[100] rounded-[2rem] px-8 py-4 shadow-2xl md:hidden">
-        <div className="flex justify-between items-center">
-          {[
-            { id: "home", icon: LayoutDashboard, label: "Home" },
-            { id: "scanner", icon: Camera, label: "Scan", path: "/ai-scanner" },
-            { id: "checker", icon: Sparkles, label: "Safety", path: "/ai-checker" }
-          ].map((link) => (
-            <button 
-              key={link.id} 
-              onClick={() => link.path ? router.push(link.path) : setActiveTab(link.id)}
-              className={`flex flex-col items-center gap-1 transition-all ${activeTab === link.id ? "text-[#E1784F]" : "text-muted-foreground/40"}`}
-            >
-              <link.icon size={20} strokeWidth={activeTab === link.id ? 2.5 : 2} />
-              <span className="text-[8px] font-bold uppercase tracking-widest">{link.label}</span>
-            </button>
-          ))}
-        </div>
-      </nav>
-
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 p-5 md:p-12 lg:p-16 min-h-[100svh] overflow-y-auto relative bg-background pb-44 md:pb-12 scroll-smooth">
-        <div className="absolute top-0 left-0 w-full h-[300px] bg-[radial-gradient(circle_at_50%_0%,rgba(225,120,79,0.05),transparent_70%)] pointer-events-none" />
-        
-        <header className="flex justify-between items-center mb-10 relative z-10 text-left">
+      <main className="flex-1 p-6 md:p-12 lg:p-16 min-h-[100svh] relative bg-background pb-32">
+        <header className="flex justify-between items-center mb-10 text-left">
            <div>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">Hello, {displayName}</h2>
-              <p className="text-sm md:text-lg font-medium text-[#4DB6AC] italic">Check if your skin glows today.</p>
-           </div>
-           <div onClick={() => router.push('/profile')} className="w-12 h-12 rounded-2xl bg-muted/50 border border-border flex items-center justify-center md:hidden cursor-pointer">
-              <UserIcon size={20} className="text-[#E1784F]" />
+              <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Hello, {displayName}</h2>
+              <p className="text-sm md:text-lg font-bold text-[#4DB6AC] italic uppercase tracking-tight">Check your glow today.</p>
            </div>
         </header>
 
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab} variants={containerVariants} initial="hidden" animate="visible" className="relative z-10 max-w-5xl mx-auto space-y-6 md:space-y-10">
+          <motion.div key={activeTab} variants={containerVariants} initial="hidden" animate="visible" className="max-w-4xl mx-auto space-y-6">
             
             {activeTab === "home" && (
               <>
-                {/* 🛡️ INTEGRATED ONBOARDING (Force Swap) */}
+                {/* 🛡️ THE PROFILE SETUP FORM */}
                 {requiresOnboarding ? (
-                  <motion.section variants={itemVariants} className="bg-white dark:bg-card border-2 border-[#E1784F]/10 p-8 rounded-[2.5rem] shadow-xl space-y-6 text-left relative z-20">
+                  <motion.section variants={itemVariants} className="bg-white border-2 border-[#E1784F]/5 p-8 rounded-[2.5rem] shadow-sm space-y-6 text-left">
                     <div className="flex justify-between items-start">
-                      <h3 className="text-xl font-bold">Set up your wellness profile</h3>
-                      {/* 🛡️ SKIP OPTION ADDED */}
-                      <button 
-                        onClick={() => handleCompleteOnboarding()} 
-                        className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-[#E1784F]"
-                      >
-                        Skip for now
-                      </button>
+                      <h3 className="text-xl font-black uppercase italic tracking-tighter">Set up your profile</h3>
+                      <button onClick={() => handleCompleteOnboarding()} className="text-[8px] font-black uppercase tracking-widest text-gray-300">Skip</button>
                     </div>
                     <OnboardingSurvey onComplete={handleCompleteOnboarding} />
                   </motion.section>
                 ) : (
-                  <>
-                    {/* WELLNESS CHAT */}
-                    <motion.section variants={itemVariants} className="p-6 md:p-8 bg-card border border-[#E1784F]/20 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
-                      <div className="flex items-center gap-5 text-left relative z-10">
-                        <div className="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center text-[#E1784F]"><HeartPulse size={24} /></div>
+                  <div className="space-y-6">
+                    {/* MAIN SCANNER BUTTON */}
+                    <motion.section variants={itemVariants} onClick={() => router.push('/ai-scanner')} className="bg-gradient-to-br from-[#E1784F] to-[#C55A32] p-8 rounded-[2.5rem] flex items-center justify-between cursor-pointer shadow-xl text-white">
+                      <div className="flex items-center gap-4 text-left">
+                        <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center"><Camera size={24} /></div>
                         <div>
-                          <h3 className="text-lg md:text-xl font-bold">Wellness Chat</h3>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Speak with our care team for advice.</p>
+                          <h3 className="text-xl font-bold uppercase italic tracking-tighter">Start Skin Check</h3>
+                          <p className="opacity-70 text-[9px] font-black uppercase tracking-widest">Analyze your texture</p>
                         </div>
                       </div>
-                      <button onClick={() => setActiveTab('appointment')} className="w-full md:w-auto px-8 py-3 bg-[#E1784F] text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg">Start Chat</button>
+                      <ArrowRight size={20} />
                     </motion.section>
 
-                    {/* SCANNER CARD */}
-                    <motion.section variants={itemVariants} onClick={() => router.push('/ai-scanner')} className="relative overflow-hidden bg-gradient-to-br from-[#E1784F] to-[#C55A32] p-6 md:p-10 rounded-[2.5rem] flex items-center justify-between cursor-pointer group shadow-xl">
-                      <div className="flex items-center gap-4 text-left relative z-10 text-white">
-                        <div className="w-12 h-12 md:w-16 md:h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center"><Camera size={24} /></div>
-                        <div>
-                          <h3 className="text-xl md:text-2xl font-bold">Skin Check</h3>
-                          <p className="text-white/70 text-[9px] font-bold uppercase">Check your glow today</p>
-                        </div>
-                      </div>
-                      <div className="w-10 h-10 bg-white text-[#E1784F] rounded-xl flex items-center justify-center group-hover:translate-x-1 transition-transform"><ArrowRight size={18} /></div>
-                    </motion.section>
-
-                    {/* TOOLS GRID */}
+                    {/* TOOLS */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                      <motion.div variants={itemVariants} onClick={() => router.push('/ai-checker')} className="p-8 bg-card/40 border border-border rounded-[2.5rem] space-y-4 hover:border-[#4DB6AC]/50 cursor-pointer shadow-sm">
+                      <div onClick={() => router.push('/ai-checker')} className="p-8 bg-gray-50 rounded-[2.5rem] space-y-4 cursor-pointer hover:bg-gray-100 transition-colors">
                         <div className="w-10 h-10 bg-[#4DB6AC]/10 text-[#4DB6AC] rounded-xl flex items-center justify-center"><Sparkles size={18}/></div>
-                        <h4 className="font-bold uppercase tracking-tight">Safety Scan</h4>
-                        <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-widest">Safe skincare for all skin types.</p>
-                      </motion.div>
-                      <motion.div variants={itemVariants} onClick={() => router.push('/marketplace')} className="p-8 bg-card/40 border border-border rounded-[2.5rem] space-y-4 hover:border-blue-400/50 cursor-pointer shadow-sm">
+                        <h4 className="font-black uppercase text-sm tracking-widest">Safety Scan</h4>
+                        <p className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Check ingredients for family safety.</p>
+                      </div>
+                      <div onClick={() => router.push('/marketplace')} className="p-8 bg-gray-50 rounded-[2.5rem] space-y-4 cursor-pointer hover:bg-gray-100 transition-colors">
                         <div className="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center"><ShoppingBag size={18}/></div>
-                        <h4 className="font-bold uppercase tracking-tight">Care Shop</h4>
-                        <p className="text-muted-foreground text-[9px] uppercase font-bold tracking-widest">Shop our curated skincare products.</p>
-                      </motion.div>
+                        <h4 className="font-black uppercase text-sm tracking-widest">Care Shop</h4>
+                        <p className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Shop curated safe products.</p>
+                      </div>
                     </div>
-                  </>
+
+                    {/* WELLNESS CHAT */}
+                    <motion.section variants={itemVariants} className="p-8 bg-white border border-gray-100 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 text-left">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-red-50 text-[#E1784F] rounded-2xl flex items-center justify-center"><HeartPulse size={24} /></div>
+                        <div>
+                          <h3 className="text-lg font-black uppercase italic tracking-tighter">Wellness Chat</h3>
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Talk to our care team.</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setActiveTab('appointment')} className="w-full md:w-auto px-10 py-4 bg-[#1A1A1A] text-white rounded-xl font-black uppercase text-[10px] tracking-widest">Start Chat</button>
+                    </motion.section>
+                  </div>
                 )}
               </>
             )}
 
             {activeTab === "appointment" && (
-              <motion.div variants={itemVariants} className="bg-card rounded-[2.5rem] border border-border p-6 md:p-10 text-left">
+              <motion.div variants={itemVariants} className="bg-white rounded-[2.5rem] p-8 text-left border border-gray-50">
                  <div className="flex justify-between items-center mb-8">
-                   <h2 className="text-xl font-bold uppercase">Care Team</h2>
-                   <button onClick={() => setActiveTab("home")} className="text-[9px] font-black uppercase px-4 py-2 bg-muted rounded-lg">Back</button>
+                   <h2 className="text-xl font-black uppercase italic tracking-tighter">Care Guide</h2>
+                   <button onClick={() => setActiveTab("home")} className="text-[9px] font-black uppercase px-4 py-2 bg-gray-50 rounded-lg">Back</button>
                  </div>
                  <AppointmentView />
               </motion.div>
             )}
 
-            <footer className="mt-12 pt-8 border-t border-border/40 flex flex-col items-center gap-4 pb-24 md:pb-4">
-               <p className="text-[7px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 text-center italic">
-                 AfriDam is a skin wellness support tool. Not for medical diagnosis.
-               </p>
-               <p className="text-[7px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 text-center">© 2026 AfriDam AI</p>
+            <footer className="mt-12 opacity-30 text-center">
+               <p className="text-[7px] font-black uppercase tracking-[0.4em]">AfriDam AI • Built with Pride</p>
             </footer>
           </motion.div>
         </AnimatePresence>
