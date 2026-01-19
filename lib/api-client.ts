@@ -91,7 +91,7 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** 🛡️ TOBI'S UNIFIED CONTEXT **/
+/** 🛡️ TOBI & NATHAN'S UNIFIED CONTEXT **/
 const defaultAiContext = {
   skinType: "not_specified",
   duration: "recent",
@@ -103,9 +103,8 @@ const defaultAiContext = {
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   
+  // 1. Image Handshake (CSP Bypass)
   if (typeof file === 'string') {
-    // 🛡️ SINCERITY FIX: Manual Base64 to Blob conversion 
-    // This bypasses the 'fetch' CSP violation that was blocking your scans
     try {
       const parts = file.split(',');
       const byteString = atob(parts[1]);
@@ -124,6 +123,11 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
 
+  /**
+   * 🛡️ NATHAN SYNC: JSON.stringify()
+   * We pass the context as a stringified JSON under 'more_info'.
+   * Nathan's Python code does: json.loads(more_info)
+   */
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
   const response = await apiClient.post("/v1/scan", formData, {
