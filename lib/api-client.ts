@@ -91,9 +91,7 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** 🛡️ TOBI'S UNIFIED CONTEXT 
- * This is the 'UserContextDto' the AI team needs for all endpoints.
- **/
+/** 🛡️ TOBI'S UNIFIED CONTEXT **/
 const defaultAiContext = {
   skinType: "not_specified",
   duration: "recent",
@@ -106,14 +104,26 @@ export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   
   if (typeof file === 'string') {
-    const res = await fetch(file);
-    const blob = await res.blob();
-    formData.append("file", blob, "scan_capture.jpg");
+    // 🛡️ SINCERITY FIX: Manual Base64 to Blob conversion 
+    // This bypasses the 'fetch' CSP violation that was blocking your scans
+    try {
+      const parts = file.split(',');
+      const byteString = atob(parts[1]);
+      const mimeString = parts[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: mimeString });
+      formData.append("file", blob, "scan_capture.jpg");
+    } catch (e) {
+      console.error("Image Processing Error:", e);
+    }
   } else {
     formData.append("file", file);
   }
 
-  // AI Team requirement: more_info must be a string for multipart/form-data
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
   const response = await apiClient.post("/v1/scan", formData, {
@@ -124,7 +134,6 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
-  // AI Team requirement: IngredientsAnalysisRequestDto
   const response = await apiClient.post("/v1/ingredients-analysis", { 
     ingredients,
     context: defaultAiContext 
@@ -133,7 +142,6 @@ export const analyzeIngredients = async (ingredients: string) => {
 };
 
 export const sendChatMessage = async (message: string) => {
-  // AI Team requirement: ChatbotRequestDto
   const response = await apiClient.post("/v1/chatbot", { 
     message,
     context: defaultAiContext 

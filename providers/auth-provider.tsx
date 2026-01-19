@@ -1,20 +1,21 @@
+/**
+ * 🛡️ AFRIDAM AUTH PROVIDER
+ * Version: 2026.1.4 (400 Error Fix & Data Sanitization)
+ * Focus: Ensuring the handshake with Tobi's backend is clean and valid.
+ */
+
 "use client"
 
 import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react"
 import { jwtDecode } from "jwt-decode";
-
-/** * 🛡️ OGA FIX: Switched to Absolute Aliases (@/) 
- * This prevents the Vercel "Module Not Found" error caused by relative path sensitivity.
- */
 import { 
   login, 
   register, 
   setAuthToken, 
   getUser, 
-  updateUser as updateUserProfileApi, 
+  updateUser, 
   forgotPassword as forgotPasswordApi 
 } from "@/lib/api-client" 
-
 import { UserLoginDto, CreateUserDto } from "@/lib/types"
 
 interface User {
@@ -22,14 +23,9 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
-  sex: string;
-  phoneNo: string;
   onboardingCompleted?: boolean;
   profile?: {
-    avatarUrl?: string;
     onboardingCompleted?: boolean;
-    hasCompletedOnboarding?: boolean;
-    subscriptionPlan?: string;
     [key: string]: any;
   };
 }
@@ -53,79 +49,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // 🛡️ RE-ENFORCED: Unified Data Normalizer for NestJS Responses
-  const extractUserData = (response: any) => {
-    return response?.resultData || response?.data || response;
-  };
+  const extractUserData = (response: any) => response?.resultData || response?.data || response;
 
   const fetchUserData = async (userId: string) => {
     try {
       const response = await getUser(userId);
       const userData = extractUserData(response);
-      
       if (userData) {
         setUser(userData);
         return userData;
       }
-      return null;
     } catch (err) {
-      console.error("Aesthetic Node Sync Failed:", err);
-      return null;
+      console.error("Profile Fetch Failed:", err);
     }
+    return null;
   };
 
   useEffect(() => {
     const initAuth = async () => {
-      if (typeof window === "undefined") return;
-      
-      const token = localStorage.getItem("token");
-      
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       if (token) {
         try {
           const decoded: any = jwtDecode(token);
-          const currentTime = Date.now() / 1000;
-          
-          if (decoded.exp && decoded.exp < currentTime) {
+          if (decoded.exp && decoded.exp < Date.now() / 1000) {
             signOut();
           } else {
             setAuthToken(token);
-            const userId = decoded.sub || decoded.id || decoded.userId;
-            if (userId) {
-              await fetchUserData(userId);
-            }
+            await fetchUserData(decoded.sub || decoded.id || decoded.userId);
           }
         } catch (err) {
-          console.error("Auth Initialisation Error:", err);
           signOut();
         }
       }
       setIsLoading(false);
     };
-
     initAuth();
   }, []);
 
   const signIn = async (credentials: UserLoginDto) => {
-    setIsLoading(true); // 🛡️ Keep loading TRUE during the entire handshake
+    setIsLoading(true);
     try {
       const data = await login(credentials);
-      
-      const accessToken = data.resultData?.accessToken || data.accessToken || data.data?.accessToken;
-      
-      if (!accessToken) throw new Error("Sync Failed: Invalid Token Payload");
+      const accessToken = data.resultData?.accessToken || data.accessToken;
+      if (!accessToken) throw new Error("Invalid Token");
 
-      // 🔐 SECURING THE TOKEN IMMEDIATELY
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
 
       const decoded: any = jwtDecode(accessToken);
-      const userId = decoded.sub || decoded.id || decoded.userId;
-      
-      // 🚀 WAIT for user data before letting the Guard move
-      await fetchUserData(userId);
-    } catch (error: any) {
-      localStorage.removeItem("token");
-      setAuthToken(null);
+      await fetchUserData(decoded.sub || decoded.id || decoded.userId);
+    } catch (error) {
+      signOut();
       throw error;
     } finally {
       setIsLoading(false);
@@ -133,22 +107,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signUp = async (userData: CreateUserDto) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       await register(userData);
       await signIn({ email: userData.email, password: userData.password });
-    } catch (error: any) {
-      throw error;
     } finally {
       setIsLoading(false);
-    }
-  }
-
-  const forgotPassword = async (email: string) => {
-    try {
-      await forgotPasswordApi(email);
-    } catch (error: any) {
-      throw error;
     }
   }
 
@@ -159,17 +123,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }
 
-  const updateUserProfile = async (updates: Partial<any>): Promise<User | null> => {
+  const updateUserProfile = async (updates: Partial<any>) => {
+    if (!user?.id) return null;
     try {
-      const response = await updateUserProfileApi(updates);
+      // 🛡️ SINCERITY FIX: SANITIZE DATA
+      // We strip 'id' and 'email' because the backend (Render) rejects them in a PUT body
+      const { id, email, ...cleanUpdates } = updates;
+      
+      const response = await updateUser(user.id, cleanUpdates);
       const updatedData = extractUserData(response);
       
-      setUser(prev => {
-        if (!prev) return updatedData;
-        return { ...prev, ...updatedData };
-      });
+      // Merge updates into local state so the loop breaks instantly
+      setUser(prev => prev ? { ...prev, ...updatedData } : updatedData);
       return updatedData;
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Critical Handshake Error:", error.response?.data || error.message);
       throw error;
     }
   }
@@ -178,14 +146,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user?.id) await fetchUserData(user.id);
   }
 
-  /**
-   * 🛡️ THE NUCLEAR STABILIZER (EMERGENCY BYPASS)
-   * Forced to FALSE for launch. This prevents the dashboard from redirecting 
-   * users back to onboarding in a fresh database environment.
-   */
   const requiresOnboarding = useMemo(() => {
-    return false; // 🚀 BYPASS ACTIVE: All users proceed directly to Dashboard
-  }, []);
+    if (!user) return false;
+    return user.onboardingCompleted !== true && user.profile?.onboardingCompleted !== true;
+  }, [user]);
 
   const contextValue = useMemo(() => ({
     user,
@@ -195,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signUp,
     signOut,
-    forgotPassword,
+    forgotPassword: forgotPasswordApi,
     updateUserProfile,
     refreshUser
   }), [user, isLoading, requiresOnboarding]);
@@ -207,10 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within AuthProvider")
-  }
-  return context
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
+};
