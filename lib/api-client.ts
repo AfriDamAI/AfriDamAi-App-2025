@@ -88,12 +88,25 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** 🛡️ TOBI & NATHAN'S UNIFIED CONTEXT **/
+/** * 🛡️ NATHAN'S AI VALIDATION SYNC
+ * This dictionary now perfectly matches the 14-field MoreInfo class 
+ * in the AI's predict.py to prevent 500 Validation Errors.
+ */
 const defaultAiContext = {
-  skinType: "not_specified",
-  duration: "recent",
-  symptoms: ["routine_check"],
-  history: "none"
+  region: "West Africa",
+  country: "Nigeria",
+  known_skintone_type: "not_specified",
+  skin_type_last_time_checked: null,
+  known_skin_condition: "none",
+  skin_condition_last_time_checked: null,
+  gender: "male", 
+  age: 25,
+  known_body_lotion: "none",
+  known_body_lotion_brand: "none",
+  known_allergies: [], 
+  known_last_skin_treatment: null,
+  known_last_consultation_with_afridermatologists: null,
+  user_activeness_on_app: "moderate" 
 };
 
 /** 🔬 AI SERVICE MODULE - FULL SYNC **/
@@ -119,7 +132,7 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
 
-  // 🛡️ NATHAN SYNC: Stringified for Python json.loads()
+  // 🛡️ NATHAN SYNC: Sending the full 14-field object as a JSON string
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
   const response = await apiClient.post("/v1/scan", formData, {
@@ -130,19 +143,23 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
-  // 🛡️ NATHAN SYNC: Context must be a stringified JSON
+  /**
+   * 🛡️ NATHAN SYNC: Ingredients analysis uses the 'LLMRequest' model 
+   * which expects 'more_info' as a nested object (already handled by axios)
+   * but we pass the full context to satisfy the AI's Pydantic model.
+   */
   const response = await apiClient.post("/v1/ingredients-analysis", { 
-    ingredients,
-    context: JSON.stringify(defaultAiContext) 
+    query: ingredients,
+    more_info: defaultAiContext 
   });
   return response.data;
 };
 
 export const sendChatMessage = async (message: string) => {
-  // 🛡️ NATHAN SYNC: Context must be a stringified JSON
+  // 🛡️ NATHAN SYNC: Chatbot also expects the 14-field MoreInfo model
   const response = await apiClient.post("/v1/chatbot", { 
-    message,
-    context: JSON.stringify(defaultAiContext) 
+    query: message,
+    more_info: defaultAiContext 
   });
   return response.data;
 };
