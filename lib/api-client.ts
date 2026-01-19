@@ -1,9 +1,6 @@
 import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
-/** * 🛡️ OGA FIX: Simple & Direct Pathing
- * Ensure NEXT_PUBLIC_API_URL on Vercel is: https://afridamai-backend.onrender.com/api
- */
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 const apiClient = axios.create({
@@ -99,11 +96,10 @@ const defaultAiContext = {
   history: "none"
 };
 
-/** 🔬 AI SERVICE MODULE **/
+/** 🔬 AI SERVICE MODULE - FULL SYNC **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   
-  // 1. Image Handshake (CSP Bypass)
   if (typeof file === 'string') {
     try {
       const parts = file.split(',');
@@ -123,11 +119,7 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
 
-  /**
-   * 🛡️ NATHAN SYNC: JSON.stringify()
-   * We pass the context as a stringified JSON under 'more_info'.
-   * Nathan's Python code does: json.loads(more_info)
-   */
+  // 🛡️ NATHAN SYNC: Stringified for Python json.loads()
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
   const response = await apiClient.post("/v1/scan", formData, {
@@ -138,17 +130,19 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
+  // 🛡️ NATHAN SYNC: Context must be a stringified JSON
   const response = await apiClient.post("/v1/ingredients-analysis", { 
     ingredients,
-    context: defaultAiContext 
+    context: JSON.stringify(defaultAiContext) 
   });
   return response.data;
 };
 
 export const sendChatMessage = async (message: string) => {
+  // 🛡️ NATHAN SYNC: Context must be a stringified JSON
   const response = await apiClient.post("/v1/chatbot", { 
     message,
-    context: defaultAiContext 
+    context: JSON.stringify(defaultAiContext) 
   });
   return response.data;
 };
