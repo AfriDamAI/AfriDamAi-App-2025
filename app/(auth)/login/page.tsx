@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM CLINICAL ACCESS: LOGIN
- * Version: 2026.1.2 (Premium Editorial Refactor)
- * Focus: High-Contrast, Deep Ambiance, Breathing Room.
+ * Version: 2026.1.3 (Build Fix Refactor)
+ * Focus: High-Contrast, Deep Ambiance, Next.js 15 Compliance.
  */
 
 "use client"
@@ -44,11 +44,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-[100svh] bg-[#050505] flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#E1784F]/30 relative overflow-hidden">
       
-      {/* --- CINEMATIC AMBIANCE (World Class Depth) --- */}
+      {/* --- CINEMATIC AMBIANCE --- */}
       <div className="absolute top-[-20%] right-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#E1784F]/5 blur-[120px] md:blur-[250px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-20%] left-[-10%] w-[400px] md:w-[700px] h-[400px] md:h-[700px] bg-[#4DB6AC]/5 blur-[100px] md:blur-[200px] rounded-full pointer-events-none" />
       
-      {/* Subtle Grainy Texture Overlay */}
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
 
       <motion.div 
@@ -79,9 +78,8 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* --- THE ENTRY PORTAL (Breathing Space) --- */}
+        {/* --- THE ENTRY PORTAL --- */}
         <div className="relative">
-          {/* Close Button */}
           <button 
             type="button"
             onClick={handleCancel}
@@ -105,7 +103,6 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-6 md:space-y-10">
-              {/* EMAIL ENTRY */}
               <div className="relative group/input">
                 <div className="absolute left-8 md:left-12 top-1/2 -translate-y-1/2 flex items-center gap-4 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
                     <Mail className="w-5 h-5 md:w-6 md:h-6 text-white" />
@@ -121,7 +118,6 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* PASSWORD ENTRY */}
               <div className="relative group/input">
                 <div className="absolute left-8 md:left-12 top-1/2 -translate-y-1/2 flex items-center gap-4 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
                     <Lock className="w-5 h-5 md:w-6 md:h-6 text-white" />
@@ -153,7 +149,11 @@ export default function LoginPage() {
               </button>
 
               <div className="flex flex-col items-center gap-4">
-                 <Link href="/forgot-password" opacity-30 hover:opacity-100 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 hover:text-[#E1784F] transition-all">
+                 {/* 🛡️ FIXED: Moved attributes to className */}
+                 <Link 
+                   href="/forgot-password" 
+                   className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 hover:text-[#E1784F] transition-all opacity-30 hover:opacity-100"
+                 >
                    Credential Recovery
                  </Link>
               </div>
@@ -161,7 +161,6 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* FOOTER SYNC */}
         <div className="flex flex-col items-center gap-10 pt-10">
             <div className="flex items-center gap-4 opacity-40">
                 <Fingerprint size={16} className="text-[#4DB6AC]" />
