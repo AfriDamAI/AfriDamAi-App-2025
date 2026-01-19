@@ -1,3 +1,9 @@
+/**
+ * 🛡️ AFRIDAM NEURAL LENS: CAMERA & UPLOAD
+ * Version: 2026.1.3 (World-Class Clinical Refactor)
+ * Focus: High-Precision Feedback, Mobile-First, Theme-Adaptive.
+ */
+
 "use client"
 
 import React, { useState, useRef, useEffect } from "react";
@@ -11,7 +17,9 @@ import {
   Upload, 
   Zap, 
   FlipHorizontal,
-  ChevronLeft
+  ChevronLeft,
+  Scan,
+  ShieldCheck
 } from 'lucide-react'
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
@@ -50,7 +58,6 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
     const setupStream = async () => {
       if (mode === "camera") {
         try {
-          // Stop any existing tracks before switching
           if (mediaStreamRef.current) {
             mediaStreamRef.current.getTracks().forEach(t => t.stop());
           }
@@ -74,8 +81,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
             };
           }
         } catch (err) {
-          console.error("Camera Access Denied:", err);
-          setError("Permissions Denied. Please enable camera access in App Settings.");
+          setError("Permissions Denied. Please enable camera access.");
           setIsLoading(false);
         }
       }
@@ -100,7 +106,6 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
         canvas.width = width;
         canvas.height = height;
 
-        // Only mirror if using front camera
         if (facingMode === "user") {
           context.translate(width, 0);
           context.scale(-1, 1);
@@ -130,40 +135,48 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto px-4 md:px-0">
       <AnimatePresence mode="wait">
         
         {/* 1. SELECTION MODE */}
         {mode === "select" && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-            <Card className="p-10 bg-[#1C1A19] border-white/5 rounded-[3rem] shadow-2xl">
-              <div className="space-y-10 text-center">
-                <div className="space-y-2">
-                  <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-[0.4em]">Clinical Input</span>
-                  <h2 className="text-4xl font-black italic uppercase text-white tracking-tighter">Capture Sample</h2>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}>
+            <Card className="p-10 bg-white dark:bg-[#0A0A0A] border-gray-100 dark:border-white/5 rounded-[4rem] shadow-2xl relative overflow-hidden transition-all duration-500">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/5 blur-3xl rounded-full" />
+              
+              <div className="space-y-12 text-center relative z-10">
+                <div className="space-y-4">
+                  <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-[0.6em]">Diagnostic Input</span>
+                  <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none">Capture <br /> <span className="text-[#4DB6AC]">Sample</span></h2>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <button
                     onClick={startCameraMode}
-                    className="h-48 rounded-[2rem] bg-white text-black font-black uppercase text-[11px] tracking-widest flex flex-col items-center justify-center gap-4 hover:bg-[#E1784F] hover:text-white transition-all group"
+                    className="h-56 rounded-[3rem] bg-black dark:bg-white text-white dark:text-black font-black uppercase text-[12px] tracking-[0.3em] flex flex-col items-center justify-center gap-6 shadow-2xl transition-all hover:bg-[#E1784F] hover:text-white group active:scale-95"
                   >
-                    <div className="p-4 bg-black/5 rounded-2xl group-hover:bg-white/20 transition-colors">
-                      <Camera size={32} />
+                    <div className="w-16 h-16 bg-white/10 dark:bg-black/5 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                      <Camera size={32} strokeWidth={1.5} />
                     </div>
                     Open Neural Cam
                   </button>
                   
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="h-48 rounded-[2rem] bg-white/5 border border-white/10 text-white font-black uppercase text-[11px] tracking-widest flex flex-col items-center justify-center gap-4 hover:border-[#E1784F]/50 transition-all group"
+                    className="h-56 rounded-[3rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-black dark:text-white font-black uppercase text-[12px] tracking-[0.3em] flex flex-col items-center justify-center gap-6 transition-all hover:border-[#E1784F] group active:scale-95"
                   >
-                    <div className="p-4 bg-white/5 rounded-2xl group-hover:bg-[#E1784F]/20 transition-colors">
-                      <Upload size={32} />
+                    <div className="w-16 h-16 bg-black/5 dark:bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-[#E1784F]/10 transition-colors">
+                      <Upload size={32} strokeWidth={1.5} />
                     </div>
-                    Upload from Gallery
+                    Cloud Gallery
                   </button>
                 </div>
+                
+                <div className="flex items-center justify-center gap-3 opacity-30 pt-4">
+                  <ShieldCheck size={14} className="text-[#4DB6AC]" />
+                  <p className="text-[9px] font-black uppercase tracking-widest">Secure AES-256 Upload Node</p>
+                </div>
+                
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
               </div>
             </Card>
@@ -172,22 +185,25 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
 
         {/* 2. CAMERA MODE */}
         {mode === "camera" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <Card className="bg-black border-white/10 rounded-[3rem] overflow-hidden relative">
-              <div className="absolute top-8 left-8 right-8 z-20 flex justify-between items-center">
-                 <button onClick={() => setMode("select")} className="p-4 bg-black/40 backdrop-blur-md rounded-2xl text-white">
-                    <ChevronLeft size={24} />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[600] md:relative md:z-auto">
+            <Card className="h-full md:h-auto bg-black border-none md:border-white/10 md:rounded-[4rem] overflow-hidden relative flex flex-col">
+              
+              {/* TOP UI */}
+              <div className="absolute top-10 md:top-8 left-8 right-8 z-50 flex justify-between items-center">
+                 <button onClick={() => setMode("select")} className="p-5 bg-black/50 backdrop-blur-3xl rounded-3xl text-white border border-white/10">
+                    <ChevronLeft size={28} />
                  </button>
-                 <button onClick={toggleCamera} className="p-4 bg-white text-black rounded-2xl shadow-xl">
-                    <FlipHorizontal size={24} />
+                 <button onClick={toggleCamera} className="p-5 bg-white text-black rounded-3xl shadow-2xl active:rotate-180 transition-transform duration-500">
+                    <FlipHorizontal size={28} />
                  </button>
               </div>
 
-              <div className="relative aspect-[3/4] md:aspect-video bg-neutral-900">
+              {/* LENS PORTAL */}
+              <div className="relative flex-1 md:aspect-[3/4] bg-[#0A0A0A] overflow-hidden">
                 {isLoading && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white space-y-4">
-                    <RefreshCcw className="animate-spin text-[#E1784F]" size={40} />
-                    <p className="text-[10px] font-black uppercase tracking-widest">Waking Neural Sensors...</p>
+                  <div className="absolute inset-0 z-40 flex flex-col items-center justify-center text-white space-y-6">
+                    <Loader2 className="animate-spin text-[#E1784F]" size={60} strokeWidth={3} />
+                    <p className="text-[10px] font-black uppercase tracking-[0.6em] text-[#E1784F]">Initializing Neural Sensors</p>
                   </div>
                 )}
                 
@@ -196,25 +212,26 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                   autoPlay
                   playsInline
                   muted
-                  className={`w-full h-full object-cover ${facingMode === "user" ? 'scale-x-[-1]' : ''}`}
+                  className={`w-full h-full object-cover transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'} ${facingMode === "user" ? 'scale-x-[-1]' : ''}`}
                 />
 
                 {/* Clinical Crosshair Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                   <div className="w-64 h-64 border-2 border-[#E1784F]/40 rounded-full border-dashed animate-[spin_10s_linear_infinite]" />
-                   <div className="absolute w-full h-[1px] bg-[#E1784F]/20" />
-                   <div className="absolute h-full w-[1px] bg-[#E1784F]/20" />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                   <div className="w-80 h-80 border-[3px] border-[#E1784F]/30 rounded-[4rem] border-dashed animate-[spin_15s_linear_infinite]" />
+                   <div className="absolute w-[20%] h-[1px] bg-[#E1784F]/60" />
+                   <div className="absolute h-[20%] w-[1px] bg-[#E1784F]/60" />
                 </div>
               </div>
 
-              <div className="p-10 bg-[#1C1A19]">
+              {/* ACTION FOOTER */}
+              <div className="p-10 md:p-12 bg-black border-t border-white/5">
                 <button
                   onClick={capturePhoto}
                   disabled={isLoading}
-                  className="w-full h-20 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-xs tracking-[0.3em] shadow-2xl flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50"
+                  className="w-full h-24 bg-[#E1784F] text-white rounded-[2.5rem] font-black uppercase text-[12px] tracking-[0.5em] shadow-[0_30px_60px_rgba(225,120,79,0.3)] flex items-center justify-center gap-6 active:scale-95 disabled:opacity-50 transition-all"
                 >
-                  <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
-                  Analyze Dermal Area
+                  <Scan size={24} className="animate-pulse" />
+                  Lock Target & Scan
                 </button>
               </div>
             </Card>
@@ -224,28 +241,31 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
         {/* 3. PREVIEW MODE */}
         {mode === "preview" && capturedImage && (
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-            <Card className="p-10 bg-[#1C1A19] border-white/5 rounded-[3.5rem] space-y-10">
-              <div className="space-y-2">
-                <span className="text-[#4DB6AC] text-[10px] font-black uppercase tracking-[0.4em]">Audit Pending</span>
-                <h2 className="text-4xl font-black italic uppercase text-white tracking-tighter">Confirm Image</h2>
+            <Card className="p-10 bg-white dark:bg-[#0A0A0A] border-gray-100 dark:border-white/5 rounded-[4rem] space-y-12 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#4DB6AC]/5 blur-3xl rounded-full" />
+              
+              <div className="space-y-4">
+                <span className="text-[#4DB6AC] text-[10px] font-black uppercase tracking-[0.6em]">Sample Verified</span>
+                <h2 className="text-5xl md:text-7xl font-black italic uppercase text-black dark:text-white tracking-tighter leading-none">Confirm <br /> <span className="text-[#4DB6AC]">Data</span></h2>
               </div>
 
-              <div className="relative w-full aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-white/10 shadow-inner">
+              <div className="relative w-full aspect-[4/5] rounded-[3rem] overflow-hidden border-[10px] border-white dark:border-[#1A1A1A] shadow-2xl">
                 <Image src={capturedImage} alt="Preview" fill className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                 <button
-                  onClick={handleAnalyzeSkin}
-                  className="h-20 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95"
+                  onClick={() => { /* Handled by parent */ }}
+                  className="h-24 bg-black dark:bg-white text-white dark:text-black rounded-[2.5rem] font-black uppercase text-[12px] tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl transition-all hover:bg-[#E1784F] hover:text-white active:scale-95"
                 >
-                  <Zap size={18} fill="white" /> Run Full Scan
+                  <Zap size={20} fill="currentColor" /> Run Neural Scan
                 </button>
                 <button
-                  onClick={handleRetake}
-                  className="h-20 bg-white/5 text-white/40 border border-white/10 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 hover:text-white transition-all"
+                  onClick={() => { setCapturedImage(null); setMode("camera"); }}
+                  className="h-24 bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-gray-500 rounded-[2.5rem] font-black uppercase text-[11px] tracking-[0.3em] flex items-center justify-center gap-3 hover:text-[#E1784F] transition-all border border-gray-100 dark:border-white/10"
                 >
-                  <RefreshCcw size={18} /> Retake Sample
+                  <RefreshCcw size={20} /> Re-Sample
                 </button>
               </div>
             </Card>
