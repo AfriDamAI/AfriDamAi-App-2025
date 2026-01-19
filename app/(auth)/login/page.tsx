@@ -1,7 +1,13 @@
+/**
+ * 🛡️ AFRIDAM CLINICAL ACCESS: LOGIN
+ * Version: 2026.1.2 (Premium Editorial Refactor)
+ * Focus: High-Contrast, Deep Ambiance, Breathing Room.
+ */
+
 "use client"
 
 import React, { useState } from "react"
-import { Lock, Mail, ArrowRight, Loader2, X, ShieldCheck } from "lucide-react"
+import { Lock, Mail, ArrowRight, Loader2, X, ShieldCheck, Fingerprint } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -29,7 +35,6 @@ export default function LoginPage() {
       await signIn({ email, password })
       router.push("/dashboard") 
     } catch (err: any) {
-      console.error("Login Error:", err);
       setError("INVALID CREDENTIALS. VERIFY & RETRY.")
     } finally {
       setIsLoading(false)
@@ -37,115 +42,136 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-[100svh] bg-[#0A0A0A] flex flex-col justify-center items-center p-4 md:p-10 selection:bg-[#E1784F]/30 relative overflow-x-hidden font-sans">
+    <div className="min-h-[100svh] bg-[#050505] flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#E1784F]/30 relative overflow-hidden">
       
-      {/* --- CINEMATIC AMBIANCE --- */}
-      <div className="absolute top-[-10%] right-[-10%] w-[300px] md:w-[700px] h-[300px] md:h-[700px] bg-[#E1784F]/10 blur-[120px] md:blur-[180px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[#4DB6AC]/5 blur-[100px] md:blur-[150px] rounded-full pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+      {/* --- CINEMATIC AMBIANCE (World Class Depth) --- */}
+      <div className="absolute top-[-20%] right-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#E1784F]/5 blur-[120px] md:blur-[250px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[400px] md:w-[700px] h-[400px] md:h-[700px] bg-[#4DB6AC]/5 blur-[100px] md:blur-[200px] rounded-full pointer-events-none" />
+      
+      {/* Subtle Grainy Texture Overlay */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-xl space-y-8 md:space-y-12 relative z-10"
+        transition={{ duration: 0.8, ease: "circOut" }}
+        className="w-full max-w-2xl space-y-12 md:space-y-20 relative z-10"
       >
-        {/* BRANDING HEADER - SCALED FOR MOBILE */}
-        <div className="text-center space-y-4 md:space-y-6">
+        {/* BRANDING HEADER */}
+        <div className="text-center space-y-6 md:space-y-10">
           <motion.div 
-            whileHover={{ rotate: 5, scale: 1.05 }}
-            className="w-20 h-20 md:w-28 md:h-28 bg-[#E1784F] rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center font-black text-4xl md:text-5xl text-white shadow-[0_20px_40px_rgba(225,120,79,0.4)] mx-auto mb-6 md:mb-10 cursor-pointer transition-all"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="w-24 h-24 md:w-32 md:h-32 bg-white text-black rounded-[2.5rem] md:rounded-[3.5rem] flex items-center justify-center shadow-[0_30px_60px_rgba(255,255,255,0.1)] mx-auto mb-8 relative group cursor-pointer"
           >
-            A
+            <span className="font-black text-4xl md:text-5xl italic tracking-tighter">A</span>
+            <div className="absolute inset-0 rounded-[2.5rem] md:rounded-[3.5rem] border border-white/20 scale-110 group-hover:scale-125 opacity-0 group-hover:opacity-100 transition-all duration-500" />
           </motion.div>
-          <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-[0.85] text-center">
-            Welcome <br /> <span className="text-[#E1784F]">Back</span>
-          </h1>
-          <p className="text-white/30 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] md:tracking-[0.6em] pt-2">
-            Clinical Portal Access
-          </p>
+          
+          <div className="space-y-4">
+            <h1 className="text-6xl md:text-9xl font-black text-white tracking-[1px] md:tracking-[-4px] uppercase italic leading-[0.8] text-center">
+              Welcome <br /> <span className="text-[#E1784F]">Back</span>
+            </h1>
+            <p className="text-white/20 text-[10px] md:text-xs font-black uppercase tracking-[0.5em] pt-4">
+              Secure Clinical Gateway
+            </p>
+          </div>
         </div>
 
-        {/* --- PREMIUM GLASS CARD --- */}
-        <div className="relative group">
+        {/* --- THE ENTRY PORTAL (Breathing Space) --- */}
+        <div className="relative">
+          {/* Close Button */}
           <button 
             type="button"
             onClick={handleCancel}
-            className="absolute -top-4 -right-2 md:-top-6 md:-right-6 p-4 md:p-5 text-white/40 hover:text-white transition-all bg-white/5 backdrop-blur-3xl rounded-full z-[100] border border-white/10"
+            className="absolute -top-6 -right-2 md:-top-10 md:-right-10 p-4 md:p-6 text-white/20 hover:text-[#E1784F] hover:scale-110 transition-all z-[100]"
           >
-            <X className="w-5 h-5 md:w-6 md:h-6" />
+            <X className="w-6 h-6 md:w-8 md:h-8" />
           </button>
 
           <form 
             onSubmit={handleSubmit} 
-            className="bg-white/[0.03] border border-white/10 p-6 md:p-20 rounded-[3rem] md:rounded-[5rem] shadow-2xl backdrop-blur-3xl space-y-6 md:space-y-10"
+            className="space-y-8 md:space-y-14"
           >
             {error && (
               <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-[10px] font-black uppercase tracking-widest text-center"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="py-4 px-6 bg-red-500/5 border border-red-500/20 rounded-2xl text-red-500 text-[10px] font-black uppercase tracking-widest text-center"
               >
                 {error}
               </motion.div>
             )}
 
-            <div className="space-y-4 md:space-y-6">
+            <div className="space-y-6 md:space-y-10">
+              {/* EMAIL ENTRY */}
               <div className="relative group/input">
-                <Mail className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within/input:text-[#E1784F] transition-all" />
+                <div className="absolute left-8 md:left-12 top-1/2 -translate-y-1/2 flex items-center gap-4 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
+                    <Mail className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                    <div className="w-[1px] h-4 bg-white/20" />
+                </div>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-black/40 border-2 border-white/5 rounded-2xl md:rounded-[2.5rem] pl-16 md:pl-20 pr-6 py-5 md:py-8 text-white font-bold focus:outline-none focus:border-[#E1784F] transition-all text-md md:text-xl placeholder:text-white/10 uppercase tracking-tight"
-                  placeholder="EMAIL ADDRESS"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#E1784F] focus:bg-white/[0.05] transition-all text-lg md:text-2xl placeholder:text-white/5 uppercase tracking-tighter"
+                  placeholder="ID@AFRIDAMAI.COM"
                   required
                 />
               </div>
 
+              {/* PASSWORD ENTRY */}
               <div className="relative group/input">
-                <Lock className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within/input:text-[#E1784F] transition-all" />
+                <div className="absolute left-8 md:left-12 top-1/2 -translate-y-1/2 flex items-center gap-4 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
+                    <Lock className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                    <div className="w-[1px] h-4 bg-white/20" />
+                </div>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-black/40 border-2 border-white/5 rounded-2xl md:rounded-[2.5rem] pl-16 md:pl-20 pr-6 py-5 md:py-8 text-white font-bold focus:outline-none focus:border-[#E1784F] transition-all text-md md:text-xl placeholder:text-white/10 uppercase tracking-tight"
-                  placeholder="PASSWORD"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#E1784F] focus:bg-white/[0.05] transition-all text-lg md:text-2xl placeholder:text-white/5 uppercase tracking-tighter"
+                  placeholder="PROTECTION KEY"
                   required
                 />
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#E1784F] text-white font-black uppercase text-sm md:text-lg tracking-[0.3em] md:tracking-[0.4em] py-6 md:py-9 rounded-2xl md:rounded-[2.5rem] shadow-xl transition-all flex items-center justify-center gap-4 disabled:opacity-50 active:scale-[0.98]"
-            >
-              {isLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                <>SECURE LOGIN <ArrowRight className="w-5 h-5 md:w-6 md:h-6" /></>
-              )}
-            </button>
+            {/* ACTION BUTTON */}
+            <div className="space-y-8">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="group w-full bg-[#E1784F] text-white font-black uppercase text-xs md:text-sm tracking-[0.5em] py-8 md:py-12 rounded-[2.5rem] md:rounded-[3.5rem] shadow-[0_20px_50px_rgba(225,120,79,0.3)] transition-all flex items-center justify-center gap-6 disabled:opacity-50 hover:bg-[#ff8a5c] active:scale-[0.97]"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <>AUTHENTICATE SESSION <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform" /></>
+                )}
+              </button>
 
-            <div className="flex justify-center">
-               <Link href="/forgot-password" className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-[#E1784F] transition-colors">
-                 Lost Access? Reset Credentials
-               </Link>
+              <div className="flex flex-col items-center gap-4">
+                 <Link href="/forgot-password" opacity-30 hover:opacity-100 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 hover:text-[#E1784F] transition-all">
+                   Credential Recovery
+                 </Link>
+              </div>
             </div>
           </form>
         </div>
 
-        {/* FOOTER ACTION */}
-        <div className="flex flex-col items-center gap-6 pb-10">
-            <div className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/5 rounded-2xl">
-                <ShieldCheck size={14} className="text-[#4DB6AC]" />
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Encrypted Session</p>
+        {/* FOOTER SYNC */}
+        <div className="flex flex-col items-center gap-10 pt-10">
+            <div className="flex items-center gap-4 opacity-40">
+                <Fingerprint size={16} className="text-[#4DB6AC]" />
+                <p className="text-[9px] font-black uppercase tracking-[0.5em]">Biometric-Ready Protocol</p>
             </div>
             
-            <p className="text-center text-[11px] text-white/30 font-bold uppercase tracking-widest">
-              New here? 
-              <Link href="/register" className="text-[#4DB6AC] font-black hover:underline ml-2">
-                Create Account
+            <p className="text-center text-[10px] text-white/20 font-black uppercase tracking-[0.4em]">
+              New Practitioner? 
+              <Link href="/register" className="text-white hover:text-[#E1784F] transition-all ml-4 border-b border-white/20">
+                Register Here
               </Link>
             </p>
         </div>

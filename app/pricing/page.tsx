@@ -1,11 +1,17 @@
+/**
+ * 🛡️ AFRIDAM CLINICAL BILLING: PRICING
+ * Version: 2026.1.2 (Premium Editorial Refactor)
+ * Handshake: Fully synced with Flutterwave Gateway
+ * Focus: High-Contrast UI, Secure Ambiance, Mature Typography.
+ */
+
 "use client"
 
 import React, { useState } from "react"
 import { PricingTable } from "@/components/pricing-table"
-import { ChevronLeft, ShieldCheck, Star, Zap, Loader2 } from "lucide-react"
+import { ChevronLeft, ShieldCheck, Star, Zap, Loader2, Fingerprint, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-// 🛡️ FIXED: Ensuring standard lowercase paths for Linux build compatibility
 import { useTheme } from "@/providers/theme-provider"
 import { useAuth } from "@/providers/auth-provider"
 
@@ -22,7 +28,7 @@ export default function PricingPage() {
     setIsProcessing(true);
 
     try {
-      // 🚀 HANDSHAKE: Hits the new /api/payments endpoint we discussed
+      // 🚀 HANDSHAKE: Hits the Render Backend /api/payments endpoint
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/initialize`, {
         method: 'POST',
         headers: { 
@@ -53,106 +59,104 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-[#E1784F]/30 transition-colors duration-500 overflow-x-hidden relative">
+    <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white selection:bg-[#E1784F]/30 transition-colors duration-500 overflow-x-hidden relative">
       
-      {/* --- WORLD-CLASS BACKGROUND MESH --- */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#E1784F]/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#4DB6AC]/5 blur-[120px] rounded-full" />
-      </div>
+      {/* --- PREMIUM AMBIANCE --- */}
+      <div className="absolute top-0 left-0 w-full h-[800px] bg-[radial-gradient(circle_at_50%_0%,rgba(225,120,79,0.05),transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] pointer-events-none" />
 
-      {/* 1. PREMIUM NAVIGATION */}
-      <nav className="relative z-20 p-8 md:p-12 max-w-7xl mx-auto flex items-center justify-between">
+      {/* 1. WORLD-CLASS NAVIGATION */}
+      <nav className="relative z-50 max-w-screen-xl mx-auto px-6 h-24 flex items-center justify-between">
         <button 
           onClick={() => router.back()}
-          className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-[#E1784F] transition-all group"
+          className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F] transition-all"
         >
-          <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center group-hover:bg-[#E1784F] group-hover:text-white transition-all shadow-sm">
-            <ChevronLeft size={18} /> 
-          </div>
-          <span className="hidden sm:inline">Back to Dashboard</span>
+          <ChevronLeft size={16} className="group-hover:-translate-x-2 transition-transform" /> 
+          <span className="hidden sm:inline">Back to Hub</span>
         </button>
         
         <div className="flex items-center gap-6">
-            <div className="hidden md:flex items-center gap-3 px-5 py-2.5 bg-muted/50 backdrop-blur-md border border-border rounded-full shadow-sm">
-                <ShieldCheck size={14} className="text-[#4DB6AC]" />
-                <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Secure SSL Encrypted Payment</span>
+            <div className="hidden md:flex items-center gap-4 px-6 py-2.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full">
+                <Lock size={14} className="text-[#4DB6AC]" />
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-60 text-black dark:text-white">Encrypted Checkout</span>
             </div>
-            {/* 🛡️ Ensure logo.png exists in /public/logo.png */}
             <img 
               src="/logo.png" 
               alt="AfriDam" 
-              className={`h-8 w-auto object-contain transition-all ${isDark ? '' : 'invert'}`} 
+              className={`h-10 w-auto object-contain transition-all ${isDark ? '' : 'invert'}`} 
             />
         </div>
       </nav>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 pb-32 space-y-16">
+      <main className="relative z-10 max-w-screen-xl mx-auto px-6 pb-32 space-y-24 md:space-y-40">
         
         {/* 2. SOPHISTICATED HEADLINE */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-6"
+          className="text-center space-y-10"
         >
-          <div className="inline-flex items-center gap-3 bg-[#E1784F]/10 px-6 py-2 rounded-full border border-[#E1784F]/20">
-             <Zap size={14} className="text-[#E1784F] fill-[#E1784F]" />
-             <span className="text-[10px] font-black text-[#E1784F] uppercase tracking-[0.4em]">Experience Premium Care</span>
+          <div className="inline-flex items-center gap-3 bg-gray-100 dark:bg-white/5 px-6 py-2 rounded-full border border-gray-200 dark:border-white/10">
+             <div className="w-1.5 h-1.5 rounded-full bg-[#E1784F] animate-pulse" />
+             <span className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.4em]">Membership Protocol</span>
           </div>
           
-          <h1 className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter leading-none text-foreground">
-            Simple <span className="text-[#E1784F]">Pricing.</span>
+          <h1 className="text-6xl md:text-[10rem] font-black italic uppercase tracking-[-0.05em] leading-[0.8] text-black dark:text-white">
+            Simple <br /> <span className="text-[#E1784F]">Pricing.</span>
           </h1>
           
-          <p className="text-muted-foreground font-medium max-w-xl mx-auto text-sm md:text-base leading-relaxed px-4">
-            Beautiful skin starts with expert support. Choose a plan that fits your lifestyle and get the clinical care you deserve.
+          <p className="text-[11px] md:text-sm font-black uppercase tracking-[0.5em] opacity-40 max-w-2xl mx-auto leading-relaxed">
+            Beautiful skin starts with expert support. Select your clinical access tier to begin.
           </p>
         </motion.div>
 
-        {/* 3. THE PRICING TABLE SECTION */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-          className="relative"
-        >
-          {/* 🛡️ PASSING HANDLER: Connects the table buttons to Flutterwave */}
-          <PricingTable onUpgrade={handlePaymentInit} isProcessing={isProcessing} />
+        {/* 3. PRICING TABLE CONTAINER */}
+        <div className="relative">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+          >
+            <PricingTable onUpgrade={handlePaymentInit} isProcessing={isProcessing} />
+          </motion.div>
           
           {isProcessing && (
-            <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center space-y-4">
-                <Loader2 className="animate-spin text-[#E1784F]" size={40} />
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">Securing Gateway...</p>
+            <div className="fixed inset-0 bg-white/90 dark:bg-black/95 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center space-y-8">
+                <Loader2 className="animate-spin text-[#E1784F]" size={60} strokeWidth={3} />
+                <div className="text-center space-y-2">
+                   <p className="text-[12px] font-black uppercase tracking-[0.6em] text-[#E1784F]">Authenticating Gateway</p>
+                   <p className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30">Redirecting to Secure Checkout...</p>
+                </div>
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* 4. CLINICAL TRUST BANNER */}
-        <div className="pt-24 border-t border-border/50 flex flex-col items-center gap-12">
-           <div className="flex flex-col items-center gap-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.6em] text-muted-foreground opacity-40">Trusted Technology</p>
-              <div className="flex items-center gap-2 opacity-30">
-                <Star className="fill-current text-[#E1784F]" size={16} />
-                <span className="font-black italic uppercase tracking-tighter text-2xl">Verified Clinical Care</span>
+        <footer className="pt-24 border-t border-gray-100 dark:border-white/10 flex flex-col items-center gap-16">
+           <div className="flex flex-col items-center gap-8">
+              <p className="text-[10px] font-black uppercase tracking-[0.8em] opacity-30">Secure Infrastructure</p>
+              <div className="flex items-center gap-6 opacity-30">
+                <Fingerprint className="text-[#4DB6AC]" size={24} />
+                <span className="font-black italic uppercase tracking-tighter text-4xl">Clinical Grade</span>
               </div>
            </div>
            
-           <div className="max-w-2xl text-center space-y-6">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] leading-loose opacity-60">
+           <div className="max-w-3xl text-center space-y-10">
+              <p className="text-[11px] font-bold text-black dark:text-white uppercase tracking-[0.2em] leading-relaxed opacity-40 italic">
                 All consultations are conducted by board-certified professionals. 
                 Your medical data is protected with AES-256 encryption, 
                 ensuring 100% privacy between you and your specialist.
               </p>
-              <div className="flex justify-center gap-6 text-[9px] font-black uppercase tracking-widest text-[#E1784F]">
-                <span className="cursor-pointer hover:opacity-100 transition-opacity">Privacy</span>
-                <span className="cursor-pointer hover:opacity-100 transition-opacity">Clinical Terms</span>
-                <span className="cursor-pointer hover:opacity-100 transition-opacity">Refunds</span>
+              <div className="flex flex-wrap justify-center gap-10 text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F]">
+                <span className="cursor-pointer hover:underline underline-offset-8">Data Privacy</span>
+                <span className="cursor-pointer hover:underline underline-offset-8">Billing Terms</span>
+                <span className="cursor-pointer hover:underline underline-offset-8">Refund Policy</span>
               </div>
            </div>
-        </div>
+           <p className="text-[9px] font-black uppercase tracking-[1em] opacity-20 pt-10">© 2026 AFRIDAM AI CLINICAL SYSTEMS</p>
+        </footer>
       </main>
-
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-64 bg-gradient-to-t from-[#E1784F]/5 to-transparent pointer-events-none" />
     </div>
   )
 }
