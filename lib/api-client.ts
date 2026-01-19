@@ -1,7 +1,11 @@
 import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+/**
+ * 🛡️ RULE 6: REFERENCING api-client.ts
+ * Pointing to Render (The Proxy). Render then forwards AI tasks to Google Cloud v2.
+ */
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
 
 const apiClient = axios.create({
   baseURL,
@@ -88,9 +92,9 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** * 🛡️ NATHAN'S AI VALIDATION SYNC
- * This dictionary now perfectly matches the 14-field MoreInfo class 
- * in the AI's predict.py to prevent 500 Validation Errors.
+/** * 🔬 NATHAN'S AI VALIDATION SYNC
+ * We keep this so the AI doesn't crash, but we label it as 'Default'
+ * so we can scrap the onboarding form safely.
  */
 const defaultAiContext = {
   region: "West Africa",
@@ -99,8 +103,8 @@ const defaultAiContext = {
   skin_type_last_time_checked: null,
   known_skin_condition: "none",
   skin_condition_last_time_checked: null,
-  gender: "male", 
-  age: 25,
+  gender: "not_specified", 
+  age: 0,
   known_body_lotion: "none",
   known_body_lotion_brand: "none",
   known_allergies: [], 
@@ -132,7 +136,7 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
 
-  // 🛡️ NATHAN SYNC: Sending the full 14-field object as a JSON string
+  // Sending the default context so the backend stays happy without a form.
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
   const response = await apiClient.post("/v1/scan", formData, {
@@ -143,11 +147,6 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
-  /**
-   * 🛡️ NATHAN SYNC: Ingredients analysis uses the 'LLMRequest' model 
-   * which expects 'more_info' as a nested object (already handled by axios)
-   * but we pass the full context to satisfy the AI's Pydantic model.
-   */
   const response = await apiClient.post("/v1/ingredients-analysis", { 
     query: ingredients,
     more_info: defaultAiContext 
@@ -156,7 +155,6 @@ export const analyzeIngredients = async (ingredients: string) => {
 };
 
 export const sendChatMessage = async (message: string) => {
-  // 🛡️ NATHAN SYNC: Chatbot also expects the 14-field MoreInfo model
   const response = await apiClient.post("/v1/chatbot", { 
     query: message,
     more_info: defaultAiContext 
