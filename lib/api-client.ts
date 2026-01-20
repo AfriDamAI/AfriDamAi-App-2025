@@ -137,8 +137,8 @@ export async function uploadImage(file: File | string): Promise<any> {
 
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
-  // Directly hitting the AI service
-  const response = await axios.post(`${aiURL}/v1/scan`, formData, {
+  // 🛡️ NATHAN FIX: Endpoint changed from /v1/scan to /v1/skin-diagnosis
+  const response = await axios.post(`${aiURL}/v1/skin-diagnosis`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   
