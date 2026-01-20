@@ -1,6 +1,6 @@
 /**
  * 🛡️ AFRIDAM WELLNESS HUB: LANDING PAGE
- * Version: 2026.1.3 (All-Inclusive Clinical Refactor)
+ * Version: 2026.1.4 (Build Fix - Lucide Namespace)
  * Focus: High-End Ambiance, Melanin Intelligence, Mobile-First.
  */
 
@@ -54,7 +54,7 @@ export default function LandingPage() {
         </p>
       </div>
 
-      {/* 🧭 2. NAVIGATION (REFINED SYNC) */}
+      {/* 🧭 2. NAVIGATION */}
       <nav className={`fixed top-12 left-0 right-0 z-[100] transition-all duration-500 px-6 ${
         scrolled ? 'bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl py-4 shadow-2xl' : 'bg-transparent py-8'
       }`}>
@@ -63,7 +63,6 @@ export default function LandingPage() {
             <img src="/logo.png" alt="AfriDam AI" className={`h-8 md:h-12 w-auto object-contain ${isDark ? '' : 'invert'}`} />
           </Link>
 
-          {/* Desktop Menu - Gated Shop/Pricing */}
           <div className="hidden lg:flex items-center gap-12">
             <div className="flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.4em] opacity-40">
                <Link href="/mission" className="hover:text-[#E1784F] hover:opacity-100 transition-all">Manifesto</Link>
@@ -138,7 +137,7 @@ export default function LandingPage() {
                 
                 <div className="absolute inset-x-4 bottom-4 md:inset-x-8 md:bottom-8 p-6 md:p-8 bg-black/60 backdrop-blur-3xl rounded-[2rem] md:rounded-[2.5rem] border border-white/10 flex items-center gap-4 md:gap-6">
                     <div className="w-12 h-12 md:w-16 md:h-16 bg-[#4DB6AC] rounded-2xl md:rounded-3xl flex items-center justify-center text-white shadow-2xl">
-                        <Camera size={24} />
+                        <Camera className="w-6 h-6 md:w-7 md:h-7" />
                     </div>
                     <div className="flex-1 space-y-2">
                         <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-white">Scanning Skin</p>
@@ -152,7 +151,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. STATS BAR (ALL-INCLUSIVE) */}
+      {/* 4. STATS BAR */}
       <section className="py-16 md:py-24 border-y border-gray-100 dark:border-white/5">
         <div className="max-w-screen-xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {[
@@ -177,13 +176,13 @@ export default function LandingPage() {
             "AfriDam is a tribute to <span className="text-[#4DB6AC]">African Heritage</span>—built by our people, to protect the wellness of <span className="text-[#E1784F]">our community</span>."
           </h2>
           <div className="flex items-center gap-4 opacity-40">
-             <Heart size={18} className="text-[#E1784F]" />
+             <Heart className="w-5 h-5 text-[#E1784F]" />
              <p className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.6em]">A Founder's Promise</p>
           </div>
         </div>
       </section>
 
-      {/* 6. FEATURES (GATED MARKETPLACE) */}
+      {/* 6. FEATURES */}
       <section id="features" className="py-24 md:py-48 px-6 bg-gray-50 dark:bg-white/5 border-y border-gray-100 dark:border-white/10">
         <div className="max-w-screen-xl mx-auto space-y-16 md:space-y-24">
           <div className="space-y-4">
@@ -192,8 +191,8 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
             {[
-              { title: "AI Scan", icon: Camera, color: "#4DB6AC", text: "Melanin-first texture analysis in seconds.", path: "/scanner" },
-              { title: "Safety Audit", icon: Search, color: "#E1784F", text: "Vetting ingredients for clinical safety.", path: "/ai-checker" }
+              { title: "AI Scan", icon: Camera, text: "Melanin-first texture analysis in seconds.", path: "/scanner" },
+              { title: "Safety Audit", icon: Search, text: "Vetting ingredients for clinical safety.", path: "/ai-checker" }
             ].map((f, i) => (
               <div key={i} onClick={() => handleFeatureAccess(f.path)} className="group p-8 md:p-12 bg-white dark:bg-black border border-gray-100 dark:border-white/10 rounded-[2.5rem] md:rounded-[3.5rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm hover:shadow-2xl">
                 <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-8 md:mb-10 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 group-hover:bg-[#E1784F]/10">
@@ -208,7 +207,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 7. CONNECT (REFINED WORDS) */}
+      {/* 7. CONNECT */}
       <section className="py-24 md:py-48 px-6">
         <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-16 md:gap-32">
           <div className="space-y-8 md:space-y-12">
@@ -220,14 +219,14 @@ export default function LandingPage() {
             <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter text-[#E1784F]">Connect.</h2>
             <div className="space-y-10 md:space-y-12">
               <div className="flex gap-6 items-center">
-                <MapPin className="text-[#E1784F]" size={28} md:size={32} />
+                <MapPin className="text-[#E1784F] w-7 h-7 md:w-8 md:h-8" />
                 <div>
                   <p className="font-black uppercase text-[9px] tracking-[0.5em] opacity-30">Headquarters</p>
                   <p className="text-xl md:text-2xl font-black italic uppercase tracking-tighter lowercase">lagos, nigeria</p>
                 </div>
               </div>
               <div className="flex gap-6 items-center">
-                <Mail className="text-[#E1784F]" size={28} md:size={32} />
+                <Mail className="text-[#E1784F] w-7 h-7 md:w-8 md:h-8" />
                 <div>
                   <p className="font-black uppercase text-[9px] tracking-[0.5em] opacity-30">Inquiries</p>
                   <p className="text-xl md:text-2xl font-black italic uppercase tracking-tighter lowercase">hello@afridamai.com</p>
@@ -266,14 +265,13 @@ export default function LandingPage() {
         </div>
         <div className="max-w-screen-xl mx-auto mt-20 pt-10 border-t border-gray-100 dark:border-white/10 text-center space-y-6">
           <div className="flex items-center justify-center gap-4 md:gap-6 opacity-30">
-             <ShieldCheck size={18} />
+             <ShieldCheck className="w-4 h-4 md:w-5 md:h-5" />
              <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.6em]">Safe Care Architecture</p>
           </div>
           <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.5em] opacity-20">© 2026 AFRIDAM AI CLINICAL SYSTEMS. ALL RIGHTS RESERVED.</p>
         </div>
       </footer>
 
-      {/* Auth Modal Support */}
       <AuthModals isOpen={isAuthModalOpen} type={authType} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   )
