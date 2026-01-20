@@ -1,5 +1,3 @@
-// Path: lib/environment.ts
-
 /**
  * 🛡️ OGA FIX: Robust Production URL Handling
  * Updated for the Render Migration.
@@ -9,7 +7,8 @@
 
 const getBackendUrl = () => {
     // 1. Get the URL from environment variables
-    let url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+    // UPDATED: Changed fallback to the live Render backend for stability.
+    let url = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
     
     // 2. Remove any trailing slash first to avoid //api
     url = url.replace(/\/$/, "");
