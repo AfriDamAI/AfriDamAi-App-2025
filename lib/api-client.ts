@@ -2,11 +2,12 @@ import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /**
- * 🛡️ RULE 6: REFERENCING api-client.ts
- * Reverting to Nathan's stable URL (afridam-ai2-api).
- * This service is already linked to the bucket with the new prompt.json.
+ * 🛡️ HYBRID ROUTING CONFIGURATION
+ * baseURL: Handles Auth, Users, and Database (Main Backend)
+ * aiURL: Handles heavy AI Scans and Chat (Nathan's Stable AI)
  */
-const baseURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api";
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
+const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api";
 
 const apiClient = axios.create({
   baseURL,
@@ -61,7 +62,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-/** 🔑 AUTH ENDPOINTS **/
+/** 🔑 AUTH ENDPOINTS (Uses baseURL) **/
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
   const response = await apiClient.post("/auth/user/login", credentials);
   return response.data;
@@ -77,7 +78,7 @@ export const forgotPassword = async (email: string) => {
   return response.data;
 };
 
-/** 👤 USER DATA **/
+/** 👤 USER DATA (Uses baseURL) **/
 export const getProfile = async () => {
   const response = await apiClient.get("/profile");
   return response.data;
@@ -93,10 +94,7 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** * 🔬 NATHAN'S AI VALIDATION SYNC
- * We keep this so the AI doesn't crash, but we label it as 'Default'
- * so we can scrap the onboarding form safely.
- */
+/** 🔬 AI CONTEXT **/
 const defaultAiContext = {
   region: "West Africa",
   country: "Nigeria",
@@ -114,7 +112,7 @@ const defaultAiContext = {
   user_activeness_on_app: "moderate" 
 };
 
-/** 🔬 AI SERVICE MODULE - FULL SYNC **/
+/** 🔬 AI SERVICE MODULE (Uses aiURL) **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   
@@ -137,10 +135,10 @@ export async function uploadImage(file: File | string): Promise<any> {
     formData.append("file", file);
   }
 
-  // Sending the default context so the backend stays happy without a form.
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
-  const response = await apiClient.post("/v1/scan", formData, {
+  // Directly hitting the AI service
+  const response = await axios.post(`${aiURL}/v1/scan`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   
@@ -148,7 +146,7 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
-  const response = await apiClient.post("/v1/ingredients-analysis", { 
+  const response = await axios.post(`${aiURL}/v1/ingredients-analysis`, { 
     query: ingredients,
     more_info: defaultAiContext 
   });
@@ -156,7 +154,7 @@ export const analyzeIngredients = async (ingredients: string) => {
 };
 
 export const sendChatMessage = async (message: string) => {
-  const response = await apiClient.post("/v1/chatbot", { 
+  const response = await axios.post(`${aiURL}/v1/chatbot`, { 
     query: message,
     more_info: defaultAiContext 
   });
