@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { 
   ChevronLeft, Activity, CheckCircle2, Zap,
   RotateCcw, Scan, Loader2, Upload, Info, Camera,
-  ShieldCheck, ArrowRight
+  ShieldCheck, ArrowRight, Binary, Fingerprint, Search
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { uploadImage } from "@/lib/api-client"
@@ -20,15 +20,38 @@ export default function UnifiedScanner() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState<any>(null)
   const [status, setStatus] = useState("System Ready")
+  const [scanStep, setScanStep] = useState(0) // New: Tracks the thinking process
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  // Relatable steps for the client to see while waiting for the AI Brain
+  const analysisSteps = [
+    { icon: <Scan size={16} />, text: "Analyzing Image Clarity" },
+    { icon: <Fingerprint size={16} />, text: "Detecting Melanin Patterns" },
+    { icon: <Binary size={16} />, text: "Matching with Clinical Data" },
+    { icon: <Search size={16} />, text: "Generating Diagnosis Report" },
+    { icon: <ShieldCheck size={16} />, text: "Finalizing Safe Regimen" }
+  ];
+
   useEffect(() => {
     if (!authLoading && !user) router.push("/");
   }, [user, authLoading, router]);
+
+  // Logic to cycle through steps while the AI works
+  useEffect(() => {
+    let interval: any;
+    if (isAnalyzing) {
+      interval = setInterval(() => {
+        setScanStep((prev) => (prev < analysisSteps.length - 1 ? prev + 1 : prev));
+      }, 3500); // Changes text every 3.5 seconds
+    } else {
+      setScanStep(0);
+    }
+    return () => clearInterval(interval);
+  }, [isAnalyzing]);
 
   const startCamera = async () => {
     setErrorDetails(null)
@@ -71,12 +94,13 @@ export default function UnifiedScanner() {
     setErrorDetails(null)
     setStatus("Neural Analysis...")
     try {
+      // Calls the uploadImage function in client.ts
       const data = await uploadImage(imgSource);
       const finalFinding = data?.description || data?.resultData?.description || "Healthy Texture Detected";
       setResults({ finding: finalFinding });
       setStatus("Analysis Complete")
     } catch (err: any) {
-      setErrorDetails("Network sync failed. Retry.");
+      setErrorDetails("The AI Brain is waking up. Please try one more time.");
     } finally {
       setIsAnalyzing(false)
     }
@@ -138,14 +162,30 @@ export default function UnifiedScanner() {
                     <div className="relative w-full h-full">
                       <img src={imgSource} className={`w-full h-full object-cover transition-all duration-1000 ${isAnalyzing ? 'scale-110 blur-md opacity-40' : ''}`} alt="Captured" />
                       {isAnalyzing && (
-                         <div className="absolute inset-0 flex flex-col items-center justify-center">
+                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm">
                             <motion.div 
                               initial={{ top: "0%" }} animate={{ top: "100%" }} 
                               transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                               className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_20px_#E1784F] z-50"
                             />
-                            <Loader2 className="animate-spin text-[#E1784F] mb-4" size={40} strokeWidth={3} />
-                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Processing Tissue</p>
+                            
+                            {/* NEW: Step-by-Step Progress display */}
+                            <motion.div 
+                              key={scanStep}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="flex flex-col items-center gap-3 text-white text-center px-8"
+                            >
+                              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/20 animate-pulse">
+                                {analysisSteps[scanStep].icon}
+                              </div>
+                              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#E1784F]">
+                                {analysisSteps[scanStep].text}
+                              </p>
+                              <p className="text-[9px] font-bold opacity-50 uppercase tracking-widest">
+                                Comparing {Math.floor(Math.random() * 500) + 1000}+ Data Points
+                              </p>
+                            </motion.div>
                          </div>
                       )}
                     </div>

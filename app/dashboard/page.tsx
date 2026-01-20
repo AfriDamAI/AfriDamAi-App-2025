@@ -1,183 +1,189 @@
-/**
- * 🛡️ AFRIDAM WELLNESS HUB: DASHBOARD (FAST-TRACK VERSION)
- * Sync: lib/api-client.ts
- * Focus: High-Contrast UI, Mobile-First, Instant Onboarding Exit.
- */
-
 "use client"
 
-import { useEffect, useState } from "react"
-import { 
-  LayoutDashboard, ShoppingBag, Stethoscope, Sparkles, 
-  ArrowRight, Camera, User as UserIcon, HeartPulse, MessageSquare
-} from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { 
+  Scan, MessageSquare, History, User, 
+  Settings, Zap, Clock, ShieldCheck, 
+  ArrowRight, CreditCard, Sparkles, Activity
+} from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { OnboardingSurvey } from "@/components/onboarding-survey"
-import { updateUser } from "@/lib/api-client"
+import { getScanHistory } from "@/lib/api-client"
 
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" } }
-}
-
-export default function DashboardPage() {
-  const { user, signOut, isLoading, mutate } = useAuth()
+export default function Dashboard() {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState("home")
-  const [hasJustFinished, setHasJustFinished] = useState(false);
-
-  /**
-   * 🛡️ THE "EXPRESS" BYPASS: 
-   * We set this to false so the onboarding survey never shows up.
-   * Your users go straight to the scanner.
-   */
-  const requiresOnboarding = false; 
+  const { user, isLoading: authLoading } = useAuth()
+  const [history, setHistory] = useState([])
+  const [loadingHistory, setLoadingHistory] = useState(true)
 
   useEffect(() => {
-    if (!isLoading && !user) router.push("/")
-    
-    // 🚀 AUTO-SYNC: If user isn't marked as onboarded in DB, we do it silently.
-    if (user && user.onboardingCompleted !== true) {
-      handleSilentOnboarding();
-    }
-  }, [user, isLoading, router])
+    if (!authLoading && !user) router.push("/")
+  }, [user, authLoading, router])
 
-  const handleSilentOnboarding = async () => {
-    try {
-      await updateUser(user?.id, { onboardingCompleted: true });
-      await mutate();
-    } catch (err) {
-      console.error("Silent sync failed, but we are moving on.");
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const data = await getScanHistory()
+        setHistory(data || [])
+      } catch (err) {
+        console.error("Failed to load history")
+      } finally {
+        setLoadingHistory(false)
+      }
     }
-  }
+    if (user) fetchHistory()
+  }, [user])
 
-  const handleCompleteOnboarding = async (surveyData: any = {}) => {
-    setHasJustFinished(true);
-    try {
-      await updateUser(user?.id, { ...surveyData, onboardingCompleted: true });
-      await mutate();
-    } catch (err) {
-      setHasJustFinished(false);
-      console.error("Profile update failed.");
-    }
-  }
-
-  if (isLoading || !user) return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
+  if (authLoading || !user) return null
 
   return (
-    <div className="min-h-[100svh] bg-background text-foreground flex flex-col md:flex-row overflow-x-hidden selection:bg-primary/20">
-      
-      {/* --- TACTICAL SIDEBAR (Desktop) --- */}
-      <aside className="w-72 border-r border-border/50 p-8 space-y-10 bg-card/30 backdrop-blur-xl hidden md:flex flex-col sticky top-0 h-screen">
-        <div className="px-2 mb-4">
-           <img src="/logo.png" alt="AfriDam AI" className="h-10 w-auto invert dark:invert-0" />
+    <main className="min-h-screen bg-white dark:bg-[#0A0A0A] text-black dark:text-white pb-24 md:pb-10 transition-colors duration-500">
+      {/* top navigation / profile header */}
+      <nav className="max-w-screen-xl mx-auto px-6 py-8 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#E1784F] flex items-center justify-center text-white font-black text-xs italic">
+            {user?.name?.charAt(0) || "U"}
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-40">User Profile</p>
+            <h2 className="text-lg font-bold">Hello, {user?.name?.split(' ')[0] || 'Obey'}</h2>
+          </div>
         </div>
-        <nav className="flex-1 space-y-3">
-          {[
-            { id: "home", label: "Overview", icon: LayoutDashboard },
-            { id: "scanner", label: "AI Scanner", icon: Camera, path: "/ai-scanner" },
-            { id: "checker", label: "Ingredient Check", icon: Sparkles, path: "/ai-checker" },
-            { id: "marketplace", label: "Care Shop", icon: ShoppingBag, path: "/marketplace" },
-            { id: "appointment", label: "Care Guide", icon: Stethoscope },
-          ].map((link) => (
-            <button 
-              key={link.id}
-              onClick={() => link.path ? router.push(link.path) : setActiveTab(link.id)}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] uppercase tracking-[0.2em] font-black transition-all border ${
-                activeTab === link.id 
-                ? "bg-primary text-white border-primary shadow-xl scale-[1.02]" 
-                : "text-muted-foreground border-transparent hover:bg-secondary/50"
-              }`}
-            >
-              <link.icon size={16} /> {link.label}
-            </button>
-          ))}
-        </nav>
-        <button onClick={() => signOut?.()} className="mt-auto flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-destructive transition-colors">
-          Log Out
-        </button>
-      </aside>
+        
+        {/* tier display logic */}
+        <div className="px-4 py-2 bg-gray-50 dark:bg-white/5 rounded-full border border-gray-100 dark:border-white/10">
+          <span className="text-[9px] font-black uppercase tracking-widest text-[#E1784F]">
+            {user?.tier === 'premium' ? 'Premium Account' : 'Free Account'}
+          </span>
+        </div>
+      </nav>
 
-      {/* --- MAIN CONTENT (Mobile First) --- */}
-      <main className="flex-1 p-5 md:p-12 lg:p-16 relative pb-32">
-        <header className="flex justify-between items-center mb-10">
-           <div className="text-left">
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-                {activeTab === "home" ? `Hello, ${user.firstName || 'Chief'}` : activeTab}
-              </h2>
-              <p className="text-xs md:text-sm font-bold text-primary italic uppercase tracking-[0.2em] mt-2 opacity-80">
-                Premium Skin Intelligence
-              </p>
-           </div>
-           <div onClick={() => router.push('/profile')} className="w-12 h-12 rounded-2xl bg-secondary border border-border flex items-center justify-center cursor-pointer hover:border-primary transition-all">
-              <UserIcon size={20} className="text-primary" />
-           </div>
+      <div className="max-w-screen-xl mx-auto px-6 space-y-10">
+        
+        {/* greeting & sub-text */}
+        <header className="space-y-2">
+          <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter">
+            Dash<span className="text-[#E1784F]">board</span>
+          </h1>
+          <p className="text-sm font-medium opacity-50">Check if your skin glows today.</p>
         </header>
 
-        <AnimatePresence mode="wait">
-          <motion.div key={activeTab} variants={itemVariants} initial="hidden" animate="visible" className="max-w-5xl mx-auto space-y-8">
-            
-            {activeTab === "home" && (
-              <>
-                {requiresOnboarding ? (
-                  <section className="bg-card border-2 border-primary/20 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
-                    <div className="relative z-10 space-y-6">
-                      <h3 className="text-2xl font-black uppercase italic tracking-tighter">Personalize Your Care</h3>
-                      <OnboardingSurvey onComplete={handleCompleteOnboarding} />
-                    </div>
-                  </section>
-                ) : (
-                  <div className="grid grid-cols-1 gap-6">
-                    {/* HERO ACTION: SCANNER */}
-                    <div onClick={() => router.push('/ai-scanner')} className="group relative bg-primary rounded-[2.5rem] p-10 text-white overflow-hidden cursor-pointer shadow-2xl shadow-primary/20">
-                      <div className="relative z-10 flex justify-between items-end">
-                        <div className="text-left space-y-2">
-                          <span className="text-[10px] font-black uppercase tracking-[0.3em] bg-white/20 px-3 py-1 rounded-full">New Scan Available</span>
-                          <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter">AI Skin Scanner</h3>
-                          <p className="opacity-80 text-xs font-medium max-w-[200px]">Get a clinical-grade health analysis in seconds.</p>
-                        </div>
-                        <div className="w-16 h-16 bg-white text-primary rounded-3xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <ArrowRight size={28} />
-                        </div>
-                      </div>
-                      <Camera className="absolute -right-10 -bottom-10 w-64 h-64 opacity-10 rotate-12" />
-                    </div>
+        {/* 15$ instant consultation - high priority */}
+        <section className="relative overflow-hidden group">
+          <div className="absolute inset-0 bg-[#E1784F] opacity-10 group-hover:opacity-20 transition-opacity" />
+          <div className="relative border-2 border-[#E1784F] rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="space-y-4 text-center md:text-left">
+              <div className="flex items-center gap-2 px-3 py-1 bg-[#E1784F] text-white rounded-full w-fit mx-auto md:mx-0">
+                <Zap size={12} fill="currentColor" />
+                <span className="text-[9px] font-black uppercase tracking-widest">No Waiting Time</span>
+              </div>
+              <h3 className="text-2xl font-black italic uppercase">Instant specialist consultation</h3>
+              <p className="text-xs font-bold opacity-60 uppercase tracking-tight max-w-xs">
+                Connect with a certified dermatologist in under 5 minutes for immediate clinical advice.
+              </p>
+            </div>
+            <button 
+              onClick={() => router.push('/consultation/instant')}
+              className="bg-black dark:bg-white text-white dark:text-black px-8 py-5 rounded-2xl font-black uppercase text-[11px] tracking-widest flex items-center gap-3 hover:scale-105 transition-all shadow-xl"
+            >
+              Consult now <span className="text-[#E1784F]">$15</span>
+            </button>
+          </div>
+        </section>
 
-                    {/* SECONDARY TOOLS */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div onClick={() => router.push('/ai-checker')} className="p-8 bg-card border border-border/50 rounded-[2.5rem] hover:border-primary/50 transition-all cursor-pointer group">
-                        <Sparkles className="text-primary mb-4 group-hover:rotate-12 transition-transform" size={32} />
-                        <h4 className="font-black uppercase text-lg tracking-tighter italic">Ingredient Checker</h4>
-                        <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest mt-1">Verify safety labels instantly.</p>
-                      </div>
-                      <div onClick={() => router.push('/marketplace')} className="p-8 bg-card border border-border/50 rounded-[2.5rem] hover:border-primary/50 transition-all cursor-pointer group">
-                        <ShoppingBag className="text-primary mb-4 group-hover:rotate-12 transition-transform" size={32} />
-                        <h4 className="font-black uppercase text-lg tracking-tighter italic">Curated Shop</h4>
-                        <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest mt-1">Verified skin-safe products.</p>
-                      </div>
+        {/* main actions grid */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <button 
+            onClick={() => router.push('/scanner')}
+            className="group relative h-64 bg-black dark:bg-white text-white dark:text-black rounded-[3rem] p-10 flex flex-col justify-between items-start text-left overflow-hidden"
+          >
+            <div className="absolute right-[-10%] top-[-10%] opacity-10 group-hover:scale-110 transition-transform duration-700">
+               <Scan size={240} strokeWidth={1} />
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-[#E1784F] flex items-center justify-center">
+              <Scan size={24} />
+            </div>
+            <div>
+              <h3 className="text-3xl font-black italic uppercase leading-none">AI Skin<br/>Analysis</h3>
+              <p className="text-[10px] font-bold uppercase tracking-widest mt-3 opacity-50 flex items-center gap-2">
+                Start scan <ArrowRight size={12} />
+              </p>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => router.push('/specialist')}
+            className="group relative h-64 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[3rem] p-10 flex flex-col justify-between items-start text-left"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center">
+              <MessageSquare size={24} />
+            </div>
+            <div>
+              <h3 className="text-3xl font-black italic uppercase leading-none">Chat a<br/>specialist</h3>
+              <p className="text-[10px] font-bold uppercase tracking-widest mt-3 opacity-50 flex items-center gap-2">
+                Care guide <ArrowRight size={12} />
+              </p>
+            </div>
+          </button>
+        </div>
+
+        {/* scanning history section */}
+        <section className="space-y-6">
+          <div className="flex justify-between items-center px-2">
+            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Scanning History</h4>
+            <History size={16} className="opacity-20" />
+          </div>
+
+          <div className="space-y-4">
+            {loadingHistory ? (
+              <div className="animate-pulse flex flex-col gap-4">
+                {[1, 2].map(i => <div key={i} className="h-20 bg-gray-100 dark:bg-white/5 rounded-[2rem]" />)}
+              </div>
+            ) : history.length > 0 ? (
+              history.map((scan: any, idx) => (
+                <div key={idx} className="flex items-center justify-between p-6 bg-gray-50 dark:bg-white/5 rounded-[2rem] border border-gray-100 dark:border-white/10 group hover:border-[#E1784F] transition-all">
+                  <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gray-200">
+                       <img src={scan.imageUrl || "/placeholder.jpg"} alt="scan" className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h5 className="text-[12px] font-black uppercase italic tracking-tight">{scan.label || "Texture Scan"}</h5>
+                      <p className="text-[10px] font-bold opacity-40 uppercase">{new Date(scan.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>
-                )}
-              </>
+                  <button onClick={() => router.push(`/scanner/results/${scan.id}`)} className="w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-all">
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="py-12 text-center bg-gray-50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-white/10">
+                <Activity size={40} className="mx-auto opacity-10 mb-4" />
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-30">No scans recorded yet</p>
+              </div>
             )}
+          </div>
+        </section>
+      </div>
 
-            {activeTab === "appointment" && <div className="p-10 text-center">Care Guide Content Coming Soon</div>}
-          </motion.div>
-        </AnimatePresence>
-
+      {/* floating ai chatbot - positioned to not disturb down panel */}
+      <div className="fixed bottom-24 right-6 z-40 md:bottom-10 md:right-10">
         <button 
-          onClick={() => setActiveTab('appointment')}
-          className="fixed bottom-8 right-8 w-16 h-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 md:hidden"
+          onClick={() => router.push('/chat')}
+          className="w-16 h-16 bg-[#E1784F] rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform active:scale-95"
         >
-          <MessageSquare size={24} />
+          <Sparkles size={28} />
         </button>
-      </main>
-    </div>
+      </div>
+
+      {/* mobile bottom panel - ensured spacing */}
+      <div className="fixed bottom-0 left-0 right-0 h-20 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-t border-gray-100 dark:border-white/10 flex justify-around items-center px-6 lg:hidden z-50">
+        <button onClick={() => router.push('/dashboard')} className="p-3 text-[#E1784F]"><Zap size={22} fill="currentColor" /></button>
+        <button onClick={() => router.push('/scanner')} className="p-3 opacity-30"><Scan size={22} /></button>
+        <button onClick={() => router.push('/specialist')} className="p-3 opacity-30"><MessageSquare size={22} /></button>
+        <button onClick={() => router.push('/profile')} className="p-3 opacity-30"><User size={22} /></button>
+      </div>
+    </main>
   )
 }
