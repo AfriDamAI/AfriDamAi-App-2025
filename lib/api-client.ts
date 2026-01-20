@@ -3,9 +3,10 @@ import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /**
  * 🛡️ RULE 6: REFERENCING api-client.ts
- * Pointing to Render (The Proxy). Render then forwards AI tasks to Google Cloud v2.
+ * Reverting to Nathan's stable URL (afridam-ai2-api).
+ * This service is already linked to the bucket with the new prompt.json.
  */
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
+const baseURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api";
 
 const apiClient = axios.create({
   baseURL,
