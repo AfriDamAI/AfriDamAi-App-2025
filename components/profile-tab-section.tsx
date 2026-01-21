@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM WELLNESS HUB: TAB SECTION
- * Version: 2026.1.4 (Soft & Relatable)
- * Handshake: Ready for Dashboard Integration
+ * 🛡️ AFRIDAM WELLNESS HUB: TAB SECTION (Rule 7 Sync)
+ * Version: 2026.1.5 (Handshake & Note Persistence)
+ * Focus: High-Precision Data entry for the Clinical Diary.
  */
 
 "use client"
@@ -98,7 +98,7 @@ export default function TabSection({
                                 </div>
                             </div>
 
-                            {/* Vetted Care Items */}
+                            {/* Supplies */}
                             <div>
                                 <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4 flex items-center gap-2">
                                     <Droplets className="w-4 h-4 text-[#E1784F]" />
@@ -124,11 +124,11 @@ export default function TabSection({
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-1">
                                             <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Date</label>
-                                            <input type="date" name="date" value={appointmentForm.date} onChange={handleAppointmentChange} className="auth-input w-full py-4" />
+                                            <input type="date" name="date" value={appointmentForm.date} onChange={handleAppointmentChange} className="w-full py-4 bg-gray-50 dark:bg-white/5 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" />
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Time</label>
-                                            <select name="time" value={appointmentForm.time} onChange={handleAppointmentChange} className="auth-input w-full py-4">
+                                            <select name="time" value={appointmentForm.time} onChange={handleAppointmentChange} className="w-full py-4 bg-gray-50 dark:bg-white/5 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]">
                                                 <option value="">Select Time</option>
                                                 {timeSlots.map((slot) => <option key={slot} value={slot}>{slot}</option>)}
                                             </select>
@@ -136,9 +136,9 @@ export default function TabSection({
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Message</label>
-                                        <textarea name="reason" value={appointmentForm.reason} onChange={handleAppointmentChange} rows={3} className="auth-input w-full resize-none py-4" placeholder="How can we help?" />
+                                        <textarea name="reason" value={appointmentForm.reason} onChange={handleAppointmentChange} rows={3} className="w-full py-4 bg-gray-50 dark:bg-white/5 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] resize-none" placeholder="How can we help?" />
                                     </div>
-                                    <button type="button" className="w-full py-5 bg-[#E1784F] text-white rounded-xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg">Book Session</button>
+                                    <button type="button" className="w-full py-5 bg-[#E1784F] text-white rounded-xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-[#ff8e5e] active:scale-95 transition-all">Book Session</button>
                                 </form>
 
                                 <div className="mt-6 p-5 bg-[#4DB6AC]/5 border border-[#4DB6AC]/10 rounded-xl flex gap-3">
@@ -164,9 +164,9 @@ export default function TabSection({
                         value={comment}
                         onChange={(e) => onCommentChange(e.target.value)}
                         placeholder="How does your skin feel today?"
-                        className="auth-input w-full h-28 resize-none py-4"
+                        className="w-full py-4 bg-background border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] h-28 resize-none"
                     />
-                    <button onClick={onSubmitComment} className="w-full md:w-auto px-10 py-4 bg-foreground text-background rounded-xl font-black uppercase text-[9px] tracking-widest shadow-md">
+                    <button onClick={onSubmitComment} className="w-full md:w-auto px-10 py-4 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase text-[9px] tracking-widest shadow-md hover:bg-[#E1784F] hover:text-white transition-all">
                         Save Notes
                     </button>
                 </div>

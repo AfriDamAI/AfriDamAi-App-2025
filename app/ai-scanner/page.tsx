@@ -1,12 +1,18 @@
+/**
+ * 🛡️ AFRIDAM CLINICAL SCANNER (Rule 7 Sync)
+ * Version: 2026.1.6 (Intelligence Hub Alignment)
+ * Focus: High-Precision Image Handshake & Error Resiliency.
+ */
+
 "use client"
 
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { 
-  ChevronLeft, Activity, CheckCircle2, Zap,
-  RotateCcw, Scan, Loader2, Upload, Info, Camera,
-  ShieldCheck, ArrowRight, Binary, Fingerprint, Search
+  ChevronLeft, CheckCircle2, Zap,
+  RotateCcw, Scan, Info, ShieldCheck, 
+  ArrowRight, Binary, Fingerprint, Search
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { uploadImage } from "@/lib/api-client"
@@ -20,14 +26,13 @@ export default function UnifiedScanner() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState<any>(null)
   const [status, setStatus] = useState("System Ready")
-  const [scanStep, setScanStep] = useState(0) // New: Tracks the thinking process
+  const [scanStep, setScanStep] = useState(0)
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
-  // Relatable steps for the client to see while waiting for the AI Brain
   const analysisSteps = [
     { icon: <Scan size={16} />, text: "Analyzing Image Clarity" },
     { icon: <Fingerprint size={16} />, text: "Detecting Melanin Patterns" },
@@ -40,18 +45,17 @@ export default function UnifiedScanner() {
     if (!authLoading && !user) router.push("/");
   }, [user, authLoading, router]);
 
-  // Logic to cycle through steps while the AI works
   useEffect(() => {
     let interval: any;
     if (isAnalyzing) {
       interval = setInterval(() => {
         setScanStep((prev) => (prev < analysisSteps.length - 1 ? prev + 1 : prev));
-      }, 3500); // Changes text every 3.5 seconds
+      }, 3500); 
     } else {
       setScanStep(0);
     }
     return () => clearInterval(interval);
-  }, [isAnalyzing]);
+  }, [isAnalyzing, analysisSteps.length]);
 
   const startCamera = async () => {
     setErrorDetails(null)
@@ -93,14 +97,24 @@ export default function UnifiedScanner() {
     setIsAnalyzing(true)
     setErrorDetails(null)
     setStatus("Neural Analysis...")
+    
     try {
-      // Calls the uploadImage function in client.ts
+      /**
+       * 🚀 THE NEURAL HANDSHAKE (Rule 7)
+       * Uses the restored uploadImage from api-client.ts.
+       * Includes full clinical context and Base64-to-Blob conversion.
+       */
       const data = await uploadImage(imgSource);
+      
+      // Rule 7 Sync: Accessing the description from the flattened interceptor result
       const finalFinding = data?.description || data?.resultData?.description || "Healthy Texture Detected";
+      
       setResults({ finding: finalFinding });
       setStatus("Analysis Complete")
     } catch (err: any) {
-      setErrorDetails("The AI Brain is waking up. Please try one more time.");
+      // Rule 3: Relatable error message for 503 or timeout events
+      setErrorDetails("The AI Brain is waking up. Please try once more in 10 seconds.");
+      setStatus("Sync Interrupted")
     } finally {
       setIsAnalyzing(false)
     }
@@ -153,7 +167,6 @@ export default function UnifiedScanner() {
         <div className="relative">
           {!results ? (
             <div className="space-y-10">
-              {/* THE LENS */}
               <div className="relative aspect-square w-full rounded-[3.5rem] overflow-hidden bg-gray-100 dark:bg-white/5 border-[8px] border-white dark:border-[#1A1A1A] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)]">
                 <AnimatePresence mode="wait">
                   {isCapturing ? (
@@ -169,7 +182,6 @@ export default function UnifiedScanner() {
                               className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_20px_#E1784F] z-50"
                             />
                             
-                            {/* NEW: Step-by-Step Progress display */}
                             <motion.div 
                               key={scanStep}
                               initial={{ opacity: 0, y: 10 }}
@@ -181,9 +193,6 @@ export default function UnifiedScanner() {
                               </div>
                               <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#E1784F]">
                                 {analysisSteps[scanStep].text}
-                              </p>
-                              <p className="text-[9px] font-bold opacity-50 uppercase tracking-widest">
-                                Comparing {Math.floor(Math.random() * 500) + 1000}+ Data Points
                               </p>
                             </motion.div>
                          </div>
@@ -219,7 +228,7 @@ export default function UnifiedScanner() {
                       Open Clinical Lens
                     </button>
                     <button onClick={() => fileInputRef.current?.click()} className="w-full py-4 text-[10px] font-black opacity-40 uppercase tracking-[0.3em] hover:opacity-100 flex items-center justify-center gap-2 transition-all">
-                      <Upload size={14} /> Import from Gallery
+                      <Scan size={14} /> Import from Gallery
                     </button>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
                       const file = e.target.files?.[0];
@@ -235,7 +244,7 @@ export default function UnifiedScanner() {
               </div>
             </div>
           ) : (
-            /* RESULTS VIEW - High-End Editorial Style */
+            /* RESULTS VIEW */
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
               <div className="bg-black dark:bg-white text-white dark:text-black p-12 rounded-[4rem] space-y-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)]">
                 <div className="flex justify-between items-start">
@@ -259,7 +268,7 @@ export default function UnifiedScanner() {
                   <div className="flex items-start gap-4">
                     <Info size={18} className="text-[#E1784F] shrink-0" />
                     <p className="text-[10px] font-bold uppercase leading-relaxed opacity-60 tracking-tight">
-                      AI analysis is for educational support. This does not replace a clinical biopsy or professional dermatological consultation.
+                      AI analysis is for educational support. This does not replace a professional clinical consultation.
                     </p>
                   </div>
                   <button onClick={() => router.push('/marketplace')} className="w-full py-6 bg-white dark:bg-black text-black dark:text-white rounded-[2rem] font-black uppercase text-[11px] tracking-[0.3em] flex items-center justify-center gap-3 group">

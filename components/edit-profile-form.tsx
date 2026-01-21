@@ -1,3 +1,9 @@
+/**
+ * 🛡️ AFRIDAM CLINICAL PROFILE (Rule 7 Sync)
+ * Version: 2026.1.4 (Metric Alignment & Sync Protection)
+ * Focus: High-Precision update for Melanin-Rich dermal data.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -45,7 +51,7 @@ export const EditProfileForm = () => {
         lastName: user.lastName || "",
         phoneNo: user.phoneNo || "",
         sex: user.sex || "",
-        // 🛡️ RECTIFIED: Prevents defaulting to Nigeria if user data is still syncing
+        // 🚀 RULE 7 SYNC: Prevents state override during hydration
         nationality: userNationality ? (isAfrican ? userNationality : "Other") : "Nigeria",
         otherCountry: isAfrican ? "" : userNationality,
         skinType: user.profile?.skinType || "",
@@ -66,6 +72,11 @@ export const EditProfileForm = () => {
       if (!user) return;
       const finalNationality = formData.nationality === "Other" ? formData.otherCountry : formData.nationality;
       
+      /**
+       * 🚀 RULE 7 HANDSHAKE
+       * We explicitly preserve existing profile fields to prevent overwriting
+       * data like scan history or diagnostic IDs.
+       */
       const payload = {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -121,18 +132,18 @@ export const EditProfileForm = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">First Name</label>
-                <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="auth-input w-full" />
+                <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" />
               </div>
               <div className="space-y-2">
                 <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Last Name</label>
-                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="auth-input w-full" />
+                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Nationality</label>
               <div className="relative">
-                <select name="nationality" value={formData.nationality} onChange={handleChange} className="auth-input w-full appearance-none">
+                <select name="nationality" value={formData.nationality} onChange={handleChange} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] appearance-none">
                   {AFRICAN_COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
                 <Globe className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={16} />
@@ -141,7 +152,7 @@ export const EditProfileForm = () => {
                 <motion.input 
                   initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
                   name="otherCountry" value={formData.otherCountry} onChange={handleChange}
-                  placeholder="Specify country" className="auth-input w-full mt-2" 
+                  placeholder="Specify country" className="w-full mt-2 py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" 
                 />
               )}
             </div>
@@ -173,13 +184,13 @@ export const EditProfileForm = () => {
 
             <div className="space-y-2">
               <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Phone Number</label>
-              <input type="tel" name="phoneNo" value={formData.phoneNo} onChange={handleChange} className="auth-input w-full" placeholder="+234..." />
+              <input type="tel" name="phoneNo" value={formData.phoneNo} onChange={handleChange} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" placeholder="+234..." />
             </div>
 
             <div className="space-y-2">
               <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Skin Type</label>
               <div className="relative">
-                <select name="skinType" value={formData.skinType} onChange={handleChange} className="auth-input w-full appearance-none">
+                <select name="skinType" value={formData.skinType} onChange={handleChange} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] appearance-none">
                   <option value="">Select Category</option>
                   <option value="Oily / Shine">Oily / Shine</option>
                   <option value="Dry / Tight">Dry / Tight</option>
@@ -197,7 +208,7 @@ export const EditProfileForm = () => {
               </div>
               <textarea
                 name="allergies" value={formData.allergies} onChange={handleChange}
-                rows={3} className="auth-input w-full resize-none min-h-[100px] py-4"
+                rows={3} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] resize-none min-h-[100px]"
                 placeholder="Fragrance, Vitamin C, Nuts, etc."
               />
             </div>

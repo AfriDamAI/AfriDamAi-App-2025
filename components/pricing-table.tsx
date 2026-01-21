@@ -1,18 +1,17 @@
+/**
+ * 🛡️ AFRIDAM PRICING ARCHITECTURE (Rule 7 Sync)
+ * Version: 2026.1.4 (Payment Handshake Alignment)
+ * Focus: High-Precision Transaction Triggers for Paystack.
+ */
+
 "use client"
 
 import React from "react"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation" // Rule 7: For Free tier routing
 import { 
-  Check, 
-  ArrowRight,
-  Clock,
-  UserCheck,
-  Sparkles,
-  Zap,
-  Loader2,
-  Stethoscope,
-  ShieldCheck,
-  Video
+  Check, ArrowRight, Clock, Sparkles, 
+  Zap, Loader2, Stethoscope, ShieldCheck, Video
 } from "lucide-react"
 
 const PLANS = [
@@ -80,10 +79,12 @@ interface PricingTableProps {
 }
 
 export function PricingTable({ onUpgrade, isProcessing }: PricingTableProps) {
+  const router = useRouter();
+
   return (
     <div className="w-full space-y-12 text-left">
       
-      {/* ⚡ 1. URGENT CARE BANNER (HIGH CONVERSION) */}
+      {/* ⚡ URGENT CARE BANNER */}
       <motion.div 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -109,7 +110,7 @@ export function PricingTable({ onUpgrade, isProcessing }: PricingTableProps) {
             </div>
             <button 
               disabled={isProcessing}
-              onClick={() => onUpgrade?.("Urgent Session", 15)}
+              onClick={() => onUpgrade?.("URGENT_CONSULTATION", 15)}
               className="w-full md:w-auto px-12 h-20 bg-white text-black font-black rounded-2xl hover:bg-[#E1784F] hover:text-white transition-all shadow-xl uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-4 active:scale-95 disabled:opacity-50"
             >
               {isProcessing ? <Loader2 className="animate-spin" size={18} /> : "Initiate Request"} <ArrowRight size={18} />
@@ -118,7 +119,7 @@ export function PricingTable({ onUpgrade, isProcessing }: PricingTableProps) {
         </div>
       </motion.div>
 
-      {/* 🏛️ 2. SUBSCRIPTION GRID */}
+      {/* 🏛️ SUBSCRIPTION GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-12">
         {PLANS.map((plan, i) => (
           <div 
@@ -171,7 +172,15 @@ export function PricingTable({ onUpgrade, isProcessing }: PricingTableProps) {
             <button 
               disabled={isProcessing}
               onClick={() => {
-                if(plan.rawPrice > 0) onUpgrade?.(plan.name, plan.rawPrice)
+                /** 🚀 RULE 7 HANDSHAKE
+                 * If price is 0, we simply route to dashboard.
+                 * Otherwise, we trigger the payment initializer.
+                 */
+                if(plan.rawPrice === 0) {
+                  router.push("/dashboard");
+                } else {
+                  onUpgrade?.(plan.name.toUpperCase(), plan.rawPrice);
+                }
               }}
               className={`w-full mt-12 h-20 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 ${
               plan.highlight 

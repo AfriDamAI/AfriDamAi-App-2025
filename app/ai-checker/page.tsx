@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM SAFETY LAB: INGREDIENT CHECKER
- * Version: 2026.1.2 (Premium Editorial Refactor)
- * Handshake: Fully synced with lib/api-client.ts
+ * 🛡️ AFRIDAM SAFETY LAB: INGREDIENT CHECKER (Rule 7 Sync)
+ * Version: 2026.1.3 (Molecular Handshake Alignment)
+ * Focus: High-Precision Ingredient Parsing & Response Mapping.
  */
 
 "use client"
@@ -11,9 +11,9 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
-  Loader2, ChevronLeft, CheckCircle2, Zap, Camera,
-  RotateCcw, AlertTriangle, Upload, Baby, Info, ShoppingBag, 
-  ArrowRight, Scan, FlaskConical
+  ChevronLeft, CheckCircle2, Zap, 
+  RotateCcw, AlertTriangle, Upload, Baby, ShoppingBag, 
+  Scan, FlaskConical
 } from "lucide-react"
 import { analyzeIngredients } from "@/lib/api-client"
 
@@ -66,20 +66,33 @@ export default function IngredientCheckerPage() {
   const handleAnalyze = async () => {
     const input = imgSource || manualText;
     if (!input) return;
+    
     setIsAnalyzing(true);
     setStatus("Molecular Review...");
+    
     try {
-      const data = await analyzeIngredients(input);
-      const payload = data?.resultData || data;
+      /**
+       * 🚀 THE MOLECULAR HANDSHAKE (Rule 7)
+       * Rule 7: We send the raw string or image to the specialized endpoint.
+       */
+      const response = await analyzeIngredients(input);
+      
+      // Rule 7 Sync: Mapping the response to our Editorial UI
+      const payload = response?.resultData || response;
+      
       setResults({
-        riskLevel: payload?.riskLevel || "Balanced",
-        safetyScore: payload?.safetyScore || 100,
+        riskLevel: payload?.riskLevel || payload?.status || "Balanced",
+        safetyScore: payload?.safetyScore || 85,
         isChildSafe: payload?.isChildSafe ?? true,
-        summary: payload?.description || "Safe for daily skincare regimens."
+        // Rule 7: Pulling from the AI's 'results' summary field
+        summary: payload?.results?.summary || payload?.description || "Safe for daily skincare regimens."
       });
+      
       setStatus("Complete");
     } catch (err) {
+      // Rule 3: No jargon error handling
       setStatus("Sync Failure");
+      console.error("Analysis Error:", err);
     } finally {
       setIsAnalyzing(false);
     }
@@ -88,7 +101,7 @@ export default function IngredientCheckerPage() {
   if (authLoading || !user) return null;
 
   return (
-    <main className="min-h-[100svh] bg-white dark:bg-[#0A0A0A] text-black dark:text-white transition-colors duration-500">
+    <main className="min-h-[100svh] bg-white dark:bg-[#0A0A0A] text-black dark:text-white selection:bg-[#E1784F]/30 transition-colors duration-500">
       <div className="max-w-screen-xl mx-auto px-6 py-10 lg:py-16 grid lg:grid-cols-2 gap-16 items-start">
         
         {/* LEFT: STATUS & BRAND */}
@@ -113,7 +126,7 @@ export default function IngredientCheckerPage() {
 
           <div className="hidden lg:block space-y-8 max-w-sm">
             <p className="text-sm font-medium leading-relaxed opacity-60">
-              Verify every chemical in your products. Our AI cross-references ingredients against clinical safety databases for families.
+              Verify every chemical in your products. Our AI cross-references ingredients against clinical safety databases.
             </p>
             <div className="space-y-4">
               <label className="text-[10px] font-black text-[#E1784F] uppercase tracking-[0.3em]">Manual Entry</label>
@@ -139,7 +152,7 @@ export default function IngredientCheckerPage() {
                     <div className="relative w-full h-full">
                       <img src={imgSource} className={`w-full h-full object-cover transition-all duration-1000 ${isAnalyzing ? 'scale-110 blur-lg opacity-40' : ''}`} alt="Label" />
                       {isAnalyzing && (
-                         <div className="absolute inset-0 flex flex-col items-center justify-center">
+                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm">
                             <motion.div 
                               animate={{ top: ["0%", "100%", "0%"] }} 
                               transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}

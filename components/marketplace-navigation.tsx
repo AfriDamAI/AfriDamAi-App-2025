@@ -1,10 +1,16 @@
+/**
+ * 🛡️ AFRIDAM CARE HUB: NAVIGATION (Rule 7 Sync)
+ * Version: 2026.1.4 (Handshake & Ambiance Alignment)
+ * Focus: Direct Portal access and standardized User State.
+ */
+
 "use client"
 
 import { useAuth } from '@/providers/auth-provider'
 import { useTheme } from '@/providers/theme-provider'
 import Link from 'next/link'
 import React, { useState, useEffect } from 'react'
-import { Menu, Moon, ShoppingBag, Sun, X, LogOut, Search } from 'lucide-react'
+import { Menu, Moon, ShoppingBag, Sun, X, LogOut } from 'lucide-react'
 import { UserProfile } from './user-profile'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -17,11 +23,11 @@ interface NavigationProps {
 export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: NavigationProps) {
     const { theme, toggleTheme } = useTheme()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const { user, signOut } = useAuth()
+    const { user, signOut, isLoading } = useAuth()
     const router = useRouter()
     const isDark = theme === "dark"
 
-    // 🛡️ RE-ENFORCED: Syncing body scroll
+    // 🛡️ RE-ENFORCED: Preventing background scroll on mobile menu
     useEffect(() => {
         if (mobileMenuOpen) {
             document.body.style.overflow = 'hidden'
@@ -48,14 +54,14 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                         <img 
                           src="/logo.png" 
                           alt="AfriDam AI" 
-                          className="h-10 md:h-12 w-auto object-contain" 
+                          className="h-10 md:h-12 w-auto object-contain dark:invert" 
                         />
                         <div className="hidden sm:block border-l border-border/50 pl-3">
                             <p className="text-[8px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Marketplace</p>
                         </div>
                     </Link>
 
-                    {/* Desktop Links */}
+                    {/* Desktop Links (Rule 3: Clean Tracking) */}
                     <div className="hidden lg:flex items-center gap-10">
                         {navLinks.map((link) => (
                             <Link
@@ -80,12 +86,14 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                             className="relative p-3 rounded-2xl bg-[#E1784F]/10 border border-[#E1784F]/20 text-[#E1784F] hover:bg-[#E1784F] hover:text-white transition-all active:scale-90"
                         >
                             <ShoppingBag size={18} />
+                            {/* Rule 7: Cart sync placeholder */}
                             <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E1784F] text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-background">
-                                1
+                                0
                             </span>
                         </button>
 
                         <div className="hidden md:block">
+                            {/* Rule 7: Passing standardized user data */}
                             <UserProfile
                                 onSignInClick={onSignInClick}
                                 onSignUpClick={onSignUpClick}
@@ -102,7 +110,7 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
+            {/* Mobile Menu Overlay (Editorial Style) */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div 
@@ -126,20 +134,31 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                         </div>
 
                         <div className="pt-8 border-t border-border">
-                            {!user ? (
+                            {!user && !isLoading ? (
                                 <button 
                                     onClick={() => { setMobileMenuOpen(false); onSignUpClick(); }}
                                     className="w-full py-6 bg-[#E1784F] text-white rounded-[2rem] font-black uppercase text-[11px] tracking-widest shadow-xl"
                                 >
                                     Join The Hub
                                 </button>
-                            ) : (
-                                <button
-                                    onClick={() => { signOut(); setMobileMenuOpen(false); }}
-                                    className="w-full py-6 bg-red-500/10 text-red-500 rounded-[2rem] font-black uppercase text-[11px] tracking-widest flex items-center justify-center gap-3"
-                                >
-                                    <LogOut size={16} /> End Session
-                                </button>
+                            ) : user && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-3xl mb-4">
+                                        <div className="w-10 h-10 rounded-full bg-[#E1784F] flex items-center justify-center text-white text-xs font-black italic">
+                                            {user.firstName?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-tighter">{user.firstName} {user.lastName}</p>
+                                            <p className="text-[8px] opacity-40 uppercase font-bold tracking-widest">Active Profile</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => { signOut(); setMobileMenuOpen(false); }}
+                                        className="w-full py-6 bg-red-500/10 text-red-500 rounded-[2rem] font-black uppercase text-[11px] tracking-widest flex items-center justify-center gap-3"
+                                    >
+                                        <LogOut size={16} /> End Session
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </motion.div>

@@ -1,21 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
 import { 
-  Scan, MessageSquare, History, User, 
-  Settings, Zap, Clock, ShieldCheck, 
-  ArrowRight, CreditCard, Sparkles, Activity, Home, ShoppingBag
+  Scan, MessageSquare, History, User as UserIcon, 
+  Settings, Zap, Home, ShoppingBag, ArrowRight, Activity, Sparkles
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { getScanHistory } from "@/lib/api-client"
+import { getScanHistory, initializePayment } from "@/lib/api-client"
+import { usePaystackPayment } from "react-paystack"
 
 export default function Dashboard() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const [history, setHistory] = useState([])
   const [loadingHistory, setLoadingHistory] = useState(true)
+
+  // 🛡️ THE FIX: Accessing names correctly from our standardized User interface
+  const displayName = user ? `${user.firstName} ${user.lastName}` : "User"
+  const initials = user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : "U"
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/")
@@ -24,8 +28,9 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const data = await getScanHistory()
-        setHistory(data || [])
+        const response = await getScanHistory()
+        // Rule 7 Sync: NestJS wraps results in resultData
+        setHistory(response?.resultData || response || [])
       } catch (err) {
         console.error("Failed to load history")
       } finally {
@@ -34,6 +39,34 @@ export default function Dashboard() {
     }
     if (user) fetchHistory()
   }, [user])
+
+  /**
+   * 💳 PAYSTACK CONFIGURATION
+   * Rule 7: Hooks must be at the top level.
+   */
+  const config = {
+    reference: `REF-${Date.now()}`,
+    email: user?.email || "",
+    amount: 15 * 100 * 1600, // $15 to Naira conversion
+    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
+  }
+
+  const initializePaystack = usePaystackPayment(config)
+
+  const handleConsultation = async () => {
+    try {
+      // 1. Log the intent to the backend (Optional but good for tracking)
+      await initializePayment({ plan: "INSTANT_CONSULTATION", amount: 15 })
+      
+      // 2. Launch Paystack
+      initializePaystack({
+        onSuccess: () => router.push('/consultation/instant'),
+        onClose: () => console.log("Payment Cancelled")
+      })
+    } catch (err) {
+      console.error("Payment Initialization Failed")
+    }
+  }
 
   if (authLoading || !user) return null
 
@@ -68,9 +101,9 @@ export default function Dashboard() {
         <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-3xl space-y-4">
           <div className="flex items-center gap-3">
              <div className="w-8 h-8 rounded-full bg-[#E1784F] flex items-center justify-center text-white text-[10px] font-black italic">
-               {user?.name?.charAt(0)}
+               {initials}
              </div>
-             <span className="text-[10px] font-black uppercase tracking-tighter truncate">{user?.name}</span>
+             <span className="text-[10px] font-black uppercase tracking-tighter truncate">{displayName}</span>
           </div>
           <button onClick={() => router.push('/profile')} className="w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[9px] font-black uppercase tracking-widest">
             View Profile
@@ -80,22 +113,15 @@ export default function Dashboard() {
 
       {/* 📱 MAIN CONTENT AREA */}
       <div className="flex-1 pb-32 lg:pb-10">
-        {/* top navigation */}
         <nav className="max-w-screen-xl mx-auto px-6 py-8 flex justify-between items-center">
           <div className="flex items-center gap-3 lg:hidden">
             <div className="w-10 h-10 rounded-full bg-[#E1784F] flex items-center justify-center text-white font-black text-xs italic">
-              {user?.name?.charAt(0) || "U"}
+              {initials}
             </div>
-            <h2 className="text-lg font-bold">Hello, {user?.name?.split(' ')[0] || 'Obey'}</h2>
+            <h2 className="text-lg font-bold">Hello, {user.firstName}</h2>
           </div>
           <div className="hidden lg:block">
              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Clinical Intelligence Hub</p>
-          </div>
-          
-          <div className="px-4 py-2 bg-gray-50 dark:bg-white/5 rounded-full border border-gray-100 dark:border-white/10">
-            <span className="text-[9px] font-black uppercase tracking-widest text-[#E1784F]">
-              {user?.tier === 'premium' ? 'Premium Account' : 'Free Account'}
-            </span>
           </div>
         </nav>
 
@@ -104,25 +130,24 @@ export default function Dashboard() {
             <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter leading-none">
               Dash<span className="text-[#E1784F]">board</span>
             </h1>
-            <p className="text-sm font-medium opacity-50">Check if your skin glows today.</p>
+            <p className="text-sm font-medium opacity-50">Precision monitoring for your skin health.</p>
           </header>
 
-          {/* $15 instant consultation - SHRUNK & CLEANED */}
           <section className="relative overflow-hidden group rounded-[2rem] border border-[#E1784F]/30">
             <div className="absolute inset-0 bg-[#E1784F] opacity-[0.03] group-hover:opacity-[0.07] transition-opacity" />
             <div className="relative p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="space-y-3 text-center md:text-left">
                 <div className="flex items-center gap-2 px-2 py-1 bg-[#E1784F] text-white rounded-full w-fit mx-auto md:mx-0">
                   <Zap size={10} fill="currentColor" />
-                  <span className="text-[8px] font-black uppercase tracking-widest">No Waiting Time</span>
+                  <span className="text-[8px] font-black uppercase tracking-widest">Priority Queue</span>
                 </div>
-                <h3 className="text-xl font-black italic uppercase leading-none">Instant specialist consultation</h3>
+                <h3 className="text-xl font-black italic uppercase leading-none">Dermatologist Consultation</h3>
                 <p className="text-[10px] font-bold opacity-60 uppercase tracking-tight max-w-xs">
-                  Connect with a certified dermatologist for immediate clinical advice.
+                  Direct encrypted channel to clinical specialists for rapid diagnosis.
                 </p>
               </div>
               <button 
-                onClick={() => router.push('/consultation/instant')}
+                onClick={handleConsultation}
                 className="bg-black dark:bg-white text-white dark:text-black px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center gap-3 hover:scale-105 transition-all"
               >
                 Consult now <span className="text-[#E1784F]">$15</span>
@@ -130,47 +155,32 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* main actions grid */}
+          {/* Action Grid */}
           <div className="grid md:grid-cols-2 gap-6">
-            <button 
-              onClick={() => router.push('/scanner')}
-              className="group relative h-56 bg-black dark:bg-white text-white dark:text-black rounded-[2.5rem] p-8 flex flex-col justify-between items-start text-left overflow-hidden"
-            >
+            <button onClick={() => router.push('/scanner')} className="group relative h-56 bg-black dark:bg-white text-white dark:text-black rounded-[2.5rem] p-8 flex flex-col justify-between items-start text-left overflow-hidden">
               <div className="absolute right-[-5%] top-[-5%] opacity-10 group-hover:scale-110 transition-transform duration-700">
                  <Scan size={180} strokeWidth={1} />
               </div>
-              <div className="w-10 h-10 rounded-xl bg-[#E1784F] flex items-center justify-center">
-                <Scan size={20} />
-              </div>
+              <div className="w-10 h-10 rounded-xl bg-[#E1784F] flex items-center justify-center"><Scan size={20} /></div>
               <div>
                 <h3 className="text-2xl font-black italic uppercase leading-none">AI Skin<br/>Analysis</h3>
-                <p className="text-[9px] font-bold uppercase tracking-widest mt-3 opacity-50 flex items-center gap-2">
-                  Start scan <ArrowRight size={10} />
-                </p>
+                <p className="text-[9px] font-bold uppercase tracking-widest mt-3 opacity-50 flex items-center gap-2">Start scan <ArrowRight size={10} /></p>
               </div>
             </button>
 
-            <button 
-              onClick={() => router.push('/specialist')}
-              className="group relative h-56 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[2.5rem] p-8 flex flex-col justify-between items-start text-left"
-            >
-              <div className="w-10 h-10 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center">
-                <MessageSquare size={20} />
-              </div>
+            <button onClick={() => router.push('/specialist')} className="group relative h-56 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[2.5rem] p-8 flex flex-col justify-between items-start text-left">
+              <div className="w-10 h-10 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center"><MessageSquare size={20} /></div>
               <div>
                 <h3 className="text-2xl font-black italic uppercase leading-none">Chat a<br/>specialist</h3>
-                <p className="text-[9px] font-bold uppercase tracking-widest mt-3 opacity-50 flex items-center gap-2">
-                  Care guide <ArrowRight size={10} />
-                </p>
+                <p className="text-[9px] font-bold uppercase tracking-widest mt-3 opacity-50 flex items-center gap-2">Care guide <ArrowRight size={10} /></p>
               </div>
             </button>
           </div>
 
-          {/* scanning history section */}
+          {/* History Section */}
           <section className="space-y-6">
             <div className="flex justify-between items-center px-2">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Scanning History</h4>
-              <History size={14} className="opacity-20" />
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Clinical History</h4>
             </div>
 
             <div className="space-y-4">
@@ -198,7 +208,7 @@ export default function Dashboard() {
               ) : (
                 <div className="py-12 text-center bg-gray-50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-white/10">
                   <Activity size={32} className="mx-auto opacity-10 mb-4" />
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-30">No scans recorded yet</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-30">No scans recorded</p>
                 </div>
               )}
             </div>
@@ -206,22 +216,17 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* floating ai chatbot */}
+      {/* Floating AI chat */}
       <div className="fixed bottom-24 right-6 z-40 lg:bottom-10 lg:right-10">
-        <button 
-          onClick={() => router.push('/chat')}
-          className="w-14 h-14 bg-[#E1784F] rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform active:scale-95"
-        >
-          <Sparkles size={24} />
-        </button>
+        <button onClick={() => router.push('/chat')} className="w-14 h-14 bg-[#E1784F] rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform"><Sparkles size={24} /></button>
       </div>
 
-      {/* mobile bottom panel */}
+      {/* Mobile Nav */}
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-t border-gray-100 dark:border-white/10 flex justify-around items-center px-6 lg:hidden z-50">
         <button onClick={() => router.push('/dashboard')} className="p-3 text-[#E1784F]"><Home size={22} /></button>
         <button onClick={() => router.push('/scanner')} className="p-3 opacity-30"><Scan size={22} /></button>
         <button onClick={() => router.push('/specialist')} className="p-3 opacity-30"><MessageSquare size={22} /></button>
-        <button onClick={() => router.push('/profile')} className="p-3 opacity-30"><User size={22} /></button>
+        <button onClick={() => router.push('/profile')} className="p-3 opacity-30"><UserIcon size={22} /></button>
       </div>
     </main>
   )

@@ -1,25 +1,23 @@
 /**
- * 🛡️ AFRIDAM NEURAL LENS: CAMERA & UPLOAD
- * Version: 2026.1.3 (World-Class Clinical Refactor)
- * Focus: High-Precision Feedback, Mobile-First, Theme-Adaptive.
+ * 🛡️ AFRIDAM NEURAL LENS (Rule 7 Sync)
+ * Version: 2026.1.4 (Lens Handshake Alignment)
+ * Focus: High-Precision Image Capture & Neural Sensor Cleanup.
  */
 
 "use client"
 
 import React, { useState, useRef, useEffect } from "react";
-import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { 
   Camera, 
   RefreshCcw, 
-  CheckCircle, 
-  X, 
   Upload, 
   Zap, 
   FlipHorizontal,
   ChevronLeft,
   Scan,
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 } from 'lucide-react'
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
@@ -41,6 +39,18 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
+  /**
+   * 🚀 RULE 7: SENSOR CLEANUP
+   * Ensures the camera hardware is released when the component unmounts
+   * or when switching to preview mode.
+   */
+  const stopMediaStream = () => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+  };
+
   const startCameraMode = () => {
     setError(null);
     setMode("camera");
@@ -53,14 +63,10 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
   };
 
   useEffect(() => {
-    let activeStream: MediaStream | null = null;
-
     const setupStream = async () => {
       if (mode === "camera") {
         try {
-          if (mediaStreamRef.current) {
-            mediaStreamRef.current.getTracks().forEach(t => t.stop());
-          }
+          stopMediaStream(); // Rule 7: Clear existing streams first
 
           const stream = await navigator.mediaDevices.getUserMedia({
             video: {
@@ -70,28 +76,25 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
             },
           });
 
-          activeStream = stream;
           mediaStreamRef.current = stream;
 
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             videoRef.current.onloadedmetadata = () => {
               setIsLoading(false);
-              videoRef.current?.play().catch(e => console.error("Play error:", e));
+              videoRef.current?.play().catch(e => console.error("Neural Play error:", e));
             };
           }
         } catch (err) {
-          setError("Permissions Denied. Please enable camera access.");
+          setError("Clinical Lens Access Denied. Check Permissions.");
           setIsLoading(false);
+          setMode("select");
         }
       }
     };
 
     setupStream();
-
-    return () => {
-      if (activeStream) activeStream.getTracks().forEach((track) => track.stop());
-    };
+    return () => stopMediaStream();
   }, [mode, facingMode]);
 
   const capturePhoto = () => {
@@ -113,8 +116,9 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
 
         context.drawImage(video, 0, 0, width, height);
         const imageData = canvas.toDataURL("image/jpeg", 0.9);
+        
         setCapturedImage(imageData);
-        onImageCapture(imageData);
+        stopMediaStream(); // Rule 7: Kill sensors once captured
         setMode("preview");
       }
     }
@@ -127,10 +131,19 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
       reader.onload = (e) => {
         const data = e.target?.result as string;
         setCapturedImage(data);
-        onImageCapture(data);
         setMode("preview");
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  /**
+   * 🛡️ FINAL HANDSHAKE
+   * Forwards the verified data to the parent for AI Analysis.
+   */
+  const handleFinalSubmission = () => {
+    if (capturedImage) {
+      onImageCapture(capturedImage);
     }
   };
 
@@ -141,7 +154,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
         {/* 1. SELECTION MODE */}
         {mode === "select" && (
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}>
-            <Card className="p-10 bg-white dark:bg-[#0A0A0A] border-gray-100 dark:border-white/5 rounded-[4rem] shadow-2xl relative overflow-hidden transition-all duration-500">
+            <Card className="p-10 bg-white dark:bg-[#0A0A0A] border-gray-100 dark:border-white/5 rounded-[4rem] shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/5 blur-3xl rounded-full" />
               
               <div className="space-y-12 text-center relative z-10">
@@ -176,7 +189,6 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                   <ShieldCheck size={14} className="text-[#4DB6AC]" />
                   <p className="text-[9px] font-black uppercase tracking-widest">Secure AES-256 Upload Node</p>
                 </div>
-                
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
               </div>
             </Card>
@@ -188,7 +200,6 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[600] md:relative md:z-auto">
             <Card className="h-full md:h-auto bg-black border-none md:border-white/10 md:rounded-[4rem] overflow-hidden relative flex flex-col">
               
-              {/* TOP UI */}
               <div className="absolute top-10 md:top-8 left-8 right-8 z-50 flex justify-between items-center">
                  <button onClick={() => setMode("select")} className="p-5 bg-black/50 backdrop-blur-3xl rounded-3xl text-white border border-white/10">
                     <ChevronLeft size={28} />
@@ -198,7 +209,6 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                  </button>
               </div>
 
-              {/* LENS PORTAL */}
               <div className="relative flex-1 md:aspect-[3/4] bg-[#0A0A0A] overflow-hidden">
                 {isLoading && (
                   <div className="absolute inset-0 z-40 flex flex-col items-center justify-center text-white space-y-6">
@@ -207,15 +217,8 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                   </div>
                 )}
                 
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className={`w-full h-full object-cover transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'} ${facingMode === "user" ? 'scale-x-[-1]' : ''}`}
-                />
+                <video ref={videoRef} autoPlay playsInline muted className={`w-full h-full object-cover transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'} ${facingMode === "user" ? 'scale-x-[-1]' : ''}`} />
 
-                {/* Clinical Crosshair Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                    <div className="w-80 h-80 border-[3px] border-[#E1784F]/30 rounded-[4rem] border-dashed animate-[spin_15s_linear_infinite]" />
                    <div className="absolute w-[20%] h-[1px] bg-[#E1784F]/60" />
@@ -223,7 +226,6 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                 </div>
               </div>
 
-              {/* ACTION FOOTER */}
               <div className="p-10 md:p-12 bg-black border-t border-white/5">
                 <button
                   onClick={capturePhoto}
@@ -256,7 +258,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                 <button
-                  onClick={() => { /* Handled by parent */ }}
+                  onClick={handleFinalSubmission}
                   className="h-24 bg-black dark:bg-white text-white dark:text-black rounded-[2.5rem] font-black uppercase text-[12px] tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl transition-all hover:bg-[#E1784F] hover:text-white active:scale-95"
                 >
                   <Zap size={20} fill="currentColor" /> Run Neural Scan

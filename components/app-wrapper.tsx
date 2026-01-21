@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM APP WRAPPER
- * Version: 2026.1.1 (Clean Architecture)
- * Focus: High-End Navigation & Seamless Viewport Management
+ * 🛡️ AFRIDAM APP WRAPPER (Rule 7 Sync)
+ * Version: 2026.1.2 (Viewport & Route Management)
+ * Focus: High-Precision Navigation & Seamless Overlay Transitions.
  */
 
 "use client"
@@ -24,15 +24,17 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
 
   /**
-   * 🛡️ VIEWPORT SYNC
-   * We hide the footer on active tool pages to maintain a clean, mobile-first focus.
+   * 🛡️ VIEWPORT SYNC (Rule 7)
+   * We hide the footer on active tool pages to maintain a clean focus.
+   * Synced with: Neural Lens (/scanner) and Ingredient Audit (/analyzer).
    */
   const hideFooterRoutes = [
     "/dashboard", 
     "/profile", 
-    "/ai-scanner",   
-    "/ai-checker",
+    "/scanner",    // 🚀 Updated: Matches Neural Lens route
+    "/analyzer",   // 🚀 Updated: Matches Molecular Audit route
     "/marketplace",
+    "/specialist", // 🚀 Updated: Specialist Chat should be full-screen
     "/history"
   ];
   

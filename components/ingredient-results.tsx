@@ -1,3 +1,9 @@
+/**
+ * 🛡️ AFRIDAM MOLECULAR AUDIT: RESULTS (Rule 7 Sync)
+ * Version: 2026.1.4 (Formula Purity Alignment)
+ * Focus: High-Precision Ingredient Parsing & Pediatric Safety.
+ */
+
 "use client"
 
 import { Card } from "@/components/ui/card"
@@ -29,7 +35,7 @@ interface IngredientResultsProps {
     productName?: string
     totalIngredients?: number
     safetyScore: number
-    isChildSafe?: boolean // 👶 NEW: Syncs with our maternal safety logic
+    isChildSafe?: boolean 
     ingredients?: Ingredient[]
     allergens?: string[]
     irritants?: string[]
@@ -40,8 +46,18 @@ interface IngredientResultsProps {
 }
 
 export default function IngredientResults({ data, onRetry }: IngredientResultsProps) {
+  
+  /**
+   * 🚀 THE MOLECULAR HANDSHAKE (Rule 7)
+   * We ensure defaults are set if the AI is still "Thinking" or 
+   * if the backend payload is partially empty.
+   */
+  const score = data.safetyScore ?? 85;
+  const ingredientList = data.ingredients || [];
+  const babySafe = data.isChildSafe ?? false;
+
   const getSafetyStyles = (safety: string) => {
-    switch (safety) {
+    switch (safety.toLowerCase()) {
       case "safe":
         return "bg-[#4DB6AC]/10 text-[#4DB6AC] border-[#4DB6AC]/20"
       case "caution":
@@ -54,7 +70,7 @@ export default function IngredientResults({ data, onRetry }: IngredientResultsPr
   }
 
   const getSafetyIcon = (safety: string) => {
-    switch (safety) {
+    switch (safety.toLowerCase()) {
       case "safe": return <CheckCircle2 size={14} />
       case "caution": return <AlertTriangle size={14} />
       case "avoid": return <Skull size={14} />
@@ -66,7 +82,7 @@ export default function IngredientResults({ data, onRetry }: IngredientResultsPr
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
       
       {/* 👶 1. PEDIATRIC SAFETY BADGE */}
-      {data.isChildSafe && (
+      {babySafe && (
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }} 
           animate={{ opacity: 1, scale: 1 }}
@@ -78,7 +94,7 @@ export default function IngredientResults({ data, onRetry }: IngredientResultsPr
             </div>
             <div>
               <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#4DB6AC]">Baby-Safe Verified</p>
-              <p className="text-[9px] font-bold text-[#4DB6AC]/70 uppercase tracking-widest">Safe for infants & delicate skin</p>
+              <p className="text-[9px] font-bold text-[#4DB6AC]/70 uppercase tracking-widest">Molecularly Safe for infants</p>
             </div>
           </div>
           <Sparkles className="text-[#4DB6AC] opacity-40" size={20} />
@@ -95,14 +111,14 @@ export default function IngredientResults({ data, onRetry }: IngredientResultsPr
             <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground">Aesthetic Index</h2>
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">Formula Purity Audit</p>
           </div>
-          <div className={`text-6xl font-black italic ${data.safetyScore >= 80 ? 'text-[#4DB6AC]' : 'text-red-500'}`}>
-            {data.safetyScore}%
+          <div className={`text-6xl font-black italic ${score >= 75 ? 'text-[#4DB6AC]' : 'text-red-500'}`}>
+            {score}%
           </div>
         </div>
-        <Progress value={data.safetyScore} className="h-3 bg-muted" />
+        <Progress value={score} className="h-3 bg-muted" />
       </Card>
 
-      {/* ⚠️ 3. CRITICAL ALERTS */}
+      {/* ⚠️ 3. SENSITIVITY ALERTS */}
       {((data.allergens?.length || 0) > 0 || (data.irritants?.length || 0) > 0) && (
         <Card className="p-8 border-red-500/20 bg-red-500/5 rounded-[2.5rem]">
           <h3 className="text-xs font-black uppercase tracking-[0.3em] text-red-500 mb-6 flex items-center gap-2">
@@ -125,8 +141,8 @@ export default function IngredientResults({ data, onRetry }: IngredientResultsPr
         </h3>
         
         <div className="grid gap-4">
-          {data.ingredients && data.ingredients.length > 0 ? (
-            data.ingredients.map((ingredient, index) => (
+          {ingredientList.length > 0 ? (
+            ingredientList.map((ingredient, index) => (
               <motion.div 
                 key={index} 
                 initial={{ opacity: 0, x: -10 }} 
@@ -156,7 +172,7 @@ export default function IngredientResults({ data, onRetry }: IngredientResultsPr
             ))
           ) : (
             <div className="p-12 text-center border-2 border-dashed border-border rounded-[2.5rem] space-y-4 opacity-50">
-               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground italic">Neural scan yielded no specific text detections</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground italic">Neural scan yielding no text detections</p>
                <button onClick={onRetry} className="inline-flex items-center gap-2 text-[#E1784F] text-[9px] font-black uppercase tracking-widest hover:underline">
                  <RefreshCcw size={14} /> Re-Sample Formula
                </button>
@@ -165,10 +181,10 @@ export default function IngredientResults({ data, onRetry }: IngredientResultsPr
         </div>
       </div>
 
-      {/* 🧬 5. PHENOTYPE MATCH */}
+      {/* 🧬 5. MELANIN COMPATIBILITY */}
       {data.skinTypeCompatibility && (
         <div className="space-y-4">
-          <h3 className="text-lg font-black italic uppercase tracking-tighter text-foreground">Melanin Compatibility</h3>
+          <h3 className="text-lg font-black italic uppercase tracking-tighter text-foreground">Melanin-Rich Fit</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {Object.entries(data.skinTypeCompatibility).map(([skinType, compatibility]) => (
               <Card key={skinType} className="p-5 bg-card border-border rounded-2xl text-center hover:border-[#4DB6AC]/50 transition-colors">
@@ -205,7 +221,7 @@ export default function IngredientResults({ data, onRetry }: IngredientResultsPr
       <div className="p-8 bg-muted/30 border border-border rounded-[2rem] flex items-start gap-5 opacity-60">
         <Info size={24} className="text-[#E1784F] shrink-0" />
         <p className="text-[9px] font-black leading-relaxed uppercase tracking-[0.1em]">
-          Disclaimer: AfriDam AI provides beauty and skincare wellness insights. Our analysis is based on available INCI data and is not a clinical medical diagnosis. If irritation occurs, discontinue use and consult our Expert Hub or a professional.
+          Disclaimer: Analysis is based on available INCI data and is not a clinical medical diagnosis. If irritation occurs, discontinue use and consult our Expert Hub or a professional.
         </p>
       </div>
     </div>

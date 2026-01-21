@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM CLINICAL ACCESS: REGISTRATION
- * Version: 2026.1.2 (Premium Editorial Refactor)
- * Focus: Deep Teal Accents, High-Contrast, Breathing Space.
+ * Version: 2026.1.3 (Language & Typography Simplification)
+ * Focus: Deep Teal Accents, High-Contrast, Mature Input Typography.
  */
 
 "use client"
@@ -49,7 +49,8 @@ export default function RegisterPage() {
       await signUp(formData)
       router.push("/dashboard")
     } catch (err: any) {
-      setError("REGISTRATION SYNC FAILED. VERIFY DATA.")
+      // 🛡️ SIMPLIFIED: Relatable error message
+      setError("Registration failed. Please check your details and try again.")
       setStep(1) 
     } finally {
       setIsLoading(false)
@@ -91,7 +92,7 @@ export default function RegisterPage() {
               <div className={`h-1.5 rounded-full transition-all duration-700 ${step === 2 ? 'w-24 bg-[#4DB6AC]' : 'w-4 bg-white/10'}`} />
             </div>
             <p className="text-white/20 text-[10px] md:text-xs font-black uppercase tracking-[0.5em] pt-2">
-              Step {step} / Identity Sync
+              Step {step} / Account Details
             </p>
           </div>
         </div>
@@ -127,8 +128,8 @@ export default function RegisterPage() {
                         <div className="relative group/input">
                             <input
                                 type="text"
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] px-10 md:px-12 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/5 uppercase tracking-tighter"
-                                placeholder="FIRST NAME"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] px-10 md:px-12 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/10"
+                                placeholder="First Name"
                                 value={formData.firstName}
                                 onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                                 required
@@ -137,8 +138,8 @@ export default function RegisterPage() {
                         <div className="relative group/input">
                             <input
                                 type="text"
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] px-10 md:px-12 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/5 uppercase tracking-tighter"
-                                placeholder="LAST NAME"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] px-10 md:px-12 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/10"
+                                placeholder="Last Name"
                                 value={formData.lastName}
                                 onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                                 required
@@ -149,25 +150,25 @@ export default function RegisterPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
                         <div className="relative">
                             <select
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] px-10 md:px-12 py-7 md:py-10 text-white font-black focus:outline-none focus:border-[#4DB6AC] appearance-none cursor-pointer text-lg md:text-2xl uppercase tracking-widest"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] px-10 md:px-12 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] appearance-none cursor-pointer text-lg md:text-2xl uppercase tracking-widest"
                                 onChange={(e) => setFormData({...formData, sex: e.target.value})}
                                 value={formData.sex}
                             >
-                                <option value="male" className="bg-[#0A0A0A]">MALE</option>
-                                <option value="female" className="bg-[#0A0A0A]">FEMALE</option>
+                                <option value="male" className="bg-[#0A0A0A]">Male</option>
+                                <option value="female" className="bg-[#0A0A0A]">Female</option>
                             </select>
                             <div className="absolute right-10 top-1/2 -translate-y-1/2 pointer-events-none text-white/20 text-xs">▼</div>
                         </div>
 
                         <div className="relative">
                             <select
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] px-10 md:px-12 py-7 md:py-10 text-white font-black focus:outline-none focus:border-[#4DB6AC] appearance-none cursor-pointer text-lg md:text-2xl uppercase tracking-widest"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] px-10 md:px-12 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] appearance-none cursor-pointer text-lg md:text-2xl uppercase tracking-widest"
                                 onChange={(e) => setFormData({...formData, country: e.target.value})}
                                 value={formData.country}
                             >
-                                <option value="Nigeria" className="bg-[#0A0A0A]">NIGERIA</option>
-                                <option value="Ghana" className="bg-[#0A0A0A]">GHANA</option>
-                                <option value="Kenya" className="bg-[#0A0A0A]">KENYA</option>
+                                <option value="Nigeria" className="bg-[#0A0A0A]">Nigeria</option>
+                                <option value="Ghana" className="bg-[#0A0A0A]">Ghana</option>
+                                <option value="Kenya" className="bg-[#0A0A0A]">Kenya</option>
                                 <option value="USA" className="bg-[#0A0A0A]">USA</option>
                             </select>
                             <div className="absolute right-10 top-1/2 -translate-y-1/2 pointer-events-none text-white/20 text-xs">▼</div>
@@ -180,8 +181,8 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="tel"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/5 uppercase tracking-tighter"
-                            placeholder="PHONE NUMBER"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/10"
+                            placeholder="Phone Number"
                             value={formData.phoneNo}
                             onChange={(e) => setFormData({...formData, phoneNo: e.target.value})}
                             required
@@ -197,7 +198,7 @@ export default function RegisterPage() {
                     className="space-y-8 md:space-y-12"
                 >
                     <button onClick={() => setStep(1)} className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-[#4DB6AC] mb-6">
-                        <ChevronLeft size={18} /> Identity Correction
+                        <ChevronLeft size={18} /> Go Back
                     </button>
                     
                     <div className="relative group/input">
@@ -206,8 +207,8 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="email"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/5 uppercase tracking-tighter"
-                            placeholder="EMAIL ADDRESS"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/10"
+                            placeholder="Email Address"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
                             required
@@ -220,8 +221,8 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="password"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/5 uppercase tracking-tighter"
-                            placeholder="CREATE PASSWORD"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/10"
+                            placeholder="Create Password"
                             value={formData.password}
                             onChange={(e) => setFormData({...formData, password: e.target.value})}
                             required
@@ -231,7 +232,7 @@ export default function RegisterPage() {
                     <div className="flex items-start gap-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5">
                         <ShieldCheck className="text-[#4DB6AC] shrink-0" size={24} />
                         <p className="text-[10px] text-white/20 font-black leading-relaxed uppercase tracking-[0.3em]">
-                            Practitioner data is secured within localized pan-African nodes.
+                            Your medical data is encrypted and protected.
                         </p>
                     </div>
                 </motion.div>
@@ -242,13 +243,13 @@ export default function RegisterPage() {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="group w-full bg-[#E1784F] text-white font-black uppercase text-xs md:text-sm tracking-[0.5em] py-8 md:py-12 rounded-[2.5rem] md:rounded-[3.5rem] shadow-[0_20px_50px_rgba(225,120,79,0.3)] transition-all flex items-center justify-center gap-6 disabled:opacity-50 hover:bg-[#ff8a5c] active:scale-[0.97]"
+                    className="group w-full bg-[#E1784F] text-white font-black uppercase text-xs md:text-sm tracking-[0.4em] py-8 md:py-12 rounded-[2.5rem] md:rounded-[3.5rem] shadow-[0_20px_50px_rgba(225,120,79,0.3)] transition-all flex items-center justify-center gap-6 disabled:opacity-50 hover:bg-[#ff8a5c] active:scale-[0.97]"
                 >
                     {isLoading ? (
                         <Loader2 className="w-6 h-6 animate-spin" />
                     ) : (
                         <>
-                            {step === 1 ? "NEXT PHASE" : "ACTIVATE PORTAL"} 
+                            {step === 1 ? "Continue" : "Create Account"} 
                             <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform" />
                         </>
                     )}
@@ -260,10 +261,10 @@ export default function RegisterPage() {
         <div className="flex flex-col items-center gap-10 pb-20">
             <div className="flex items-center gap-4 opacity-40">
                 <Fingerprint size={16} className="text-[#4DB6AC]" />
-                <p className="text-[9px] font-black uppercase tracking-[0.5em]">Secure Biometric Entry</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.5em]">Secure Registration</p>
             </div>
             <p className="text-center text-[10px] text-white/20 font-black uppercase tracking-[0.4em]">
-              Already Active? <Link href="/login" className="text-white hover:text-[#4DB6AC] transition-all ml-4 border-b border-white/20">Sign In</Link>
+              Already have an account? <Link href="/login" className="text-white hover:text-[#4DB6AC] transition-all ml-4 border-b border-white/20">Login</Link>
             </p>
         </div>
       </motion.div>
