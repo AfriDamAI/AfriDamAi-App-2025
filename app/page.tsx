@@ -1,14 +1,14 @@
 /**
- * 🛡️ AFRIDAM WELLNESS HUB: LANDING PAGE
- * Version: 2026.1.4 (Build Fix - Lucide Namespace)
- * Focus: High-End Ambiance, Melanin Intelligence, Mobile-First.
+ * 🛡️ AFRIDAM WELLNESS HUB: ELEGANT UNIFIED EDITION (Rule 7 Sync)
+ * Version: 2026.6.0 (Balanced Typography, Human Language, Mobile-First)
+ * Focus: Sophisticated Scaling, Repaired Visuals, Single Header.
  */
 
 "use client"
 
 import React, { useState, useEffect } from "react"
 import { 
-  Camera, ArrowRight, Sun, Moon, Search, MapPin, Mail, Heart, Menu, X, ShoppingBag, ShieldCheck, Lock
+  Camera, ArrowRight, Sun, Moon, Search, MapPin, Mail, Heart, Menu, X, ShieldCheck, Lock, Zap, Activity, Sparkles, Scan, LayoutDashboard, Aperture
 } from "lucide-react"
 import { AuthModals } from "@/components/auth-modals"
 import { useAuth } from "@/providers/auth-provider"
@@ -44,105 +44,96 @@ export default function LandingPage() {
     else openAuth("signup");
   };
 
-  return (
-    <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 relative overflow-x-hidden">
-      
-      {/* 🌍 1. CLINICAL BANNER */}
-      <div className="bg-black dark:bg-white py-3 text-center border-b border-white/10 fixed top-0 left-0 right-0 z-[110]">
-        <p className="text-[7px] md:text-[9px] font-black uppercase tracking-[0.5em] text-white dark:text-black px-4">
-          PREMIUM CLINICAL INTELLIGENCE • MELANIN-FIRST PROTOCOLS
-        </p>
-      </div>
+  const NavLink = ({ href, label }: { href: string; label: string }) => (
+    <Link href={href} className="opacity-60 hover:opacity-100 hover:text-[#E1784F] transition-all font-bold tracking-widest uppercase text-[10px]">
+      {label}
+    </Link>
+  );
 
-      {/* 🧭 2. NAVIGATION */}
-      <nav className={`fixed top-12 left-0 right-0 z-[100] transition-all duration-500 px-6 ${
-        scrolled ? 'bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl py-4 shadow-2xl' : 'bg-transparent py-8'
+  return (
+    <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 relative overflow-x-hidden no-scrollbar">
+      
+      {/* 🧭 1. NAVIGATION (Single Unified Header) */}
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 px-6 py-4 md:px-12 ${
+        scrolled ? 'bg-white/95 dark:bg-[#050505]/95 backdrop-blur-3xl py-4 shadow-sm border-b border-black/5 dark:border-white/5' : 'bg-transparent py-8'
       }`}>
         <div className="max-w-screen-xl mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 active:scale-95 transition-transform">
-            <img src="/logo.png" alt="AfriDam AI" className={`h-8 md:h-12 w-auto object-contain ${isDark ? '' : 'invert'}`} />
+          <Link href="/" className="active:scale-95 transition-transform">
+            <img src="/logo.png" alt="AfriDam" className={`h-7 md:h-9 w-auto object-contain ${isDark ? '' : 'invert'}`} />
           </Link>
 
-          <div className="hidden lg:flex items-center gap-12">
-            <div className="flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.4em] opacity-40">
-               <Link href="/mission" className="hover:text-[#E1784F] hover:opacity-100 transition-all">Manifesto</Link>
-               {user && (
-                 <>
-                   <Link href="/marketplace" className="hover:text-[#E1784F] hover:opacity-100 transition-all">Shop</Link>
-                   <Link href="/pricing" className="hover:text-[#E1784F] hover:opacity-100 transition-all">Pricing</Link>
-                 </>
-               )}
-            </div>
-            
-            <div className="flex items-center gap-4">
-               <button onClick={toggleTheme} className="p-3 text-black dark:text-white opacity-40 hover:opacity-100 transition-all">
-                 {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          <div className="hidden lg:flex items-center gap-8 text-[10px] font-black uppercase tracking-widest">
+               <NavLink href="/mission" label="Our Mission" />
+               <NavLink href="/marketplace" label="Care Hub" />
+               <NavLink href="#contact" label="Contact" />
+               
+               <button onClick={toggleTheme} className="p-2 opacity-40 hover:opacity-100 transition-all ml-4">
+                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
                </button>
-
+               
                {user ? (
-                 <Link href="/dashboard" className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] shadow-xl">Dashboard</Link>
+                 <Link href="/dashboard" className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg uppercase tracking-widest font-black text-[9px]">
+                   Portal
+                 </Link>
                ) : (
-                 <div className="flex items-center gap-4">
-                    <button onClick={() => openAuth("signin")} className="px-6 py-4 text-black dark:text-white font-black text-[10px] uppercase tracking-[0.3em] flex items-center gap-2">
-                       <Lock size={14} /> Login
-                    </button>
-                    <button onClick={() => openAuth("signup")} className="px-8 py-4 bg-[#E1784F] text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] shadow-xl">Sign Up</button>
+                 <div className="flex items-center gap-6">
+                   <button onClick={() => openAuth("signin")} className="opacity-50 hover:opacity-100 transition-all">Login</button>
+                   <button onClick={() => openAuth("signup")} className="px-8 py-3 bg-[#E1784F] text-white rounded-lg uppercase tracking-widest font-black text-[9px] shadow-xl active:scale-95 transition-all">Get Started</button>
                  </div>
                )}
-            </div>
           </div>
 
-          <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden p-3 bg-gray-100 dark:bg-white/5 rounded-2xl">
-            <Menu size={20} />
+          <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden p-2.5 bg-gray-100 dark:bg-white/5 rounded-xl">
+            <Menu size={18} />
           </button>
         </div>
       </nav>
 
-      {/* 3. HERO SECTION */}
-      <section className="relative pt-40 md:pt-64 pb-24 px-6 overflow-hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#E1784F]/5 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#4DB6AC]/5 blur-[100px] rounded-full pointer-events-none" />
-
-        <div className="max-w-screen-xl mx-auto grid lg:grid-cols-12 items-center gap-12 lg:gap-20">
-          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-7 space-y-8 md:space-y-12">
-            <div className="inline-flex items-center gap-3 bg-gray-100 dark:bg-white/5 px-4 py-1.5 rounded-full border border-gray-200 dark:border-white/10">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#E1784F] animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Skin Intelligence Platform</span>
+      {/* 🌪️ 2. HERO: BALANCED & CHARMING */}
+      <section className="relative pt-32 md:pt-56 pb-20 px-6">
+        <div className="max-w-screen-xl mx-auto grid lg:grid-cols-12 items-center gap-12 md:gap-20">
+          
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="lg:col-span-7 space-y-8 md:space-y-12">
+            <div className="inline-flex items-center gap-2.5 bg-[#E1784F]/5 dark:bg-white/5 px-4 py-2 rounded-full border border-[#E1784F]/10">
+              <Sparkles className="text-[#E1784F]" size={12} />
+              <span className="text-[9px] font-black uppercase tracking-widest text-[#E1784F]">Clinical Excellence</span>
             </div>
             
-            <h1 className="text-5xl md:text-9xl lg:text-[11rem] font-black leading-[0.85] tracking-[-0.05em] uppercase italic">
-              Protect Your <br /> <span className="text-[#E1784F]">Natural</span> <br /> <span className="text-[#4DB6AC]">Glow.</span>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tight uppercase italic text-black dark:text-white">
+              Your <br /> Skin's <br /> <span className="text-[#E1784F]">Best Friend.</span>
             </h1>
             
-            <p className="text-lg md:text-2xl font-medium max-w-xl opacity-40 uppercase tracking-tighter leading-tight">
-              A high-precision clinical intelligence system engineered to protect and celebrate melanin-rich skin.
+            <p className="text-lg md:text-2xl font-black max-w-lg opacity-25 uppercase tracking-tighter leading-tight italic">
+              Localized protection. <br /> Safe care for the heritage.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <button onClick={() => handleFeatureAccess("/scanner")} className="group px-10 py-6 md:px-12 md:py-7 bg-black dark:bg-white text-white dark:text-black rounded-[2rem] font-black uppercase text-[10px] md:text-[11px] tracking-[0.4em] shadow-2xl transition-all flex items-center justify-center gap-4 hover:bg-[#E1784F] hover:text-white">
-                    Start AI Scan <ArrowRight className="group-hover:translate-x-3 transition-transform" />
-                </button>
-                {!user && (
-                    <button onClick={() => openAuth("signin")} className="px-10 py-6 md:py-7 bg-gray-100 dark:bg-white/5 rounded-[2rem] font-black uppercase text-[10px] md:text-[11px] tracking-[0.4em] flex items-center justify-center gap-3 border border-gray-200 dark:border-white/10">
-                        Login to Portal
-                    </button>
-                )}
-            </div>
+            <button onClick={() => handleFeatureAccess("/scanner")} className="group h-20 px-12 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl flex items-center justify-center gap-6 active:scale-95 transition-all">
+                Start Now <ArrowRight size={18} />
+            </button>
           </motion.div>
 
+          {/* VISUAL MODULE: SCANNER VISUAL */}
           <div className="lg:col-span-5 relative">
-             <div className="aspect-[4/5] rounded-[3rem] md:rounded-[4rem] overflow-hidden border-[6px] md:border-[10px] border-white dark:border-[#1A1A1A] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] bg-gray-100">
-                <img src="/model-hero.JPG" alt="AfriDam Excellence" className="w-full h-full object-cover" />
-                <motion.div animate={{ top: ["0%", "100%", "0%"] }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_20px_#E1784F] z-20" />
+             <div className="aspect-[4/5] rounded-[3.5rem] overflow-hidden border-[10px] border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
+                <img src="/model-hero.JPG" alt="AfriDam" className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0" />
                 
-                <div className="absolute inset-x-4 bottom-4 md:inset-x-8 md:bottom-8 p-6 md:p-8 bg-black/60 backdrop-blur-3xl rounded-[2rem] md:rounded-[2.5rem] border border-white/10 flex items-center gap-4 md:gap-6">
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-[#4DB6AC] rounded-2xl md:rounded-3xl flex items-center justify-center text-white shadow-2xl">
-                        <Camera className="w-6 h-6 md:w-7 md:h-7" />
+                {/* INTERACTIVE SCANNER OVERLAY */}
+                <div className="absolute inset-0 pointer-events-none">
+                    <motion.div 
+                      animate={{ top: ["0%", "100%", "0%"] }} 
+                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} 
+                      className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_30px_5px_#E1784F] z-20" 
+                    />
+                </div>
+                
+                <div className="absolute bottom-6 left-6 right-6 p-6 bg-black/80 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center gap-5">
+                    <div className="w-12 h-12 bg-[#4DB6AC] rounded-2xl flex items-center justify-center text-white">
+                        <Camera size={24} />
                     </div>
                     <div className="flex-1 space-y-2">
-                        <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-white">Scanning Skin</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white italic">Analysis Active</p>
                         <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                           <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 5, repeat: Infinity }} className="h-full bg-[#4DB6AC]" />
+                           <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 6, repeat: Infinity }} className="h-full bg-[#E1784F]" />
                         </div>
                     </div>
                 </div>
@@ -151,85 +142,109 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. STATS BAR */}
-      <section className="py-16 md:py-24 border-y border-gray-100 dark:border-white/5">
-        <div className="max-w-screen-xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-          {[
-            { label: "Availability", val: "24/7" }, 
-            { label: "Melanin Accuracy", val: "100%" }, 
-            { label: "Intelligence", val: "LOCAL" }, 
-            { label: "Clinical Privacy", val: "SECURE" }
-          ].map((stat, i) => (
-            <div key={i} className="space-y-1 text-center">
-              <p className="text-3xl md:text-6xl font-black italic tracking-tighter text-[#E1784F] uppercase leading-none">{stat.val}</p>
-              <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] opacity-30">{stat.label}</p>
-            </div>
-          ))}
+      {/* 🎥 3. THE VISUAL FLOW (World-Class Fix) */}
+      <section className="py-20 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5 border-y border-black/5 dark:border-white/5">
+        <div className="max-w-screen-xl mx-auto space-y-20">
+           <div className="text-center space-y-4">
+              <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest opacity-40">Simple English Approach</span>
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter leading-tight">Simple Path. <br/>Pure Results.</h2>
+           </div>
+
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Step 1: Capture */}
+              <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm">
+                 <div className="w-14 h-14 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-black text-xl italic">01</div>
+                 <h3 className="text-2xl font-black uppercase italic leading-none">Snap a <br/>Photo</h3>
+                 <p className="text-[11px] font-bold uppercase opacity-30 leading-relaxed tracking-tight">Capture your skin concern clearly under soft, natural light.</p>
+                 <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2.5rem] relative border border-black/5 dark:border-white/5 flex items-center justify-center">
+                    <div className="p-8 bg-white/10 backdrop-blur-3xl rounded-full border border-white/20 shadow-xl">
+                       <Aperture size={40} className="text-[#E1784F]" />
+                    </div>
+                 </div>
+              </div>
+
+              {/* Step 2: Analysis */}
+              <div className="p-10 bg-[#E1784F] text-white rounded-[3rem] space-y-8 shadow-2xl relative overflow-hidden group">
+                 <div className="w-14 h-14 rounded-2xl bg-white text-[#E1784F] flex items-center justify-center font-black text-xl italic">02</div>
+                 <h3 className="text-2xl font-black uppercase italic leading-none text-white">Instant <br/>Check</h3>
+                 <p className="text-[11px] font-bold uppercase opacity-80 leading-relaxed tracking-tight">We check your scan against clinical health standards for melanin.</p>
+                 <div className="aspect-square bg-black/10 rounded-[2.5rem] flex items-center justify-center">
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="w-24 h-24 border-2 border-dashed border-white/30 rounded-full flex items-center justify-center">
+                        <Activity size={32} />
+                    </motion.div>
+                 </div>
+              </div>
+
+              {/* Step 3: Result */}
+              <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm">
+                 <div className="w-14 h-14 rounded-2xl bg-[#4DB6AC] text-white flex items-center justify-center font-black text-xl italic">03</div>
+                 <h3 className="text-2xl font-black uppercase italic leading-none">Get the <br/>Answer</h3>
+                 <p className="text-[11px] font-bold uppercase opacity-30 leading-relaxed tracking-tight">Receive immediate results and guidance for your skin journey.</p>
+                 <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2.5rem] p-10 flex flex-col justify-center space-y-4">
+                    <motion.div initial={{ width: 0 }} whileInView={{ width: "80%" }} className="h-2.5 bg-[#4DB6AC] rounded-full opacity-40" />
+                    <motion.div initial={{ width: 0 }} whileInView={{ width: "100%" }} transition={{ delay: 0.2 }} className="h-2.5 bg-[#4DB6AC] rounded-full opacity-20" />
+                    <motion.div initial={{ width: 0 }} whileInView={{ width: "60%" }} transition={{ delay: 0.4 }} className="h-2.5 bg-[#4DB6AC] rounded-full opacity-10" />
+                 </div>
+              </div>
+           </div>
         </div>
       </section>
 
-      {/* 5. HERITAGE MANIFESTO */}
-      <section className="py-24 md:py-48 px-6">
-        <div className="max-w-screen-xl mx-auto flex flex-col items-center text-center space-y-12 md:space-y-16">
-          <div className="w-[1px] h-24 md:h-32 bg-gradient-to-b from-[#E1784F] to-transparent opacity-30" />
-          <h2 className="text-3xl md:text-7xl font-black italic uppercase tracking-tighter leading-[1] max-w-5xl">
-            "AfriDam is a tribute to <span className="text-[#4DB6AC]">African Heritage</span>—built by our people, to protect the wellness of <span className="text-[#E1784F]">our community</span>."
+      {/* 📜 4. THE MANIFESTO */}
+      <section className="py-24 md:py-40 px-6 text-center">
+        <div className="max-w-screen-xl mx-auto flex flex-col items-center">
+          <Heart className="text-[#E1784F] mb-12" size={40} fill="currentColor" />
+          <h2 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
+            "Heritage is <br/> our <span className="text-[#4DB6AC]">Foundation</span>, <br/> Skin is our <span className="text-[#E1784F]">Legacy</span>."
           </h2>
-          <div className="flex items-center gap-4 opacity-40">
-             <Heart className="w-5 h-5 text-[#E1784F]" />
-             <p className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.6em]">A Founder's Promise</p>
-          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-20 mt-16 italic">A Founder's Promise</p>
         </div>
       </section>
 
-      {/* 6. FEATURES */}
-      <section id="features" className="py-24 md:py-48 px-6 bg-gray-50 dark:bg-white/5 border-y border-gray-100 dark:border-white/10">
-        <div className="max-w-screen-xl mx-auto space-y-16 md:space-y-24">
-          <div className="space-y-4">
-             <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-[0.6em]">Core Protocols</span>
-             <h2 className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter leading-none">Intelligence <br/>Solutions.</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+      {/* 🧪 5. CARE SOLUTIONS */}
+      <section id="features" className="py-24 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5">
+        <div className="max-w-screen-xl mx-auto space-y-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
-              { title: "AI Scan", icon: Camera, text: "Melanin-first texture analysis in seconds.", path: "/scanner" },
-              { title: "Safety Audit", icon: Search, text: "Vetting ingredients for clinical safety.", path: "/ai-checker" }
+              { title: "Check Skin", icon: Camera, text: "A precision scan to verify your skin health.", path: "/scanner", color: "#E1784F" },
+              { title: "Safe Choice", icon: ShieldCheck, text: "Verify if your products are safe for melanin.", path: "/analyzer", color: "#4DB6AC" }
             ].map((f, i) => (
-              <div key={i} onClick={() => handleFeatureAccess(f.path)} className="group p-8 md:p-12 bg-white dark:bg-black border border-gray-100 dark:border-white/10 rounded-[2.5rem] md:rounded-[3.5rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm hover:shadow-2xl">
-                <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-8 md:mb-10 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 group-hover:bg-[#E1784F]/10">
-                    <f.icon className="w-6 h-6 md:w-7 md:h-7 group-hover:text-[#E1784F] transition-colors" />
+              <div key={i} onClick={() => handleFeatureAccess(f.path)} className="group p-12 md:p-16 bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[4rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 text-white shadow-lg" style={{ backgroundColor: f.color }}>
+                    <f.icon size={28} />
                 </div>
-                <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter mb-4">{f.title}</h3>
-                <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] opacity-40 leading-relaxed mb-8 md:mb-10">{f.text}</p>
-                <div className="flex items-center gap-3 text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] text-[#E1784F]">Initiate <ArrowRight size={14} /></div>
+                <h3 className="text-4xl font-black italic uppercase tracking-tighter mb-4 leading-none">{f.title}</h3>
+                <p className="text-[12px] font-bold uppercase tracking-widest opacity-30 leading-relaxed mb-10 max-w-xs">{f.text}</p>
+                <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest" style={{ color: f.color }}>Start Now <ArrowRight size={16} /></div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 7. CONNECT */}
-      <section className="py-24 md:py-48 px-6">
-        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-16 md:gap-32">
-          <div className="space-y-8 md:space-y-12">
-            <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.85]">Join the <br/><span className="text-[#4DB6AC]">Circle.</span></h2>
-            <p className="text-lg md:text-xl font-medium opacity-40 leading-relaxed">Secure your skin health with localized intelligence. Start your first scan today.</p>
-            <button onClick={() => openAuth("signup")} className="w-full md:w-auto px-12 py-7 bg-[#4DB6AC] text-black font-black uppercase text-[11px] md:text-[12px] tracking-[0.4em] rounded-[2rem] shadow-2xl hover:scale-105 transition-all">Create Profile</button>
+      {/* 🏛️ 6. CONTACT & ACTION */}
+      <section id="contact" className="py-32 md:py-56 px-8 md:px-20">
+        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-24 md:gap-40 items-center">
+          <div className="space-y-12">
+            <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.85] text-black dark:text-white">Get <br/><span className="text-[#4DB6AC]">Started.</span></h2>
+            <p className="text-xl md:text-2xl font-black opacity-20 uppercase tracking-tighter italic">Join the movement for <br/>Melanin-Rich Health.</p>
+            <button onClick={() => openAuth("signup")} className="w-full md:w-auto h-20 px-16 bg-[#4DB6AC] text-black font-black uppercase text-[11px] tracking-widest rounded-2xl shadow-xl hover:scale-105 transition-all">Create Profile</button>
           </div>
-          <div className="space-y-12 md:space-y-16">
-            <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter text-[#E1784F]">Connect.</h2>
-            <div className="space-y-10 md:space-y-12">
-              <div className="flex gap-6 items-center">
-                <MapPin className="text-[#E1784F] w-7 h-7 md:w-8 md:h-8" />
+          <div className="space-y-16">
+            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-[#E1784F]">Contact.</h2>
+            <div className="space-y-12">
+              <div className="flex gap-8 items-center">
+                <MapPin className="text-[#E1784F]" size={32} />
                 <div>
-                  <p className="font-black uppercase text-[9px] tracking-[0.5em] opacity-30">Headquarters</p>
-                  <p className="text-xl md:text-2xl font-black italic uppercase tracking-tighter lowercase">lagos, nigeria</p>
+                  <p className="font-black uppercase text-[9px] tracking-[0.5em] opacity-20">Lagos HQ</p>
+                  <p className="text-2xl font-black italic uppercase tracking-tighter text-black dark:text-white">Nigeria</p>
                 </div>
               </div>
-              <div className="flex gap-6 items-center">
-                <Mail className="text-[#E1784F] w-7 h-7 md:w-8 md:h-8" />
+              <div className="flex gap-8 items-center">
+                <Mail className="text-[#E1784F]" size={32} />
                 <div>
-                  <p className="font-black uppercase text-[9px] tracking-[0.5em] opacity-30">Inquiries</p>
-                  <p className="text-xl md:text-2xl font-black italic uppercase tracking-tighter lowercase">hello@afridamai.com</p>
+                  <p className="font-black uppercase text-[9px] tracking-[0.5em] opacity-20">Direct</p>
+                  <p className="text-2xl font-black italic uppercase tracking-tighter text-black dark:text-white">hello@afridamai.com</p>
                 </div>
               </div>
             </div>
@@ -237,40 +252,65 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 8. FOOTER */}
-      <footer className="pt-24 md:pt-32 pb-16 px-6 border-t border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#050505]">
-        <div className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-20">
-          <div className="md:col-span-6 space-y-8 md:space-y-10">
-            <img src="/logo.png" className={`h-10 md:h-12 w-auto ${isDark ? '' : 'invert'}`} alt="Logo" />
-            <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] leading-loose opacity-30 max-w-sm italic">
-                The most sophisticated clinical vision engine built to protect melanin-rich skin across the continent.
+      {/* 🏷️ 7. FOOTER */}
+      <footer className="pt-32 pb-16 px-10 border-t border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-[#050505]">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16 text-center md:text-left">
+          <div className="md:col-span-6 space-y-10">
+            <img src="/logo.png" className={`h-10 w-auto mx-auto md:mx-0 ${isDark ? '' : 'invert'}`} alt="Logo" />
+            <p className="text-[11px] font-bold uppercase tracking-widest leading-loose opacity-20 max-w-sm mx-auto md:mx-0 italic">
+                Caring for melanin-rich skin through high-precision technology and love.
             </p>
           </div>
-          <div className="md:col-span-6 flex gap-12 md:gap-20">
-             <div className="space-y-6 md:space-y-8">
-               <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.5em] text-[#E1784F]">Protocols</p>
-               <ul className="space-y-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] opacity-40">
-                 <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => handleFeatureAccess('/scanner')}>Skin Check</li>
-                 <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => handleFeatureAccess('/ai-checker')}>Safety Scan</li>
+          <div className="md:col-span-6 flex gap-16 justify-center md:justify-end">
+             <div className="space-y-8">
+               <p className="text-[10px] font-black uppercase tracking-widest text-[#E1784F]">Navigation</p>
+               <ul className="space-y-5 text-[10px] font-black uppercase tracking-widest opacity-30">
+                 <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => router.push('/mission')}>Mission</li>
+                 <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => handleFeatureAccess('/marketplace')}>Care Hub</li>
                </ul>
              </div>
-             <div className="space-y-6 md:space-y-8">
-               <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.5em] text-[#4DB6AC]">Foundation</p>
-               <ul className="space-y-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] opacity-40">
-                 <li className="hover:text-[#4DB6AC] cursor-pointer" onClick={() => router.push('/mission')}>Manifesto</li>
-                 <li className="hover:text-[#4DB6AC] cursor-pointer italic">Privacy</li>
+             <div className="space-y-8">
+               <p className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC]">Legal</p>
+               <ul className="space-y-5 text-[10px] font-black uppercase tracking-widest opacity-30">
+                 <li className="hover:text-[#4DB6AC] cursor-pointer" onClick={() => openAuth('signin')}>Login</li>
+                 <li className="hover:text-[#4DB6AC] cursor-pointer">Security</li>
                </ul>
              </div>
           </div>
         </div>
-        <div className="max-w-screen-xl mx-auto mt-20 pt-10 border-t border-gray-100 dark:border-white/10 text-center space-y-6">
-          <div className="flex items-center justify-center gap-4 md:gap-6 opacity-30">
-             <ShieldCheck className="w-4 h-4 md:w-5 md:h-5" />
-             <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.6em]">Safe Care Architecture</p>
-          </div>
-          <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.5em] opacity-20">© 2026 AFRIDAM AI CLINICAL SYSTEMS. ALL RIGHTS RESERVED.</p>
+        <div className="max-w-screen-xl mx-auto mt-24 pt-10 border-t border-black/5 dark:border-white/5 text-center">
+          <p className="text-[9px] font-black uppercase tracking-[0.6em] opacity-10 italic">© 2026 AFRIDAM AI CLINICAL VISION ARCHITECTURE.</p>
         </div>
       </footer>
+
+      {/* MOBILE MENU */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div initial={{ opacity: 0, scale: 1.1 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="fixed inset-0 z-[200] bg-white dark:bg-[#050505] p-10 flex flex-col justify-between">
+            <header className="flex justify-between items-center">
+               <img src="/logo.png" className={`h-8 ${isDark ? '' : 'invert'}`} alt="Logo" />
+               <button onClick={() => setMobileMenuOpen(false)} className="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl"><X size={24} /></button>
+            </header>
+            <div className="space-y-12">
+               {['Mission', 'Care Hub', 'Contact', 'Login'].map((item) => (
+                 <button 
+                  key={item} 
+                  onClick={() => { 
+                    setMobileMenuOpen(false); 
+                    if (item === 'Login') openAuth('signin');
+                    else if (item === 'Contact') document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                    else handleFeatureAccess(item === 'Mission' ? '/mission' : '/marketplace');
+                  }} 
+                  className="block text-5xl font-black italic uppercase tracking-tighter text-left"
+                >
+                  {item}
+                </button>
+               ))}
+            </div>
+            <button onClick={() => openAuth("signup")} className="w-full py-8 bg-[#E1784F] text-white rounded-[2rem] font-black uppercase text-[12px] tracking-widest shadow-2xl">Get Started</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AuthModals isOpen={isAuthModalOpen} type={authType} onClose={() => setIsAuthModalOpen(false)} />
     </div>

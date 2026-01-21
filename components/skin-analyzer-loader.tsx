@@ -1,52 +1,51 @@
 /**
- * 🛡️ AFRIDAM WELLNESS LOADER
- * Version: 2026.1.3 (Sleek & Professional)
- * Purpose: Ensures the app is synced with Tobi's backend before entry.
+ * 🛡️ AFRIDAM WELLNESS LOADER (Rule 7 Sync)
+ * Version: 2026.1.4 (Handshake & State Alignment)
+ * Focus: Synchronizing Auth State before UI visibility.
  */
 
 "use client"
 
 import type React from "react"
-import { useEffect, useState, useLayoutEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, ShieldCheck, Sparkles, Activity } from "lucide-react"
+import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
+import { Loader2, ShieldCheck, Activity } from "lucide-react"
+import { useAuth } from "@/providers/auth-provider"
 
 interface SkinAnalysisLoaderProps {
   children: React.ReactNode
 }
 
 export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps) {
+  const { isLoading: authLoading } = useAuth()
   const [isReady, setIsReady] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const [loadingStep, setLoadingStep] = useState("Connecting...")
-
-  useLayoutEffect(() => {
-    setMounted(true)
-  }, [])
+  const [loadingStep, setLoadingStep] = useState("Initializing...")
 
   useEffect(() => {
-    if (!mounted) return
-
-    const initializeEngine = async () => {
-      try {
+    const synchronizeSystems = async () => {
+      // 🛡️ THE HANDSHAKE SYNC (Rule 7)
+      // We wait for the Auth Provider to finish checking the JWT
+      if (!authLoading) {
         setLoadingStep("Syncing Wellness Profile...")
         
-        // 🛡️ RE-ENFORCED: Syncing with Tobi's cloud backend
-        await new Promise(r => setTimeout(r, 1200))
-        
-        setLoadingStep("Wellness Intelligence Active")
+        // Artificial delay for cinematic ambiance and database stability
         await new Promise(r => setTimeout(r, 800))
         
+        setLoadingStep("Wellness Intelligence Active")
+        await new Promise(r => setTimeout(r, 500))
+        
         setIsReady(true)
-      } catch (err) {
-        setIsReady(true) 
       }
-    }
+    };
 
-    initializeEngine()
-  }, [mounted])
+    synchronizeSystems();
+  }, [authLoading])
 
-  if (!mounted || !isReady) {
+  /**
+   * 🚀 RULE 7: PREVENT HYDRATION ERRORS
+   * We return the loader until the Auth state is 100% determined.
+   */
+  if (authLoading || !isReady) {
     return (
       <div className="fixed inset-0 z-[999] bg-[#0A0A0A] flex flex-col items-center justify-center p-6 text-center">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(225,120,79,0.1),transparent_70%)] pointer-events-none" />

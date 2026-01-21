@@ -1,56 +1,43 @@
 /**
  * 🛡️ AFRIDAM ONBOARDING: SILENT BYPASS
- * Version: 2026.1.3 (World-Class Clean Sweep)
- * Focus: Scrapping onboarding for instant dashboard access.
- * Rule 7 & 8: Mobile-First & Theme-Adaptive.
+ * Rule 7 Sync: Removed scrapped onboarding flags.
+ * Focus: Instant state synchronization and dashboard hand-off.
  */
 
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { motion } from "framer-motion"
-import { Loader2, Zap } from "lucide-react"
+import { Zap } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { updateUser } from "@/lib/api-client"
 
 export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
-  const { user, mutate } = useAuth();
-  const [isBypassing, setIsBypassing] = useState(true);
+  const { user, refreshUser } = useAuth();
 
   useEffect(() => {
-    const performSilentHandshake = async () => {
+    const performInstantHandshake = async () => {
       if (!user?.id) return;
 
       try {
         /**
-         * 🚀 OGA SYNC: 
-         * Instead of showing a form, we tell the backend 
-         * immediately that this user is "onboarded."
+         * 🚀 THE CLEAN SWEEP (Rule 7)
+         * We no longer send 'onboardingCompleted' because it doesn't exist in the DB.
+         * We simply refresh the user state to ensure we have the latest Profile 
+         * and then trigger the completion callback.
          */
-        await updateUser(user.id, {
-          onboardingCompleted: true,
-          hasCompletedOnboarding: true,
-          skinType: "Balanced", // Default profile data to prevent null errors
-          melaninTone: "Rich"
-        });
-
-        // Refresh global state
-        await mutate();
+        await refreshUser();
         
         // Instant exit to dashboard
         onComplete();
       } catch (err) {
-        console.error("Bypass failed, forcing dashboard...");
-        onComplete(); // Force it anyway so user isn't stuck
-      } finally {
-        setIsBypassing(false);
+        // Rule 6: No stress—if refresh fails, we still move to dashboard
+        onComplete(); 
       }
     };
 
-    performSilentHandshake();
-  }, [user, mutate, onComplete]);
+    performInstantHandshake();
+  }, [user, refreshUser, onComplete]);
 
-  // 🛡️ WORLD-CLASS LOADING STATE (Rule 8: Dark Mode Adaptive)
   return (
     <div className="fixed inset-0 z-[999] bg-[#050505] flex items-center justify-center">
        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
@@ -69,10 +56,10 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
           
           <div className="space-y-2">
              <h2 className="text-xl font-black italic uppercase tracking-tighter text-white">
-                Initializing <span className="text-[#4DB6AC]">Clinic</span>
+                Preparing <span className="text-[#4DB6AC]">Dashboard</span>
              </h2>
              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">
-                Syncing Neural Profile
+                Direct Clinical Access
              </p>
           </div>
        </motion.div>

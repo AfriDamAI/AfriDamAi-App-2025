@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM CLINICAL BILLING: PRICING
  * Version: 2026.1.2 (Premium Editorial Refactor)
- * Handshake: Fully synced with Flutterwave Gateway
+ * Handshake: Fully synced with Paystack Gateway (Live)
  * Focus: High-Contrast UI, Secure Ambiance, Mature Typography.
  */
 
@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useTheme } from "@/providers/theme-provider"
 import { useAuth } from "@/providers/auth-provider"
+import { initializePayment } from "@/lib/api-client" // 🛡️ TOUCHED: Using our secure client
 
 export default function PricingPage() {
   const router = useRouter();
@@ -22,31 +23,21 @@ export default function PricingPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const isDark = theme === "dark";
 
-  // 🛡️ RE-ENFORCED: FLUTTERWAVE INITIALIZATION LOGIC
+  // 🛡️ RE-ENFORCED: PAYSTACK INITIALIZATION LOGIC
   const handlePaymentInit = async (planType: string, amount: number) => {
     if (isProcessing) return;
     setIsProcessing(true);
 
     try {
-      // 🚀 HANDSHAKE: Hits the Render Backend /api/payments endpoint
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/initialize`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` 
-        },
-        body: JSON.stringify({ 
-          plan: planType, 
-          amount: amount,
-          currency: "USD" 
-        })
+      // 🚀 HANDSHAKE: Hits the updated Paystack logic in api-client.ts
+      const response = await initializePayment({ 
+        plan: planType, 
+        amount: amount 
       });
 
-      const data = await response.json();
-      
-      if (data.resultData?.link || data.link) {
-        // Redirect to Flutterwave Secure Checkout
-        window.location.href = data.resultData?.link || data.link;
+      // Paystack returns an authorizationUrl for the checkout page
+      if (response.authorizationUrl || response.data?.authorizationUrl) {
+        window.location.href = response.authorizationUrl || response.data?.authorizationUrl;
       } else {
         throw new Error("Payment link generation failed");
       }

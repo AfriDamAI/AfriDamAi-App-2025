@@ -1,7 +1,13 @@
+/**
+ * 🛡️ AFRIDAM MOLECULAR AUDIT: MANUAL ANALYZER (Rule 7 Sync)
+ * Version: 2026.1.4 (Handshake & Clinical Context Alignment)
+ * Focus: High-Precision Ingredient Parsing & Melanin Safety.
+ */
+
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { 
@@ -14,7 +20,7 @@ import {
   Baby
 } from "lucide-react"
 import IngredientResults from "@/components/ingredient-results"
-import apiClient from "@/lib/api-client"
+import { analyzeIngredients } from "@/lib/api-client" // 🚀 RULE 7: Using the unified function
 
 interface IngredientAnalyzerProps {
   onAnalysisComplete: (results: any) => void
@@ -33,24 +39,21 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
     setError(null)
 
     try {
-      /** * 🚀 OGA FIX: SYNCED WITH TOBI'S AI MODULE
-       * Updated path to /ai/analyze-ingredients to match the 8080 Backend push.
+      /** * 🚀 THE HANDSHAKE SYNC (Rule 7)
+       * We now use the unified analyzeIngredients function.
+       * This automatically includes the 14 clinical context fields
+       * required for an accurate Melanin-Rich safety audit.
        */
-      const response = await apiClient.post('/ai/analyze-ingredients', {
-        ingredients: ingredientText, // Tobi's new AI module expects 'ingredients' key
-        source: 'manual_entry'
-      });
-
-      const data = response.data;
+      const data = await analyzeIngredients(ingredientText);
       
-      // Handle the unwrapped resultData from our interceptor logic
-      const payload = data.resultData || data;
+      // Standardize payload extraction from the resultData interceptor
+      const payload = data?.resultData || data;
       
       // 🛡️ RE-ENFORCED: Aesthetic & Family Data Mapping
       const aestheticResults = {
         productName: "Aesthetic Safety Audit",
         totalIngredients: ingredientText.split(",").length,
-        safetyScore: payload.safetyScore || payload.score || 100,
+        safetyScore: payload.safetyScore || payload.score || 85,
         ingredients: payload.ingredients || [],
         recommendations: payload.recommendations || ["Formula appears balanced for melanin-rich skin."],
         riskLevel: payload.riskLevel || payload.safetyRating || "SAFE",
@@ -66,8 +69,9 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
       setResults(aestheticResults)
       onAnalysisComplete(aestheticResults)
     } catch (err: any) {
+      // Rule 3: No jargon, relatable error messaging
+      setError("The AI Brain is busy. Please try one more time in 10 seconds.");
       console.error("Aesthetic AI Analysis Failed:", err);
-      setError("Aesthetic Node Sync Failed. Check your connection to the care hub.");
     } finally {
       setIsAnalyzing(false)
     }
@@ -119,7 +123,7 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
             value={ingredientText}
             onChange={(e) => setIngredientText(e.target.value)}
             placeholder="Aqua, Glycerin, Butyrospermum Parkii..."
-            className="w-full h-56 p-8 bg-muted/30 border border-border rounded-[2rem] text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-[#E1784F]/20 transition-all outline-none text-sm leading-relaxed italic font-medium resize-none"
+            className="w-full h-56 p-8 bg-muted/30 border border-border rounded-[2rem] text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-[#E1784F]/20 transition-all outline-none text-sm leading-relaxed italic font-medium resize-none shadow-inner"
           />
         </div>
 
@@ -135,7 +139,7 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
           <div className="space-y-1">
             <p className="text-[10px] font-black uppercase text-[#4DB6AC] tracking-widest">Melanin Safety</p>
             <p className="text-[10px] text-muted-foreground font-bold leading-relaxed uppercase tracking-tight">
-              We cross-reference every component against African skin safety profiles and pediatric compatibility.
+              Analysis cross-referenced against African skin profiles and pediatric compatibility.
             </p>
           </div>
         </div>

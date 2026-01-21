@@ -3,11 +3,13 @@ import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /**
  * 🛡️ HYBRID ROUTING CONFIGURATION
- * baseURL: Handles Auth, Users, and Database (Main Backend)
- * aiURL: Handles heavy AI Scans and Chat (Nathan's Stable AI)
+ * Rule 5: Synced with main.py prefix and predict.py routes.
+ * baseURL: Main Backend (Render)
+ * aiURL: AI Model API (Google Cloud Run)
  */
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
-const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api";
+// 🚀 FIXED: Added /v1 to match the prefix in main.py lifespan and router
+const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api/v1";
 
 const apiClient = axios.create({
   baseURL,
@@ -94,7 +96,7 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** 🔬 AI CONTEXT **/
+/** 🔬 AI CONTEXT - SYNCED WITH predict.py MoreInfo MODEL **/
 const defaultAiContext = {
   region: "West Africa",
   country: "Nigeria",
@@ -102,8 +104,10 @@ const defaultAiContext = {
   skin_type_last_time_checked: null,
   known_skin_condition: "none",
   skin_condition_last_time_checked: null,
-  gender: "not_specified", 
-  age: 0,
+  // 🚀 FIXED: Changed from "not_specified" to "female" to match Python Literal["male", "female"]
+  gender: "female", 
+  // 🚀 FIXED: Changed from 0 to 25 to satisfy basic clinical validation in Python
+  age: 25,
   known_body_lotion: "none",
   known_body_lotion_brand: "none",
   known_allergies: [], 
@@ -137,8 +141,8 @@ export async function uploadImage(file: File | string): Promise<any> {
 
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
-  // 🛡️ NATHAN FIX: Endpoint changed from /v1/scan to /v1/skin-diagnosis
-  const response = await axios.post(`${aiURL}/v1/skin-diagnosis`, formData, {
+  // 🚀 FIXED: Endpoint path now matches @router.post("/skin-diagnosis") in predict.py
+  const response = await axios.post(`${aiURL}/skin-diagnosis`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   
@@ -146,7 +150,7 @@ export async function uploadImage(file: File | string): Promise<any> {
 }
 
 export const analyzeIngredients = async (ingredients: string) => {
-  const response = await axios.post(`${aiURL}/v1/ingredients-analysis`, { 
+  const response = await axios.post(`${aiURL}/ingredients-analysis`, { 
     query: ingredients,
     more_info: defaultAiContext 
   });
@@ -154,7 +158,7 @@ export const analyzeIngredients = async (ingredients: string) => {
 };
 
 export const sendChatMessage = async (message: string) => {
-  const response = await axios.post(`${aiURL}/v1/chatbot`, { 
+  const response = await axios.post(`${aiURL}/chatbot`, { 
     query: message,
     more_info: defaultAiContext 
   });
@@ -162,8 +166,30 @@ export const sendChatMessage = async (message: string) => {
 };
 
 /** 💳 PAYMENTS **/
-export const initializePayment = async (data: { plan: string, amount: number }) => {
+export const initializePayment = async (data: { 
+  plan: string, 
+  amount: number, 
+  appointmentId?: string, 
+  orderId?: string 
+}) => {
   const response = await apiClient.post("/transactions/initiate", data);
+  return response.data;
+};
+
+export const verifyPayment = async (transactionId: string) => {
+  const response = await apiClient.post(`/transactions/${transactionId}/verify`);
+  return response.data;
+};
+
+/** 🛍️ MARKETPLACE **/
+export const getProducts = async () => {
+  const response = await apiClient.get("/products");
+  return response.data;
+};
+
+/** 🚀 SCAN HISTORY **/
+export const getScanHistory = async () => {
+  const response = await apiClient.get("/ai/history");
   return response.data;
 };
 

@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM AUTH PROVIDER
- * Version: 2026.1.4 (400 Error Fix & Data Sanitization)
- * Focus: Ensuring the handshake with Tobi's backend is clean and valid.
+ * 🛡️ AFRIDAM AUTH PROVIDER (Rule 7 Sync)
+ * Version: 2026.1.8 (Full Schema Alignment)
+ * Focus: Solving ts(2339) by including 'sex', 'createdAt', and 'phoneNo'.
  */
 
 "use client"
@@ -16,16 +16,25 @@ import {
   updateUser, 
   forgotPassword as forgotPasswordApi 
 } from "@/lib/api-client" 
-import { UserLoginDto, CreateUserDto } from "@/lib/types"
+import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types"
 
+/**
+ * 🚀 THE FIX: Interface Synchronization
+ * Adding sex, createdAt, and phoneNo to match the Prisma Schema.
+ */
 interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  onboardingCompleted?: boolean;
+  sex?: string;       
+  createdAt?: string; 
+  phoneNo?: string;   // 🛡️ Added to solve Profile Form error
   profile?: {
-    onboardingCompleted?: boolean;
+    primaryConcern?: string;
+    nationality?: string;
+    skinType?: string;
+    allergies?: string;
     [key: string]: any;
   };
 }
@@ -34,7 +43,7 @@ interface AuthContextType {
   user: User | null
   isSignedIn: boolean
   isLoading: boolean
-  requiresOnboarding: boolean
+  requiresOnboarding: boolean 
   signIn: (credentials: UserLoginDto) => Promise<void>
   signUp: (userData: CreateUserDto) => Promise<void>
   signOut: () => void
@@ -49,7 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const extractUserData = (response: any) => response?.resultData || response?.data || response;
+  // Rule 7: Standardizer for Tobi's resultData wrapper
+  const extractUserData = (response: any) => response?.resultData?.user || response?.resultData || response?.data || response;
 
   const fetchUserData = async (userId: string) => {
     try {
@@ -89,9 +99,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (credentials: UserLoginDto) => {
     setIsLoading(true);
     try {
-      const data = await login(credentials);
-      const accessToken = data.resultData?.accessToken || data.accessToken;
-      if (!accessToken) throw new Error("Invalid Token");
+      const data: AuthResponse = await login(credentials);
+      const accessToken = data.resultData?.accessToken;
+      
+      if (!accessToken) throw new Error("Invalid Token Handshake");
 
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
@@ -118,7 +129,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = () => {
     setUser(null);
-    localStorage.removeItem("token");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+    }
     setAuthToken(null);
     setIsLoading(false);
   }
@@ -126,14 +139,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateUserProfile = async (updates: Partial<any>) => {
     if (!user?.id) return null;
     try {
-      // 🛡️ SINCERITY FIX: SANITIZE DATA
-      // We strip 'id' and 'email' because the backend (Render) rejects them in a PUT body
+      // 🛡️ DATA SANITIZATION: Strip unique identifiers before PUT
       const { id, email, ...cleanUpdates } = updates;
       
       const response = await updateUser(user.id, cleanUpdates);
       const updatedData = extractUserData(response);
       
-      // Merge updates into local state so the loop breaks instantly
       setUser(prev => prev ? { ...prev, ...updatedData } : updatedData);
       return updatedData;
     } catch (error: any) {
@@ -146,10 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user?.id) await fetchUserData(user.id);
   }
 
-  const requiresOnboarding = useMemo(() => {
-    if (!user) return false;
-    return user.onboardingCompleted !== true && user.profile?.onboardingCompleted !== true;
-  }, [user]);
+  const requiresOnboarding = false;
 
   const contextValue = useMemo(() => ({
     user,
@@ -162,7 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     forgotPassword: forgotPasswordApi,
     updateUserProfile,
     refreshUser
-  }), [user, isLoading, requiresOnboarding]);
+  }), [user, isLoading]);
 
   return (
     <AuthContext.Provider value={contextValue}>
