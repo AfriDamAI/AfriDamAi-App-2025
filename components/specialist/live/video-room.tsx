@@ -1,14 +1,14 @@
 /**
- * 🛡️ AFRIDAM NEURAL LINK: VIDEO ROOM (Rule 7 Sync)
- * Version: 2026.1.3 (Full Hardware & UI Integration)
- * Rule 5: Synced with CallControls and specialist view logic.
+ * 🛡️ AFRIDAM SPECIALIST: VIDEO ROOM
+ * Version: 2026.1.4 (Human-First & Hardware Sync)
+ * Rule 5: Synced with CallControls and clinical dashboard logic.
  */
 
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { VideoOff, Loader2, User, ShieldCheck } from "lucide-react"
+import { VideoOff, Loader2, User, ShieldCheck, Heart } from "lucide-react"
 import { CallControls } from "./call-controls"        
 import { ConnectionStatus } from "./connection-status" 
 import { useRouter } from "next/navigation"
@@ -23,7 +23,7 @@ export function VideoRoom() {
   const streamRef = useRef<MediaStream | null>(null);
 
   /**
-   * 🚀 HARDWARE HANDSHAKE (Rule 7)
+   * 🚀 CAMERA & MIC SYNC
    */
   useEffect(() => {
     async function startCamera() {
@@ -38,7 +38,7 @@ export function VideoRoom() {
         }
         setIsSyncing(false);
       } catch (err) {
-        console.error("Clinical Lens Handshake Failed:", err);
+        console.error("Camera connection failed:", err);
         setIsSyncing(false);
       }
     }
@@ -52,7 +52,6 @@ export function VideoRoom() {
     };
   }, [isVideoOff]);
 
-  // 🛡️ SYNC: Toggle Mic Hardware
   const toggleMic = () => {
     if (streamRef.current) {
       streamRef.current.getAudioTracks().forEach(track => {
@@ -68,10 +67,10 @@ export function VideoRoom() {
   };
 
   return (
-    <div className="relative w-full h-[600px] bg-[#050505] rounded-[3.5rem] overflow-hidden group shadow-2xl border border-white/5">
+    <div className="relative w-full h-[500px] md:h-[600px] bg-white dark:bg-[#050505] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden group shadow-2xl border border-black/5 dark:border-white/5 transition-colors">
       
-      {/* 📺 1. SPECIALIST VIEW (Main Interface Placeholder) */}
-      <div className="absolute inset-0 bg-[#0A0A0A] flex items-center justify-center">
+      {/* 📺 1. SPECIALIST VIEW (Placeholder) */}
+      <div className="absolute inset-0 bg-gray-50 dark:bg-[#0A0A0A] flex items-center justify-center">
         <AnimatePresence>
           {isSyncing ? (
             <motion.div 
@@ -80,23 +79,23 @@ export function VideoRoom() {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center gap-6"
             >
-              <Loader2 className="w-12 h-12 text-[#4DB6AC] animate-spin" />
-              <p className="text-[10px] font-black uppercase tracking-[0.6em] text-[#4DB6AC]">Syncing Specialist Node...</p>
+              <Loader2 className="w-10 h-10 text-[#4DB6AC] animate-spin" />
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#4DB6AC]">Connecting to Specialist...</p>
             </motion.div>
           ) : (
-            <div className="flex flex-col items-center gap-6 opacity-20">
-              <StethoscopeIcon className="w-20 h-20 text-white" />
-              <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white">Specialist Awaiting Feed</p>
+            <div className="flex flex-col items-center gap-6 opacity-10 dark:opacity-20">
+              <StethoscopeIcon className="w-20 h-20 text-black dark:text-white" />
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black dark:text-white">Waiting for Specialist</p>
             </div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* 👤 2. USER MINI-PREVIEW (Draggable) */}
+      {/* 👤 2. USER MINI-PREVIEW */}
       <motion.div 
         drag
-        dragConstraints={{ left: -400, right: 0, top: 0, bottom: 400 }}
-        className="absolute top-8 right-8 w-36 h-48 md:w-56 md:h-72 bg-black rounded-[2.5rem] border-2 border-white/10 overflow-hidden shadow-2xl z-20 cursor-grab active:cursor-grabbing group/user"
+        dragConstraints={{ left: -300, right: 0, top: 0, bottom: 300 }}
+        className="absolute top-6 right-6 w-32 h-44 md:w-52 md:h-64 bg-black rounded-[2rem] border-2 border-white/10 overflow-hidden shadow-2xl z-20 cursor-grab active:cursor-grabbing group/user"
       >
         {!isVideoOff ? (
           <video 
@@ -108,21 +107,21 @@ export function VideoRoom() {
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-white/5 gap-4">
-             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                <User size={20} className="text-white/40" />
+             <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                <User size={18} className="text-white/40" />
              </div>
-             <span className="text-[8px] font-black uppercase tracking-widest text-white/20">Lens Disabled</span>
+             <span className="text-[8px] font-black uppercase tracking-widest text-white/20">Video Paused</span>
           </div>
         )}
       </motion.div>
 
-      {/* 🛡️ 3. CONNECTION STATUS */}
-      <div className="absolute top-8 left-8 z-30 hidden md:block">
+      {/* 🛡️ 3. STATUS INDICATORS */}
+      <div className="absolute top-6 left-6 z-30 hidden md:block">
         <ConnectionStatus />
       </div>
 
-      {/* 🕹️ 4. CALL CONTROLS */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-40 transition-transform hover:scale-105">
+      {/* 🕹️ 4. CONTROLS */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 transition-transform hover:scale-105">
         <CallControls 
           isMuted={isMuted}
           isVideoOff={isVideoOff}
@@ -132,8 +131,8 @@ export function VideoRoom() {
         />
       </div>
 
-      <div className="absolute top-8 left-8 z-30 md:hidden">
-          <div className="w-10 h-10 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 rounded-xl flex items-center justify-center text-[#4DB6AC]">
+      <div className="absolute top-6 left-6 z-30 md:hidden">
+          <div className="w-10 h-10 bg-[#4DB6AC] text-white rounded-xl flex items-center justify-center shadow-lg">
              <ShieldCheck size={20} />
           </div>
       </div>
