@@ -1,7 +1,6 @@
 /**
- * 🛡️ AFRIDAM AUTH PROVIDER (Rule 7 Sync)
- * Version: 2026.1.8 (Full Schema Alignment)
- * Focus: Solving ts(2339) by including 'sex', 'createdAt', and 'phoneNo'.
+ * 🛡️ AFRIDAM AUTH PROVIDER (Rule 6 Synergy)
+ * Version: 2026.1.9 (Zero-Flicker Bypass)
  */
 
 "use client"
@@ -18,10 +17,6 @@ import {
 } from "@/lib/api-client" 
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types"
 
-/**
- * 🚀 THE FIX: Interface Synchronization
- * Adding sex, createdAt, and phoneNo to match the Prisma Schema.
- */
 interface User {
   id: string;
   email: string;
@@ -29,7 +24,7 @@ interface User {
   lastName: string;
   sex?: string;       
   createdAt?: string; 
-  phoneNo?: string;   // 🛡️ Added to solve Profile Form error
+  phoneNo?: string;   
   profile?: {
     primaryConcern?: string;
     nationality?: string;
@@ -57,8 +52,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  // 🛡️ Added a local token state to bridge the gap during fetchUserData
+  const [hasToken, setHasToken] = useState<boolean>(false)
 
-  // Rule 7: Standardizer for Tobi's resultData wrapper
   const extractUserData = (response: any) => response?.resultData?.user || response?.resultData || response?.data || response;
 
   const fetchUserData = async (userId: string) => {
@@ -84,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (decoded.exp && decoded.exp < Date.now() / 1000) {
             signOut();
           } else {
+            setHasToken(true); // 🚀 Immediate bypass for the AuthGuard
             setAuthToken(token);
             await fetchUserData(decoded.sub || decoded.id || decoded.userId);
           }
@@ -106,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
+      setHasToken(true);
 
       const decoded: any = jwtDecode(accessToken);
       await fetchUserData(decoded.sub || decoded.id || decoded.userId);
@@ -129,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = () => {
     setUser(null);
+    setHasToken(false);
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
     }
@@ -139,12 +138,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateUserProfile = async (updates: Partial<any>) => {
     if (!user?.id) return null;
     try {
-      // 🛡️ DATA SANITIZATION: Strip unique identifiers before PUT
       const { id, email, ...cleanUpdates } = updates;
-      
       const response = await updateUser(user.id, cleanUpdates);
       const updatedData = extractUserData(response);
-      
       setUser(prev => prev ? { ...prev, ...updatedData } : updatedData);
       return updatedData;
     } catch (error: any) {
@@ -157,11 +153,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user?.id) await fetchUserData(user.id);
   }
 
+  /**
+   * 🛡️ RULE 6 BYPASS: Onboarding is strictly scrapped.
+   */
   const requiresOnboarding = false;
 
   const contextValue = useMemo(() => ({
     user,
-    isSignedIn: !!user,
+    // 🚀 SYNERGY: If we have a token or a user, we are signed in.
+    // This prevents the redirect loop while the user data is still being fetched.
+    isSignedIn: hasToken || !!user,
     isLoading,
     requiresOnboarding,
     signIn,
@@ -170,7 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     forgotPassword: forgotPasswordApi,
     updateUserProfile,
     refreshUser
-  }), [user, isLoading]);
+  }), [user, isLoading, hasToken]);
 
   return (
     <AuthContext.Provider value={contextValue}>
