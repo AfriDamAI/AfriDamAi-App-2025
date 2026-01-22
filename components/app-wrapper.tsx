@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM APP WRAPPER (Rule 6 Synergy)
- * Version: 2026.1.10 (Handshake Pruning)
- * Focus: High-Precision Navigation & Removal of Legacy Auth Gate.
+ * Version: 2026.1.11 (Route Group Alignment)
+ * Focus: High-Precision Navigation & URL Path Rectification.
  */
 
 "use client"
@@ -31,7 +31,9 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     "/analyzer",   
     "/marketplace",
     "/specialist", 
-    "/history"
+    "/history",
+    "/login",    // 🚀 Added: Ensure clean view on auth pages
+    "/register"  // 🚀 Added: Ensure clean view on auth pages
   ];
   
   const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route));
@@ -39,9 +41,10 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   /**
    * 🚀 RULE 6 EXPRESS BYPASS:
    * Navigation triggers now point directly to dedicated pages.
+   * 🛠️ OGA FIX: Paths updated to remove '/auth' prefix per (auth) route group.
    */
-  const handleSignIn = () => router.push("/auth/login");
-  const handleSignUp = () => router.push("/auth/register");
+  const handleSignIn = () => router.push("/login");
+  const handleSignUp = () => router.push("/register");
   const handleViewProfile = () => setProfileSidebarOpen(true);
 
   /**

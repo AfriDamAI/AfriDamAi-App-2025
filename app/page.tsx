@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM WELLNESS HUB: ELEGANT UNIFIED EDITION (Rule 6 Synergy)
- * Version: 2026.6.1 (Express Bypass & Zero-Flicker Redirection)
- * Focus: Sophisticated Scaling, Page-Based Auth, Rule 6 Compliance.
+ * Version: 2026.6.2 (Route Group Sync & 404 Resolution)
+ * Focus: Sophisticated Scaling, (auth) Group Alignment, Rule 6 Compliance.
  */
 
 "use client"
@@ -10,7 +10,6 @@ import React, { useState, useEffect } from "react"
 import { 
   Camera, ArrowRight, Sun, Moon, MapPin, Mail, Heart, Menu, X, ShieldCheck, Activity, Sparkles, Aperture
 } from "lucide-react"
-// 🚀 RULE 6: Legacy AuthModals removed to prioritize high-speed page routing
 import { useAuth } from "@/providers/auth-provider"
 import { useTheme } from "@/providers/theme-provider"
 import Link from "next/link"
@@ -34,10 +33,11 @@ export default function LandingPage() {
   /**
    * 🛡️ RULE 6 SYNERGY: 
    * High-speed redirection to dedicated auth nodes.
+   * 🚀 FIX: Pointing to /login instead of /auth/login to match (auth) group.
    */
   const navigateToAuth = (type: "login" | "register") => {
     setMobileMenuOpen(false);
-    router.push(`/auth/${type}`);
+    router.push(`/${type}`); 
   };
 
   const handleFeatureAccess = (path: string) => {
@@ -54,7 +54,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 relative overflow-x-hidden no-scrollbar">
       
-      {/* 🧭 1. NAVIGATION (Single Unified Header) */}
+      {/* 🧭 1. NAVIGATION */}
       <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 px-6 py-4 md:px-12 ${
         scrolled ? 'bg-white/95 dark:bg-[#050505]/95 backdrop-blur-3xl py-4 shadow-sm border-b border-black/5 dark:border-white/5' : 'bg-transparent py-8'
       }`}>
