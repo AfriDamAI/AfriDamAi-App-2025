@@ -1,6 +1,6 @@
 /**
  * 🛡️ AFRIDAM SECURITY GATE: AUTH GUARD (Rule 6 Synergy)
- * Version: 2026.1.11 (Express Bypass Recovery)
+ * Version: 2026.1.13 (Route Group Alignment)
  * Focus: High-speed clinical proxy with instant redirection.
  */
 
@@ -20,12 +20,15 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname()
 
   /** * 🚀 RULE 6 FIX: 
-   * Whitelisting the /auth/ directory so users can actually reach the Login/Register pages.
+   * Removing '/auth' because (auth) is a Route Group and invisible in the URL.
    */
-  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/auth/login", "/auth/register"]
+  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/login", "/register", "/forgot-password"]
   const isPublicPath = publicPaths.includes(pathname)
 
   useEffect(() => {
+    // 🔍 OGA CHECK: This will confirm the path in your browser console
+    console.log("GUARD CHECK:", { pathname, isPublicPath, isSignedIn });
+
     if (isLoading) return
 
     // 1. GUEST ACCESS: Kick out unauthenticated users from private routes
@@ -36,10 +39,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     /**
      * 🛡️ SYNERGY UPGRADE:
-     * If already logged in, don't let them go back to Login/Register pages either.
-     * Forward them straight to the Hub.
+     * Forward logged-in users away from auth pages to the Hub.
      */
-    if (isSignedIn && (pathname === "/" || pathname.startsWith("/auth"))) {
+    const authPaths = ["/login", "/register"]
+    if (isSignedIn && (pathname === "/" || authPaths.includes(pathname))) {
       router.replace("/dashboard")
       return
     }
@@ -49,7 +52,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
    * 🛡️ THE SYNERGY GATE:
    * Prevents flickering during the Express Bypass redirect.
    */
-  if (isLoading || (isSignedIn && (pathname === "/" || pathname.startsWith("/auth")))) {
+  const isAuthPath = pathname === "/login" || pathname === "/register";
+  if (isLoading || (isSignedIn && (pathname === "/" || isAuthPath))) {
     return null 
   }
 
