@@ -1,6 +1,6 @@
 /**
  * 🛡️ AFRIDAM ROOT SYSTEM: THE FOUNDATION (Rule 6 Synergy)
- * Version: 2026.1.11 (Build Stability & Type Alignment)
+ * Version: 2026.1.12 (Route Group Sync & Build Stability)
  * Focus: High-End Ambiance, Zero-Flicker Redirection, Build Stability.
  */
 
@@ -36,8 +36,11 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   
-  // 🛡️ Rule 6 Logic: Define public routes where the AppWrapper (Sidebar/Nav) is not needed
-  const publicRoutes = ["/", "/auth/login", "/auth/register", "/forgot-password"];
+  /** * 🛡️ RULE 6 Logic: 
+   * Updated to remove '/auth' prefix per (auth) route group organization.
+   * This ensures the AppWrapper (Sidebar/Nav) doesn't interfere with Auth pages.
+   */
+  const publicRoutes = ["/", "/login", "/register", "/forgot-password"];
   const isPublicPage = publicRoutes.includes(pathname);
 
   return (
