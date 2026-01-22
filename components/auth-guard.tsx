@@ -1,6 +1,6 @@
 /**
- * 🛡️ AFRIDAM SECURITY GATE: AUTH GUARD
- * Version: 2026.1.10 (Zero-Flicker & Express Bypass)
+ * 🛡️ AFRIDAM SECURITY GATE: AUTH GUARD (Rule 6 Synergy)
+ * Version: 2026.1.11 (Express Bypass Recovery)
  * Focus: High-speed clinical proxy with instant redirection.
  */
 
@@ -19,7 +19,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const publicPaths = ["/", "/pricing", "/contact", "/mission"]
+  /** * 🚀 RULE 6 FIX: 
+   * Whitelisting the /auth/ directory so users can actually reach the Login/Register pages.
+   */
+  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/auth/login", "/auth/register"]
   const isPublicPath = publicPaths.includes(pathname)
 
   useEffect(() => {
@@ -31,23 +34,25 @@ export function AuthGuard({ children }: AuthGuardProps) {
       return
     }
 
-    // 2. ACTIVE SESSION: Auto-forward logged-in users to the Hub
-    if (isSignedIn && pathname === "/") {
+    /**
+     * 🛡️ SYNERGY UPGRADE:
+     * If already logged in, don't let them go back to Login/Register pages either.
+     * Forward them straight to the Hub.
+     */
+    if (isSignedIn && (pathname === "/" || pathname.startsWith("/auth"))) {
       router.replace("/dashboard")
       return
     }
-  }, [isSignedIn, isLoading, pathname, router])
+  }, [isSignedIn, isLoading, pathname, router, isPublicPath])
 
   /**
    * 🛡️ THE SYNERGY GATE:
-   * During loading or while the redirect is pending, we return null.
-   * This prevents the "Landing Page Flash" that you were likely seeing.
+   * Prevents flickering during the Express Bypass redirect.
    */
-  if (isLoading || (isSignedIn && pathname === "/")) {
+  if (isLoading || (isSignedIn && (pathname === "/" || pathname.startsWith("/auth")))) {
     return null 
   }
 
-  // Prevent rendering private content if not signed in
   if (!isSignedIn && !isPublicPath) {
     return null
   }
