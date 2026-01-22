@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM SECURITY GATE: AUTH GUARD
- * Version: 2026.1.2 (Express Bypass Refactor)
- * Focus: Silent Redirection, Zero-Flicker, Rule 8 Theme Compliance.
+ * Version: 2026.1.10 (Zero-Flicker & Express Bypass)
+ * Focus: High-speed clinical proxy with instant redirection.
  */
 
 "use client"
@@ -15,30 +15,23 @@ interface AuthGuardProps {
 }
 
 export function AuthGuard({ children }: AuthGuardProps) {
-  const { isSignedIn, isLoading, user } = useAuth()
+  const { isSignedIn, isLoading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
 
+  const publicPaths = ["/", "/pricing", "/contact", "/mission"]
+  const isPublicPath = publicPaths.includes(pathname)
+
   useEffect(() => {
-    // 🛡️ OGA FIX: Silent wait to prevent theme/auth flickering
     if (isLoading) return
 
-    const publicPaths = ["/", "/pricing", "/contact", "/mission"]
-    const isPublicPath = publicPaths.includes(pathname)
-
-    /**
-     * 🚀 EXPRESS BYPASS (Rule 7 & 8): 
-     * We have removed the onboarding redirect loop. 
-     * The guard now acts as a high-speed clinical proxy.
-     */
-
-    // 1. GUEST ACCESS: If trying to access private nodes without session
+    // 1. GUEST ACCESS: Kick out unauthenticated users from private routes
     if (!isSignedIn && !isPublicPath) {
       router.replace("/")
       return
     }
 
-    // 2. ACTIVE SESSION: If logged in but lingering on landing page
+    // 2. ACTIVE SESSION: Auto-forward logged-in users to the Hub
     if (isSignedIn && pathname === "/") {
       router.replace("/dashboard")
       return
@@ -46,11 +39,18 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }, [isSignedIn, isLoading, pathname, router])
 
   /**
-   * 🛡️ RULE 8 COMPLIANCE:
-   * We return null during loading to prevent 'Theme Shock'.
-   * The RootLayout handles the global background texture.
+   * 🛡️ THE SYNERGY GATE:
+   * During loading or while the redirect is pending, we return null.
+   * This prevents the "Landing Page Flash" that you were likely seeing.
    */
-  if (isLoading) return null
+  if (isLoading || (isSignedIn && pathname === "/")) {
+    return null 
+  }
+
+  // Prevent rendering private content if not signed in
+  if (!isSignedIn && !isPublicPath) {
+    return null
+  }
 
   return <>{children}</>
 }
