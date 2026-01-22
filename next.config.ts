@@ -1,9 +1,13 @@
 import type { NextConfig } from "next";
 
+/**
+ * 🛡️ AFRIDAM NEXT CONFIG (Rule 6 Synergy)
+ * Version: 2026.1.10 (Handshake Optimization)
+ * Focus: High-Precision Hardware Handshake & Redirect Alignment.
+ */
 const nextConfig: NextConfig = {
   /* 🛡️ DEPLOYMENT BYPASS: 
-     Allows the build to complete even with 'unused variable' warnings.
-     Critical for the 2026 "Fast-to-Market" GitHub Push.
+     Ensures Rule 6 "Fast-to-Market" builds don't fail on minor lint/type warnings.
   */
   eslint: {
     ignoreDuringBuilds: true,
@@ -28,9 +32,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             /**
              * 🛠️ OGA FIX: Whitelisting Production Nodes
-             * 1. connect-src: Updated to allow your new Render Backend and Google AI.
-             * 2. img-src: Allows 'blob:' and 'data:' for local AI scan previews.
-             * 3. media-src: Essential for the live camera stream.
+             * connect-src: Updated with Render and Google Cloud Run.
              */
             value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https: https://afridamai-backend.onrender.com https://afridam-ai2-api-131829695574.us-central1.run.app;",
           },
@@ -55,22 +57,19 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  /* 🛡️ SAFETY REDIRECTS: Ensuring Clinical Tool Persistence */
+  /* 🛡️ SAFETY REDIRECTS (Rule 6 Alignment) 
+     Ensures users reach the correct clinical nodes instantly.
+  */
   async redirects() {
     return [
       {
-        source: '/scanner',
-        destination: '/ai-scanner',
-        permanent: true,
-      },
-      {
         source: '/scan',
-        destination: '/ai-scanner',
+        destination: '/scanner',
         permanent: true,
       },
       {
         source: '/ingredients',
-        destination: '/ai-checker',
+        destination: '/analyzer',
         permanent: true,
       }
     ];
@@ -80,16 +79,18 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // 🛡️ Allows images from any verified source
+        hostname: '**',
       },
     ],
   },
   
-  // 🛡️ RE-ENFORCED: React Strict Mode for detecting double-renders in AI components
+  // 🛡️ RE-ENFORCED: React Strict Mode
   reactStrictMode: true,
-  
-  // 🛡️ RE-ENFORCED: Production optimization
-  swcMinify: true,
+
+  /**
+   * 🚀 RULE 6 FIX: 
+   * 'swcMinify' is removed as it is default in Next.js 15+ and causes build errors.
+   */
 };
 
 export default nextConfig;

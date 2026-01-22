@@ -1,61 +1,54 @@
 /**
- * 🛡️ AFRIDAM APP WRAPPER (Rule 7 Sync)
- * Version: 2026.1.2 (Viewport & Route Management)
- * Focus: High-Precision Navigation & Seamless Overlay Transitions.
+ * 🛡️ AFRIDAM APP WRAPPER (Rule 6 Synergy)
+ * Version: 2026.1.10 (Handshake Pruning)
+ * Focus: High-Precision Navigation & Removal of Legacy Auth Gate.
  */
 
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useEffect } from "react"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
-import { AuthModals } from "@/components/auth-modals"
+// 🚀 RULE 6: Retired AuthModals to favor high-speed page-based auth
 import { ProfileSidebar } from "@/components/profile-sidebar"
 import type React from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const [authModal, setAuthModal] = useState<{ isOpen: boolean; type: "signin" | "signup" }>({
-    isOpen: false,
-    type: "signin",
-  })
+  const router = useRouter()
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
 
   /**
-   * 🛡️ VIEWPORT SYNC (Rule 7)
+   * 🛡️ VIEWPORT SYNC (Rule 6)
    * We hide the footer on active tool pages to maintain a clean focus.
-   * Synced with: Neural Lens (/scanner) and Ingredient Audit (/analyzer).
    */
   const hideFooterRoutes = [
     "/dashboard", 
     "/profile", 
-    "/scanner",    // 🚀 Updated: Matches Neural Lens route
-    "/analyzer",   // 🚀 Updated: Matches Molecular Audit route
+    "/scanner",    
+    "/analyzer",   
     "/marketplace",
-    "/specialist", // 🚀 Updated: Specialist Chat should be full-screen
+    "/specialist", 
     "/history"
   ];
   
   const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route));
 
-  const handleSignIn = () => setAuthModal({ isOpen: true, type: "signin" });
-  const handleSignUp = () => setAuthModal({ isOpen: true, type: "signup" });
+  /**
+   * 🚀 RULE 6 EXPRESS BYPASS:
+   * Navigation triggers now point directly to dedicated pages.
+   */
+  const handleSignIn = () => router.push("/auth/login");
+  const handleSignUp = () => router.push("/auth/register");
   const handleViewProfile = () => setProfileSidebarOpen(true);
-
-  const handleCloseModal = useCallback(() => {
-    setAuthModal(prev => ({ ...prev, isOpen: false }));
-    document.body.style.overflow = 'unset'; 
-  }, []);
 
   /**
    * 🛡️ ROUTE PROTECTION & CLEANUP
-   * Resets scroll and closes overlays whenever the user navigates.
    */
   useEffect(() => {
     setProfileSidebarOpen(false);
-    setAuthModal(prev => ({ ...prev, isOpen: false }));
     document.body.style.overflow = 'unset';
   }, [pathname]);
 
@@ -98,18 +91,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
         </motion.div>
       )}
       
-      {/* 🛡️ 4. ACCESS MODALS */}
-      <AnimatePresence>
-        {authModal.isOpen && (
-          <AuthModals 
-            isOpen={authModal.isOpen}
-            onClose={handleCloseModal} 
-            type={authModal.type} 
-          />
-        )}
-      </AnimatePresence>
-      
-      {/* 👤 5. WELLNESS SIDEBAR */}
+      {/* 👤 4. WELLNESS SIDEBAR */}
       <AnimatePresence>
         {profileSidebarOpen && (
           <ProfileSidebar 
