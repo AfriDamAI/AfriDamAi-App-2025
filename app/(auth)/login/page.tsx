@@ -1,6 +1,6 @@
 /**
- * 🛡️ AFRIDAM WELLNESS HUB: HUMAN LOGIN (Rule 7 Sync)
- * Version: 2026.1.2 (Mobile-First, Zero Jargon)
+ * 🛡️ AFRIDAM WELLNESS HUB: HUMAN LOGIN (Rule 6 Synergy)
+ * Version: 2026.1.10 (Express Bypass Refactor)
  * Focus: High-Contrast, Clear Language, Mobile Optimization.
  */
 
@@ -32,9 +32,15 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
+      /**
+       * 🚀 RULE 6 BYPASS: 
+       * Once signIn resolves, the AuthProvider has already set the token.
+       * We move straight to the dashboard—no onboarding checks required.
+       */
       await signIn({ email, password })
-      router.push("/dashboard") 
+      router.replace("/dashboard") 
     } catch (err: any) {
+      // 🛡️ Rule 4: Relatable, jargon-free error message
       setError("We couldn't find an account with those details. Please try again.")
     } finally {
       setIsLoading(false)

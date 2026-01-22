@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM CLINICAL ACCESS: REGISTRATION
- * Version: 2026.1.3 (Language & Typography Simplification)
- * Focus: Deep Teal Accents, High-Contrast, Mature Input Typography.
+ * 🛡️ AFRIDAM CLINICAL ACCESS: REGISTRATION (Rule 6 Synergy)
+ * Version: 2026.1.10 (Express Bypass Refactor)
+ * Focus: Deep Teal Accents, Zero-Flicker Redirect, Mobile-First.
  */
 
 "use client"
@@ -46,10 +46,15 @@ export default function RegisterPage() {
     setIsLoading(true)
     
     try {
+      /**
+       * 🚀 RULE 6 BYPASS: 
+       * signUp now handles both registration and immediate login.
+       * We use router.replace to lock the user into the dashboard hub.
+       */
       await signUp(formData)
-      router.push("/dashboard")
+      router.replace("/dashboard")
     } catch (err: any) {
-      // 🛡️ SIMPLIFIED: Relatable error message
+      // 🛡️ Rule 4: Relatable, simple English error handling
       setError("Registration failed. Please check your details and try again.")
       setStep(1) 
     } finally {
