@@ -1,3 +1,9 @@
+/**
+ * 🛡️ AFRIDAM FOOTER (Rule 6 Synergy)
+ * Version: 2026.1.22 (Bypass Integration)
+ * Focus: High-Precision Navigation & Path Alignment.
+ */
+
 "use client"
 
 import type React from "react"
@@ -6,23 +12,23 @@ import { Heart, ShieldCheck, Instagram, Twitter, Linkedin, Globe, MapPin, Extern
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 
-interface FooterProps {
-  onSignUpClick?: () => void
-}
-
-export default function Footer({ onSignUpClick }: FooterProps) {
+export default function Footer() {
   const currentYear = new Date().getFullYear()
   const { user } = useAuth()
   const router = useRouter()
 
+  /**
+   * 🚀 RULE 6 EXPRESS BYPASS:
+   * Instead of opening a modal, we push the user to the /register page
+   * if they try to access a tool while logged out.
+   */
   const handleProtectedClick = (e: React.MouseEvent, href: string) => {
-    // 🛡️ RE-ENFORCED: Updated paths to match our new routing structure
-    const protectedRoutes = ["/ai-scanner", "/ai-checker", "/dashboard", "/profile"]
+    // 🛡️ OGA FIX: Updated paths to match /scanner and /analyzer folders
+    const protectedRoutes = ["/scanner", "/analyzer", "/dashboard", "/profile"]
+    
     if (protectedRoutes.some(route => href.startsWith(route)) && !user) {
       e.preventDefault()
-      if (onSignUpClick) {
-        onSignUpClick()
-      }
+      router.push("/register") // 🚀 Direct Bypass
     }
   }
 
@@ -36,11 +42,7 @@ export default function Footer({ onSignUpClick }: FooterProps) {
           {/* 🌍 1. BRAND COLUMN */}
           <div className="md:col-span-5 space-y-10">
             <Link href="/" className="inline-block active:scale-95 transition-transform">
-              <img 
-                src="/logo.png" 
-                alt="AfriDam AI" 
-                className="h-14 w-auto object-contain" 
-              />
+              <img src="/logo.png" alt="AfriDam AI" className="h-14 w-auto object-contain" />
             </Link>
             <div className="space-y-6 max-w-sm">
               <p className="text-[11px] font-black uppercase tracking-[0.2em] leading-loose text-muted-foreground/80 italic">
@@ -64,8 +66,9 @@ export default function Footer({ onSignUpClick }: FooterProps) {
             <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#E1784F] mb-8">Clinical</h3>
             <ul className="space-y-5">
               {[
-                { label: "Skin Scanner", href: "/ai-scanner" },
-                { label: "Safety Checker", href: "/ai-checker" },
+                // 🛡️ OGA FIX: Updated to match your actual folder structure
+                { label: "Skin Scanner", href: "/scanner" },
+                { label: "Safety Checker", href: "/analyzer" },
                 { label: "The Care Hub", href: "/marketplace" }
               ].map((link) => (
                 <li key={link.label}>
@@ -104,7 +107,6 @@ export default function Footer({ onSignUpClick }: FooterProps) {
             <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-muted-foreground mb-8">Protocol</h3>
             <ul className="space-y-5">
               <li>
-                {/* 🛡️ RE-ENFORCED: Pointing to actual clinical documents */}
                 <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-[#E1784F] transition-all">
                   Privacy Policy
                 </Link>
