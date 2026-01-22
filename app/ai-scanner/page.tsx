@@ -1,6 +1,6 @@
 /**
- * 🛡️ AFRIDAM CLINICAL SCANNER (Rule 7 Sync)
- * Version: 2026.1.6 (Intelligence Hub Alignment)
+ * 🛡️ AFRIDAM CLINICAL SCANNER (Rule 6 Synergy)
+ * Version: 2026.1.13 (Handshake & Property Alignment)
  * Focus: High-Precision Image Handshake & Error Resiliency.
  */
 
@@ -33,12 +33,13 @@ export default function UnifiedScanner() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  /** 🛡️ RULE 4: No Jargon. 'Diagnosis' changed to 'Skin Diary' */
   const analysisSteps = [
-    { icon: <Scan size={16} />, text: "Analyzing Image Clarity" },
-    { icon: <Fingerprint size={16} />, text: "Detecting Melanin Patterns" },
-    { icon: <Binary size={16} />, text: "Matching with Clinical Data" },
-    { icon: <Search size={16} />, text: "Generating Diagnosis Report" },
-    { icon: <ShieldCheck size={16} />, text: "Finalizing Safe Regimen" }
+    { icon: <Scan size={16} />, text: "Checking Image Clarity" },
+    { icon: <Fingerprint size={16} />, text: "Detecting Patterns" },
+    { icon: <Binary size={16} />, text: "Matching Clinical Data" },
+    { icon: <Search size={16} />, text: "Building Your Skin Diary" },
+    { icon: <ShieldCheck size={16} />, text: "Finalizing Safe Routine" }
   ];
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function UnifiedScanner() {
     if (isAnalyzing) {
       interval = setInterval(() => {
         setScanStep((prev) => (prev < analysisSteps.length - 1 ? prev + 1 : prev));
-      }, 3500); 
+      }, 3000); 
     } else {
       setScanStep(0);
     }
@@ -70,7 +71,7 @@ export default function UnifiedScanner() {
       if (videoRef.current) videoRef.current.srcObject = stream
     } catch (err: any) {
       setIsCapturing(false)
-      setErrorDetails("Camera access denied.");
+      setErrorDetails("Please allow camera access in your settings.");
     }
   }
 
@@ -96,25 +97,28 @@ export default function UnifiedScanner() {
     if (!imgSource) return;
     setIsAnalyzing(true)
     setErrorDetails(null)
-    setStatus("Neural Analysis...")
+    setStatus("Scanning...")
     
     try {
       /**
-       * 🚀 THE NEURAL HANDSHAKE (Rule 7)
-       * Uses the restored uploadImage from api-client.ts.
-       * Includes full clinical context and Base64-to-Blob conversion.
+       * 🚀 THE NEURAL HANDSHAKE (Rule 6)
+       * We check multiple fields to handle Tobi's backend flexibility.
        */
       const data = await uploadImage(imgSource);
       
-      // Rule 7 Sync: Accessing the description from the flattened interceptor result
-      const finalFinding = data?.description || data?.resultData?.description || "Healthy Texture Detected";
+      const analysisData = {
+        finding: data?.finding || data?.description || data?.status || "Analysis complete.",
+        predictions: data?.predictions || {},
+        overallHealth: data?.overallHealth || data?.overall_health || 85,
+        image: imgSource,
+        id: data?.id || data?.scanId
+      };
       
-      setResults({ finding: finalFinding });
-      setStatus("Analysis Complete")
+      setResults(analysisData);
+      setStatus("Ready")
     } catch (err: any) {
-      // Rule 3: Relatable error message for 503 or timeout events
-      setErrorDetails("The AI Brain is waking up. Please try once more in 10 seconds.");
-      setStatus("Sync Interrupted")
+      setErrorDetails("The AI Brain is busy. Please try one more time.");
+      setStatus("Try Again")
     } finally {
       setIsAnalyzing(false)
     }
@@ -123,75 +127,67 @@ export default function UnifiedScanner() {
   if (authLoading || !user) return null;
 
   return (
-    <main className="min-h-[100svh] bg-white dark:bg-[#0A0A0A] text-black dark:text-white selection:bg-[#E1784F]/30 transition-colors duration-500">
-      <div className="max-w-screen-xl mx-auto px-6 py-10 lg:py-16 grid lg:grid-cols-2 gap-16 items-start">
+    <main className="min-h-[100svh] bg-white dark:bg-[#0A0A0A] text-black dark:text-white pb-20">
+      <div className="max-w-screen-xl mx-auto px-6 py-10 lg:py-16 grid lg:grid-cols-2 gap-12 items-start">
         
-        {/* LEFT COLUMN: BRANDING & STATUS */}
-        <div className="space-y-12">
-          <header className="space-y-8">
+        {/* LEFT: BRANDING */}
+        <div className="space-y-10">
+          <header className="space-y-6 text-left">
             <button 
               onClick={() => router.push('/dashboard')} 
-              className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] opacity-50 hover:opacity-100 transition-all"
+              className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] opacity-40 hover:opacity-100 transition-all"
             >
-              <ChevronLeft size={14} /> Back to Hub
+              <ChevronLeft size={14} /> Dashboard
             </button>
             
-            <div className="space-y-4">
-              <h1 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.85] py-2">
+            <div className="space-y-2">
+              <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
                 Skin <span className="text-[#E1784F]">Scan</span>
               </h1>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 px-3 py-1 bg-black dark:bg-white text-white dark:text-black rounded-full">
-                   <div className="w-1.5 h-1.5 rounded-full bg-[#E1784F] animate-pulse" />
-                   <span className="text-[9px] font-black uppercase tracking-widest">{status}</span>
+              <div className="flex items-center gap-3">
+                <div className="px-3 py-1 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center gap-2">
+                   <div className="w-1 h-1 rounded-full bg-[#E1784F] animate-pulse" />
+                   <span className="text-[8px] font-black uppercase tracking-widest">{status}</span>
                 </div>
-                <span className="text-[9px] font-bold opacity-40 uppercase tracking-[0.2em]">v2.0 Clinical AI</span>
               </div>
             </div>
           </header>
 
-          <div className="hidden lg:block space-y-6 max-w-sm">
-            <p className="text-sm font-medium leading-relaxed opacity-60">
-              Our advanced melanin-first AI scans thousands of data points to identify texture variations and health patterns in seconds.
+          <div className="hidden lg:block space-y-4 max-w-sm text-left">
+            <p className="text-xs font-medium leading-relaxed opacity-60">
+              Our melanin-first AI scans your unique skin patterns to find the best care for your glow.
             </p>
-            <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-3xl border border-gray-100 dark:border-white/10">
-              <ShieldCheck className="text-[#E1784F]" size={20} />
-              <p className="text-[10px] font-bold uppercase tracking-tight opacity-80">
-                End-to-End Encrypted Analysis
-              </p>
-            </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: SCANNER PORTAL */}
+        {/* RIGHT: PORTAL */}
         <div className="relative">
           {!results ? (
-            <div className="space-y-10">
-              <div className="relative aspect-square w-full rounded-[3.5rem] overflow-hidden bg-gray-100 dark:bg-white/5 border-[8px] border-white dark:border-[#1A1A1A] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)]">
+            <div className="space-y-8">
+              <div className="relative aspect-square w-full rounded-[3rem] overflow-hidden bg-gray-50 dark:bg-white/5 border-4 border-white dark:border-white/10 shadow-2xl">
                 <AnimatePresence mode="wait">
                   {isCapturing ? (
                     <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
                   ) : imgSource ? (
                     <div className="relative w-full h-full">
-                      <img src={imgSource} className={`w-full h-full object-cover transition-all duration-1000 ${isAnalyzing ? 'scale-110 blur-md opacity-40' : ''}`} alt="Captured" />
+                      <img src={imgSource} className={`w-full h-full object-cover ${isAnalyzing ? 'blur-md opacity-50 scale-105' : ''} transition-all duration-700`} alt="Skin Capture" />
                       {isAnalyzing && (
-                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm">
+                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
                             <motion.div 
                               initial={{ top: "0%" }} animate={{ top: "100%" }} 
                               transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                              className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_20px_#E1784F] z-50"
+                              className="absolute left-0 right-0 h-[1px] bg-[#E1784F] shadow-[0_0_15px_#E1784F]"
                             />
-                            
                             <motion.div 
                               key={scanStep}
-                              initial={{ opacity: 0, y: 10 }}
+                              initial={{ opacity: 0, y: 5 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="flex flex-col items-center gap-3 text-white text-center px-8"
+                              className="flex flex-col items-center gap-4 text-white text-center"
                             >
-                              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/20 animate-pulse">
+                              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
                                 {analysisSteps[scanStep].icon}
                               </div>
-                              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#E1784F]">
+                              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">
                                 {analysisSteps[scanStep].text}
                               </p>
                             </motion.div>
@@ -199,9 +195,9 @@ export default function UnifiedScanner() {
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full opacity-20">
-                      <Scan size={80} strokeWidth={1} />
-                      <p className="text-[10px] font-black uppercase tracking-[0.5em] mt-6">Awaiting Input</p>
+                    <div className="flex flex-col items-center justify-center h-full opacity-10">
+                      <Scan size={60} />
+                      <p className="text-[9px] font-black uppercase tracking-widest mt-4">Lens Ready</p>
                     </div>
                   )}
                 </AnimatePresence>
@@ -210,25 +206,25 @@ export default function UnifiedScanner() {
               {/* CONTROLS */}
               <div className="max-w-xs mx-auto space-y-4">
                 {isCapturing ? (
-                  <button onClick={capture} className="w-20 h-20 mx-auto rounded-full border-[6px] border-[#E1784F] bg-transparent p-1 flex items-center justify-center transition-transform active:scale-90">
+                  <button onClick={capture} className="w-16 h-16 mx-auto rounded-full border-4 border-[#E1784F] p-1 flex items-center justify-center active:scale-90 transition-transform">
                      <div className="w-full h-full rounded-full bg-[#E1784F]" />
                   </button>
                 ) : imgSource && !isAnalyzing ? (
-                  <div className="space-y-4">
-                    <button onClick={analyze} className="group w-full py-6 bg-black dark:bg-white text-white dark:text-black rounded-[2rem] font-black uppercase text-[11px] tracking-[0.3em] flex items-center justify-center gap-3 shadow-2xl transition-all hover:bg-[#E1784F] hover:text-white">
-                      Initiate Scan <Zap size={16} fill="currentColor" />
+                  <div className="space-y-3">
+                    <button onClick={analyze} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-xl">
+                      Start Analysis <Zap size={14} fill="currentColor" />
                     </button>
-                    <button onClick={() => { setImgSource(null); startCamera(); }} className="w-full text-[10px] font-black opacity-40 uppercase tracking-[0.3em] hover:opacity-100 py-2 transition-all">
-                      Discard & Retake
+                    <button onClick={() => { setImgSource(null); startCamera(); }} className="w-full text-[9px] font-black opacity-40 uppercase tracking-widest py-2">
+                      Retake Photo
                     </button>
                   </div>
                 ) : !isAnalyzing && (
-                  <div className="space-y-4">
-                    <button onClick={startCamera} className="w-full py-6 bg-[#E1784F] text-white rounded-[2rem] font-black uppercase text-[11px] tracking-[0.3em] shadow-xl hover:scale-[1.02] transition-all">
-                      Open Clinical Lens
+                  <div className="space-y-3">
+                    <button onClick={startCamera} className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg">
+                      Open Camera
                     </button>
-                    <button onClick={() => fileInputRef.current?.click()} className="w-full py-4 text-[10px] font-black opacity-40 uppercase tracking-[0.3em] hover:opacity-100 flex items-center justify-center gap-2 transition-all">
-                      <Scan size={14} /> Import from Gallery
+                    <button onClick={() => fileInputRef.current?.click()} className="w-full py-2 text-[9px] font-black opacity-40 uppercase tracking-widest flex items-center justify-center gap-2">
+                      <Scan size={12} /> Upload Gallery
                     </button>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
                       const file = e.target.files?.[0];
@@ -240,45 +236,37 @@ export default function UnifiedScanner() {
                     }} />
                   </div>
                 )}
-                {errorDetails && <p className="text-center text-red-500 text-[10px] font-black uppercase tracking-widest">{errorDetails}</p>}
+                {errorDetails && <p className="text-center text-red-500 text-[9px] font-black uppercase">{errorDetails}</p>}
               </div>
             </div>
           ) : (
-            /* RESULTS VIEW */
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-              <div className="bg-black dark:bg-white text-white dark:text-black p-12 rounded-[4rem] space-y-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)]">
+            /* RESULTS HUB */
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+              <div className="bg-black dark:bg-white text-white dark:text-black p-8 md:p-12 rounded-[3rem] space-y-8 text-left shadow-2xl">
                 <div className="flex justify-between items-start">
-                  <div className="w-16 h-16 bg-[#E1784F] rounded-2xl flex items-center justify-center rotate-3">
-                    <CheckCircle2 size={32} className="text-white" />
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50">Report ID</p>
-                    <p className="text-[10px] font-mono font-bold uppercase">AD-{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+                  <CheckCircle2 size={40} className="text-[#E1784F]" />
+                  <div className="text-right opacity-30">
+                    <p className="text-[8px] font-black uppercase tracking-widest">Afla-ID</p>
+                    <p className="text-[8px] font-mono uppercase">#{Math.random().toString(36).substr(2, 6).toUpperCase()}</p>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <p className="text-[11px] font-black text-[#E1784F] uppercase tracking-[0.4em]">Primary Finding</p>
-                  <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none">
+                <div className="space-y-2">
+                  <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.3em]">AI Observation</p>
+                  <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter leading-tight">
                     {results.finding}
                   </h2>
                 </div>
 
-                <div className="pt-10 border-t border-white/10 dark:border-black/10 space-y-6">
-                  <div className="flex items-start gap-4">
-                    <Info size={18} className="text-[#E1784F] shrink-0" />
-                    <p className="text-[10px] font-bold uppercase leading-relaxed opacity-60 tracking-tight">
-                      AI analysis is for educational support. This does not replace a professional clinical consultation.
-                    </p>
-                  </div>
-                  <button onClick={() => router.push('/marketplace')} className="w-full py-6 bg-white dark:bg-black text-black dark:text-white rounded-[2rem] font-black uppercase text-[11px] tracking-[0.3em] flex items-center justify-center gap-3 group">
-                    View Safe Regimen <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
+                <div className="pt-8 border-t border-white/10 dark:border-black/10 space-y-6">
+                  <button onClick={() => router.push('/marketplace')} className="w-full py-5 bg-white dark:bg-black text-black dark:text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 group">
+                    View Care Plan <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
               </div>
 
-              <button onClick={() => setResults(null)} className="w-full py-4 text-[10px] font-black opacity-40 uppercase tracking-[0.3em] hover:opacity-100 flex items-center justify-center gap-2 transition-all">
-                <RotateCcw size={14} /> New Analysis
+              <button onClick={() => setResults(null)} className="w-full py-2 text-[9px] font-black opacity-30 uppercase tracking-widest flex items-center justify-center gap-2">
+                <RotateCcw size={12} /> New Scan
               </button>
             </motion.div>
           )}

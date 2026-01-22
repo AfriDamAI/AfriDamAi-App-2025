@@ -1,9 +1,9 @@
 "use client"
 
 /**
- * 🛡️ AFRIDAM AESTHETIC INTELLIGENCE
- * Comprehensive ingredient database with melanin-specific safety profiles.
- * Optimized for Skincare, Women, and Pediatric Safety.
+ * 🛡️ AFRIDAM AESTHETIC INTELLIGENCE (Rule 6 Synergy)
+ * Version: 2026.1.16 (Full Data Node)
+ * Focus: Comprehensive melanin-specific safety profiles.
  */
 
 export interface IngredientProfile {
@@ -11,7 +11,7 @@ export interface IngredientProfile {
   aliases: string[]
   type: string
   safetyRating: "safe" | "caution" | "avoid"
-  isChildSafe?: boolean // 👶 NEW: Supporting maternal safety checks
+  isChildSafe?: boolean
   commonConcerns: string[]
   allergenPotential: boolean
   irritantPotential: boolean
@@ -21,6 +21,7 @@ export interface IngredientProfile {
     normal: boolean
     dry: boolean
     sensitive: boolean
+    [key: string]: boolean // 🚀 OGA FIX: Allows the NLP engine to index skin types dynamically
   }
   description: string
   benefits: string[]
@@ -38,13 +39,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: true,
-    },
+    skinTypeCompatibility: { oily: true, combination: true, normal: true, dry: true, sensitive: true },
     description: "Primary solvent and hydrating agent",
     benefits: ["Hydration", "Solvent"],
   },
@@ -57,13 +52,7 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: true,
-    },
+    skinTypeCompatibility: { oily: true, combination: true, normal: true, dry: true, sensitive: true },
     description: "Powerful humectant that draws moisture into skin",
     benefits: ["Hydration", "Moisture retention", "Skin softening"],
   },
@@ -73,16 +62,10 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     type: "exfoliant",
     safetyRating: "caution",
     isChildSafe: false,
-    commonConcerns: ["May cause irritation in sensitive skin", "Avoid if pregnant", "Can cause dryness", "Risk of hyperpigmentation if overused on dark skin"],
+    commonConcerns: ["May cause irritation in sensitive skin", "Avoid if pregnant", "Risk of hyperpigmentation if overused on dark skin"],
     allergenPotential: false,
     irritantPotential: true,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: false,
-      sensitive: false,
-    },
+    skinTypeCompatibility: { oily: true, combination: true, normal: true, dry: false, sensitive: false },
     description: "Beta hydroxy acid for chemical exfoliation",
     benefits: ["Exfoliation", "Pore cleansing", "Acne treatment"],
     concentration: "0.5-2%",
@@ -93,37 +76,12 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     type: "fragrance",
     safetyRating: "caution",
     isChildSafe: false,
-    commonConcerns: ["Common allergen", "May irritate sensitive skin", "Can cause photosensitivity"],
+    commonConcerns: ["Common allergen", "Can cause photosensitivity"],
     allergenPotential: true,
     irritantPotential: true,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: false,
-    },
+    skinTypeCompatibility: { oily: true, combination: true, normal: true, dry: true, sensitive: false },
     description: "Synthetic or natural fragrance compounds",
     benefits: ["Scent"],
-  },
-  phenoxyethanol: {
-    name: "Phenoxyethanol",
-    aliases: ["phenoxyethanol", "preservative"],
-    type: "preservative",
-    safetyRating: "safe",
-    isChildSafe: true,
-    commonConcerns: [],
-    allergenPotential: false,
-    irritantPotential: false,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: true,
-    },
-    description: "Preservative to prevent microbial growth",
-    benefits: ["Preservation", "Antimicrobial"],
   },
   niacinamide: {
     name: "Niacinamide",
@@ -134,15 +92,9 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: true,
-    },
+    skinTypeCompatibility: { oily: true, combination: true, normal: true, dry: true, sensitive: true },
     description: "Vitamin B3 derivative with multiple skin benefits",
-    benefits: ["Pore minimizing", "Oil control", "Anti-inflammatory", "Brightening"],
+    benefits: ["Pore minimizing", "Oil control", "Brightening"],
   },
   hyaluronicacid: {
     name: "Hyaluronic Acid",
@@ -153,34 +105,9 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     commonConcerns: [],
     allergenPotential: false,
     irritantPotential: false,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: true,
-    },
-    description: "Powerful humectant that holds up to 1000x its weight in water",
-    benefits: ["Deep hydration", "Plumping", "Anti-aging"],
-  },
-  vitaminc: {
-    name: "Vitamin C",
-    aliases: ["ascorbic acid", "l-ascorbic acid"],
-    type: "antioxidant",
-    safetyRating: "safe",
-    isChildSafe: true,
-    commonConcerns: ["Can be unstable", "May cause irritation at high concentrations"],
-    allergenPotential: false,
-    irritantPotential: false,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: true,
-    },
-    description: "Powerful antioxidant for brightening and anti-aging",
-    benefits: ["Brightening", "Antioxidant", "Collagen synthesis", "Sun protection"],
+    skinTypeCompatibility: { oily: true, combination: true, normal: true, dry: true, sensitive: true },
+    description: "Powerful humectant that holds water",
+    benefits: ["Deep hydration", "Plumping"],
   },
   retinol: {
     name: "Retinol",
@@ -188,74 +115,37 @@ export const ingredientDatabase: Record<string, IngredientProfile> = {
     type: "vitamin",
     safetyRating: "caution",
     isChildSafe: false,
-    commonConcerns: ["Avoid during pregnancy", "Can cause photosensitivity", "May cause irritation"],
+    commonConcerns: ["Avoid during pregnancy", "Can cause photosensitivity", "Irritation risk"],
     allergenPotential: false,
     irritantPotential: true,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: false,
-    },
-    description: "Vitamin A derivative for anti-aging and skin renewal",
-    benefits: ["Anti-aging", "Acne treatment", "Skin renewal"],
-  },
-  benzoylperoxide: {
-    name: "Benzoyl Peroxide",
-    aliases: ["bpo"],
-    type: "acne-fighter",
-    safetyRating: "caution",
-    isChildSafe: false,
-    commonConcerns: ["Can cause dryness", "May bleach fabrics", "Can cause irritation"],
-    allergenPotential: false,
-    irritantPotential: true,
-    skinTypeCompatibility: {
-      oily: true,
-      combination: true,
-      normal: true,
-      dry: false,
-      sensitive: false,
-    },
-    description: "Powerful acne-fighting ingredient",
-    benefits: ["Acne treatment", "Antibacterial"],
+    skinTypeCompatibility: { oily: true, combination: true, normal: true, dry: true, sensitive: false },
+    description: "Vitamin A derivative for skin renewal",
+    benefits: ["Anti-aging", "Acne treatment"],
   },
   sheabutter: {
     name: "Shea Butter",
-    aliases: ["butyrospermum parkii", "vitellaria paradoxa"],
+    aliases: ["butyrospermum parkii"],
     type: "emollient",
     safetyRating: "safe",
     isChildSafe: true,
     commonConcerns: ["May be heavy for extremely oily skin"],
     allergenPotential: false,
     irritantPotential: false,
-    skinTypeCompatibility: {
-      oily: false,
-      combination: true,
-      normal: true,
-      dry: true,
-      sensitive: true,
-    },
-    description: "Traditional African lipid extracted from Shea tree nuts",
-    benefits: ["Barrier repair", "Deep moisture", "Anti-inflammatory"],
+    skinTypeCompatibility: { oily: false, combination: true, normal: true, dry: true, sensitive: true },
+    description: "Traditional African lipid for deep moisture",
+    benefits: ["Barrier repair", "Anti-inflammatory"],
   },
   hydroquinone: {
     name: "Hydroquinone",
-    aliases: ["quinol", "1,4-dihydroxybenzene"],
+    aliases: ["quinol"],
     type: "lightening agent",
     safetyRating: "avoid",
     isChildSafe: false,
-    commonConcerns: ["Risk of exogenous ochronosis on dark skin", "Significant irritation risk", "Strictly medical use only"],
+    commonConcerns: ["Risk of ochronosis on dark skin", "Strictly medical use only"],
     allergenPotential: true,
     irritantPotential: true,
-    skinTypeCompatibility: {
-      oily: false,
-      combination: false,
-      normal: false,
-      dry: false,
-      sensitive: false,
-    },
-    description: "Potent skin depigmenting agent with high risk profiles for melanin-rich skin",
+    skinTypeCompatibility: { oily: false, combination: false, normal: false, dry: false, sensitive: false },
+    description: "Potent skin depigmenting agent with high risk",
     benefits: ["Hyperpigmentation treatment"],
   }
 }
@@ -268,7 +158,7 @@ export function normalizeIngredientName(name: string): string {
 }
 
 /**
- * 🛡️ RE-ENFORCED: Pre-computed Alias Map for O(1) Search Performance
+ * 🛡️ PRE-COMPUTED ALIAS MAP
  */
 const aliasMap: Record<string, string> = {}
 Object.entries(ingredientDatabase).forEach(([key, profile]) => {
@@ -283,18 +173,16 @@ Object.entries(ingredientDatabase).forEach(([key, profile]) => {
  */
 export function findIngredient(name: string): IngredientProfile | null {
   const normalized = normalizeIngredientName(name)
-
   const databaseKey = aliasMap[normalized]
   if (databaseKey && ingredientDatabase[databaseKey]) {
     return ingredientDatabase[databaseKey]
   }
-
   return null
 }
 
 /**
- * 🔬 NEW: Local Engine Bridge
- * Required by performIngredientAnalysis in ingredient-checker.ts
+ * 🔬 LOCAL ENGINE BRIDGE
+ * Synchronizes with ingredient-nlp-engine.ts
  */
 export function analyzeIngredients(text: string) {
   const ingredientsToSearch = text.split(/,|\n/).map(i => i.trim()).filter(i => i.length > 0)
@@ -311,10 +199,10 @@ export function analyzeIngredients(text: string) {
       }
       return null
     })
-    .filter(Boolean)
+    .filter((i): i is NonNullable<typeof i> => i !== null)
 
   const totalIngredients = analyzedIngredients.length
-  const safeCount = analyzedIngredients.filter(i => i?.safety === "safe").length
+  const safeCount = analyzedIngredients.filter(i => i.safety === "safe").length
   const safetyScore = totalIngredients > 0 ? Math.round((safeCount / totalIngredients) * 100) : 100
 
   return {
@@ -324,9 +212,9 @@ export function analyzeIngredients(text: string) {
     summary: safetyScore > 80 ? "This formula appears balanced and safe for regular use." : "Caution advised. Flagged ingredients detected.",
     recommendations: ["Perform a 24-hour patch test before full application."],
     skinTypeCompatibility: {
-      "Oily": "Good",
-      "Dry": "Good",
-      "Sensitive": "Caution"
+      "Oily": safetyScore > 70 ? "Good" : "Caution",
+      "Dry": safetyScore > 70 ? "Good" : "Caution",
+      "Sensitive": safetyScore > 90 ? "Good" : "Avoid"
     }
   }
 }
