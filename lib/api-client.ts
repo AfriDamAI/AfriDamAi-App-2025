@@ -8,7 +8,6 @@ import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
  * aiURL: AI Model API (Google Cloud Run)
  */
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
-// 🚀 FIXED: Added /v1 to match the prefix in main.py lifespan and router
 const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api/v1";
 
 const apiClient = axios.create({
@@ -45,11 +44,15 @@ export const setAuthToken = (token: string | null) => {
   }
 };
 
-/** 🛡️ RESPONSE INTERCEPTOR **/
+/** * 🛡️ RESPONSE INTERCEPTOR - RULE 6 SYNC
+ * We unwrap resultData here so the rest of the app gets clean data.
+ * This resolves the ts(2339) errors in the AuthProvider.
+ */
 apiClient.interceptors.response.use(
   (response) => {
+    // 🚀 SYNERGY: Extract resultData if present, otherwise return raw data
     if (response.data && response.data.resultData) {
-        return { ...response, data: response.data.resultData };
+      return { ...response, data: response.data.resultData };
     }
     return response;
   },
@@ -57,7 +60,11 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
         localStorage.removeItem("token");
-        if (window.location.pathname !== "/") window.location.href = "/";
+        // Prevent redirect loops during login/landing
+        const currentPath = window.location.pathname;
+        if (currentPath !== "/" && currentPath !== "/auth/login") {
+          window.location.href = "/";
+        }
       }
     }
     return Promise.reject(error);
@@ -67,6 +74,7 @@ apiClient.interceptors.response.use(
 /** 🔑 AUTH ENDPOINTS (Uses baseURL) **/
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
   const response = await apiClient.post("/auth/user/login", credentials);
+  // 🛡️ Rule 6: Interceptor has already unwrapped resultData; response.data is now AuthResponse
   return response.data;
 };
 
@@ -104,9 +112,7 @@ const defaultAiContext = {
   skin_type_last_time_checked: null,
   known_skin_condition: "none",
   skin_condition_last_time_checked: null,
-  // 🚀 FIXED: Changed from "not_specified" to "female" to match Python Literal["male", "female"]
   gender: "female", 
-  // 🚀 FIXED: Changed from 0 to 25 to satisfy basic clinical validation in Python
   age: 25,
   known_body_lotion: "none",
   known_body_lotion_brand: "none",
@@ -141,7 +147,6 @@ export async function uploadImage(file: File | string): Promise<any> {
 
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
-  // 🚀 FIXED: Endpoint path now matches @router.post("/skin-diagnosis") in predict.py
   const response = await axios.post(`${aiURL}/skin-diagnosis`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });

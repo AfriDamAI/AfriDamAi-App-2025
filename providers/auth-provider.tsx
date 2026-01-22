@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM AUTH PROVIDER (Rule 6 Synergy)
- * Version: 2026.1.10 (High-Speed Bypass & Response Sync)
- * Focus: Eliminating redirect loops and syncing with flat resultData.
+ * Version: 2026.1.11 (Post-Interceptor Unwrap Sync)
+ * Focus: High-speed clinical bypass with accurate data extraction.
  */
 
 "use client"
@@ -23,7 +23,7 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
-  displayName?: string; // 🛡️ SYNCED: Backend uses displayName in the response
+  displayName?: string; 
   sex?: string;       
   createdAt?: string; 
   phoneNo?: string;   
@@ -57,17 +57,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [hasToken, setHasToken] = useState<boolean>(false)
 
   /**
-   * 🛡️ SYNCED HELPER: Correctly handles both nested 'user' and flat 'resultData'
+   * 🛡️ SYNCED HELPER: Interceptor now handles resultData unwrapping.
+   * This helper ensures we safely grab the user object from the clean response.
    */
-  const extractUserData = (response: any) => {
-    const base = response?.resultData || response?.data || response;
-    // If the backend sent user: { id... }, use that. Otherwise, use the base itself.
-    return base?.user || base;
+  const extractUserData = (data: any) => {
+    // If data is already the user object or has a nested user key
+    return data?.user || data;
   };
 
   const fetchUserData = async (userId: string) => {
     try {
       const response = await getUser(userId);
+      // getUser() now returns the unwrapped resultData directly
       const userData = extractUserData(response);
       if (userData) {
         setUser(userData);
@@ -88,7 +89,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (decoded.exp && decoded.exp < Date.now() / 1000) {
             signOut();
           } else {
-            // 🚀 BOUNCE PREVENTION: Set token state immediately before fetching
             setHasToken(true); 
             setAuthToken(token);
             await fetchUserData(decoded.sub || decoded.id || decoded.userId);
@@ -105,17 +105,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (credentials: UserLoginDto) => {
     setIsLoading(true);
     try {
-      const data: AuthResponse = await login(credentials);
-      // 🛡️ Ensure we access the token correctly via resultData wrapper
-      const accessToken = data.resultData?.accessToken;
+      /**
+       * 🚀 RULE 6 FIX: The api-client interceptor has already unwrapped 'resultData'.
+       * 'data' here IS now the resultData object (containing accessToken, user, etc.)
+       */
+      const data: any = await login(credentials);
+      const accessToken = data?.accessToken;
       
       if (!accessToken) throw new Error("Invalid Token Handshake");
 
+      // Set persistence immediately
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
       setHasToken(true);
 
       const decoded: any = jwtDecode(accessToken);
+      
+      // Update local user state immediately with available data from login
+      const userData = extractUserData(data);
+      setUser(userData);
+
+      // Background refresh to get full clinical profile
       await fetchUserData(decoded.sub || decoded.id || decoded.userId);
     } catch (error) {
       signOut();
@@ -167,8 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const contextValue = useMemo(() => ({
     user,
-    // 🚀 THE FIX: isSignedIn is TRUE if we have a token, even if 'user' is still loading.
-    // This stops the AuthGuard from redirecting you to "/" during the handshake.
+    // 🚀 THE BYPASS: True if token exists OR user is set.
     isSignedIn: hasToken || !!user,
     isLoading,
     requiresOnboarding,
