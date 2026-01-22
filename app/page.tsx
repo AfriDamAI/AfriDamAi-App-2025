@@ -1,16 +1,16 @@
 /**
- * 🛡️ AFRIDAM WELLNESS HUB: ELEGANT UNIFIED EDITION (Rule 7 Sync)
- * Version: 2026.6.0 (Balanced Typography, Human Language, Mobile-First)
- * Focus: Sophisticated Scaling, Repaired Visuals, Single Header.
+ * 🛡️ AFRIDAM WELLNESS HUB: ELEGANT UNIFIED EDITION (Rule 6 Synergy)
+ * Version: 2026.6.1 (Express Bypass & Zero-Flicker Redirection)
+ * Focus: Sophisticated Scaling, Page-Based Auth, Rule 6 Compliance.
  */
 
 "use client"
 
 import React, { useState, useEffect } from "react"
 import { 
-  Camera, ArrowRight, Sun, Moon, Search, MapPin, Mail, Heart, Menu, X, ShieldCheck, Lock, Zap, Activity, Sparkles, Scan, LayoutDashboard, Aperture
+  Camera, ArrowRight, Sun, Moon, MapPin, Mail, Heart, Menu, X, ShieldCheck, Activity, Sparkles, Aperture
 } from "lucide-react"
-import { AuthModals } from "@/components/auth-modals"
+// 🚀 RULE 6: Legacy AuthModals removed to prioritize high-speed page routing
 import { useAuth } from "@/providers/auth-provider"
 import { useTheme } from "@/providers/theme-provider"
 import Link from "next/link"
@@ -21,8 +21,6 @@ export default function LandingPage() {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authType, setAuthType] = useState<"signin" | "signup">("signup");
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isDark = theme === "dark";
@@ -33,15 +31,18 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const openAuth = (type: "signin" | "signup") => {
-    setAuthType(type);
-    setIsAuthModalOpen(true);
+  /**
+   * 🛡️ RULE 6 SYNERGY: 
+   * High-speed redirection to dedicated auth nodes.
+   */
+  const navigateToAuth = (type: "login" | "register") => {
     setMobileMenuOpen(false);
+    router.push(`/auth/${type}`);
   };
 
   const handleFeatureAccess = (path: string) => {
     if (user) router.push(path);
-    else openAuth("signup");
+    else navigateToAuth("register");
   };
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
@@ -77,8 +78,8 @@ export default function LandingPage() {
                  </Link>
                ) : (
                  <div className="flex items-center gap-6">
-                   <button onClick={() => openAuth("signin")} className="opacity-50 hover:opacity-100 transition-all">Login</button>
-                   <button onClick={() => openAuth("signup")} className="px-8 py-3 bg-[#E1784F] text-white rounded-lg uppercase tracking-widest font-black text-[9px] shadow-xl active:scale-95 transition-all">Get Started</button>
+                   <button onClick={() => navigateToAuth("login")} className="opacity-50 hover:opacity-100 transition-all">Login</button>
+                   <button onClick={() => navigateToAuth("register")} className="px-8 py-3 bg-[#E1784F] text-white rounded-lg uppercase tracking-widest font-black text-[9px] shadow-xl active:scale-95 transition-all">Get Started</button>
                  </div>
                )}
           </div>
@@ -89,43 +90,31 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* 🌪️ 2. HERO: BALANCED & CHARMING */}
+      {/* 🌪️ 2. HERO */}
       <section className="relative pt-32 md:pt-56 pb-20 px-6">
         <div className="max-w-screen-xl mx-auto grid lg:grid-cols-12 items-center gap-12 md:gap-20">
-          
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="lg:col-span-7 space-y-8 md:space-y-12">
             <div className="inline-flex items-center gap-2.5 bg-[#E1784F]/5 dark:bg-white/5 px-4 py-2 rounded-full border border-[#E1784F]/10">
               <Sparkles className="text-[#E1784F]" size={12} />
               <span className="text-[9px] font-black uppercase tracking-widest text-[#E1784F]">Clinical Excellence</span>
             </div>
-            
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tight uppercase italic text-black dark:text-white">
               Your <br /> Skin's <br /> <span className="text-[#E1784F]">Best Friend.</span>
             </h1>
-            
             <p className="text-lg md:text-2xl font-black max-w-lg opacity-25 uppercase tracking-tighter leading-tight italic">
               Localized protection. <br /> Safe care for the heritage.
             </p>
-            
             <button onClick={() => handleFeatureAccess("/scanner")} className="group h-20 px-12 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl flex items-center justify-center gap-6 active:scale-95 transition-all">
                 Start Now <ArrowRight size={18} />
             </button>
           </motion.div>
 
-          {/* VISUAL MODULE: SCANNER VISUAL */}
           <div className="lg:col-span-5 relative">
              <div className="aspect-[4/5] rounded-[3.5rem] overflow-hidden border-[10px] border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
                 <img src="/model-hero.JPG" alt="AfriDam" className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0" />
-                
-                {/* INTERACTIVE SCANNER OVERLAY */}
                 <div className="absolute inset-0 pointer-events-none">
-                    <motion.div 
-                      animate={{ top: ["0%", "100%", "0%"] }} 
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} 
-                      className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_30px_5px_#E1784F] z-20" 
-                    />
+                    <motion.div animate={{ top: ["0%", "100%", "0%"] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_30px_5px_#E1784F] z-20" />
                 </div>
-                
                 <div className="absolute bottom-6 left-6 right-6 p-6 bg-black/80 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center gap-5">
                     <div className="w-12 h-12 bg-[#4DB6AC] rounded-2xl flex items-center justify-center text-white">
                         <Camera size={24} />
@@ -142,16 +131,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 🎥 3. THE VISUAL FLOW (World-Class Fix) */}
+      {/* 🎥 3. THE VISUAL FLOW */}
       <section className="py-20 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5 border-y border-black/5 dark:border-white/5">
         <div className="max-w-screen-xl mx-auto space-y-20">
            <div className="text-center space-y-4">
               <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest opacity-40">Simple English Approach</span>
               <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter leading-tight">Simple Path. <br/>Pure Results.</h2>
            </div>
-
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Step 1: Capture */}
               <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm">
                  <div className="w-14 h-14 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-black text-xl italic">01</div>
                  <h3 className="text-2xl font-black uppercase italic leading-none">Snap a <br/>Photo</h3>
@@ -163,7 +150,6 @@ export default function LandingPage() {
                  </div>
               </div>
 
-              {/* Step 2: Analysis */}
               <div className="p-10 bg-[#E1784F] text-white rounded-[3rem] space-y-8 shadow-2xl relative overflow-hidden group">
                  <div className="w-14 h-14 rounded-2xl bg-white text-[#E1784F] flex items-center justify-center font-black text-xl italic">02</div>
                  <h3 className="text-2xl font-black uppercase italic leading-none text-white">Instant <br/>Check</h3>
@@ -175,7 +161,6 @@ export default function LandingPage() {
                  </div>
               </div>
 
-              {/* Step 3: Result */}
               <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm">
                  <div className="w-14 h-14 rounded-2xl bg-[#4DB6AC] text-white flex items-center justify-center font-black text-xl italic">03</div>
                  <h3 className="text-2xl font-black uppercase italic leading-none">Get the <br/>Answer</h3>
@@ -228,7 +213,7 @@ export default function LandingPage() {
           <div className="space-y-12">
             <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.85] text-black dark:text-white">Get <br/><span className="text-[#4DB6AC]">Started.</span></h2>
             <p className="text-xl md:text-2xl font-black opacity-20 uppercase tracking-tighter italic">Join the movement for <br/>Melanin-Rich Health.</p>
-            <button onClick={() => openAuth("signup")} className="w-full md:w-auto h-20 px-16 bg-[#4DB6AC] text-black font-black uppercase text-[11px] tracking-widest rounded-2xl shadow-xl hover:scale-105 transition-all">Create Profile</button>
+            <button onClick={() => navigateToAuth("register")} className="w-full md:w-auto h-20 px-16 bg-[#4DB6AC] text-black font-black uppercase text-[11px] tracking-widest rounded-2xl shadow-xl hover:scale-105 transition-all">Create Profile</button>
           </div>
           <div className="space-y-16">
             <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-[#E1784F]">Contact.</h2>
@@ -272,7 +257,7 @@ export default function LandingPage() {
              <div className="space-y-8">
                <p className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC]">Legal</p>
                <ul className="space-y-5 text-[10px] font-black uppercase tracking-widest opacity-30">
-                 <li className="hover:text-[#4DB6AC] cursor-pointer" onClick={() => openAuth('signin')}>Login</li>
+                 <li className="hover:text-[#4DB6AC] cursor-pointer" onClick={() => navigateToAuth('login')}>Login</li>
                  <li className="hover:text-[#4DB6AC] cursor-pointer">Security</li>
                </ul>
              </div>
@@ -297,7 +282,7 @@ export default function LandingPage() {
                   key={item} 
                   onClick={() => { 
                     setMobileMenuOpen(false); 
-                    if (item === 'Login') openAuth('signin');
+                    if (item === 'Login') navigateToAuth('login');
                     else if (item === 'Contact') document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
                     else handleFeatureAccess(item === 'Mission' ? '/mission' : '/marketplace');
                   }} 
@@ -307,12 +292,10 @@ export default function LandingPage() {
                 </button>
                ))}
             </div>
-            <button onClick={() => openAuth("signup")} className="w-full py-8 bg-[#E1784F] text-white rounded-[2rem] font-black uppercase text-[12px] tracking-widest shadow-2xl">Get Started</button>
+            <button onClick={() => navigateToAuth("register")} className="w-full py-8 bg-[#E1784F] text-white rounded-[2rem] font-black uppercase text-[12px] tracking-widest shadow-2xl">Get Started</button>
           </motion.div>
         )}
       </AnimatePresence>
-
-      <AuthModals isOpen={isAuthModalOpen} type={authType} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   )
 }
