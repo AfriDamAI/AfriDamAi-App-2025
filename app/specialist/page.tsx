@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM SPECIALIST CONSOLE: PRODUCTION SYNC
- * Version: 2026.1.22 (Live Handshake Integration)
- * Rule 5: Fully synced with useSocket hook and Prisma Profile models.
+ * Version: 2026.1.22 (Human-First & Path Sync)
+ * Rule 5: Fully synced with root useSocket hook and user profile models.
  */
 
 "use client"
@@ -9,18 +9,17 @@
 import React, { useState, useEffect, useRef } from "react"
 import { 
   Send, ChevronLeft, Stethoscope, ShieldCheck, 
-  FileText, User, Activity, Zap, Clock, 
-  Video, MessageSquare 
+  FileText, Activity, Clock, 
+  Video, MessageSquare, Heart
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { VideoRoom } from "@/components/specialist/live/video-room"
 import { DoctorsNote } from "@/components/specialist/live/doctors-note"
-import { useSocket } from "@/components/hooks/use-socket" // 🛡️ SYNCED PATH
+import { useSocket } from "@/hooks/use-socket" // 🛡️ FIXED PATH
 import apiClient from "@/lib/api-client"
 
-// 🧬 THE ANTI-ANY SHIELD
 interface SocketPayload {
   content: string;
   payload?: {
@@ -34,7 +33,6 @@ export default function SpecialistChatPage() {
   const { user } = useAuth();
   const router = useRouter();
   
-  // 🛰️ INITIALIZE THE NEURAL LINK
   const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "";
   const { isConnected, emit, listen } = useSocket(socketUrl);
   
@@ -53,9 +51,6 @@ export default function SpecialistChatPage() {
   
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * 🔬 INITIAL CLINICAL HANDSHAKE
-   */
   useEffect(() => {
     const fetchSessionDetails = async () => {
       if (!user?.id) return;
@@ -66,7 +61,7 @@ export default function SpecialistChatPage() {
         if (data?.specialist) {
           setSpecialist({
             name: `Dr. ${data.specialist.lastName}`,
-            title: data.specialist.type || "Medical Reviewer",
+            title: data.specialist.type || "Medical Professional",
             avatar: data.specialist.profileImage
           });
         }
@@ -75,35 +70,27 @@ export default function SpecialistChatPage() {
           setDoctorsNote(data.notes);
         }
       } catch (err) {
-        console.error("Clinical Node Sync Failed:", err);
+        console.error("Clinical Session Sync Failed:", err);
       }
     };
 
     fetchSessionDetails();
   }, [user?.id]);
 
-  /**
-   * 🚀 LIVE HANDSHAKE LISTENERS
-   * FIXED: Explicitly typed 'data' to resolve ts(7006)
-   */
   useEffect(() => {
     if (!isConnected) return;
 
-    // Join room based on user session
-    emit("join_session", { userId: user?.id, content: "Joining Portal" });
+    emit("join_session", { userId: user?.id, content: "Joining Consultation" });
 
-    // Listen for incoming specialist messages
     listen("new_message", (data: SocketPayload) => {
       setMessages((prev) => [...prev, { id: Date.now(), role: "specialist", content: data.content }]);
     });
 
-    // Listen for real-time Note updates
     listen("note_update", (data: SocketPayload) => {
       if (data.payload?.note) setDoctorsNote(data.payload.note);
       setIsPrescribing(false);
     });
 
-    // Listen for typing indicators
     listen("specialist_typing", (data: SocketPayload) => {
       setIsTyping(data.payload?.isTyping || false);
       if (data.payload?.isNote) setIsPrescribing(data.payload.isTyping || false);
@@ -111,7 +98,6 @@ export default function SpecialistChatPage() {
 
   }, [isConnected, user?.id, emit, listen]);
 
-  // 🛡️ SECURITY GUARD
   useEffect(() => {
     if (!user) return;
     const hasAccess = user.profile?.subscriptionPlan !== "Free" || user.profile?.onboardingCompleted;
@@ -130,34 +116,31 @@ export default function SpecialistChatPage() {
     e.preventDefault();
     if (!input.trim() || !isConnected) return;
 
-    const payload = {
+    emit("send_message", {
       content: input,
       userId: user?.id,
       senderId: user?.id
-    };
-
-    // 🛰️ EMIT TO BACKEND
-    emit("send_message", payload);
+    });
 
     setMessages(prev => [...prev, { id: Date.now(), role: "user", content: input }]);
     setInput("");
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col md:flex-row overflow-hidden no-scrollbar">
+    <div className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white flex flex-col md:flex-row overflow-hidden transition-colors">
       
-      {/* 🧬 1. CLINICAL SIDEBAR */}
-      <aside className="w-full md:w-[400px] border-r border-white/10 p-8 space-y-10 overflow-y-auto no-scrollbar bg-[#0A0A0A] z-20">
+      {/* 🧬 1. SIDEBAR */}
+      <aside className="w-full md:w-[400px] border-r border-black/5 dark:border-white/10 p-8 space-y-8 overflow-y-auto no-scrollbar bg-gray-50 dark:bg-[#0A0A0A] z-20">
         <button 
           onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] text-[#4DB6AC] mb-12 hover:translate-x-[-4px] transition-transform"
+          className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] text-[#4DB6AC] hover:translate-x-[-4px] transition-transform"
         >
-          <ChevronLeft size={16} /> Exit Portal
+          <ChevronLeft size={16} /> Exit Room
         </button>
 
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-             <div className="w-14 h-14 bg-[#E1784F] rounded-2xl flex items-center justify-center text-white shadow-2xl relative overflow-hidden">
+             <div className="w-14 h-14 bg-[#E1784F] rounded-2xl flex items-center justify-center text-white shadow-xl overflow-hidden">
                 {specialist?.avatar ? (
                     <img src={specialist.avatar} alt="Specialist" className="w-full h-full object-cover" />
                 ) : (
@@ -165,62 +148,62 @@ export default function SpecialistChatPage() {
                 )}
              </div>
              <div>
-                <h2 className="text-2xl font-black italic uppercase tracking-tighter">
-                    {specialist?.name || "Assigning..."}
+                <h2 className="text-xl font-black uppercase tracking-tight">
+                    {specialist?.name || "Connecting..."}
                 </h2>
                 <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">
-                    {specialist?.title || "Specialist Node"}
+                    {specialist?.title || "Medical Specialist"}
                 </p>
              </div>
           </div>
           
-          <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-4">
+          <div className="p-6 bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-3xl shadow-sm">
              <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest opacity-40">
                 <span>Status</span>
                 <span className={isConnected ? "text-[#4DB6AC] animate-pulse" : "text-red-500"}>
-                  {isConnected ? "Sync Active" : "Offline"}
+                  {isConnected ? "Secure Connection" : "Offline"}
                 </span>
              </div>
-             <div className="flex items-center gap-3 opacity-60">
+             <div className="flex items-center gap-3 mt-4 opacity-60">
                 <Clock size={14} />
-                <span className="text-xs font-bold uppercase tracking-tighter">Live Session</span>
+                <span className="text-xs font-bold">Session Active</span>
              </div>
           </div>
         </div>
 
         <DoctorsNote note={doctorsNote} isPrescribing={isPrescribing} />
 
-        <div className="space-y-6 pt-6 border-t border-white/5">
-           <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30 flex items-center gap-2">
-             <FileText size={14} /> Clinical Profile
+        <div className="space-y-6 pt-6 border-t border-black/5 dark:border-white/5">
+           <h3 className="text-[10px] font-black uppercase tracking-[0.5em] opacity-30 flex items-center gap-2">
+             <FileText size={14} /> Clinical Data
            </h3>
-           <div className="space-y-3">
-              <div className="p-5 bg-white/5 border border-white/10 rounded-2xl">
-                 <p className="text-[8px] font-black uppercase tracking-widest opacity-30 mb-1">Dermal Type</p>
-                 <p className="text-xs font-black italic uppercase tracking-tight text-[#4DB6AC]">{user?.profile?.skinType || "Analysis Pending"}</p>
+           <div className="grid grid-cols-2 gap-3">
+              <div className="p-4 bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl text-center">
+                 <p className="text-[7px] font-black uppercase tracking-widest opacity-30 mb-1">Skin Type</p>
+                 <p className="text-[10px] font-black text-[#4DB6AC] uppercase">{user?.profile?.skinType || "Reviewing"}</p>
               </div>
-              <div className="p-5 bg-white/5 border border-white/10 rounded-2xl">
-                 <p className="text-[8px] font-black uppercase tracking-widest opacity-30 mb-1">Melanin Tone</p>
-                 <p className="text-xs font-black italic uppercase tracking-tight text-[#E1784F]">{user?.profile?.melaninTone || "Type VI"}</p>
+              <div className="p-4 bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl text-center">
+                 <p className="text-[7px] font-black uppercase tracking-widest opacity-30 mb-1">Tone</p>
+                 <p className="text-[10px] font-black text-[#E1784F] uppercase">{user?.profile?.melaninTone || "Type VI"}</p>
               </div>
            </div>
         </div>
 
         <button 
           onClick={() => setViewMode(viewMode === 'chat' ? 'video' : 'chat')}
-          className="w-full h-20 bg-white text-black rounded-3xl font-black uppercase text-[10px] tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl hover:bg-[#4DB6AC] hover:text-white transition-all active:scale-95"
+          className="w-full h-16 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.4em] flex items-center justify-center gap-4 shadow-xl hover:bg-[#4DB6AC] hover:text-white transition-all active:scale-95"
         >
-          {viewMode === 'chat' ? <><Video size={18} /> Switch to Video</> : <><MessageSquare size={18} /> Return to Chat</>}
+          {viewMode === 'chat' ? <><Video size={18} /> Start Video</> : <><MessageSquare size={18} /> Return to Chat</>}
         </button>
       </aside>
 
-      {/* 🏛️ 2. DYNAMIC WORKSPACE */}
+      {/* 🏛️ 2. WORKSPACE */}
       <main className="flex-1 flex flex-col relative h-[100svh] md:h-screen">
-        <header className="p-8 border-b border-white/5 flex items-center justify-between bg-[#050505]/80 backdrop-blur-2xl z-10">
+        <header className="p-8 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl z-10">
            <div className="flex items-center gap-4">
               <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-[#4DB6AC] animate-pulse' : 'bg-red-500'}`} />
-              <h1 className="text-xl font-black italic uppercase tracking-tighter">
-                {viewMode === 'chat' ? 'Secure Clinical Chat' : 'Live Neural Link'}
+              <h1 className="text-lg font-black uppercase tracking-tight">
+                {viewMode === 'chat' ? 'Secure Clinical Chat' : 'Secure Video Feed'}
               </h1>
            </div>
            <ShieldCheck size={18} className="opacity-30 text-[#4DB6AC]" />
@@ -230,28 +213,30 @@ export default function SpecialistChatPage() {
           {viewMode === 'chat' ? (
             <motion.div 
               key="chat"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="flex-1 flex flex-col overflow-hidden"
             >
               <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar scroll-smooth pb-32">
                 <div className="flex justify-start">
-                    <div className="max-w-[80%] space-y-4">
-                      <div className="w-10 h-10 bg-[#4DB6AC] rounded-xl flex items-center justify-center text-black shadow-lg">
-                          <Zap size={20} fill="currentColor" />
+                    <div className="max-w-[85%] space-y-4">
+                      <div className="w-10 h-10 bg-[#4DB6AC] rounded-xl flex items-center justify-center text-white shadow-lg">
+                          <Heart size={18} fill="currentColor" />
                       </div>
-                      <div className="p-6 bg-white/5 border border-white/10 rounded-[2rem] text-sm font-medium italic text-white/80">
-                        "Welcome {user?.firstName}. {specialist?.name || "The specialist"} is reviewing your neural metrics. How can we support you today?"
+                      <div className="p-6 bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl text-sm leading-relaxed">
+                        "Hello {user?.firstName}. Your medical specialist is reviewing your scan results. How can we help you today?"
                       </div>
                     </div>
                 </div>
 
                 {messages.map((msg) => (
                   <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[80%] space-y-4 ${msg.role === 'user' ? 'flex flex-col items-end' : ''}`}>
-                        <div className={`p-6 rounded-[2rem] text-sm font-bold ${
-                          msg.role === 'user' ? 'bg-white text-black shadow-xl' : 'bg-white/5 text-white/80'
+                      <div className={`max-w-[85%] space-y-4`}>
+                        <div className={`p-5 rounded-2xl text-sm leading-relaxed ${
+                          msg.role === 'user' 
+                            ? 'bg-[#E1784F] text-white shadow-lg' 
+                            : 'bg-gray-100 dark:bg-white/5 text-black dark:text-white'
                         }`}>
                             {msg.content}
                         </div>
@@ -261,26 +246,26 @@ export default function SpecialistChatPage() {
 
                 {isTyping && (
                   <div className="flex justify-start animate-pulse">
-                    <div className="px-6 py-3 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-[#4DB6AC]">
-                      {isPrescribing ? "Drafting care node..." : "Specialist typing..."}
+                    <div className="px-5 py-2 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 rounded-full text-[9px] font-black uppercase tracking-widest text-[#4DB6AC]">
+                      {isPrescribing ? "Updating Medical Note..." : "Specialist is typing..."}
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="p-8 bg-gradient-to-t from-[#050505] to-transparent">
+              <div className="p-8 bg-gradient-to-t from-white dark:from-[#050505] to-transparent">
                 <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto relative flex items-center">
                     <input 
                       type="text"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      placeholder="Enter clinical inquiry..."
-                      className="w-full h-20 bg-white/5 border border-white/10 rounded-[2rem] px-8 text-sm font-black italic uppercase outline-none focus:border-[#E1784F] transition-all placeholder:opacity-20"
+                      placeholder="Type your message..."
+                      className="w-full h-16 bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl px-6 text-sm font-medium outline-none focus:border-[#E1784F] transition-all"
                     />
                     <button 
                       type="submit"
                       disabled={!input.trim() || !isConnected}
-                      className="absolute right-3 w-14 h-14 bg-[#E1784F] text-white rounded-full flex items-center justify-center shadow-xl active:scale-90 disabled:opacity-20"
+                      className="absolute right-2 w-12 h-12 bg-[#E1784F] text-white rounded-xl flex items-center justify-center shadow-lg active:scale-90 disabled:opacity-20"
                     >
                       <Send size={18} />
                     </button>
