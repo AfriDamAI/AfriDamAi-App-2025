@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM AUTH PROVIDER (Rule 6 Synergy)
- * Version: 2026.1.11 (Post-Interceptor Unwrap Sync)
- * Focus: High-speed clinical bypass with accurate data extraction.
+ * Version: 2026.1.22 (Post-Interceptor Unwrap Sync)
+ * Focus: High-speed profile sync with clean English.
  */
 
 "use client"
@@ -16,22 +16,17 @@ import {
   updateUser, 
   forgotPassword as forgotPasswordApi 
 } from "@/lib/api-client" 
-import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types"
+import { UserLoginDto, CreateUserDto } from "@/lib/types"
 
 interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  displayName?: string; 
-  sex?: string;       
-  createdAt?: string; 
   phoneNo?: string;   
   profile?: {
-    primaryConcern?: string;
-    nationality?: string;
     skinType?: string;
-    allergies?: string;
+    melaninTone?: string;
     [key: string]: any;
   };
 }
@@ -46,7 +41,8 @@ interface AuthContextType {
   signOut: () => void
   forgotPassword: (email: string) => Promise<void>
   updateUserProfile: (updates: Partial<any>) => Promise<User | null>
-  refreshUser: () => Promise<void>
+  refreshUser: () => Promise<void> // 🚀 This is our 'mutate' button
+  mutate: () => Promise<void>     // Alias for the Profile page fix
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -56,26 +52,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasToken, setHasToken] = useState<boolean>(false)
 
-  /**
-   * 🛡️ SYNCED HELPER: Interceptor now handles resultData unwrapping.
-   * This helper ensures we safely grab the user object from the clean response.
-   */
-  const extractUserData = (data: any) => {
-    // If data is already the user object or has a nested user key
-    return data?.user || data;
-  };
+  const extractUserData = (data: any) => data?.user || data;
 
   const fetchUserData = async (userId: string) => {
     try {
       const response = await getUser(userId);
-      // getUser() now returns the unwrapped resultData directly
       const userData = extractUserData(response);
       if (userData) {
         setUser(userData);
         return userData;
       }
     } catch (err) {
-      console.error("Profile Fetch Failed:", err);
+      console.error("Profile sync paused");
     }
     return null;
   };
@@ -105,27 +93,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (credentials: UserLoginDto) => {
     setIsLoading(true);
     try {
-      /**
-       * 🚀 RULE 6 FIX: The api-client interceptor has already unwrapped 'resultData'.
-       * 'data' here IS now the resultData object (containing accessToken, user, etc.)
-       */
       const data: any = await login(credentials);
       const accessToken = data?.accessToken;
       
-      if (!accessToken) throw new Error("Invalid Token Handshake");
+      if (!accessToken) throw new Error("Link failed");
 
-      // Set persistence immediately
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
       setHasToken(true);
 
       const decoded: any = jwtDecode(accessToken);
-      
-      // Update local user state immediately with available data from login
-      const userData = extractUserData(data);
-      setUser(userData);
-
-      // Background refresh to get full clinical profile
+      setUser(extractUserData(data));
       await fetchUserData(decoded.sub || decoded.id || decoded.userId);
     } catch (error) {
       signOut();
@@ -155,6 +133,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }
 
+  const refreshUser = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      await fetchUserData(decoded.sub || decoded.id || decoded.userId);
+    }
+  }
+
   const updateUserProfile = async (updates: Partial<any>) => {
     if (!user?.id) return null;
     try {
@@ -164,29 +150,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(prev => prev ? { ...prev, ...updatedData } : updatedData);
       return updatedData;
     } catch (error: any) {
-      console.error("Critical Handshake Error:", error.response?.data || error.message);
+      console.error("Profile sync error");
       throw error;
     }
   }
 
-  const refreshUser = async () => {
-    if (user?.id) await fetchUserData(user.id);
-  }
-
-  const requiresOnboarding = false;
-
   const contextValue = useMemo(() => ({
     user,
-    // 🚀 THE BYPASS: True if token exists OR user is set.
     isSignedIn: hasToken || !!user,
     isLoading,
-    requiresOnboarding,
+    requiresOnboarding: false,
     signIn,
     signUp,
     signOut,
     forgotPassword: forgotPasswordApi,
     updateUserProfile,
-    refreshUser
+    refreshUser,
+    mutate: refreshUser // 🛡️ Fix for the Profile page error
   }), [user, isLoading, hasToken]);
 
   return (

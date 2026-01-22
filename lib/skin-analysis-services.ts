@@ -1,9 +1,9 @@
 "use client"
 
 /**
- * 🛡️ AFRIDAM AESTHETIC NEURAL SERVICE
- * Version: 2026.1.0
- * Combines Edge Inference (TensorFlow) with Cloud Aesthetic Enrichment.
+ * 🛡️ AFRIDAM AESTHETIC NEURAL SERVICE (Rule 6 Synergy)
+ * Version: 2026.1.1 (Backend Handshake Optimization)
+ * Focus: Sophisticated Scaling, Property Alignment, Rule 6 Compliance.
  */
 
 import { analyzeSkinImage as runTensorFlowAnalysis } from "./tensorflow-model"
@@ -11,14 +11,14 @@ import apiClient from "@/lib/api-client"
 
 export interface SkinObservation {
   name: string
-  intensity: "low" | "moderate" | "high" // 🛡️ RE-ENFORCED: Non-medical terminology
+  intensity: "low" | "moderate" | "high"
   confidence: number
   description: string
   suggestion: string
 }
 
 export interface DetailedSkinAnalysis {
-  overallGlow: number // 🛡️ RE-ENFORCED: Beauty-centric metric
+  overallGlow: number
   observations: SkinObservation[]
   recommendations: string[]
   careSuggestions: Array<{
@@ -47,38 +47,40 @@ export async function performSkinAnalysis(
       localAnalysis = await runTensorFlowAnalysis(imageData);
       log += "Local Analysis Complete. ";
     } catch (error) {
-      console.warn("Local TensorFlow failed, shifting to Cloud Node:", error);
+      // 🛡️ Rule 6: No jargon, just graceful fallback
       log += "Local Analysis Bypassed. ";
     }
 
-    /** * 🚀 OGA FIX: SYNCED WITH TOBI'S AI MODULE
-     * Path updated from /analyzer/skin/enrich to /ai/analyze-skin/enrich
+    /** * 🚀 RULE 6 SYNC: 
+     * Handshake with Tobi's AI Module.
+     * Path: /ai/analyze-skin/enrich
      */
     const apiResponse = await apiClient.post("/ai/analyze-skin/enrich", {
       imageId,
-      // Only send raw data if imageId is missing (Safety Fallback)
       rawBuffer: !imageId ? imageData : null 
     });
 
-    const apiAnalysis = apiResponse.data;
+    const apiData = apiResponse.data;
 
-    // 🛡️ STEP 3: Combine Results with Aesthetic Bias
+    // 🛡️ STEP 3: Combine Results with Property Fallbacks (Preventing Undefined)
     const combinedAnalysis: DetailedSkinAnalysis = {
-      overallGlow: localAnalysis?.overallHealth || apiAnalysis.overallGlow || 85,
-      observations: apiAnalysis.observations || apiAnalysis.conditions || [],
-      recommendations: apiAnalysis.recommendations || [
+      // 🚀 OGA FIX: Checking both camelCase and snake_case from Backend
+      overallGlow: localAnalysis?.overallHealth || apiData.overallGlow || apiData.overall_glow || 85,
+      observations: apiData.observations || apiData.conditions || [],
+      recommendations: apiData.recommendations || [
         "Maintain hydration levels",
         "Perform a 24-hour patch test for new products"
       ],
-      careSuggestions: apiAnalysis.careSuggestions || apiAnalysis.productSuggestions || [],
-      summary: apiAnalysis.summary || "Aesthetic evaluation complete. Review details below.",
+      careSuggestions: apiData.careSuggestions || apiData.care_suggestions || apiData.productSuggestions || [],
+      summary: apiData.summary || "Aesthetic evaluation complete. Review details below.",
       processingLog: log + "Cloud AI Sync Finalized."
     };
 
     return combinedAnalysis;
   } catch (error) {
-    console.error("Aesthetic Skin Analysis Failed:", error);
-    throw new Error("Glow Sync Failed. Please check your connection.");
+    console.error("Clinical Sync Failed:", error);
+    // 🛡️ RE-ENFORCED: Relatable English
+    throw new Error("We couldn't sync your skin data. Please check your connection and try again.");
   }
 }
 

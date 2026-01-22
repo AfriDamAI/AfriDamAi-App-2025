@@ -1,15 +1,14 @@
 /**
  * 🛡️ AFRIDAM NEURAL SOCKET HOOK
- * Location: components/hooks/use-socket.tsx
- * Version: 2026.1.21 (Type-Safe Handshake)
+ * Location: hooks/use-socket.tsx
+ * Version: 2026.1.22 (Handshake Sync)
  * Rule 5: Pure logic engine. Resolves ts(7006) 'any' errors.
  */
 
 import { useEffect, useState, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 
-// 🧬 Define the Clinical Data structure
-// This ensures 'data' never implicitly has an 'any' type.
+// 🧬 Define the Message Data structure
 export interface SocketData {
   content: string;
   senderId?: string;
@@ -29,29 +28,35 @@ export const useSocket = (url: string) => {
   useEffect(() => {
     if (!url) return;
 
-    // 🚀 Initializing the WebSocket Handshake
+    /**
+     * 🚀 THE HANDSHAKE (Rule 6)
+     * Ensuring the token is pulled from local storage for the specialist sync.
+     */
     const socketInstance = io(url, {
       transports: ["websocket"],
       secure: true,
+      reconnection: true,
       auth: {
-        // Rule 5: Safety check for client-side execution
         token: typeof window !== 'undefined' ? localStorage.getItem("token") : null
       }
     });
 
     socketInstance.on("connect", () => {
       setIsConnected(true);
-      console.log("Clinical Node: ONLINE");
+      // 🛡️ Soft Tone: Keep it relatable
+      console.log("Specialist Sync: ACTIVE");
     });
 
     socketInstance.on("disconnect", () => {
       setIsConnected(false);
-      console.log("Clinical Node: OFFLINE");
+      console.log("Specialist Sync: PAUSED");
     });
 
     setSocket(socketInstance);
 
     return () => {
+      // 🚀 OGA FIX: Clean up all listeners to prevent double-messages
+      socketInstance.off();
       socketInstance.disconnect();
     };
   }, [url]);

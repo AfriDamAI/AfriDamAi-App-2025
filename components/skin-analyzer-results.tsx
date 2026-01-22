@@ -1,6 +1,6 @@
 /**
- * 🛡️ AFRIDAM SKIN WELLNESS: RESULTS VIEW (Rule 7 Sync)
- * Version: 2026.1.4 (Handshake & Visual Intensity Sync)
+ * 🛡️ AFRIDAM SKIN WELLNESS: RESULTS VIEW (Rule 6 Synergy)
+ * Version: 2026.1.13 (Handshake & Visual Intensity Sync)
  * Focus: High-Precision Indicator mapping for Melanin-Rich profiles.
  */
 
@@ -19,8 +19,11 @@ interface SkinAnalysisResultsProps {
     finding?: string;
     predictions?: Record<string, number>;
     status?: string;
-    overallHealth?: number; // Standardized with parent
-    overallGlow?: number;   // Fallback support
+    // 🚀 OGA FIX: Syncing with potential snake_case from Backend
+    overallHealth?: number; 
+    overall_health?: number;
+    overallGlow?: number;   
+    overall_glow?: number;
   }
 }
 
@@ -28,21 +31,23 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
   const router = useRouter();
   
   /**
-   * 🛡️ THE HANDSHAKE SYNC (Rule 7)
-   * Standardizing the wellness index from the backend payload.
+   * 🛡️ THE HANDSHAKE SYNC (Rule 6)
+   * Prioritize the most clinical index available in the payload.
    */
-  const healthIndex = data.overallHealth || data.overallGlow || 85;
+  const healthIndex = data.overallHealth || data.overall_health || data.overallGlow || data.overall_glow || 85;
   const findings = data.finding || "Analysis complete. Maintaining your current hydration and protection routine is recommended.";
 
   /**
    * 🎨 INTENSITY LOGIC (Rule 6: Low Stress)
-   * High confidence in a finding (like dryness or irritation) triggers a 
-   * warmer, attention-grabbing tone.
+   * Standardizes colors based on confidence markers.
    */
   const getIntensityStyles = (confidence: number) => {
-    if (confidence < 0.3) return "bg-green-500/10 text-green-500 border-green-500/20"
-    if (confidence < 0.6) return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
-    return "bg-[#E1784F]/10 text-[#E1784F] border-[#E1784F]/20"
+    // Confidence is usually 0-1 from AI, or 0-100 from certain endpoints
+    const value = confidence <= 1 ? confidence : confidence / 100;
+    
+    if (value < 0.3) return "bg-green-500/10 text-green-500 border-green-500/20";
+    if (value < 0.6) return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
+    return "bg-[#E1784F]/10 text-[#E1784F] border-[#E1784F]/20";
   }
 
   return (
@@ -50,7 +55,7 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
       
       {/* 📊 1. WELLNESS INDEX CARD */}
       <Card className="p-6 md:p-8 bg-card border-border backdrop-blur-xl relative overflow-hidden rounded-[2.5rem] shadow-xl">
-        <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
+        <div className="absolute top-0 right-0 p-4 opacity-[0.05]">
            <Activity size={100} />
         </div>
         <div className="flex items-center justify-between mb-4 relative z-10">
@@ -71,32 +76,35 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
         
         <div className="grid gap-3">
           {data.predictions && Object.entries(data.predictions).length > 0 ? (
-            Object.entries(data.predictions).map(([name, confidence]: [string, any], index) => (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }} 
-                animate={{ opacity: 1, y: 0 }} 
-                transition={{ delay: index * 0.1 }}
-                key={name}
-              >
-                <Card className="p-5 md:p-6 bg-card border-border rounded-2xl">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h4 className="text-md font-black uppercase italic tracking-tight text-foreground">
-                        {name.replace(/_/g, ' ')}
-                      </h4>
-                      <p className="text-[8px] text-muted-foreground font-black uppercase tracking-widest mt-0.5">Analysis Match</p>
+            Object.entries(data.predictions).map(([name, confidence], index) => {
+              const displayConfidence = confidence <= 1 ? confidence * 100 : confidence;
+              return (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  transition={{ delay: index * 0.1 }}
+                  key={name}
+                >
+                  <Card className="p-5 md:p-6 bg-card border-border rounded-2xl">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="text-md font-black uppercase italic tracking-tight text-foreground">
+                          {name.replace(/_/g, ' ')}
+                        </h4>
+                        <p className="text-[8px] text-muted-foreground font-black uppercase tracking-widest mt-0.5">Neural Match</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${getIntensityStyles(confidence)}`}>
+                        {displayConfidence.toFixed(0)}%
+                      </span>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${getIntensityStyles(confidence)}`}>
-                      {(confidence * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                  <Progress value={confidence * 100} className="h-1.5 bg-muted" />
-                </Card>
-              </motion.div>
-            ))
+                    <Progress value={displayConfidence} className="h-1.5 bg-muted" />
+                  </Card>
+                </motion.div>
+              )
+            })
           ) : (
-            <div className="p-8 text-center border border-dashed border-border rounded-3xl opacity-30">
-              <p className="text-[9px] font-black uppercase tracking-widest">Awaiting Neural Indicators</p>
+            <div className="p-12 text-center border border-dashed border-border rounded-[2rem] opacity-40">
+              <p className="text-[9px] font-black uppercase tracking-[0.4em]">Awaiting Neural Indicators</p>
             </div>
           )}
         </div>
@@ -113,15 +121,16 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
       </div>
 
       {/* 🛍️ 4. CARE HUB CTA */}
-      <Card className="p-6 md:p-8 bg-gradient-to-r from-[#E1784F] to-[#ff8e5e] border-none rounded-[2.5rem] md:rounded-[3rem] shadow-xl">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center">
+      <Card className="p-6 md:p-8 bg-gradient-to-r from-[#E1784F] to-[#ff8e5e] border-none rounded-[2.5rem] shadow-xl overflow-hidden relative">
+        <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+        <div className="flex flex-col gap-6 md:flex-row md:items-center relative z-10">
           <div className="flex items-center gap-4 flex-1">
             <div className="w-12 h-12 md:w-14 md:h-14 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                <ShoppingBag className="text-white" size={24} />
             </div>
             <div className="text-left text-white">
               <h4 className="text-xl font-black italic uppercase tracking-tighter">The Care Hub</h4>
-              <p className="text-white/80 text-[8px] font-black uppercase tracking-widest">Personalized safe regimens</p>
+              <p className="text-white/80 text-[8px] font-black uppercase tracking-widest leading-none">Personalized melanin-safe products</p>
             </div>
           </div>
           <button 

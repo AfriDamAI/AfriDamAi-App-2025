@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 /**
  * 🛡️ AFRIDAM NEXT CONFIG (Rule 6 Synergy)
- * Version: 2026.1.11 (404 Path Recovery)
- * Focus: High-Precision Hardware Handshake & Redirect Alignment.
+ * Version: 2026.1.14 (Scanner Path Rectification)
+ * Focus: High-Precision Path Alignment & 404 Resolution.
  */
 const nextConfig: NextConfig = {
   eslint: {
@@ -47,23 +47,26 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  /* 🛡️ RULE 6 REDIRECT CLEANUP
-     Ensures that legacy paths don't conflict with our new /auth/ pages.
+  /* 🛡️ RULE 6 REDIRECT SYNC
+     🚀 OGA FIX: Aligning legacy paths with ACTUAL folder names.
   */
   async redirects() {
     return [
       {
         source: '/scan',
-        destination: '/scanner',
+        destination: '/ai-scanner', // ✅ Updated to match your actual folder name
+        permanent: true,
+      },
+      {
+        source: '/scanner',
+        destination: '/ai-scanner', // ✅ Updated to match your actual folder name
         permanent: true,
       },
       {
         source: '/ingredients',
-        destination: '/analyzer',
+        destination: '/analyzer', // ✅ Ensure this folder name is also correct in your sidebar
         permanent: true,
       }
-      // 🚀 NOTE: We are NOT redirecting /auth/ here. 
-      // This allows the file system to handle the /auth/login route directly.
     ];
   },
 

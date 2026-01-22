@@ -1,20 +1,25 @@
+"use client"
+
 /**
- * 🛡️ AFRIDAM NEURAL CORE: INGREDIENT SAFETY SERVICE
- * Optimized for Skincare, Women, and Pediatric Safety.
+ * 🛡️ AFRIDAM NEURAL CORE: INGREDIENT SAFETY SERVICE (Rule 6 Synergy)
+ * Version: 2026.1.18 (Type-Safe Hybrid)
+ * Focus: High-speed local analysis with Cloud Aesthetic Enrichment.
  */
 
 import apiClient from "@/lib/api-client"
+import { analyzeIngredients as runLocalAnalysis } from "./ingredient-nlp-engine"
 
 export interface IngredientResult {
   productName: string;
   totalIngredients: number;
   safetyScore: number;
   riskLevel: "LOW" | "MEDIUM" | "HIGH";
-  isChildSafe: boolean; // 👶 NEW: Vital for your target audience
+  isChildSafe: boolean;
   ingredients: Array<{
     name: string;
     type: string;
-    safety: "safe" | "caution" | "avoid";
+    // 🚀 OGA FIX: Added 'unknown' to match the NLP Engine's output
+    safety: "safe" | "caution" | "avoid" | "unknown"; 
     description: string;
     concerns: string[];
   }>;
@@ -23,56 +28,65 @@ export interface IngredientResult {
   timestamp: number;
 }
 
+/**
+ * Perform hybrid ingredient analysis
+ */
 export async function performIngredientAnalysis(ingredientText: string): Promise<IngredientResult> {
   if (!ingredientText || ingredientText.length < 3) {
-    throw new Error("Invalid formulation text detected.");
+    throw new Error("Please enter a valid list of ingredients.");
   }
 
+  // 🛡️ STEP 1: INSTANT LOCAL ANALYSIS
+  const localData = runLocalAnalysis(ingredientText);
+
   try {
-    /** * 🚀 OGA FIX: SYNCED WITH TOBI'S AI MODULE
-     * Changed from /analyzer/ingredients to /ai/ingredient-check
-     */
+    /** * 🚀 RULE 6 ENDPOINT SYNC */
     const response = await apiClient.post("/ai/ingredient-check", {
       text: ingredientText,
       source: "manual_ingestion"
     });
 
-    const data = response.data;
+    const cloudData = response.data;
 
-    // 🛡️ RE-ENFORCED: Data Mapping for Aesthetic/Beauty Scope
+    // 🛡️ STEP 2: CLOUD ENRICHMENT
     return {
-      productName: data.productName || "Safety Audit Result",
-      totalIngredients: data.totalIngredients || 0,
-      safetyScore: data.safetyScore || 0,
-      // Color-coding for the UI
-      riskLevel: data.safetyScore >= 80 ? "LOW" : data.safetyScore >= 50 ? "MEDIUM" : "HIGH",
-      // 👶 NEW: Check for child-safe ingredients (Tobi's new logic)
-      isChildSafe: data.isChildSafe ?? (data.safetyScore >= 85), 
-      ingredients: (data.ingredients || []).map((ing: any) => ({
+      productName: cloudData.productName || "Safety Audit Result",
+      totalIngredients: cloudData.totalIngredients || localData.totalIngredients,
+      safetyScore: cloudData.safetyScore || localData.safetyScore,
+      riskLevel: (cloudData.safetyScore || localData.safetyScore) >= 80 ? "LOW" : "MEDIUM",
+      isChildSafe: cloudData.isChildSafe ?? localData.isChildSafe, 
+      ingredients: (cloudData.ingredients || localData.analyzedIngredients).map((ing: any) => ({
         name: ing.name,
-        type: ing.type || "Beauty Component",
-        safety: ing.safety || "caution",
-        description: ing.description || "Safety data for this component is being updated.",
+        // 🚀 OGA FIX: Force string conversion to prevent 'any' errors
+        type: String(ing.type || ing.profile?.type || "Beauty Component"),
+        safety: (ing.safety as "safe" | "caution" | "avoid" | "unknown") || "unknown",
+        description: String(ing.description || ing.profile?.description || "Safety data is being updated."),
         concerns: ing.concerns || [],
       })),
-      recommendations: data.recommendations || ["Perform a 24-hour patch test."],
-      summary: data.summary || "Evaluation complete. Please check flagged items.",
+      recommendations: cloudData.recommendations || localData.recommendations,
+      summary: cloudData.summary || localData.summary,
       timestamp: Date.now()
     };
 
   } catch (error) {
-    console.error("Aesthetic Intelligence Sync Error:", error);
+    console.warn("Cloud Sync failed, reverting to Local Engine:", error);
     
-    // 🔬 FALLBACK: Simple Local Parser if Backend is truly offline
+    // 🛡️ STEP 3: GRACEFUL LOCAL FALLBACK
     return {
-      productName: "Basic Safety Check",
-      totalIngredients: 0,
-      safetyScore: 50,
-      riskLevel: "MEDIUM",
-      isChildSafe: false,
-      ingredients: [],
-      recommendations: ["Connection weak. Please try again for full AI analysis."],
-      summary: "Limited offline analysis. Full safety check requires sync.",
+      productName: "Local Safety Audit",
+      totalIngredients: localData.totalIngredients,
+      safetyScore: localData.safetyScore,
+      riskLevel: localData.safetyScore >= 80 ? "LOW" : localData.safetyScore >= 50 ? "MEDIUM" : "HIGH",
+      isChildSafe: localData.isChildSafe || false,
+      ingredients: localData.analyzedIngredients.map(ing => ({
+        name: ing.name,
+        type: String(ing.profile?.type || "Component"),
+        safety: ing.safety as "safe" | "caution" | "avoid" | "unknown",
+        description: String(ing.profile?.description || "Analyzed via local database."),
+        concerns: ing.concerns,
+      })),
+      recommendations: localData.recommendations,
+      summary: localData.summary + " (Offline Mode)",
       timestamp: Date.now()
     };
   }
