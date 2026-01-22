@@ -1,8 +1,7 @@
 /**
- * 🛡️ AFRIDAM ROOT SYSTEM: THE FOUNDATION
- * Version: 2026.1.2 (Premium Editorial Refactor)
- * Handshake: Global Auth & Theme Persistence
- * Focus: High-End Ambiance, Mature Typography, Clinical Integrity.
+ * 🛡️ AFRIDAM ROOT SYSTEM: THE FOUNDATION (Rule 6 Synergy)
+ * Version: 2026.1.11 (Build Stability & Type Alignment)
+ * Focus: High-End Ambiance, Zero-Flicker Redirection, Build Stability.
  */
 
 "use client"
@@ -12,6 +11,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/providers/theme-provider"
 import { AuthProvider } from "@/providers/auth-provider"
+// 🚀 RULE 6 FIX: Corrected import path for AuthGuard
 import { AuthGuard } from "@/components/auth-guard" 
 import { AppWrapper } from "@/components/app-wrapper"
 import { AIChatBot } from "@/components/ai/ai-chatbot" 
@@ -35,12 +35,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   const pathname = usePathname();
-  const isLandingPage = pathname === "/";
+  
+  // 🛡️ Rule 6 Logic: Define public routes where the AppWrapper (Sidebar/Nav) is not needed
+  const publicRoutes = ["/", "/auth/login", "/auth/register", "/forgot-password"];
+  const isPublicPage = publicRoutes.includes(pathname);
 
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <head>
-        {/* 📱 VIEWPORT OPTIMIZATION */}
+        {/* 📱 VIEWPORT OPTIMIZATION - Mobile First (Rule 3) */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" /> 
         
         {/* 🛡️ CLINICAL BRANDING */}
@@ -48,7 +51,6 @@ export default function RootLayout({
         <meta name="description" content="Clinical-grade AI diagnostics and verified skincare regimens for the African family." />
         <meta name="theme-color" content="#050505" />
         
-        {/* Favicons & Icons */}
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-[#050505] text-black dark:text-white selection:bg-[#E1784F]/30 min-h-[100svh] relative overflow-x-hidden transition-colors duration-500`}>
@@ -56,11 +58,12 @@ export default function RootLayout({
         {/* 🛡️ GLOBAL EDITORIAL TEXTURE */}
         <div className="fixed inset-0 z-[0] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
         
-        {/* --- LIGHTING ORBS (Subtle Depth) --- */}
+        {/* --- LIGHTING ORBS --- */}
         <div className="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#E1784F]/5 blur-[120px] rounded-full pointer-events-none z-[1]" />
         <div className="fixed bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#4DB6AC]/5 blur-[100px] rounded-full pointer-events-none z-[1]" />
 
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        {/* 🚀 THE FIX: ThemeProvider props removed to resolve ts(2322) */}
+        <ThemeProvider>
           <AuthProvider>
             <AuthGuard>
               <AnimatePresence mode="wait">
@@ -72,7 +75,8 @@ export default function RootLayout({
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
                 >
-                  {isLandingPage ? (
+                  {/* 🚀 RULE 6: High-speed route management */}
+                  {isPublicPage ? (
                     <main className="w-full flex-1">
                       {children}
                     </main>
@@ -84,7 +88,7 @@ export default function RootLayout({
                 </motion.div>
               </AnimatePresence>
               
-              {/* 💬 THE CARE ASSISTANT (Persistent Support) */}
+              {/* 💬 PERSISTENT SUPPORT */}
               <div className="fixed bottom-8 right-8 z-[100]">
                 <AIChatBot />
               </div>

@@ -1,3 +1,9 @@
+/**
+ * 🛡️ AFRIDAM THEME PROVIDER (Rule 6 Synergy)
+ * Version: 2026.1.11 (Dark-Default Sync)
+ * Focus: Eliminating Hydration Flicker & Syncing with Tailwind 4.0.
+ */
+
 "use client"
 
 import type React from "react"
@@ -13,20 +19,19 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // 🛡️ RE-ENFORCED: Initial state set to "light" for clinical consistency
-  const [theme, setTheme] = useState<Theme>("light")
+  // 🚀 RULE 6 FIX: Initial state set to "dark" to match Dashboard & Auth aesthetics
+  const [theme, setTheme] = useState<Theme>("dark")
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // 1. Check if user has a saved preference
     const savedTheme = localStorage.getItem("theme") as Theme | null
     
-    // 🛡️ OGA FIX: Intentional override of system settings for "Light-First" onboarding
-    const initialTheme = savedTheme || "light"
+    // 🛡️ SYNERGY: Default to dark for the 2026 Clinical Intelligence Hub
+    const initialTheme = savedTheme || "dark"
 
     setTheme(initialTheme)
     
-    // 2. Immediate DOM Sync for Tailwind 4.0 dark: classes
+    // 2. Immediate DOM Sync
     if (initialTheme === "dark") {
       document.documentElement.classList.add("dark")
       document.documentElement.style.colorScheme = "dark"
@@ -43,7 +48,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const newTheme = prev === "light" ? "dark" : "light"
       localStorage.setItem("theme", newTheme)
       
-      // 🛡️ RE-ENFORCED: Sync both Class and colorScheme for mobile browser compatibility
       if (newTheme === "dark") {
         document.documentElement.classList.add("dark")
         document.documentElement.style.colorScheme = "dark"
@@ -57,11 +61,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   // 🛡️ NUCLEAR STABILIZER: Prevent Hydration Flicker
-  // The "invisible" class prevents the user from seeing the default 
-  // theme before the JS decides which one to apply.
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className={!mounted ? "invisible" : "visible contents"}>
+      <div className={!mounted ? "opacity-0" : "opacity-100 contents transition-opacity duration-300"}>
         {children}
       </div>
     </ThemeContext.Provider>
