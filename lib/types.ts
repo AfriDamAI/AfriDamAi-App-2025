@@ -1,6 +1,6 @@
 /**
- * 🛡️ AFRIDAM CLINICAL AUTH TYPES (Rule 7 Sync)
- * Version: 2026.1.6 (Unwrapped Interceptor Sync)
+ * 🛡️ AFRIDAM CLINICAL AUTH TYPES (Rule 6 Synergy)
+ * Version: 2026.1.9 (Full Schema Alignment)
  * Focus: High-Precision Type alignment for the Intelligence Hub.
  */
 
@@ -13,7 +13,7 @@ export interface CreateUserDto {
   firstName: string;
   lastName: string;
   email: string;
-  // 🛡️ Rule 7 Sync: Matches User model in schema.prisma
+  // 🛡️ Rule 6 Sync: Matches User model in schema.prisma
   sex: string; 
   phoneNo: string;
   password: string;
@@ -21,27 +21,33 @@ export interface CreateUserDto {
 }
 
 /**
- * 🚀 THE FIX: UNWRAPPED AUTH RESPONSE
- * Rule 7: Matches the data shape AFTER the api-client interceptor 
- * strips the NestJS 'resultData' wrapper.
+ * 🚀 THE SYNERGY FIX: WRAPPED AUTH RESPONSE
+ * Synced with the 2026 NestJS 'resultData' Envelope.
  */
 export interface AuthResponse {
-  accessToken: string;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    sex: string;
-    phoneNo: string;
-    role?: string;
+  message: string;
+  statusCode: number;
+  resultData: {
+    accessToken: string;
+    refreshToken: string;
+    isActive: boolean;
+    displayName: string;
+    role: string;
+    user: {
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      sex: string;
+      phoneNo: string;
+    };
   };
 }
 
 /** 🛡️ RE-ENFORCED: Profile Update Type **/
 export interface UpdateUserDto extends Partial<Omit<CreateUserDto, 'password'>> {
   nationality?: string;
-  // Rule 7: These match the Profile model in Prisma linked via AnalyzerService
+  // Rule 6: These match the Profile model in Prisma linked via AnalyzerService
   ageRange?: number;
   skinToneLevel?: string; // Synced with 'Fitzpatrick Level' in AnalyzerService
   primaryConcern?: string;
