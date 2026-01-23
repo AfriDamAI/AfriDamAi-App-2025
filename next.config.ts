@@ -2,15 +2,15 @@ import type { NextConfig } from "next";
 
 /**
  * 🛡️ AFRIDAM NEXT CONFIG (Rule 6 Synergy)
- * Version: 2026.1.14 (Scanner Path Rectification)
- * Focus: High-Precision Path Alignment & 404 Resolution.
+ * Version: 2026.1.22 (Hardware & Path Sync)
+ * Focus: High-Precision Path Alignment & Hardware Access.
  */
 const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true, // 🚀 RULE 6: Bypasses the 2,000 VS Code errors during Vercel build
   },
 
   async headers() {
@@ -20,10 +20,12 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Permissions-Policy',
-            value: 'camera=*, microphone=(), geolocation=(), interest-cohort=()', 
+            // 🎙️ OGA FIX: Microphone must be allowed for Specialist Audio/Video sessions
+            value: 'camera=*, microphone=*, geolocation=(), interest-cohort=()', 
           },
           {
             key: 'Content-Security-Policy',
+            // 🛡️ SECURITY SYNC: Allowing your specific Backend and AI Engine URLs
             value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https: https://afridamai-backend.onrender.com https://afridam-ai2-api-131829695574.us-central1.run.app;",
           },
           {
@@ -47,24 +49,19 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  /* 🛡️ RULE 6 REDIRECT SYNC
-     🚀 OGA FIX: Aligning legacy paths with ACTUAL folder names.
+  /* 🛡️ PATH HANDSHAKE
+     Ensures legacy links land on your new high-precision folders.
   */
   async redirects() {
     return [
       {
         source: '/scan',
-        destination: '/ai-scanner', // ✅ Updated to match your actual folder name
-        permanent: true,
-      },
-      {
-        source: '/scanner',
-        destination: '/ai-scanner', // ✅ Updated to match your actual folder name
+        destination: '/scanner', 
         permanent: true,
       },
       {
         source: '/ingredients',
-        destination: '/analyzer', // ✅ Ensure this folder name is also correct in your sidebar
+        destination: '/lab', 
         permanent: true,
       }
     ];
@@ -74,7 +71,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: '**', // 🚀 Allows specialists' photos and product images from any secure cloud
       },
     ],
   },

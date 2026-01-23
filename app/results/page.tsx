@@ -1,6 +1,6 @@
 /**
  * 🛡️ AFRIDAM NEURAL DIAGNOSTICS: REPORT (Rule 6 Synergy)
- * Version: 2026.1.22 (Handshake & Soft Tone Alignment)
+ * Version: 2026.1.22 (Handshake & Vercel Build Fix)
  * Focus: High-Precision Report Mapping & Melanin Patterns.
  */
 
@@ -58,7 +58,6 @@ function ResultsContent() {
           imageUrl: data.imageUrl
         })
       } catch (err: any) {
-        // 🛡️ Rule 4: Relatable English
         setError("Our AI core is taking a moment to sync. Please try again.");
       } finally {
         setIsLoading(false)
@@ -87,7 +86,6 @@ function ResultsContent() {
 
   return (
     <div className="max-w-screen-xl mx-auto space-y-20 md:space-y-32 pb-20 text-left">
-        {/* HEADER SECTION (Soft Tone) */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 border-b border-white/5 pb-16">
           <div className="space-y-6">
             <button 
@@ -131,7 +129,6 @@ function ResultsContent() {
             animate={{ opacity: 1, y: 0 }}
             className="grid lg:grid-cols-[1.2fr_0.8fr] gap-16 items-start"
           >
-            {/* LEFT COLUMN */}
             <div className="space-y-16">
               <SkinAnalysisResults data={analysisData} />
               <div className="bg-white/5 p-10 md:p-14 rounded-[3.5rem] border border-white/5 shadow-2xl space-y-10">
@@ -140,18 +137,17 @@ function ResultsContent() {
                     <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-[#4DB6AC]">Summary Observation</h3>
                  </div>
                  <p className="text-2xl md:text-4xl font-black italic uppercase tracking-tighter leading-tight text-white">
-                    "{analysisData.finding || "Your skin shows a healthy, stable pattern with good hydration."}"
+                    "{analysisData.finding || "Your skin shows a healthy, stable pattern."}"
                  </p>
                  <div className="flex items-start gap-3 pt-8 border-t border-white/5">
                     <Info className="text-[#E1784F] shrink-0" size={16} />
                     <p className="text-[9px] font-bold uppercase tracking-widest opacity-30 leading-relaxed">
-                       AI results are for guidance only. For a certified care plan, please talk to a specialist.
+                       AI results are for guidance only. Please talk to a specialist.
                     </p>
                  </div>
               </div>
             </div>
 
-            {/* RIGHT COLUMN */}
             <div className="space-y-10 lg:sticky lg:top-24">
                <div className="p-10 bg-black/40 border border-white/5 rounded-[3.5rem] shadow-2xl space-y-8">
                   <div className="space-y-2">
@@ -181,4 +177,23 @@ function ResultsContent() {
   )
 }
 
-// ... ResultsPage container remains same but updated background styles
+export default function ResultsPage() {
+  return (
+    <main className="min-h-[100svh] bg-[#050505] text-white p-6 lg:p-16 relative overflow-x-hidden">
+      <div className="absolute top-0 right-0 w-full h-[800px] bg-[radial-gradient(circle_at_70%_0%,rgba(225,120,79,0.05),transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] pointer-events-none" />
+
+      <Suspense fallback={
+         <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
+            <Loader2 className="w-16 h-16 text-[#E1784F] animate-spin" strokeWidth={3} />
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 text-[#E1784F]">Syncing Neural Data</p>
+         </div>
+      }>
+        <ResultsContent />
+      </Suspense>
+    </main>
+  )
+}
+
+/** 🚀 RULE 6: FIXES PRERENDER ERROR ON VERCEL **/
+export const dynamic = "force-dynamic";
