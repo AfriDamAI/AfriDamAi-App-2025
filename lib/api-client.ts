@@ -2,9 +2,10 @@ import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /**
- * 🛡️ HIGH-PRECISION INFRASTRUCTURE SYNC
- * baseURL: Main Backend (Render) - Synced with NestJS Global Prefix 'api'
- * aiURL: AI Brain (Google Cloud Run) - Synced with FastAPI '/api/v1'
+ * 🛡️ AFRIDAM INFRASTRUCTURE SYNC
+ * Version: 2026.1.25
+ * baseURL: Synced with Render Backend (Global Prefix 'api')
+ * aiURL: Synced with Google Cloud Run (FastAPI '/api/v1')
  */
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
 const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api/v1";
@@ -16,7 +17,7 @@ const apiClient = axios.create({
   }
 });
 
-/** 🛡️ REQUEST GATEKEEPER **/
+/** 🛡️ RULE 3: REQUEST GATEKEEPER **/
 apiClient.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
@@ -43,12 +44,12 @@ export const setAuthToken = (token: string | null) => {
   }
 };
 
-/** 🛡️ RESPONSE INTERCEPTOR - 202 SYNC
- * Ensures data is extracted correctly even if nested inside 'resultData'.
+/** 🛡️ RULE 3 & 4: RESPONSE INTERCEPTOR - 202 SYNC
+ * Extracts data from NestJS 'resultData' wrapper while preserving standard structure.
  */
 apiClient.interceptors.response.use(
   (response) => {
-    // 🚀 THE FIX: Flexible unwrapping to catch tokens in all response types
+    // Flexible unwrapping for both wrapped and direct JSON responses
     if (response.data && response.data.resultData) {
       return { ...response, data: response.data.resultData };
     }
@@ -59,7 +60,6 @@ apiClient.interceptors.response.use(
       if (typeof window !== "undefined") {
         localStorage.removeItem("token");
         const currentPath = window.location.pathname;
-        // Redirect to clean login path
         if (currentPath !== "/" && currentPath !== "/login") {
           window.location.href = "/login";
         }
@@ -69,14 +69,15 @@ apiClient.interceptors.response.use(
   }
 );
 
-/** 🔑 AUTH ENDPOINTS **/
+/** 🔑 RULE 4: AUTH ENDPOINTS - SYNCED TO NESTJS CONTROLLER **/
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
+  // Syncs with @Post('user/login')
   const response = await apiClient.post("/auth/user/login", credentials);
   return response.data;
 };
 
 export const register = async (userData: CreateUserDto) => {
-  // 🌍 NATIONALITY SYNC: Remapping country field for backend database
+  // 🌍 NATIONALITY SYNC: Remapping country field for clinical database
   const { country, ...rest } = userData as any;
   const payload = {
     ...rest,
@@ -92,7 +93,7 @@ export const forgotPassword = async (email: string) => {
   return response.data;
 };
 
-/** 👤 USER PROFILE **/
+/** 👤 USER PROFILE HANDSHAKE **/
 export const getProfile = async () => {
   const response = await apiClient.get("/profile");
   return response.data;
@@ -126,7 +127,7 @@ const defaultAiContext = {
   user_activeness_on_app: "moderate" 
 };
 
-/** 🔬 AI SCAN MODULE **/
+/** 🔬 RULE 3: AI SCAN MODULE **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   
@@ -174,7 +175,7 @@ export const sendChatMessage = async (message: string) => {
   return response.data;
 };
 
-/** 💳 PAYMENTS **/
+/** 💳 PAYMENTS SYNC **/
 export const initializePayment = async (data: { 
   plan: string, 
   amount: number, 
@@ -190,13 +191,13 @@ export const verifyPayment = async (transactionId: string) => {
   return response.data;
 };
 
-/** 🛍️ CARE SHOP **/
+/** 🛍️ RULE 4: MARKETPLACE SYNC **/
 export const getProducts = async () => {
   const response = await apiClient.get("/product");
   return response.data;
 };
 
-/** 🚀 SKIN DIARY HISTORY **/
+/** 🚀 RULE 5: CLINICAL DIARY HISTORY **/
 export const getScanHistory = async () => {
   const response = await apiClient.get("/analyzer/history"); 
   return response.data;
