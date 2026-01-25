@@ -1,6 +1,6 @@
 /**
- * 🛡️ AFRIDAM MOLECULAR AUDIT: MANUAL ANALYZER (Rule 6 Synergy)
- * Version: 2026.1.5 (Hybrid Handshake Alignment)
+ * 🛡️ AFRIDAM MOLECULAR AUDIT: MANUAL ANALYZER (Rule 7 Precision Sync)
+ * Version: 2026.1.25
  * Focus: High-Precision Ingredient Parsing & Melanin Safety.
  */
 
@@ -20,8 +20,8 @@ import {
   Baby
 } from "lucide-react"
 import IngredientResults from "@/components/ingredient-results"
-// 🚀 RULE 6 ALIGNMENT: Pointing to your existing lib folder to resolve ts(2307)
-import { performIngredientAnalysis } from "@/lib/ingredient-analysis-service" 
+// 🚀 SYNC: Pointing to the verified api-client to resolve ts(2307)
+import { analyzeIngredients } from "@/lib/api-client" 
 
 interface IngredientAnalyzerProps {
   onAnalysisComplete: (results: any) => void
@@ -40,18 +40,29 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
     setError(null)
 
     try {
-      /** * 🚀 THE HYBRID HANDSHAKE (Rule 6)
-       * This handles Local Database lookup + Cloud AI Enrichment.
-       * No more 404s if the backend is slow!
+      /** * 🚀 THE NEURAL HANDSHAKE (Rule 7)
+       * Hits the FastAPI /ingredients-analysis endpoint.
+       * Automatically includes the melanin context from api-client.
        */
-      const data = await performIngredientAnalysis(ingredientText);
+      const data = await analyzeIngredients(ingredientText);
       
-      setResults(data)
-      onAnalysisComplete(data)
+      /** * 📊 DATA MAPPING
+       * riskLevel: Maps 'risk_level' from FastAPI.
+       * safetyScore: Maps 'safety_score' from FastAPI.
+       */
+      const formattedResults = {
+        riskLevel: data?.risk_level || "Balanced",
+        safetyScore: data?.safety_score || data?.score || 85,
+        isChildSafe: data?.child_safe || false,
+        summary: data?.summary || data?.description || "Analysis complete."
+      };
+
+      setResults(formattedResults)
+      onAnalysisComplete(formattedResults)
     } catch (err: any) {
-      // 🛡️ Rule 6: Simple English, no technical jargon
-      setError("The AI Brain is taking a breather. Please try one more time.");
-      console.error("Analysis Failed:", err);
+      // 🛡️ Rule 4: Simple English for mobile users
+      setError("I'm having trouble checking these ingredients. Please check your signal and try again.");
+      console.error("AI Sync Failed:", err.message);
     } finally {
       setIsAnalyzing(false)
     }
@@ -66,13 +77,13 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
 
   if (results) {
     return (
-      <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="space-y-8 animate-in fade-in duration-500 text-left">
         <IngredientResults data={results} onRetry={handleReset} />
         <Button 
           onClick={handleReset} 
           className="w-full h-16 bg-muted/20 border border-white/5 text-muted-foreground rounded-[2rem] font-black uppercase text-[9px] tracking-widest hover:text-white transition-all active:scale-95"
         >
-          <RotateCcw className="mr-2" size={14} /> Analyze New Formula
+          <RotateCcw className="mr-2" size={14} /> Check New Product
         </Button>
       </div>
     )
@@ -96,14 +107,14 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
             <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Paste Ingredient List</label>
             <div className="flex items-center gap-2">
                <Baby size={12} className="text-[#4DB6AC]" />
-               <span className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-widest leading-none">Child-Safe Protocol</span>
+               <span className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-widest leading-none">Family-Safe</span>
             </div>
           </div>
           <textarea
             value={ingredientText}
             onChange={(e) => setIngredientText(e.target.value)}
-            placeholder="Aqua, Shea Butter, Niacinamide..."
-            className="w-full h-56 p-8 bg-muted/30 border border-border rounded-[2.2rem] text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-[#E1784F]/20 transition-all outline-none text-sm leading-relaxed italic font-medium resize-none shadow-inner"
+            placeholder="Example: Aqua, Shea Butter, Niacinamide..."
+            className="w-full h-56 p-8 bg-muted/30 border border-border rounded-[2.2rem] text-foreground placeholder:opacity-30 focus:ring-2 focus:ring-[#E1784F]/20 transition-all outline-none text-sm leading-relaxed italic font-medium resize-none shadow-inner"
           />
         </div>
 
@@ -114,13 +125,12 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
           </motion.div>
         )}
 
-        {/* 🛡️ MELANIN INFO BADGE */}
         <div className="p-6 bg-[#4DB6AC]/5 border border-[#4DB6AC]/10 rounded-[2rem] flex items-start gap-4">
           <ShieldCheck className="text-[#4DB6AC] shrink-0 mt-1" size={20} />
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase text-[#4DB6AC] tracking-widest">Aesthetic Balance</p>
+            <p className="text-[10px] font-black uppercase text-[#4DB6AC] tracking-widest">Safe Sync</p>
             <p className="text-[9px] text-muted-foreground font-bold leading-relaxed uppercase tracking-tight">
-              Cross-referenced against African skin profiles and maternal safety.
+              Checking your formula against African skin profiles and child safety rules.
             </p>
           </div>
         </div>
@@ -133,10 +143,10 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
           >
             {isAnalyzing ? (
               <>
-                <Loader2 className="animate-spin mr-3" size={20} /> Scanning...
+                <Loader2 className="animate-spin mr-3" size={20} /> Checking...
               </>
             ) : (
-              <>Analyze Formula <Zap className="ml-3 fill-current" size={16} /></>
+              <>Check Formula <Zap className="ml-3 fill-current" size={16} /></>
             )}
           </Button>
           <Button 

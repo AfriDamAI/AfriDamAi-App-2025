@@ -1,6 +1,6 @@
 /**
- * 🛡️ AFRIDAM SKIN WELLNESS: RESULTS VIEW (Rule 6 Synergy)
- * Version: 2026.1.13 (Handshake & Visual Intensity Sync)
+ * 🛡️ AFRIDAM SKIN WELLNESS: RESULTS VIEW (Rule 7 Precision Sync)
+ * Version: 2026.1.25
  * Focus: High-Precision Indicator mapping for Melanin-Rich profiles.
  */
 
@@ -19,7 +19,7 @@ interface SkinAnalysisResultsProps {
     finding?: string;
     predictions?: Record<string, number>;
     status?: string;
-    // 🚀 OGA FIX: Syncing with potential snake_case from Backend
+    /** 🚀 SYNC: Support for all potential Backend/AI response keys */
     overallHealth?: number; 
     overall_health?: number;
     overallGlow?: number;   
@@ -31,18 +31,17 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
   const router = useRouter();
   
   /**
-   * 🛡️ THE HANDSHAKE SYNC (Rule 6)
-   * Prioritize the most clinical index available in the payload.
+   * 🛡️ THE HANDSHAKE SYNC (Rule 7)
+   * Prioritize clinical indices from the verified pipeline.
    */
   const healthIndex = data.overallHealth || data.overall_health || data.overallGlow || data.overall_glow || 85;
-  const findings = data.finding || "Analysis complete. Maintaining your current hydration and protection routine is recommended.";
+  const findings = data.finding || "Scan complete. Your profile suggests maintaining your current safe hydration routine.";
 
   /**
-   * 🎨 INTENSITY LOGIC (Rule 6: Low Stress)
-   * Standardizes colors based on confidence markers.
+   * 🎨 INTENSITY LOGIC (Standardized)
+   * Colors adjust automatically based on match accuracy.
    */
   const getIntensityStyles = (confidence: number) => {
-    // Confidence is usually 0-1 from AI, or 0-100 from certain endpoints
     const value = confidence <= 1 ? confidence : confidence / 100;
     
     if (value < 0.3) return "bg-green-500/10 text-green-500 border-green-500/20";
@@ -51,7 +50,7 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
   }
 
   return (
-    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 text-left">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 text-left px-1">
       
       {/* 📊 1. WELLNESS INDEX CARD */}
       <Card className="p-6 md:p-8 bg-card border-border backdrop-blur-xl relative overflow-hidden rounded-[2.5rem] shadow-xl">
@@ -61,7 +60,7 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
         <div className="flex items-center justify-between mb-4 relative z-10">
           <div>
             <h2 className="text-lg md:text-xl font-black italic uppercase tracking-tighter text-foreground leading-none">Wellness Index</h2>
-            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">Clinical Balance Score</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">Safe Balance Score</p>
           </div>
           <div className="text-5xl md:text-6xl font-black italic text-[#4DB6AC]">{healthIndex}%</div>
         </div>
@@ -104,7 +103,7 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
             })
           ) : (
             <div className="p-12 text-center border border-dashed border-border rounded-[2rem] opacity-40">
-              <p className="text-[9px] font-black uppercase tracking-[0.4em]">Awaiting Neural Indicators</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.4em]">Searching for Neural Indicators</p>
             </div>
           )}
         </div>
@@ -125,12 +124,12 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
         <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
         <div className="flex flex-col gap-6 md:flex-row md:items-center relative z-10">
           <div className="flex items-center gap-4 flex-1">
-            <div className="w-12 h-12 md:w-14 md:h-14 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
-               <ShoppingBag className="text-white" size={24} />
+            <div className="w-12 h-12 md:w-14 md:h-14 bg-white/20 rounded-xl flex items-center justify-center shrink-0 text-white">
+               <ShoppingBag size={24} />
             </div>
             <div className="text-left text-white">
-              <h4 className="text-xl font-black italic uppercase tracking-tighter">The Care Hub</h4>
-              <p className="text-white/80 text-[8px] font-black uppercase tracking-widest leading-none">Personalized melanin-safe products</p>
+              <h4 className="text-xl font-black italic uppercase tracking-tighter">The Care Shop</h4>
+              <p className="text-white/80 text-[8px] font-black uppercase tracking-widest leading-none">Find safe products for your scan</p>
             </div>
           </div>
           <button 
@@ -146,9 +145,9 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
       <div className="p-6 bg-muted/30 border border-border rounded-2xl flex items-start gap-4 opacity-60">
         <Info size={18} className="text-[#E1784F] shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="text-[8px] font-black text-foreground uppercase tracking-[0.2em]">Clinical Boundary</p>
+          <p className="text-[8px] font-black text-foreground uppercase tracking-[0.2em]">Safe Note</p>
           <p className="text-[8px] font-bold leading-relaxed text-muted-foreground uppercase tracking-tight">
-            Diagnostics are provided for wellness guidance only and do not replace professional clinical consultations or biopsies.
+            These results are for wellness guidance only. They do not replace a clinical consultation. If you have concerns, speak with a specialist.
           </p>
         </div>
       </div>

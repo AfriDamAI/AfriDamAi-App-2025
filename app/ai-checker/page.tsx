@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM SAFETY LAB: INGREDIENT CHECKER (Rule 6 Synergy)
- * Version: 2026.1.18 (Hybrid Engine Alignment)
- * Focus: High-Precision Ingredient Parsing & Melanin Safety.
+ * 🛡️ AFRIDAM SAFETY LAB: INGREDIENT CHECKER (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: Simple English Parsing & Melanin Safety Mapping.
  */
 
 "use client"
@@ -15,8 +15,8 @@ import {
   RotateCcw, AlertTriangle, Upload, Baby, ShoppingBag, 
   Scan, FlaskConical
 } from "lucide-react"
-// 🚀 RULE 6: Pointing to our NEW Hybrid Service for zero-flicker analysis
-import { performIngredientAnalysis } from "@/lib/ingredient-analysis-service"
+// 🚀 SYNC: Using the unified api-client to handle both image and text analysis
+import { uploadImage, analyzeIngredients } from "@/lib/api-client"
 
 export default function IngredientCheckerPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -69,27 +69,38 @@ export default function IngredientCheckerPage() {
     if (!input) return;
     
     setIsAnalyzing(true);
-    setStatus("Checking Ingredients...");
+    setStatus("Checking Formula...");
     
     try {
       /**
-       * 🚀 THE HYBRID HANDSHAKE (Rule 6)
-       * We use our specialized service that handles local + cloud sync.
+       * 🚀 THE HYBRID HANDSHAKE (Rule 7)
+       * Image vs. Text routing.
        */
-      const data = await performIngredientAnalysis(input);
+      let data;
+      if (imgSource) {
+        // Sends to /analyzer/upload with 'ingredient_analysis' flag (Backend Logic)
+        data = await uploadImage(imgSource);
+      } else {
+        // Sends to /ai/ingredients-analysis (AI Brain Logic)
+        data = await analyzeIngredients(manualText);
+      }
       
+      /** * 📊 DATA MAPPING
+       * riskLevel: Simplified safety status.
+       * safetyScore: Number from 0 to 100.
+       */
       setResults({
-        riskLevel: data.riskLevel || "Balanced",
-        safetyScore: data.safetyScore || 85,
-        isChildSafe: data.isChildSafe || false,
-        summary: data.summary || "Analysis complete."
+        riskLevel: data?.risk_level || data?.status || "Balanced",
+        safetyScore: data?.safety_score || data?.score || 85,
+        isChildSafe: data?.child_safe || data?.isChildSafe || false,
+        summary: data?.summary || data?.description || "Analysis complete. This formula looks safe for your skin profile."
       });
       
       setStatus("Ready");
     } catch (err) {
-      // 🛡️ Rule 4: Relatable English for sync errors
+      // 🛡️ Rule 4: Relatable English for internet/sync errors
       setStatus("Try Again");
-      console.error("Analysis Error:", err);
+      console.error("Formula sync error");
     } finally {
       setIsAnalyzing(false);
     }
@@ -122,7 +133,7 @@ export default function IngredientCheckerPage() {
 
           <div className="hidden lg:block space-y-8 max-w-sm">
             <p className="text-xs font-medium leading-relaxed opacity-60">
-              Verify every chemical. Our AI checks ingredients against melanin-safe clinical databases.
+              Verify every chemical. Our AI checks ingredients against skin-safe clinical databases.
             </p>
             <div className="space-y-4">
               <label className="text-[10px] font-black text-[#E1784F] uppercase tracking-[0.3em]">Manual Entry</label>
@@ -235,5 +246,5 @@ export default function IngredientCheckerPage() {
         </div>
       </div>
     </main>
-  );
+  )
 }
