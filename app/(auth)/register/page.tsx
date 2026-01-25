@@ -1,13 +1,13 @@
 /**
- * 🛡️ AFRIDAM CLINICAL ACCESS: REGISTRATION (Rule 6 Synergy)
- * Version: 2026.1.10 (Express Bypass Refactor)
- * Focus: Deep Teal Accents, Zero-Flicker Redirect, Mobile-First.
+ * 🛡️ AFRIDAM CLINICAL ACCESS: REGISTRATION (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: Deep Teal Accents, Nationality Handshake, Mobile-First.
  */
 
 "use client"
 
 import React, { useState } from "react"
-import { Mail, Phone, Lock, ArrowRight, Loader2, User, X, Globe, ChevronLeft, ShieldCheck, Fingerprint } from "lucide-react"
+import { Mail, Phone, Lock, ArrowRight, Loader2, X, ChevronLeft, ShieldCheck, Fingerprint } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -23,7 +23,7 @@ export default function RegisterPage() {
     lastName: "",
     email: "",
     sex: "male",
-    country: "Nigeria",
+    country: "Nigeria", // 🌍 This is remapped to 'nationality' in api-client.ts
     phoneNo: "",
     password: ""
   })
@@ -36,6 +36,8 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Step 1 Transition
     if (step === 1) {
         setStep(2)
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -47,15 +49,14 @@ export default function RegisterPage() {
     
     try {
       /**
-       * 🚀 RULE 6 BYPASS: 
-       * signUp now handles both registration and immediate login.
-       * We use router.replace to lock the user into the dashboard hub.
+       * 🚀 THE HANDSHAKE:
+       * signUp maps 'country' to 'nationality' via the api-client.
+       * This resolves the 404/Not Found error from the backend.
        */
       await signUp(formData)
       router.replace("/dashboard")
     } catch (err: any) {
-      // 🛡️ Rule 4: Relatable, simple English error handling
-      setError("Registration failed. Please check your details and try again.")
+      setError("We couldn't set up your account. Please check your details and try again.")
       setStep(1) 
     } finally {
       setIsLoading(false)
@@ -202,7 +203,7 @@ export default function RegisterPage() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-8 md:space-y-12"
                 >
-                    <button onClick={() => setStep(1)} className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-[#4DB6AC] mb-6">
+                    <button type="button" onClick={() => setStep(1)} className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-[#4DB6AC] mb-6">
                         <ChevronLeft size={18} /> Go Back
                     </button>
                     
