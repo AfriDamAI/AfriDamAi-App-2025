@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM SECURITY GATE: AUTH GUARD (Rule 7 Precision Sync)
  * Version: 2026.1.25
- * Focus: High-speed proxy with onboarding bypass.
+ * Focus: High-speed proxy with loop-prevention and onboarding bypass.
  */
 
 "use client"
@@ -19,50 +19,46 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  /** * 🚀 ROUTE GROUP SYNC: 
-   * (auth) is invisible in the URL. These match your actual browser paths.
-   */
+  // 🚀 PATH SYNC: These are the exact paths allowed without a token.
   const publicPaths = ["/", "/pricing", "/contact", "/mission", "/login", "/register", "/forgot-password"]
   const isPublicPath = publicPaths.includes(pathname)
-  const isAuthPath = pathname === "/login" || pathname === "/register";
+  
+  // 🔐 AUTH PATHS: Pages that should be hidden from logged-in users.
+  const isAuthPage = pathname === "/login" || pathname === "/register"
 
   useEffect(() => {
-    // 🔍 OGA DEBUG: Helps Tobi see exactly what's happening in the console
-    console.log("GUARD STATUS:", { pathname, isSignedIn, isPublicPath });
+    // 🔍 OGA DIAGNOSTIC
+    console.log("🛡️ GUARD_CHECK:", { pathname, isSignedIn, isLoading });
 
     if (isLoading) return
 
-    // 1. GUEST PROTECT: Kick guests out of private zones (Scanner, Shop, etc.)
+    // 🚩 THE FIX: Only redirect if we are CERTAIN.
+    
+    // 1. GUEST GATE: If NOT signed in and trying to hit a PRIVATE page (like /dashboard)
     if (!isSignedIn && !isPublicPath) {
-      router.replace("/")
+      console.log("🚫 Access Blocked: Redirecting to Landing");
+      router.replace("/login") // Move to login instead of root to avoid home loops
       return
     }
 
-    // 2. AUTH BYPASS: Send logged-in users away from Login/Landing to the Dashboard
-    if (isSignedIn && (pathname === "/" || isAuthPath)) {
+    // 2. AUTH BYPASS: If IS signed in and trying to hit /login or /register
+    if (isSignedIn && isAuthPage) {
+      console.log("✅ Already In: Redirecting to Dashboard");
       router.replace("/dashboard")
       return
     }
     
-    // 🛡️ OGA NOTE: Onboarding check removed to prevent user frustration loops.
-    
-  }, [isSignedIn, isLoading, pathname, router, isPublicPath, isAuthPath])
+  }, [isSignedIn, isLoading, pathname, router, isPublicPath, isAuthPage])
 
   /**
-   * 🛡️ THE FLICKER PREVENTER:
-   * Returns nothing while the Guard is deciding where to send the user.
+   * 🛡️ THE GHOST PREVENTER
+   * If it's a private page and we aren't signed in, show nothing while we redirect.
+   * If it's an auth page and we ARE signed in, show nothing while we redirect.
    */
-  if (isLoading) return null;
+  if (isLoading) return null
 
-  // Prevent seeing the Landing or Login page for a split second if already signed in
-  if (isSignedIn && (pathname === "/" || isAuthPath)) {
-    return null 
-  }
-
-  // Prevent seeing private content for a split second if not signed in
-  if (!isSignedIn && !isPublicPath) {
-    return null
-  }
+  if (!isSignedIn && !isPublicPath) return null
+  if (isSignedIn && isAuthPage) return null
 
   return <>{children}</>
 }
