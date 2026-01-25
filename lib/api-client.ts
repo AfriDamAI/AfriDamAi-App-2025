@@ -78,7 +78,16 @@ export const login = async (credentials: UserLoginDto): Promise<AuthResponse> =>
 };
 
 export const register = async (userData: CreateUserDto) => {
-  const response = await apiClient.post("/auth/user/register", userData);
+  /** * 🚀 THE PAYLOAD HANDSHAKE
+   * Remapping 'country' to 'nationality' per backend requirement.
+   */
+  const { country, ...rest } = userData as any;
+  const payload = {
+    ...rest,
+    nationality: country || "Nigerian"
+  };
+
+  const response = await apiClient.post("/auth/user/register", payload);
   return response.data;
 };
 
