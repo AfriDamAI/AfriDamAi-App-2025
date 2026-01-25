@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM CLINICAL SCANNER (Rule 6 Synergy)
- * Version: 2026.1.13 (Handshake & Property Alignment)
- * Focus: High-Precision Image Handshake & Error Resiliency.
+ * 🛡️ AFRIDAM CLINICAL SCANNER (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: High-Precision Image Handshake & Mobile-First Result Mapping.
  */
 
 "use client"
@@ -33,7 +33,7 @@ export default function UnifiedScanner() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
-  /** 🛡️ RULE 4: No Jargon. 'Diagnosis' changed to 'Skin Diary' */
+  /** 🛡️ RULE 4: Simple Language. No Medical Jargon. */
   const analysisSteps = [
     { icon: <Scan size={16} />, text: "Checking Image Clarity" },
     { icon: <Fingerprint size={16} />, text: "Detecting Patterns" },
@@ -64,7 +64,7 @@ export default function UnifiedScanner() {
     setStatus("Activating Lens")
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: 1080, height: 1080 },
+        video: { facingMode: "environment", width: 1080, height: 1080 }, // Change to environment for back camera
         audio: false
       })
       streamRef.current = stream
@@ -82,8 +82,7 @@ export default function UnifiedScanner() {
       canvas.height = videoRef.current.videoHeight
       const ctx = canvas.getContext("2d")
       if (ctx) {
-        ctx.translate(canvas.width, 0)
-        ctx.scale(-1, 1)
+        // Remove scale-x for back camera accuracy
         ctx.drawImage(videoRef.current, 0, 0)
       }
       setImgSource(canvas.toDataURL("image/jpeg", 0.9))
@@ -101,23 +100,29 @@ export default function UnifiedScanner() {
     
     try {
       /**
-       * 🚀 THE NEURAL HANDSHAKE (Rule 6)
-       * We check multiple fields to handle Tobi's backend flexibility.
+       * 🚀 THE NEURAL HANDSHAKE (Rule 7)
+       * Sending data to GCP AI via api-client.
        */
       const data = await uploadImage(imgSource);
       
+      /** * 📊 DATA MAPPING
+       * findings: The main AI observation.
+       * confidence: How sure the AI is about the result.
+       */
       const analysisData = {
-        finding: data?.finding || data?.description || data?.status || "Analysis complete.",
+        finding: data?.finding || data?.description || data?.label || "Analysis complete.",
         predictions: data?.predictions || {},
-        overallHealth: data?.overallHealth || data?.overall_health || 85,
+        overallHealth: data?.overall_health || data?.score || 85,
         image: imgSource,
-        id: data?.id || data?.scanId
+        id: data?.id || data?.scanId || "TEMP-" + Date.now()
       };
       
       setResults(analysisData);
       setStatus("Ready")
     } catch (err: any) {
-      setErrorDetails("The AI Brain is busy. Please try one more time.");
+      // 🛡️ OGA FIX: Detailed error logging for Tobi's backend tests
+      console.error("AI Sync Error:", err.response?.data || err.message);
+      setErrorDetails("The AI Brain is busy. Please check your internet and try again.");
       setStatus("Try Again")
     } finally {
       setIsAnalyzing(false)
@@ -167,7 +172,7 @@ export default function UnifiedScanner() {
               <div className="relative aspect-square w-full rounded-[3rem] overflow-hidden bg-gray-50 dark:bg-white/5 border-4 border-white dark:border-white/10 shadow-2xl">
                 <AnimatePresence mode="wait">
                   {isCapturing ? (
-                    <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
+                    <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
                   ) : imgSource ? (
                     <div className="relative w-full h-full">
                       <img src={imgSource} className={`w-full h-full object-cover ${isAnalyzing ? 'blur-md opacity-50 scale-105' : ''} transition-all duration-700`} alt="Skin Capture" />
@@ -247,7 +252,7 @@ export default function UnifiedScanner() {
                   <CheckCircle2 size={40} className="text-[#E1784F]" />
                   <div className="text-right opacity-30">
                     <p className="text-[8px] font-black uppercase tracking-widest">Afla-ID</p>
-                    <p className="text-[8px] font-mono uppercase">#{Math.random().toString(36).substr(2, 6).toUpperCase()}</p>
+                    <p className="text-[8px] font-mono uppercase">#{results.id.toString().slice(-6).toUpperCase()}</p>
                   </div>
                 </div>
 
@@ -259,7 +264,7 @@ export default function UnifiedScanner() {
                 </div>
 
                 <div className="pt-8 border-t border-white/10 dark:border-black/10 space-y-6">
-                  <button onClick={() => router.push('/marketplace')} className="w-full py-5 bg-white dark:bg-black text-black dark:text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 group">
+                  <button onClick={() => router.push(`/marketplace?focus=${results.finding}`)} className="w-full py-5 bg-white dark:bg-black text-black dark:text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 group">
                     View Care Plan <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>

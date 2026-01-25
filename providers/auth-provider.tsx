@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM AUTH PROVIDER (Rule 6 Synergy)
- * Version: 2026.1.22 (Post-Interceptor Unwrap Sync)
- * Focus: High-speed profile sync with clean English.
+ * 🛡️ AFRIDAM AUTH PROVIDER (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: Mobile-first identity gatekeeping and role synchronization.
  */
 
 "use client"
@@ -23,6 +23,8 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  role: string;
+  onboardingCompleted: boolean; // 🛡️ Locked from Prisma 'User' table
   phoneNo?: string;   
   profile?: {
     skinType?: string;
@@ -41,8 +43,8 @@ interface AuthContextType {
   signOut: () => void
   forgotPassword: (email: string) => Promise<void>
   updateUserProfile: (updates: Partial<any>) => Promise<User | null>
-  refreshUser: () => Promise<void> // 🚀 This is our 'mutate' button
-  mutate: () => Promise<void>     // Alias for the Profile page fix
+  refreshUser: () => Promise<void> 
+  mutate: () => Promise<void>     
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -52,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasToken, setHasToken] = useState<boolean>(false)
 
+  // 🚀 SYNC: Support both { user: {...} } wrapper and raw user objects
   const extractUserData = (data: any) => data?.user || data;
 
   const fetchUserData = async (userId: string) => {
@@ -63,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return userData;
       }
     } catch (err) {
-      console.error("Profile sync paused");
+      console.error("Profile sync paused - check network");
     }
     return null;
   };
@@ -74,12 +77,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token) {
         try {
           const decoded: any = jwtDecode(token);
+          // Check if token is still fresh
           if (decoded.exp && decoded.exp < Date.now() / 1000) {
             signOut();
           } else {
             setHasToken(true); 
             setAuthToken(token);
-            await fetchUserData(decoded.sub || decoded.id || decoded.userId);
+            // sub is the ID stored in our JWT payload from AuthService.ts
+            await fetchUserData(decoded.sub || decoded.id);
           }
         } catch (err) {
           signOut();
@@ -94,17 +99,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const data: any = await login(credentials);
-      const accessToken = data?.accessToken;
+      // Backend returns access_token (synced with AuthResponse interface)
+      const accessToken = data?.access_token;
       
-      if (!accessToken) throw new Error("Link failed");
+      if (!accessToken) throw new Error("Connection failed: No token received");
 
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
       setHasToken(true);
 
+      const userData = extractUserData(data);
+      setUser(userData);
+      
+      // Secondary fetch ensures we have the full profile and onboarding status
       const decoded: any = jwtDecode(accessToken);
-      setUser(extractUserData(data));
-      await fetchUserData(decoded.sub || decoded.id || decoded.userId);
+      await fetchUserData(decoded.sub || decoded.id);
     } catch (error) {
       signOut();
       throw error;
@@ -117,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       await register(userData);
+      // Auto-login after successful registration
       await signIn({ email: userData.email, password: userData.password });
     } finally {
       setIsLoading(false);
@@ -137,20 +147,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded: any = jwtDecode(token);
-      await fetchUserData(decoded.sub || decoded.id || decoded.userId);
+      await fetchUserData(decoded.sub || decoded.id);
     }
   }
 
   const updateUserProfile = async (updates: Partial<any>) => {
     if (!user?.id) return null;
     try {
+      // Don't send sensitive primary keys in the update body
       const { id, email, ...cleanUpdates } = updates;
       const response = await updateUser(user.id, cleanUpdates);
       const updatedData = extractUserData(response);
+      
+      // Update local state immediately for snappy mobile feel
       setUser(prev => prev ? { ...prev, ...updatedData } : updatedData);
       return updatedData;
     } catch (error: any) {
-      console.error("Profile sync error");
+      console.error("Profile update failed to sync");
       throw error;
     }
   }
@@ -159,14 +172,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     isSignedIn: hasToken || !!user,
     isLoading,
-    requiresOnboarding: false,
+    // 🛡️ GATEKEEPER: Mobile app uses this to force users to the setup page
+    requiresOnboarding: user ? !user.onboardingCompleted : false,
     signIn,
     signUp,
     signOut,
     forgotPassword: forgotPasswordApi,
     updateUserProfile,
     refreshUser,
-    mutate: refreshUser // 🛡️ Fix for the Profile page error
+    mutate: refreshUser 
   }), [user, isLoading, hasToken]);
 
   return (

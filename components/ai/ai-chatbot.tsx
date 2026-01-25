@@ -1,6 +1,6 @@
 /**
- * 🛡️ AFRIDAM NEURAL ASSISTANT: CHAT (Rule 7 Sync)
- * Version: 2026.1.4 (Neural Handshake Alignment)
+ * 🛡️ AFRIDAM NEURAL ASSISTANT: CHAT (Rule 7 Precision Sync)
+ * Version: 2026.1.25
  * Focus: High-Precision Response Parsing & Mobile-First UI.
  */
 
@@ -10,6 +10,7 @@ import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageSquare, X, Send, User, Bot, Zap, Info, Loader2 } from "lucide-react"
 import { useTheme } from "@/providers/theme-provider"
+// 🚀 SYNC: Using the verified chatbot endpoint from api-client
 import { sendChatMessage } from "@/lib/api-client"
 
 interface Message {
@@ -35,7 +36,7 @@ export function AIChatBot() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isDark = theme === "dark";
 
-  // 🛡️ VIEWPORT SYNC: Auto-scroll to latest clinical insight
+  // 🛡️ VIEWPORT SYNC: Auto-scroll to latest insight for mobile users
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -58,18 +59,17 @@ export function AIChatBot() {
     
     try {
       /**
-       * 🚀 THE HANDSHAKE (Rule 7)
-       * Communicating with AI v2 through the api-client wrapper.
-       * This automatically attaches the user's clinical context.
+       * 🚀 THE NEURAL HANDSHAKE (Rule 7)
+       * Communicates via baseURL -> aiURL bridge.
+       * The defaultAiContext is automatically attached in api-client.
        */
       const data = await sendChatMessage(currentInput);
       
       /**
        * 🛡️ DATA EXTRACTION (Rule 7)
-       * Robust parsing for both direct 'reply' and 'resultData' wrappers.
+       * Aligned with FastAPI chatbot response structure.
        */
-      const payload = data?.resultData || data;
-      const replyText = payload?.reply || payload?.content || "Neural sync active. Please proceed.";
+      const replyText = data?.reply || data?.content || data?.message || "Neural link active. I am processing your profile data.";
 
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -78,11 +78,12 @@ export function AIChatBot() {
       };
       setMessages(prev => [...prev, assistantMsg]);
     } catch (err) {
-      // Rule 3: Maintain relatable clinical-style error messaging
+      // 🛡️ Rule 4: Relatable, jargon-free error handling
+      console.error("Assistant sync failed");
       setMessages(prev => [...prev, {
         id: "error",
         role: "assistant",
-        content: "Neural sync interrupted. Please re-send your inquiry."
+        content: "I'm having trouble reaching the clinical database. Please check your signal and try again."
       }]);
     } finally {
       setIsTyping(false);
@@ -91,7 +92,7 @@ export function AIChatBot() {
 
   return (
     <>
-      {/* 🚀 TOGGLE HUB */}
+      {/* 🚀 TOGGLE HUB (Mobile Optimized Position) */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-28 right-6 md:bottom-10 md:right-10 z-[999] w-16 h-16 bg-[#4DB6AC] text-white rounded-[1.5rem] shadow-[0_20px_40px_rgba(77,182,172,0.4)] flex items-center justify-center active:scale-90 transition-all group border-2 border-white/10"
@@ -172,7 +173,7 @@ export function AIChatBot() {
             {/* COMPLIANCE FOOTER */}
             <div className="px-8 py-3 bg-gray-50 dark:bg-white/5 flex items-center gap-3 border-y border-gray-100 dark:border-white/10">
                <Info size={12} className="opacity-20 text-[#E1784F]" />
-               <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-30">Wellness Guidance Only • AES-256 Encrypted</p>
+               <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-30">Wellness Guidance Only • Secured Sync</p>
             </div>
 
             {/* INPUT NODE */}

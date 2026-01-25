@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM CARE SHOP: MARKETPLACE (Rule 6 Synergy)
- * Version: 2026.1.22 (Soft Tone & Property Alignment)
- * Focus: High-Precision Product Handshake.
+ * 🛡️ AFRIDAM CARE SHOP: MARKETPLACE (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: High-Precision Product Handshake & Mobile-First Commerce.
  */
 
 "use client"
@@ -40,19 +40,26 @@ export default function MarketplacePage() {
       setIsLoading(true);
       try {
         /**
-         * 🚀 THE COMMERCE HANDSHAKE (Rule 6)
-         * Aligned with the getProducts export in client.ts
+         * 🚀 THE COMMERCE HANDSHAKE (Rule 7 Sync)
+         * Matches the 'getProducts' export in client.ts
          */
         const response = await getProducts(); 
-        const data = response?.resultData || response;
         
-        // 🛡️ OGA FIX: Mapping backend fields (basePrice, imageUrl) to our local Product interface
+        // Use the unwrapped data from our interceptor
+        const data = response;
+        
+        /**
+         * 🛡️ OGA PRECISION MAPPING
+         * Aligned with SQL Schema 'Product' and 'Vendor' tables.
+         * basePrice -> price
+         * imageUrl -> thumbnail
+         */
         const mappedProducts = (Array.isArray(data) ? data : []).map((p: any) => ({
           id: p.id,
           name: p.name,
-          price: p.basePrice || p.price || 0,
-          vendorName: p.vendor?.companyName || "Verified Vendor",
-          thumbnail: p.imageUrl || p.thumbnail || "/placeholder-product.jpg",
+          price: p.basePrice || 0,
+          vendorName: p.vendor?.companyName || "Verified Shop",
+          thumbnail: p.imageUrl || "/placeholder-product.jpg",
           category: p.primaryCategory?.name || "Skin Care",
           rating: p.rating || 5,
           inStock: p.stock > 0
@@ -60,7 +67,7 @@ export default function MarketplacePage() {
 
         setProducts(mappedProducts);
       } catch (err) {
-        console.error("Shop sync paused:", err);
+        console.error("Shop update paused - check internet connection");
         setProducts([]); 
       } finally {
         setIsLoading(false);
@@ -183,7 +190,7 @@ export default function MarketplacePage() {
             <PackageOpen size={32} className="opacity-10" />
             <div className="space-y-1">
                <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-none">Restocking...</h3>
-               <p className="text-[8px] font-black uppercase tracking-widest opacity-20">We are updating the inventory</p>
+               <p className="text-[8px] font-black uppercase tracking-widest opacity-20">We are updating the shop inventory</p>
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM CARE HUB: NAVIGATION (Rule 7 Sync)
- * Version: 2026.1.4 (Handshake & Ambiance Alignment)
- * Focus: Direct Portal access and standardized User State.
+ * 🛡️ AFRIDAM CARE HUB: NAVIGATION (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: Direct Portal access and Mobile-First State Sync.
  */
 
 "use client"
@@ -10,7 +10,7 @@ import { useAuth } from '@/providers/auth-provider'
 import { useTheme } from '@/providers/theme-provider'
 import Link from 'next/link'
 import React, { useState, useEffect } from 'react'
-import { Menu, Moon, ShoppingBag, Sun, X, LogOut } from 'lucide-react'
+import { Menu, Moon, ShoppingBag, Sun, X, LogOut, LayoutDashboard } from 'lucide-react'
 import { UserProfile } from './user-profile'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -18,16 +18,17 @@ import { motion, AnimatePresence } from 'framer-motion'
 interface NavigationProps {
     onSignInClick: () => void
     onSignUpClick: () => void
+    onViewProfileClick?: () => void
 }
 
-export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: NavigationProps) {
+export default function MarketplaceNavigation({ onSignInClick, onSignUpClick, onViewProfileClick }: NavigationProps) {
     const { theme, toggleTheme } = useTheme()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const { user, signOut, isLoading } = useAuth()
     const router = useRouter()
     const isDark = theme === "dark"
 
-    // 🛡️ RE-ENFORCED: Preventing background scroll on mobile menu
+    // 🛡️ RE-ENFORCED: Smooth mobile overlay transition
     useEffect(() => {
         if (mobileMenuOpen) {
             document.body.style.overflow = 'hidden'
@@ -39,8 +40,8 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
 
     const navLinks = [
         { href: "/", label: "Home" },
-        { href: "/marketplace", label: "Care Hub" },
-        { href: "/marketplace/categories", label: "Categories" },
+        { href: "/dashboard", label: "Dashboard" }, // 🚀 SYNC: Direct access to scanner
+        { href: "/marketplace", label: "Care Shop" },
         { href: "/contact", label: "Support" },
     ]
 
@@ -50,18 +51,18 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                 <div className="flex justify-between items-center h-20 md:h-24">
                     
                     {/* 🌍 BRAND LOGO */}
-                    <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
+                    <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform text-left">
                         <img 
                           src="/logo.png" 
                           alt="AfriDam AI" 
                           className="h-10 md:h-12 w-auto object-contain dark:invert" 
                         />
                         <div className="hidden sm:block border-l border-border/50 pl-3">
-                            <p className="text-[8px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Marketplace</p>
+                            <p className="text-[8px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Care Hub</p>
                         </div>
                     </Link>
 
-                    {/* Desktop Links (Rule 3: Clean Tracking) */}
+                    {/* Desktop Links (Clean Tracking) */}
                     <div className="hidden lg:flex items-center gap-10">
                         {navLinks.map((link) => (
                             <Link
@@ -75,7 +76,7 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                     </div>
 
                     {/* Action Hub */}
-                    <div className="flex items-center gap-3 md:gap-5">
+                    <div className="flex items-center gap-3 md:gap-5 text-left">
                         
                         <button onClick={toggleTheme} className="p-3 rounded-2xl bg-muted/50 border border-border text-foreground hover:bg-muted transition-all">
                             {isDark ? <Sun size={18} className="text-[#E1784F]" /> : <Moon size={18} />}
@@ -86,17 +87,16 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                             className="relative p-3 rounded-2xl bg-[#E1784F]/10 border border-[#E1784F]/20 text-[#E1784F] hover:bg-[#E1784F] hover:text-white transition-all active:scale-90"
                         >
                             <ShoppingBag size={18} />
-                            {/* Rule 7: Cart sync placeholder */}
                             <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E1784F] text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-background">
                                 0
                             </span>
                         </button>
 
                         <div className="hidden md:block">
-                            {/* Rule 7: Passing standardized user data */}
                             <UserProfile
                                 onSignInClick={onSignInClick}
                                 onSignUpClick={onSignUpClick}
+                                onViewProfileClick={onViewProfileClick}
                             />
                         </div>
 
@@ -110,17 +110,17 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay (Editorial Style) */}
+            {/* Mobile Menu Overlay */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="fixed inset-0 top-20 z-[90] bg-background lg:hidden p-8 flex flex-col"
+                        className="fixed inset-0 top-20 z-[90] bg-background lg:hidden p-8 flex flex-col text-left"
                     >
                         <div className="flex-grow space-y-4">
-                            <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.4em] mb-6">Marketplace Node</p>
+                            <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.4em] mb-6">Care Hub Node</p>
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.href}
@@ -133,7 +133,7 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick }: 
                             ))}
                         </div>
 
-                        <div className="pt-8 border-t border-border">
+                        <div className="pt-8 border-t border-border text-left">
                             {!user && !isLoading ? (
                                 <button 
                                     onClick={() => { setMobileMenuOpen(false); onSignUpClick(); }}

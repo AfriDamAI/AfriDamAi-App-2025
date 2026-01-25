@@ -2,10 +2,10 @@ import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /**
- * 🛡️ HYBRID ROUTING CONFIGURATION
- * Rule 5: Synced with main.py prefix and predict.py routes.
- * baseURL: Main Backend (Render)
- * aiURL: AI Model API (Google Cloud Run)
+ * 🛡️ HIGH-PRECISION INFRASTRUCTURE SYNC
+ * Rule 7 Alignment:
+ * baseURL: Main Backend (Render) - Synced with NestJS Global Prefix 'api'
+ * aiURL: AI Brain (Google Cloud Run) - Synced with FastAPI '/api/v1'
  */
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
 const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api/v1";
@@ -44,13 +44,13 @@ export const setAuthToken = (token: string | null) => {
   }
 };
 
-/** * 🛡️ RESPONSE INTERCEPTOR - RULE 6 SYNC
- * We unwrap resultData here so the rest of the app gets clean data.
- * This resolves the ts(2339) errors in the AuthProvider.
+/** 🛡️ RESPONSE INTERCEPTOR - RULE 6 SYNC
+ * We unwrap data here so the frontend components stay clean.
+ * Backend returns results inside 'resultData'.
  */
 apiClient.interceptors.response.use(
   (response) => {
-    // 🚀 SYNERGY: Extract resultData if present, otherwise return raw data
+    // Extract resultData if present, otherwise return raw data
     if (response.data && response.data.resultData) {
       return { ...response, data: response.data.resultData };
     }
@@ -60,7 +60,6 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
         localStorage.removeItem("token");
-        // Prevent redirect loops during login/landing
         const currentPath = window.location.pathname;
         if (currentPath !== "/" && currentPath !== "/auth/login") {
           window.location.href = "/";
@@ -71,10 +70,10 @@ apiClient.interceptors.response.use(
   }
 );
 
-/** 🔑 AUTH ENDPOINTS (Uses baseURL) **/
+/** 🔑 AUTH ENDPOINTS (Synced with AuthService.ts) **/
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
+  // Routes strictly match NestJS AuthController
   const response = await apiClient.post("/auth/user/login", credentials);
-  // 🛡️ Rule 6: Interceptor has already unwrapped resultData; response.data is now AuthResponse
   return response.data;
 };
 
@@ -88,23 +87,23 @@ export const forgotPassword = async (email: string) => {
   return response.data;
 };
 
-/** 👤 USER DATA (Uses baseURL) **/
+/** 👤 USER DATA (Synced with UserService.ts & User.mapper.ts) **/
 export const getProfile = async () => {
   const response = await apiClient.get("/profile");
   return response.data;
 };
 
 export const getUser = async (id: string) => {
-  const response = await apiClient.get(`/users/${id}`);
+  const response = await apiClient.get(`/user/${id}`); // Synced with NestJS UserModule
   return response.data;
 };
 
 export const updateUser = async (id: string, updates: any) => {
-  const response = await apiClient.put(`/users/${id}`, updates);
+  const response = await apiClient.patch(`/user/${id}`, updates); // Synced with Service updateUser
   return response.data;
 };
 
-/** 🔬 AI CONTEXT - SYNCED WITH predict.py MoreInfo MODEL **/
+/** 🔬 AI CONTEXT - SYNCED WITH CLOUD RUN PREDICT MODEL **/
 const defaultAiContext = {
   region: "West Africa",
   country: "Nigeria",
@@ -122,7 +121,7 @@ const defaultAiContext = {
   user_activeness_on_app: "moderate" 
 };
 
-/** 🔬 AI SERVICE MODULE (Uses aiURL) **/
+/** 🔬 AI SERVICE MODULE (Uses aiURL directly for speed) **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   
@@ -147,6 +146,7 @@ export async function uploadImage(file: File | string): Promise<any> {
 
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
+  // Synced with FastAPI predict.py route
   const response = await axios.post(`${aiURL}/skin-diagnosis`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
@@ -170,31 +170,32 @@ export const sendChatMessage = async (message: string) => {
   return response.data;
 };
 
-/** 💳 PAYMENTS **/
+/** 💳 PAYMENTS (Synced with Transaction.service.ts) **/
 export const initializePayment = async (data: { 
   plan: string, 
   amount: number, 
   appointmentId?: string, 
   orderId?: string 
 }) => {
-  const response = await apiClient.post("/transactions/initiate", data);
+  const response = await apiClient.post("/transaction/initiate", data);
   return response.data;
 };
 
 export const verifyPayment = async (transactionId: string) => {
-  const response = await apiClient.post(`/transactions/${transactionId}/verify`);
+  const response = await apiClient.post(`/transaction/${transactionId}/verify`);
   return response.data;
 };
 
-/** 🛍️ MARKETPLACE **/
+/** 🛍️ MARKETPLACE (Synced with Product.module.ts) **/
 export const getProducts = async () => {
-  const response = await apiClient.get("/products");
+  const response = await apiClient.get("/product");
   return response.data;
 };
 
-/** 🚀 SCAN HISTORY **/
+/** 🚀 SCAN HISTORY (Synced with Analyzer.controller.ts) **/
 export const getScanHistory = async () => {
-  const response = await apiClient.get("/ai/history");
+  // Uses base backend (Render) where AI results are saved in PostgreSQL
+  const response = await apiClient.get("/analyzer/history"); 
   return response.data;
 };
 

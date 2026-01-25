@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM WELLNESS LOADER (Rule 6 Synergy)
- * Version: 2026.1.5 (Clean State Handshake)
- * Focus: High-speed clinical transition with zero redundant wait times.
+ * 🛡️ AFRIDAM WELLNESS LOADER (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: High-speed transition with zero redundant wait times.
  */
 
 "use client"
@@ -22,8 +22,9 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
   const [loadingStep, setLoadingStep] = useState("Checking access...")
 
   useEffect(() => {
-    // 🛡️ OGA FIX: Remove artificial delays to keep the app snappy.
-    // We only wait for the actual Auth system to be ready.
+    /** * 🚀 SYNC: Remove artificial delays.
+     * We transition the moment the AuthProvider confirms state.
+     */
     if (!authLoading) {
       setLoadingStep("Ready")
       setIsReady(true)
@@ -31,9 +32,8 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
   }, [authLoading])
 
   /**
-   * 🚀 RULE 6: PREVENT FLICKER
-   * If the auth system is still thinking, we show the branded screen.
-   * Once auth is done, we get out of the way immediately.
+   * 🛡️ THE SYNC GATE
+   * Prevents private data from flashing before the login check is done.
    */
   if (authLoading || !isReady) {
     return (
@@ -47,8 +47,8 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
         >
           {/* 🛡️ BRAND ICON */}
           <div className="relative w-20 h-20 mx-auto">
-            <div className="relative w-full h-full rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
-              <Activity className="w-8 h-8 text-[#E1784F]" />
+            <div className="relative w-full h-full rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md text-[#E1784F]">
+              <Activity className="w-8 h-8" />
             </div>
           </div>
 
@@ -70,7 +70,7 @@ export default function SkinAnalysisLoader({ children }: SkinAnalysisLoaderProps
         <div className="absolute bottom-10 flex items-center gap-2 text-white/20">
           <ShieldCheck size={12} />
           <span className="text-[7px] font-black uppercase tracking-[0.4em]">
-            Secured for your family
+            Secured for your profile
           </span>
         </div>
       </div>

@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM NEURAL LENS (Rule 7 Sync)
- * Version: 2026.1.4 (Lens Handshake Alignment)
- * Focus: High-Precision Image Capture & Neural Sensor Cleanup.
+ * 🛡️ AFRIDAM NEURAL LENS (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: High-Precision Image Capture & Mobile Sensor Alignment.
  */
 
 "use client"
@@ -40,9 +40,8 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   /**
-   * 🚀 RULE 7: SENSOR CLEANUP
-   * Ensures the camera hardware is released when the component unmounts
-   * or when switching to preview mode.
+   * 🚀 SENSOR CLEANUP
+   * Releases camera hardware to prevent battery drain or device locks.
    */
   const stopMediaStream = () => {
     if (mediaStreamRef.current) {
@@ -66,12 +65,12 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
     const setupStream = async () => {
       if (mode === "camera") {
         try {
-          stopMediaStream(); // Rule 7: Clear existing streams first
+          stopMediaStream(); 
 
           const stream = await navigator.mediaDevices.getUserMedia({
             video: {
               facingMode: facingMode,
-              width: { ideal: 1920 },
+              width: { ideal: 1080 },
               height: { ideal: 1080 }
             },
           });
@@ -86,7 +85,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
             };
           }
         } catch (err) {
-          setError("Clinical Lens Access Denied. Check Permissions.");
+          setError("Lens Access Denied. Please check your phone settings.");
           setIsLoading(false);
           setMode("select");
         }
@@ -109,16 +108,18 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
         canvas.width = width;
         canvas.height = height;
 
+        // 🛡️ OGA SYNC: Mirroring fix
         if (facingMode === "user") {
           context.translate(width, 0);
           context.scale(-1, 1);
         }
 
         context.drawImage(video, 0, 0, width, height);
-        const imageData = canvas.toDataURL("image/jpeg", 0.9);
+        // Optimized JPEG quality for high-speed AI analysis
+        const imageData = canvas.toDataURL("image/jpeg", 0.8);
         
         setCapturedImage(imageData);
-        stopMediaStream(); // Rule 7: Kill sensors once captured
+        stopMediaStream(); 
         setMode("preview");
       }
     }
@@ -137,12 +138,9 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
     }
   };
 
-  /**
-   * 🛡️ FINAL HANDSHAKE
-   * Forwards the verified data to the parent for AI Analysis.
-   */
   const handleFinalSubmission = () => {
     if (capturedImage) {
+      // 🚀 FORWARD: Sends data to UnifiedScanner for the final api-client handshake
       onImageCapture(capturedImage);
     }
   };
@@ -151,15 +149,14 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
     <div className="w-full max-w-2xl mx-auto px-4 md:px-0">
       <AnimatePresence mode="wait">
         
-        {/* 1. SELECTION MODE */}
         {mode === "select" && (
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}>
-            <Card className="p-10 bg-white dark:bg-[#0A0A0A] border-gray-100 dark:border-white/5 rounded-[4rem] shadow-2xl relative overflow-hidden">
+            <Card className="p-10 bg-white dark:bg-[#0A0A0A] border-gray-100 dark:border-white/5 rounded-[4rem] shadow-2xl relative overflow-hidden text-left">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/5 blur-3xl rounded-full" />
               
-              <div className="space-y-12 text-center relative z-10">
+              <div className="space-y-12 relative z-10">
                 <div className="space-y-4">
-                  <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-[0.6em]">Diagnostic Input</span>
+                  <span className="text-[#E1784F] text-[10px] font-black uppercase tracking-[0.6em]">Scanner Input</span>
                   <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none">Capture <br /> <span className="text-[#4DB6AC]">Sample</span></h2>
                 </div>
                 
@@ -171,7 +168,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                     <div className="w-16 h-16 bg-white/10 dark:bg-black/5 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
                       <Camera size={32} strokeWidth={1.5} />
                     </div>
-                    Open Neural Cam
+                    Open Camera
                   </button>
                   
                   <button
@@ -187,7 +184,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                 
                 <div className="flex items-center justify-center gap-3 opacity-30 pt-4">
                   <ShieldCheck size={14} className="text-[#4DB6AC]" />
-                  <p className="text-[9px] font-black uppercase tracking-widest">Secure AES-256 Upload Node</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest">Secured Cloud Upload</p>
                 </div>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
               </div>
@@ -195,7 +192,6 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
           </motion.div>
         )}
 
-        {/* 2. CAMERA MODE */}
         {mode === "camera" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[600] md:relative md:z-auto">
             <Card className="h-full md:h-auto bg-black border-none md:border-white/10 md:rounded-[4rem] overflow-hidden relative flex flex-col">
@@ -211,9 +207,9 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
 
               <div className="relative flex-1 md:aspect-[3/4] bg-[#0A0A0A] overflow-hidden">
                 {isLoading && (
-                  <div className="absolute inset-0 z-40 flex flex-col items-center justify-center text-white space-y-6">
+                  <div className="absolute inset-0 z-40 flex flex-col items-center justify-center text-white space-y-6 text-center px-10">
                     <Loader2 className="animate-spin text-[#E1784F]" size={60} strokeWidth={3} />
-                    <p className="text-[10px] font-black uppercase tracking-[0.6em] text-[#E1784F]">Initializing Neural Sensors</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.6em] text-[#E1784F]">Setting up the Lens</p>
                   </div>
                 )}
                 
@@ -240,14 +236,13 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
           </motion.div>
         )}
 
-        {/* 3. PREVIEW MODE */}
         {mode === "preview" && capturedImage && (
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-            <Card className="p-10 bg-white dark:bg-[#0A0A0A] border-gray-100 dark:border-white/5 rounded-[4rem] space-y-12 shadow-2xl relative overflow-hidden">
+            <Card className="p-10 bg-white dark:bg-[#0A0A0A] border-gray-100 dark:border-white/5 rounded-[4rem] space-y-12 shadow-2xl relative overflow-hidden text-left">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#4DB6AC]/5 blur-3xl rounded-full" />
               
               <div className="space-y-4">
-                <span className="text-[#4DB6AC] text-[10px] font-black uppercase tracking-[0.6em]">Sample Verified</span>
+                <span className="text-[#4DB6AC] text-[10px] font-black uppercase tracking-[0.6em]">Verified Sample</span>
                 <h2 className="text-5xl md:text-7xl font-black italic uppercase text-black dark:text-white tracking-tighter leading-none">Confirm <br /> <span className="text-[#4DB6AC]">Data</span></h2>
               </div>
 
@@ -261,7 +256,7 @@ export default function CameraUpload({ onImageCapture, onScanTypeSelected }: Cam
                   onClick={handleFinalSubmission}
                   className="h-24 bg-black dark:bg-white text-white dark:text-black rounded-[2.5rem] font-black uppercase text-[12px] tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl transition-all hover:bg-[#E1784F] hover:text-white active:scale-95"
                 >
-                  <Zap size={20} fill="currentColor" /> Run Neural Scan
+                  <Zap size={20} fill="currentColor" /> Run Scan
                 </button>
                 <button
                   onClick={() => { setCapturedImage(null); setMode("camera"); }}

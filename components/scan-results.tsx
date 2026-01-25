@@ -1,7 +1,7 @@
 /**
- * 🛡️ AFRIDAM SCAN RESULTS: CLINICAL UI (Rule 6 Synergy)
- * Version: 2026.1.6 (Handshake & Visual Consistency)
- * Focus: High-Precision Diary Sync & Editorial Clarity.
+ * 🛡️ AFRIDAM SCAN RESULTS: CLINICAL UI (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: High-Precision Diary Sync & Mobile-First Result Display.
  */
 
 "use client"
@@ -30,33 +30,29 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
   const [isSaved, setIsSaved] = useState(false)
 
   /**
-   * 🚀 RULE 6 SYNC: 
-   * Handshake with the User's Clinical Diary.
+   * 🚀 THE DIARY HANDSHAKE (Rule 7)
+   * Saves the results to the user's permanent history in PostgreSQL.
    */
   const handleSaveToCloud = async () => {
-    // 🛡️ OGA FIX: Robust check for data presence
-    if (!result.id && !result.image && !result.predictions) return;
+    // Check for critical data before hitting the backend
+    if (!result.image && !result.predictions) return;
     
     setIsSaving(true)
     try {
       /**
-       * 🚀 ENDPOINT ALIGNMENT:
-       * We pass both camelCase and snake_case to be safe with Tobi's backend.
+       * 🚀 ENDPOINT SYNC:
+       * Matches the NestJS Analyzer Controller routes.
        */
-      await apiClient.post("/ai/history", {
-        externalId: result.id,
-        finding: result.finding,
+      await apiClient.post("/analyzer/history", {
+        imageUrl: result.image,
         predictions: result.predictions,
-        image_url: result.image,
-        metadata: {
-          client_timestamp: Date.now()
-        }
+        label: result.finding || "Skin Scan",
+        description: result.status || "Analysis complete",
       });
       
       setIsSaved(true)
-    } catch (err) {
-      // 🛡️ No jargon, quiet log
-      console.error("Diary Sync Failed:", err)
+    } catch (err: any) {
+      console.error("Diary sync interrupted - check network");
     } finally {
       setIsSaving(false)
     }
@@ -66,16 +62,16 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
     <motion.div 
       initial={{ opacity: 0, y: 20 }} 
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-10 max-w-2xl mx-auto pb-24 text-left"
+      className="space-y-10 max-w-2xl mx-auto pb-24 text-left px-4 md:px-0"
     >
       {/* 📊 HEADER */}
       <div className="text-center space-y-3">
         <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-white leading-none">
-          Glow <span className="text-[#E1784F]">Profile</span>
+          Skin <span className="text-[#E1784F]">Diary</span>
         </h1>
         <div className="flex items-center justify-center gap-3 text-[#4DB6AC]">
           <Sparkles size={16} />
-          <p className="text-[10px] font-black uppercase tracking-[0.4em]">Optimized by AfriDam AI</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em]">Synced with AI Brain</p>
         </div>
       </div>
 
@@ -85,29 +81,28 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
           <div className="relative aspect-square rounded-[2.8rem] overflow-hidden border border-white/5">
              <Image 
                src={result.image} 
-               alt="Aesthetic Scan" 
+               alt="Skin Capture" 
                fill
                className="object-cover" 
                priority
              />
              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
              <div className="absolute bottom-8 left-8">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">High-Resolution Capture Verified</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">High-Precision Image Locked</p>
              </div>
           </div>
         </Card>
       )}
 
-      {/* 🧬 INDICATORS (Rule 6 Style Sync) */}
+      {/* 🧬 INDICATORS (Resilient Mapping) */}
       <div className="grid grid-cols-1 gap-6">
         {result.predictions && Object.entries(result.predictions).length > 0 && (
           <Card className="p-10 bg-white/5 border-white/10 backdrop-blur-2xl rounded-[3rem]">
             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F] mb-8 flex items-center gap-3">
-              <Zap size={14} className="fill-current" /> Neural Indicators
+              <Zap size={14} className="fill-current" /> Neural Patterns
             </h2>
             <div className="space-y-4">
               {Object.entries(result.predictions).map(([name, confidence]: [string, any], index) => {
-                // Scaling 0-1 confidence to 0-100%
                 const value = confidence <= 1 ? confidence * 100 : confidence;
                 const isHigh = value > 70;
                 
@@ -126,11 +121,11 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
           </Card>
         )}
 
-        {/* 📜 CLINICAL INTERPRETATION */}
+        {/* 📜 AI INTERPRETATION */}
         <Card className="p-10 bg-white/5 border-white/10 rounded-[3rem]">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F] mb-6">AI Interpretation</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F] mb-6">Observation</h2>
           <p className="text-sm md:text-base text-white/80 leading-relaxed font-medium italic">
-            "{result.finding || "Evaluation complete. No significant aesthetic barriers detected."}"
+            "{result.finding || "Scan complete. No major issues found. Maintain your current safe routine."}"
           </p>
         </Card>
       </div>
@@ -141,7 +136,7 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
           onClick={onNewScan} 
           className="flex-1 h-20 bg-white text-black hover:bg-white/90 rounded-[2.2rem] font-black uppercase text-[11px] tracking-widest transition-all shadow-xl"
         >
-          <RotateCcw className="mr-3" size={18} /> New Analysis
+          <RotateCcw className="mr-3" size={18} /> New Scan
         </Button>
         
         <Button 
@@ -157,7 +152,7 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
           ) : (
             <Save className="mr-3" size={18} />
           )}
-          {isSaving ? "Syncing..." : isSaved ? "In Care Diary" : "Save to Diary"}
+          {isSaving ? "Saving..." : isSaved ? "In Care Diary" : "Save Results"}
         </Button>
       </div>
 
@@ -165,9 +160,9 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
       <div className="p-8 bg-white/5 border border-white/5 rounded-3xl flex gap-4 items-start opacity-40">
          <Info size={18} className="text-[#E1784F] shrink-0 mt-1" />
          <div className="space-y-1">
-            <p className="text-[9px] font-black uppercase tracking-widest text-white">Wellness Note</p>
+            <p className="text-[9px] font-black uppercase tracking-widest text-white">Safe Note</p>
             <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-white/70 leading-relaxed">
-              Diagnostics are for beauty and wellness guidance only. They do not replace clinical consultations or biopsies.
+              This scan is for wellness guidance only. It is not a clinical diagnosis. Always speak with an expert for medical concerns.
             </p>
          </div>
       </div>
