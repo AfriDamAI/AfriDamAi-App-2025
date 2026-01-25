@@ -1,9 +1,3 @@
-/**
- * 🛡️ AFRIDAM SPECIALIST: VIDEO ROOM
- * Version: 2026.1.4 (Human-First & Hardware Sync)
- * Rule 5: Synced with CallControls and clinical dashboard logic.
- */
-
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
@@ -12,6 +6,12 @@ import { VideoOff, Loader2, User, ShieldCheck, Heart } from "lucide-react"
 import { CallControls } from "./call-controls"        
 import { ConnectionStatus } from "./connection-status" 
 import { useRouter } from "next/navigation"
+
+/**
+ * 🛡️ AFRIDAM SPECIALIST: VIDEO ROOM (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: Mobile Hardware Handshake & Secure Video Stream.
+ */
 
 export function VideoRoom() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export function VideoRoom() {
   const streamRef = useRef<MediaStream | null>(null);
 
   /**
-   * 🚀 CAMERA & MIC SYNC
+   * 🚀 CAMERA & MIC HARDWARE HANDSHAKE
    */
   useEffect(() => {
     async function startCamera() {
@@ -38,26 +38,31 @@ export function VideoRoom() {
         }
         setIsSyncing(false);
       } catch (err) {
-        console.error("Camera connection failed:", err);
+        console.log("Hardware access denied or unavailable");
         setIsSyncing(false);
       }
     }
 
     if (!isVideoOff) {
       startCamera();
+    } else {
+      // Stop tracks if video is manually turned off
+      streamRef.current?.getTracks().forEach(track => track.stop());
     }
 
     return () => {
+      // 🛡️ CLEANUP: Ensure camera light turns off on exit
       streamRef.current?.getTracks().forEach(track => track.stop());
     };
   }, [isVideoOff]);
 
   const toggleMic = () => {
     if (streamRef.current) {
-      streamRef.current.getAudioTracks().forEach(track => {
-        track.enabled = isMuted; 
-      });
-      setIsMuted(!isMuted);
+      const audioTrack = streamRef.current.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = isMuted; 
+        setIsMuted(!isMuted);
+      }
     }
   };
 
@@ -67,9 +72,9 @@ export function VideoRoom() {
   };
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] bg-white dark:bg-[#050505] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden group shadow-2xl border border-black/5 dark:border-white/5 transition-colors">
+    <div className="relative w-full h-[500px] md:h-[700px] bg-white dark:bg-[#050505] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden group shadow-2xl border border-black/5 dark:border-white/10 transition-colors text-left">
       
-      {/* 📺 1. SPECIALIST VIEW (Placeholder) */}
+      {/* 📺 1. SPECIALIST FEED (Waiting State) */}
       <div className="absolute inset-0 bg-gray-50 dark:bg-[#0A0A0A] flex items-center justify-center">
         <AnimatePresence>
           {isSyncing ? (
@@ -80,22 +85,24 @@ export function VideoRoom() {
               className="flex flex-col items-center gap-6"
             >
               <Loader2 className="w-10 h-10 text-[#4DB6AC] animate-spin" />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#4DB6AC]">Connecting to Specialist...</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#4DB6AC]">Joining Specialist...</p>
             </motion.div>
           ) : (
             <div className="flex flex-col items-center gap-6 opacity-10 dark:opacity-20">
               <StethoscopeIcon className="w-20 h-20 text-black dark:text-white" />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black dark:text-white">Waiting for Specialist</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black dark:text-white text-center">
+                Waiting for Specialist <br/> to join
+              </p>
             </div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* 👤 2. USER MINI-PREVIEW */}
+      {/* 👤 2. USER MINI-PREVIEW (Draggable for Mobile) */}
       <motion.div 
         drag
-        dragConstraints={{ left: -300, right: 0, top: 0, bottom: 300 }}
-        className="absolute top-6 right-6 w-32 h-44 md:w-52 md:h-64 bg-black rounded-[2rem] border-2 border-white/10 overflow-hidden shadow-2xl z-20 cursor-grab active:cursor-grabbing group/user"
+        dragConstraints={{ left: -200, right: 0, top: 0, bottom: 200 }}
+        className="absolute top-6 right-6 w-28 h-40 md:w-52 md:h-64 bg-black rounded-[1.8rem] md:rounded-[2.5rem] border-2 border-white/10 overflow-hidden shadow-2xl z-20 cursor-grab active:cursor-grabbing"
       >
         {!isVideoOff ? (
           <video 
@@ -106,22 +113,29 @@ export function VideoRoom() {
             className="w-full h-full object-cover scale-x-[-1]" 
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-white/5 gap-4">
-             <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                <User size={18} className="text-white/40" />
+          <div className="w-full h-full flex flex-col items-center justify-center bg-white/5 gap-3">
+             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <User size={16} className="text-white/40" />
              </div>
-             <span className="text-[8px] font-black uppercase tracking-widest text-white/20">Video Paused</span>
+             <span className="text-[7px] font-black uppercase tracking-widest text-white/20">Paused</span>
           </div>
         )}
       </motion.div>
 
-      {/* 🛡️ 3. STATUS INDICATORS */}
-      <div className="absolute top-6 left-6 z-30 hidden md:block">
+      {/* 🛡️ 3. DESKTOP STATUS */}
+      <div className="absolute top-8 left-8 z-30 hidden md:block">
         <ConnectionStatus />
       </div>
 
-      {/* 🕹️ 4. CONTROLS */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 transition-transform hover:scale-105">
+      {/* 📱 MOBILE SECURE BADGE */}
+      <div className="absolute top-6 left-6 z-30 md:hidden">
+          <div className="w-10 h-10 bg-[#4DB6AC] text-white rounded-xl flex items-center justify-center shadow-lg">
+             <ShieldCheck size={20} />
+          </div>
+      </div>
+
+      {/* 🕹️ 4. CALL CONTROLS */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 w-full flex justify-center px-6">
         <CallControls 
           isMuted={isMuted}
           isVideoOff={isVideoOff}
@@ -129,12 +143,6 @@ export function VideoRoom() {
           onToggleVideo={() => setIsVideoOff(!isVideoOff)}
           onHangUp={handleHangUp}
         />
-      </div>
-
-      <div className="absolute top-6 left-6 z-30 md:hidden">
-          <div className="w-10 h-10 bg-[#4DB6AC] text-white rounded-xl flex items-center justify-center shadow-lg">
-             <ShieldCheck size={20} />
-          </div>
       </div>
     </div>
   )

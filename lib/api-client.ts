@@ -3,7 +3,6 @@ import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
 
 /**
  * 🛡️ HIGH-PRECISION INFRASTRUCTURE SYNC
- * Rule 7 Alignment:
  * baseURL: Main Backend (Render) - Synced with NestJS Global Prefix 'api'
  * aiURL: AI Brain (Google Cloud Run) - Synced with FastAPI '/api/v1'
  */
@@ -17,7 +16,7 @@ const apiClient = axios.create({
   }
 });
 
-/** 🛡️ REQUEST INTERCEPTOR **/
+/** 🛡️ REQUEST GATEKEEPER **/
 apiClient.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
@@ -31,7 +30,7 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-/** 🔐 SECURITY SYNC **/
+/** 🔐 SECURITY HANDSHAKE **/
 export const setAuthToken = (token: string | null) => {
   if (typeof window !== "undefined") {
     if (token) {
@@ -44,13 +43,12 @@ export const setAuthToken = (token: string | null) => {
   }
 };
 
-/** 🛡️ RESPONSE INTERCEPTOR - RULE 6 SYNC
- * We unwrap data here so the frontend components stay clean.
- * Backend returns results inside 'resultData'.
+/** 🛡️ RESPONSE INTERCEPTOR - 202 SYNC
+ * Ensures data is extracted correctly even if nested inside 'resultData'.
  */
 apiClient.interceptors.response.use(
   (response) => {
-    // Extract resultData if present, otherwise return raw data
+    // 🚀 THE FIX: Flexible unwrapping to catch tokens in all response types
     if (response.data && response.data.resultData) {
       return { ...response, data: response.data.resultData };
     }
@@ -61,8 +59,9 @@ apiClient.interceptors.response.use(
       if (typeof window !== "undefined") {
         localStorage.removeItem("token");
         const currentPath = window.location.pathname;
-        if (currentPath !== "/" && currentPath !== "/auth/login") {
-          window.location.href = "/";
+        // Redirect to clean login path
+        if (currentPath !== "/" && currentPath !== "/login") {
+          window.location.href = "/login";
         }
       }
     }
@@ -70,17 +69,14 @@ apiClient.interceptors.response.use(
   }
 );
 
-/** 🔑 AUTH ENDPOINTS (Synced with AuthService.ts) **/
+/** 🔑 AUTH ENDPOINTS **/
 export const login = async (credentials: UserLoginDto): Promise<AuthResponse> => {
-  // Routes strictly match NestJS AuthController
   const response = await apiClient.post("/auth/user/login", credentials);
   return response.data;
 };
 
 export const register = async (userData: CreateUserDto) => {
-  /** * 🚀 THE PAYLOAD HANDSHAKE
-   * Remapping 'country' to 'nationality' per backend requirement.
-   */
+  // 🌍 NATIONALITY SYNC: Remapping country field for backend database
   const { country, ...rest } = userData as any;
   const payload = {
     ...rest,
@@ -96,23 +92,23 @@ export const forgotPassword = async (email: string) => {
   return response.data;
 };
 
-/** 👤 USER DATA (Synced with UserService.ts & User.mapper.ts) **/
+/** 👤 USER PROFILE **/
 export const getProfile = async () => {
   const response = await apiClient.get("/profile");
   return response.data;
 };
 
 export const getUser = async (id: string) => {
-  const response = await apiClient.get(`/user/${id}`); // Synced with NestJS UserModule
+  const response = await apiClient.get(`/user/${id}`);
   return response.data;
 };
 
 export const updateUser = async (id: string, updates: any) => {
-  const response = await apiClient.patch(`/user/${id}`, updates); // Synced with Service updateUser
+  const response = await apiClient.patch(`/user/${id}`, updates);
   return response.data;
 };
 
-/** 🔬 AI CONTEXT - SYNCED WITH CLOUD RUN PREDICT MODEL **/
+/** 🔬 AI CONTEXT - SKIN SETTINGS **/
 const defaultAiContext = {
   region: "West Africa",
   country: "Nigeria",
@@ -130,7 +126,7 @@ const defaultAiContext = {
   user_activeness_on_app: "moderate" 
 };
 
-/** 🔬 AI SERVICE MODULE (Uses aiURL directly for speed) **/
+/** 🔬 AI SCAN MODULE **/
 export async function uploadImage(file: File | string): Promise<any> {
   const formData = new FormData();
   
@@ -155,7 +151,6 @@ export async function uploadImage(file: File | string): Promise<any> {
 
   formData.append("more_info", JSON.stringify(defaultAiContext));
   
-  // Synced with FastAPI predict.py route
   const response = await axios.post(`${aiURL}/skin-diagnosis`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
@@ -179,7 +174,7 @@ export const sendChatMessage = async (message: string) => {
   return response.data;
 };
 
-/** 💳 PAYMENTS (Synced with Transaction.service.ts) **/
+/** 💳 PAYMENTS **/
 export const initializePayment = async (data: { 
   plan: string, 
   amount: number, 
@@ -195,15 +190,14 @@ export const verifyPayment = async (transactionId: string) => {
   return response.data;
 };
 
-/** 🛍️ MARKETPLACE (Synced with Product.module.ts) **/
+/** 🛍️ CARE SHOP **/
 export const getProducts = async () => {
   const response = await apiClient.get("/product");
   return response.data;
 };
 
-/** 🚀 SCAN HISTORY (Synced with Analyzer.controller.ts) **/
+/** 🚀 SKIN DIARY HISTORY **/
 export const getScanHistory = async () => {
-  // Uses base backend (Render) where AI results are saved in PostgreSQL
   const response = await apiClient.get("/analyzer/history"); 
   return response.data;
 };

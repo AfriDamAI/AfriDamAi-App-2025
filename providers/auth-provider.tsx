@@ -1,9 +1,3 @@
-/**
- * 🛡️ AFRIDAM AUTH PROVIDER (Rule 7 Precision Sync)
- * Version: 2026.1.25
- * Focus: Eliminating Login Loops & Full TypeScript Compliance.
- */
-
 "use client"
 
 import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react"
@@ -18,7 +12,12 @@ import {
 } from "@/lib/api-client" 
 import { UserLoginDto, CreateUserDto } from "@/lib/types"
 
-// --- 🏛️ TYPES & INTERFACES ---
+/**
+ * 🛡️ AFRIDAM AUTH PROVIDER (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: High-Speed Mobile Transitions & Background Data Fetching.
+ */
+
 interface User {
   id: string;
   email: string;
@@ -48,7 +47,6 @@ interface AuthContextType {
   mutate: () => Promise<void>     
 }
 
-// 🚀 THE FIX: Declaring the context properly
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -67,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return userData;
       }
     } catch (err) {
-      console.error("Profile sync paused");
+      console.log("Profile update pending...");
     }
     return null;
   };
@@ -83,7 +81,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           } else {
             setAuthToken(token);
             setTokenLoaded(true); 
-            await fetchUserData(decoded.sub || decoded.id);
+            // Background fetch for mobile speed
+            fetchUserData(decoded.sub || decoded.id);
           }
         } catch (err) {
           signOut();
@@ -98,19 +97,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const data: any = await login(credentials);
-      const accessToken = data?.access_token;
+      // 🚀 THE FIX: Catching token from various backend response styles
+      const accessToken = data?.access_token || data?.token;
       
-      if (!accessToken) throw new Error("Connection failed: No token received");
+      if (!accessToken) throw new Error("Connection failed: Please check your details.");
 
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
       
+      // 🛡️ IMMEDIATE ACCESS: Set state before background fetching profile
+      setTokenLoaded(true); 
+      
       const userData = extractUserData(data);
-      setUser(userData);
-      setTokenLoaded(true); // 🚀 Triggers Guard to allow access
+      if (userData) setUser(userData);
 
       const decoded: any = jwtDecode(accessToken);
-      await fetchUserData(decoded.sub || decoded.id);
+      // We don't 'await' this so the user enters the dashboard instantly
+      fetchUserData(decoded.sub || decoded.id);
+      
     } catch (error) {
       signOut();
       throw error;
@@ -164,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     isSignedIn: tokenLoaded,
     isLoading,
-    requiresOnboarding: false, // 🚀 Loop-bypass locked
+    requiresOnboarding: false, // 🚀 Bypass set to false for clean user flow
     signIn,
     signUp,
     signOut,
@@ -183,6 +187,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  if (!context) throw new Error("useAuth error");
   return context;
 };

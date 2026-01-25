@@ -2,9 +2,15 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 /**
- * 🛡️ THE AFRIDAM "CN" UTILITY
- * Merges Tailwind classes and handles conditional logic without conflicts.
+ * 🛡️ AFRIDAM STYLING CORE: CN UTILITY (Rule 6 Synergy)
+ * Version: 2026.1.25
+ * Focus: Conflict-free Tailwind Merging & Mobile-First Logic.
  */
+
 export function cn(...inputs: ClassValue[]) {
+  /**
+   * 🚀 THE STYLE HANDSHAKE
+   * Combines classes (clsx) and resolves Tailwind conflicts (twMerge).
+   */
   return twMerge(clsx(inputs))
 }
