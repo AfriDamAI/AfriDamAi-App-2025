@@ -37,7 +37,7 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
   }
 
   const userInitial = (user?.firstName || "U").charAt(0).toUpperCase();
-  const fullName = user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "Valued Member";
+  const fullName = user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || "Valued Member";
 
   return (
     <div className="relative">

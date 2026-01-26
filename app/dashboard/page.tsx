@@ -26,7 +26,9 @@ export default function Dashboard() {
   const [loadingHistory, setLoadingHistory] = useState(true)
 
   const firstName = user?.firstName || user?.displayName?.split(' ')[0] || "User"
-  const initials = user ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || ''}` : "A"
+  const initials = user 
+    ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || user.firstName?.charAt(1) || ''}`.toUpperCase() 
+    : "A"
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login")
