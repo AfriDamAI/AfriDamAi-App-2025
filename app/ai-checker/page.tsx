@@ -10,21 +10,21 @@ import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  ChevronLeft, CheckCircle2, Zap, 
-  RotateCcw, AlertTriangle, Upload, Baby, ShoppingBag, 
+import {
+  ChevronLeft, CheckCircle2, Zap,
+  RotateCcw, AlertTriangle, Upload, Baby, ShoppingBag,
   Scan, FlaskConical
 } from "lucide-react"
 // 🚀 SYNC: Using the unified api-client to handle both image and text analysis
-import { uploadImage, analyzeIngredients } from "@/lib/api-client"
+import { analyzeIngredients } from "@/lib/api-client"
 
 export default function IngredientCheckerPage() {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [imgSource, setImgSource] = useState<string | null>(null);
   const [manualText, setManualText] = useState("");
   const [isCapturing, setIsCapturing] = useState(false);
@@ -40,8 +40,8 @@ export default function IngredientCheckerPage() {
     setIsCapturing(true);
     setStatus("Opening Camera");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "environment", width: 1080, height: 1080 } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: 1080, height: 1080 }
       });
       if (videoRef.current) videoRef.current.srcObject = stream;
     } catch (err) {
@@ -67,10 +67,10 @@ export default function IngredientCheckerPage() {
   const handleAnalyze = async () => {
     const input = imgSource || manualText;
     if (!input) return;
-    
+
     setIsAnalyzing(true);
     setStatus("Checking Formula...");
-    
+
     try {
       /**
        * 🚀 THE HYBRID HANDSHAKE (Rule 7)
@@ -79,12 +79,12 @@ export default function IngredientCheckerPage() {
       let data;
       if (imgSource) {
         // Sends to /analyzer/upload with 'ingredient_analysis' flag (Backend Logic)
-        data = await uploadImage(imgSource);
+        data = await analyzeIngredients(imgSource);
       } else {
         // Sends to /ai/ingredients-analysis (AI Brain Logic)
         data = await analyzeIngredients(manualText);
       }
-      
+
       /** * 📊 DATA MAPPING
        * riskLevel: Simplified safety status.
        * safetyScore: Number from 0 to 100.
@@ -95,7 +95,7 @@ export default function IngredientCheckerPage() {
         isChildSafe: data?.child_safe || data?.isChildSafe || false,
         summary: data?.summary || data?.description || "Analysis complete. This formula looks safe for your skin profile."
       });
-      
+
       setStatus("Ready");
     } catch (err) {
       // 🛡️ Rule 4: Relatable English for internet/sync errors
@@ -111,7 +111,7 @@ export default function IngredientCheckerPage() {
   return (
     <main className="min-h-[100svh] bg-white dark:bg-[#0A0A0A] text-black dark:text-white pb-20">
       <div className="max-w-screen-xl mx-auto px-6 py-10 lg:py-16 grid lg:grid-cols-2 gap-12 items-start text-left">
-        
+
         {/* LEFT: STATUS & BRAND */}
         <div className="space-y-10">
           <header className="space-y-8">
@@ -124,8 +124,8 @@ export default function IngredientCheckerPage() {
               </h1>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 px-3 py-1 bg-black dark:bg-white text-white dark:text-black rounded-full">
-                   <div className="w-1.5 h-1.5 rounded-full bg-[#E1784F] animate-pulse" />
-                   <span className="text-[8px] font-black uppercase tracking-widest">{status}</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#E1784F] animate-pulse" />
+                  <span className="text-[8px] font-black uppercase tracking-widest">{status}</span>
                 </div>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function IngredientCheckerPage() {
             </p>
             <div className="space-y-4">
               <label className="text-[10px] font-black text-[#E1784F] uppercase tracking-[0.3em]">Manual Entry</label>
-              <textarea 
+              <textarea
                 value={manualText}
                 onChange={(e) => setManualText(e.target.value)}
                 placeholder="Paste ingredients here..."
@@ -159,15 +159,15 @@ export default function IngredientCheckerPage() {
                     <div className="relative w-full h-full">
                       <img src={imgSource} className={`w-full h-full object-cover transition-all duration-700 ${isAnalyzing ? 'blur-lg opacity-40' : ''}`} alt="Label" />
                       {isAnalyzing && (
-                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 backdrop-blur-sm">
-                            <motion.div 
-                              animate={{ top: ["0%", "100%", "0%"] }} 
-                              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                              className="absolute left-0 right-0 h-[1px] bg-[#E1784F] shadow-[0_0_15px_#E1784F] z-50"
-                            />
-                            <FlaskConical className="animate-bounce text-[#E1784F] mb-4" size={32} />
-                            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Checking Formula</p>
-                         </div>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 backdrop-blur-sm">
+                          <motion.div
+                            animate={{ top: ["0%", "100%", "0%"] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                            className="absolute left-0 right-0 h-[1px] bg-[#E1784F] shadow-[0_0_15px_#E1784F] z-50"
+                          />
+                          <FlaskConical className="animate-bounce text-[#E1784F] mb-4" size={32} />
+                          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Checking Formula</p>
+                        </div>
                       )}
                     </div>
                   ) : (
@@ -182,7 +182,7 @@ export default function IngredientCheckerPage() {
               <div className="max-w-xs mx-auto space-y-4">
                 {isCapturing ? (
                   <button onClick={capture} className="w-16 h-16 mx-auto rounded-full border-4 border-[#E1784F] p-1 flex items-center justify-center active:scale-90 transition-transform">
-                     <div className="w-full h-full rounded-full bg-[#E1784F]" />
+                    <div className="w-full h-full rounded-full bg-[#E1784F]" />
                   </button>
                 ) : (imgSource || manualText) && !isAnalyzing ? (
                   <button onClick={handleAnalyze} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 shadow-xl">
@@ -198,7 +198,7 @@ export default function IngredientCheckerPage() {
                     </button>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if(file) {
+                      if (file) {
                         const reader = new FileReader();
                         reader.onloadend = () => setImgSource(reader.result as string);
                         reader.readAsDataURL(file);
@@ -214,12 +214,12 @@ export default function IngredientCheckerPage() {
               <div className="bg-black dark:bg-white text-white dark:text-black p-10 md:p-14 rounded-[3.5rem] space-y-8 shadow-2xl text-left">
                 <div className="flex justify-between items-start">
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${results.safetyScore < 70 ? 'bg-red-500' : 'bg-[#E1784F]'}`}>
-                     {results.safetyScore < 70 ? <AlertTriangle size={28} className="text-white" /> : <CheckCircle2 size={28} className="text-white" />}
+                    {results.safetyScore < 70 ? <AlertTriangle size={28} className="text-white" /> : <CheckCircle2 size={28} className="text-white" />}
                   </div>
                   {results.isChildSafe && (
                     <div className="bg-white/10 dark:bg-black/10 px-4 py-2 rounded-full flex items-center gap-2 border border-white/20 dark:border-black/20">
-                       <Baby size={12} className="text-[#E1784F]" />
-                       <span className="text-[8px] font-black uppercase tracking-widest">Child Safe</span>
+                      <Baby size={12} className="text-[#E1784F]" />
+                      <span className="text-[8px] font-black uppercase tracking-widest">Child Safe</span>
                     </div>
                   )}
                 </div>
@@ -238,7 +238,7 @@ export default function IngredientCheckerPage() {
                   </button>
                 </div>
               </div>
-              <button onClick={() => {setResults(null); setImgSource(null); setManualText("");}} className="w-full py-2 text-[9px] font-black opacity-30 uppercase tracking-widest flex items-center justify-center gap-2">
+              <button onClick={() => { setResults(null); setImgSource(null); setManualText(""); }} className="w-full py-2 text-[9px] font-black opacity-30 uppercase tracking-widest flex items-center justify-center gap-2">
                 <RotateCcw size={12} /> New Check
               </button>
             </motion.div>
