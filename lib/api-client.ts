@@ -6,7 +6,7 @@ import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
  * Version: 2026.01.26
  * Fix: Forced token sanitation to prevent double-quote JSON errors.
  */
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "/api/proxy";
 const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api/v1";
 
 // 🧼 HELPER: Ensures the token is a clean string (No double quotes)
