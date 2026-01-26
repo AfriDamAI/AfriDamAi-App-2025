@@ -21,42 +21,28 @@ export default function LoginPage() {
   const handleCancel = () => router.push("/");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsLoading(true)
-    
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
     const credentials = {
       email: email.trim(),
-      password: password.trim()
+      password: password.trim(),
     };
 
     try {
-      const data = await loginService(credentials)
-      
-      // 🛡️ FIX: Ensure we extract a clean string token
-      let token = (data as any).accessToken || (data as any).access_token;
-      
-      if (syncAuthState && token) {
-        // 🧼 SANITY CLEAN: Remove any accidental double quotes from the string
-        const cleanToken = typeof token === 'string' ? token.replace(/^"|"$/g, '') : token;
-        
-        await syncAuthState(cleanToken, data)
-        
-        // Use a small delay to ensure state is committed before redirecting
-        setTimeout(() => {
-          router.replace("/dashboard") 
-        }, 100);
-      } else {
-        throw new Error("Identity handshake failed. Credentials missing.")
-      }
-
+      await auth.signIn(credentials);
+      router.replace("/dashboard");
     } catch (err: any) {
-      const message = err.response?.data?.message || "Verification failed. Check your credentials."
-      setError(typeof message === 'string' ? message : "Invalid identity response.");
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Verification failed. Check your credentials.";
+      setError(typeof message === "string" ? message : "Invalid identity response.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white flex flex-col justify-center items-center p-6 md:p-12 relative overflow-hidden text-left">

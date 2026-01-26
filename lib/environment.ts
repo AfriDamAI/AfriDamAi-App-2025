@@ -8,7 +8,7 @@
 const getBackendUrl = () => {
     // 1. Get the URL from environment variables
     // UPDATED: Changed fallback to the live Render backend for stability.
-    let url = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
+    let url = process.env.NEXT_PUBLIC_API_URL || "/api/proxy";
     
     // 2. Remove any trailing slash first to avoid //api
     url = url.replace(/\/$/, "");
