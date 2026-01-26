@@ -15,7 +15,7 @@ import {
   ArrowRight, Binary, Fingerprint, Search
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { uploadImage } from "@/lib/api-client"
+import { analyzeSkinWithUserData } from "@/lib/api-client"
 
 export default function UnifiedScanner() {
   const router = useRouter()
@@ -93,7 +93,7 @@ export default function UnifiedScanner() {
   }
 
   const analyze = async () => {
-    if (!imgSource) return;
+    if (!imgSource || !user) return;
     setIsAnalyzing(true)
     setErrorDetails(null)
     setStatus("Scanning...")
@@ -101,27 +101,52 @@ export default function UnifiedScanner() {
     try {
       /**
        * 🚀 THE NEURAL HANDSHAKE (Rule 7)
-       * Sending data to GCP AI via api-client.
+       * Sending data to backend with full user context using CSP-compliant apiClient
        */
-      const data = await uploadImage(imgSource);
       
-      /** * 📊 DATA MAPPING
+      // Populate more_info with user data - matching exact API spec
+      const moreInfo = {
+        region: "West Africa",
+        country: user.profile?.nationality || "Nigeria",
+        known_skintone_type: user.profile?.skinType || "brown",
+        skin_type_last_time_checked: new Date().toISOString(),
+        known_skin_condition: user.profile?.skinCondition || "none",
+        skin_condition_last_time_checked: new Date().toISOString(),
+        gender: user.profile?.sex || user.sex || "female",
+        age: user.profile?.age || 0,
+        known_body_lotion: user.profile?.bodyLotion || "unknown",
+        known_body_lotion_brand: user.profile?.bodyLotionBrand || "unknown",
+        known_allergies: (user.profile?.allergies && Array.isArray(user.profile.allergies) && user.profile.allergies.length > 0) 
+          ? user.profile.allergies 
+          : ["none"],
+        known_last_skin_treatment: user.profile?.lastSkinTreatment || new Date().toISOString(),
+        known_last_consultation_with_afridermatologists: user.profile?.lastConsultation || new Date().toISOString(),
+        user_activeness_on_app: "very_high"
+      }
+      
+      // Call the API with user context
+      const data = await analyzeSkinWithUserData(imgSource, moreInfo);
+      
+      /**
+       * 📊 DATA MAPPING
        * findings: The main AI observation.
-       * confidence: How sure the AI is about the result.
+       * recommendations: Care recommendations.
+       * description: Full analysis.
        */
       const analysisData = {
-        finding: data?.finding || data?.description || data?.label || "Analysis complete.",
-        predictions: data?.predictions || {},
-        overallHealth: data?.overall_health || data?.score || 85,
+        finding: data?.label || data?.description || "Analysis complete",
+        recommendations: data?.recommendations || [],
+        description: data?.description || "",
+        severity: data?.severity_score || data?.severity || 0,
+        conditions: data?.conditions || [],
         image: imgSource,
-        id: data?.id || data?.scanId || "TEMP-" + Date.now()
+        id: data?.id || "TEMP-" + Date.now()
       };
       
       setResults(analysisData);
-      setStatus("Ready")
+      setStatus("Analysis Complete")
     } catch (err: any) {
-      // 🛡️ OGA FIX: Detailed error logging for Tobi's backend tests
-      console.error("AI Sync Error:", err.response?.data || err.message);
+      console.error("AI Scan Error:", err);
       setErrorDetails("The AI Brain is busy. Please check your internet and try again.");
       setStatus("Try Again")
     } finally {
@@ -225,20 +250,29 @@ export default function UnifiedScanner() {
                   </div>
                 ) : !isAnalyzing && (
                   <div className="space-y-3">
-                    <button onClick={startCamera} className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg">
-                      Open Camera
+                    <button onClick={startCamera} className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg flex items-center justify-center gap-2">
+                      <Scan size={14} /> Take Photo with Camera
                     </button>
-                    <button onClick={() => fileInputRef.current?.click()} className="w-full py-2 text-[9px] font-black opacity-40 uppercase tracking-widest flex items-center justify-center gap-2">
-                      <Scan size={12} /> Upload Gallery
+                    <button onClick={() => fileInputRef.current?.click()} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg">
+                      <Search size={14} /> Choose Image from Device
                     </button>
-                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if(file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => setImgSource(reader.result as string);
-                        reader.readAsDataURL(file);
-                      }
-                    }} />
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      className="hidden" 
+                      accept="image/*" 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if(file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setImgSource(reader.result as string);
+                            setStatus("Image Selected");
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }} 
+                    />
                   </div>
                 )}
                 {errorDetails && <p className="text-center text-red-500 text-[9px] font-black uppercase">{errorDetails}</p>}
@@ -257,15 +291,68 @@ export default function UnifiedScanner() {
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.3em]">AI Observation</p>
+                  <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.3em]">AI Diagnosis</p>
                   <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter leading-tight">
                     {results.finding}
                   </h2>
                 </div>
 
-                <div className="pt-8 border-t border-white/10 dark:border-black/10 space-y-6">
+                {results.description && (
+                  <div className="py-6 border-y border-white/10 dark:border-black/10 space-y-3">
+                    <p className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-[0.3em]">Analysis Details</p>
+                    <p className="text-sm font-medium opacity-70 leading-relaxed">{results.description}</p>
+                  </div>
+                )}
+
+                {results.conditions && results.conditions.length > 0 && (
+                  <div className="space-y-4">
+                    <p className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-[0.3em]">Detected Conditions</p>
+                    <div className="flex flex-wrap gap-2">
+                      {results.conditions.map((condition: string, idx: number) => (
+                        <span key={idx} className="px-4 py-2 bg-white/10 dark:bg-black/10 rounded-full text-[9px] font-bold uppercase tracking-tight">
+                          {condition}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {results.recommendations && results.recommendations.length > 0 && (
+                  <div className="space-y-4">
+                    <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.3em]">Recommended Care</p>
+                    <ul className="space-y-2">
+                      {results.recommendations.map((rec: string, idx: number) => (
+                        <li key={idx} className="flex gap-3 text-sm font-medium opacity-70">
+                          <span className="text-[#E1784F]">•</span>
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {results.severity !== undefined && (
+                  <div className="space-y-3">
+                    <p className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-[0.3em]">Severity Score</p>
+                    <div className="w-full bg-white/10 dark:bg-black/10 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#4DB6AC] to-[#E1784F]" 
+                        style={{ width: `${Math.min(results.severity, 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-[9px] font-mono opacity-50">{results.severity}%</p>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t border-white/10 dark:border-black/10 space-y-4">
                   <button onClick={() => router.push(`/marketplace?focus=${results.finding}`)} className="w-full py-5 bg-white dark:bg-black text-black dark:text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 group">
                     View Care Plan <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button onClick={() => router.push('/specialist')} className="w-full py-5 border border-white/20 dark:border-black/20 text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 group hover:bg-white/5">
+                    Consult Specialist <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button onClick={() => router.push('/history')} className="w-full py-5 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 text-[#4DB6AC] rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2">
+                    View in History <ArrowRight size={14} />
                   </button>
                 </div>
               </div>
