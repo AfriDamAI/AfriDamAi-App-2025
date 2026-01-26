@@ -6,7 +6,7 @@ import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
  * Version: 2026.01.26
  * Fix: Forced token sanitation to prevent double-quote JSON errors.
  */
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "/api/proxy";
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridamai-backend.onrender.com/api";
 const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api/v1";
 
 // 🧼 HELPER: Ensures the token is a clean string (No double quotes)
@@ -111,38 +111,38 @@ export const updateUser = async (id: string, updates: any) => {
 };
 
 /** 🔬 AI SCAN MODULE **/
-export async function uploadImage(file: File | string): Promise<any> {
-  const formData = new FormData();
-  if (typeof file === 'string') {
-    try {
-      const parts = file.split(',');
-      const byteString = atob(parts[1]);
-      const mimeString = parts[0].split(':')[1].split(';')[0];
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-      const blob = new Blob([ab], { type: mimeString });
-      formData.append("file", blob, "scan_capture.jpg");
-    } catch (e) { console.error("Image Processing Error:", e); }
-  } else {
-    formData.append("file", file);
-  }
-  // Default AI context
-  formData.append("more_info", JSON.stringify({
-    region: "West Africa",
-    country: "Nigeria",
-    known_skintone_type: "not_specified",
-    gender: "female", 
-    age: 25,
-    known_allergies: [], 
-    user_activeness_on_app: "moderate" 
-  }));
+// export async function uploadImage(file: File | string): Promise<any> {
+//   const formData = new FormData();
+//   if (typeof file === 'string') {
+//     try {
+//       const parts = file.split(',');
+//       const byteString = atob(parts[1]);
+//       const mimeString = parts[0].split(':')[1].split(';')[0];
+//       const ab = new ArrayBuffer(byteString.length);
+//       const ia = new Uint8Array(ab);
+//       for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+//       const blob = new Blob([ab], { type: mimeString });
+//       formData.append("file", blob, "scan_capture.jpg");
+//     } catch (e) { console.error("Image Processing Error:", e); }
+//   } else {
+//     formData.append("file", file);
+//   }
+//   // Default AI context
+//   formData.append("more_info", JSON.stringify({
+//     region: "West Africa",
+//     country: "Nigeria",
+//     known_skintone_type: "not_specified",
+//     gender: "female", 
+//     age: 25,
+//     known_allergies: [], 
+//     user_activeness_on_app: "moderate" 
+//   }));
   
-  const response = await axios.post(`${aiURL}/skin-diagnosis`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return response.data;
-}
+//   const response = await axios.post(`${aiURL}/skin-diagnosis`, formData, {
+//     headers: { "Content-Type": "multipart/form-data" },
+//   });
+//   return response.data;
+// }
 
 export const analyzeIngredients = async (ingredients: string) => {
   const response = await axios.post(`${aiURL}/ingredients-analysis`, { query: ingredients });
@@ -170,8 +170,35 @@ export const getProducts = async () => {
   return response.data;
 };
 
-export const getScanHistory = async () => {
-  const response = await apiClient.get("/analyzer/history"); 
+export const getScanHistory = async (userId: string) => {
+  const response = await apiClient.get(`/v1/result/${userId}`); 
+  return response.data;
+};
+
+export const getSingleScanResult = async (resultId: string) => {
+  const response = await apiClient.get(`/v1/result/${resultId}`);
+  return response.data;
+};
+
+/** 🔬 AI SKIN DIAGNOSIS WITH USER CONTEXT **/
+export const analyzeSkinWithUserData = async (imgSource: string, userContext: any) => {
+  const formData = new FormData();
+  
+  // Convert base64 to blob
+  const parts = imgSource.split(',');
+  const byteString = atob(parts[1]);
+  const mimeString = parts[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+  const blob = new Blob([ab], { type: mimeString });
+  
+  formData.append("file", blob, "scan_capture.jpg");
+  formData.append("more_info", JSON.stringify(userContext));
+  
+  const response = await apiClient.post("/v1/skin-diagnosis", formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
   return response.data;
 };
 
