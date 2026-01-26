@@ -37,14 +37,24 @@ export default function ProfilePage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(user?.profile?.avatarUrl || null)
 
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    phoneNo: user?.phoneNo || "",
+    firstName: "",
+    lastName: "",
+    phoneNo: "",
   })
 
   useEffect(() => {
     if (!user) router.push("/login")
   }, [user, router])
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phoneNo: user.phoneNo || "",
+      })
+    }
+  }, [user])
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

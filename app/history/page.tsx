@@ -9,7 +9,7 @@ import {
   CalendarDays, Zap, ArrowRight
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import apiClient from "@/lib/api-client"
+import apiClient, { getScanHistory } from "@/lib/api-client"
 
 /**
  * 🛡️ AFRIDAM CLINICAL DIARY: HISTORY (Rule 6 Synergy)
@@ -36,10 +36,11 @@ export default function HistoryPage() {
     try {
       /**
        * 🚀 THE HISTORY HANDSHAKE
-       * Syncing with NestJS History Controller via api-client.
+       * Fetching scan results from backend using userId
        */
-      const response = await apiClient.get(`/history/user/${user?.id}`)
-      setHistory(response.data?.resultData || response.data || [])
+      const response = await getScanHistory(user?.id || '')
+      const results = Array.isArray(response) ? response : response?.data || response?.resultData || []
+      setHistory(results)
     } catch (err) {
       console.log("Cloud diary sync pending...")
       setHistory([])
