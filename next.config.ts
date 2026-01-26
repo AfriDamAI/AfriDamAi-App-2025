@@ -66,6 +66,15 @@ const nextConfig = {
     ];
   },
 
+  async rewrites() {
+    return [
+      {
+        source: '/api/proxy/:path*',
+        destination: 'https://afridamai-backend.onrender.com/api/:path*',
+      },
+    ];
+  },
+
   images: {
     remotePatterns: [
       {

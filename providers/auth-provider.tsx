@@ -6,7 +6,7 @@ import {
   login, 
   register, 
   setAuthToken, 
-  getUser, 
+  getProfile,
   updateUser, 
   forgotPassword as forgotPasswordApi 
 } from "@/lib/api-client" 
@@ -56,9 +56,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const extractUserData = (data: any) => data?.user || data;
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = async () => {
     try {
-      const response = await getUser(userId);
+      const response = await getProfile();
       const userData = extractUserData(response);
       if (userData) {
         setUser(userData);
@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setAuthToken(token);
             setTokenLoaded(true); 
             // Background fetch for mobile speed
-            fetchUserData(decoded.sub || decoded.id);
+            fetchUserData();
           }
         } catch (err) {
           signOut();
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const data: any = await login(credentials);
       // 🚀 THE FIX: Catching token from various backend response styles
-      const accessToken = data?.access_token || data?.token;
+      const accessToken = data?.accessToken || data?.access_token || data?.token;
       
       if (!accessToken) throw new Error("Connection failed: Please check your details.");
 
@@ -111,9 +111,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData = extractUserData(data);
       if (userData) setUser(userData);
 
-      const decoded: any = jwtDecode(accessToken);
       // We don't 'await' this so the user enters the dashboard instantly
-      fetchUserData(decoded.sub || decoded.id);
+      fetchUserData();
       
     } catch (error) {
       signOut();
@@ -146,8 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = async () => {
     const token = localStorage.getItem("token");
     if (token) {
-      const decoded: any = jwtDecode(token);
-      await fetchUserData(decoded.sub || decoded.id);
+      await fetchUserData();
     }
   }
 
