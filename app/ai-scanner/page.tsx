@@ -9,9 +9,9 @@
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { 
+import {
   ChevronLeft, CheckCircle2, Zap,
-  RotateCcw, Scan, Info, ShieldCheck, 
+  RotateCcw, Scan, Info, ShieldCheck,
   ArrowRight, Binary, Fingerprint, Search
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
@@ -20,7 +20,7 @@ import { analyzeSkinWithUserData } from "@/lib/api-client"
 export default function UnifiedScanner() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
-  
+
   const [imgSource, setImgSource] = useState<string | null>(null)
   const [isCapturing, setIsCapturing] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -28,7 +28,7 @@ export default function UnifiedScanner() {
   const [status, setStatus] = useState("System Ready")
   const [scanStep, setScanStep] = useState(0)
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
-  
+
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -51,7 +51,7 @@ export default function UnifiedScanner() {
     if (isAnalyzing) {
       interval = setInterval(() => {
         setScanStep((prev) => (prev < analysisSteps.length - 1 ? prev + 1 : prev));
-      }, 3000); 
+      }, 3000);
     } else {
       setScanStep(0);
     }
@@ -97,13 +97,13 @@ export default function UnifiedScanner() {
     setIsAnalyzing(true)
     setErrorDetails(null)
     setStatus("Scanning...")
-    
+
     try {
       /**
        * 🚀 THE NEURAL HANDSHAKE (Rule 7)
        * Sending data to backend with full user context using CSP-compliant apiClient
        */
-      
+
       // Populate more_info with user data - matching exact API spec
       const moreInfo = {
         region: "West Africa",
@@ -116,17 +116,17 @@ export default function UnifiedScanner() {
         age: user.profile?.age || 0,
         known_body_lotion: user.profile?.bodyLotion || "unknown",
         known_body_lotion_brand: user.profile?.bodyLotionBrand || "unknown",
-        known_allergies: (user.profile?.allergies && Array.isArray(user.profile.allergies) && user.profile.allergies.length > 0) 
-          ? user.profile.allergies 
+        known_allergies: (user.profile?.allergies && Array.isArray(user.profile.allergies) && user.profile.allergies.length > 0)
+          ? user.profile.allergies
           : ["none"],
         known_last_skin_treatment: user.profile?.lastSkinTreatment || new Date().toISOString(),
         known_last_consultation_with_afridermatologists: user.profile?.lastConsultation || new Date().toISOString(),
         user_activeness_on_app: "very_high"
       }
-      
+
       // Call the API with user context
       const data = await analyzeSkinWithUserData(imgSource, moreInfo);
-      
+
       /**
        * 📊 DATA MAPPING
        * findings: The main AI observation.
@@ -142,7 +142,7 @@ export default function UnifiedScanner() {
         image: imgSource,
         id: data?.id || "TEMP-" + Date.now()
       };
-      
+
       setResults(analysisData);
       setStatus("Analysis Complete")
     } catch (err: any) {
@@ -159,25 +159,25 @@ export default function UnifiedScanner() {
   return (
     <main className="min-h-[100svh] bg-white dark:bg-[#0A0A0A] text-black dark:text-white pb-20">
       <div className="max-w-screen-xl mx-auto px-6 py-10 lg:py-16 grid lg:grid-cols-2 gap-12 items-start">
-        
+
         {/* LEFT: BRANDING */}
         <div className="space-y-10">
           <header className="space-y-6 text-left">
-            <button 
-              onClick={() => router.push('/dashboard')} 
+            <button
+              onClick={() => router.push('/dashboard')}
               className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] opacity-40 hover:opacity-100 transition-all"
             >
               <ChevronLeft size={14} /> Dashboard
             </button>
-            
+
             <div className="space-y-2">
               <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
                 Skin <span className="text-[#E1784F]">Scan</span>
               </h1>
               <div className="flex items-center gap-3">
                 <div className="px-3 py-1 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center gap-2">
-                   <div className="w-1 h-1 rounded-full bg-[#E1784F] animate-pulse" />
-                   <span className="text-[8px] font-black uppercase tracking-widest">{status}</span>
+                  <div className="w-1 h-1 rounded-full bg-[#E1784F] animate-pulse" />
+                  <span className="text-[8px] font-black uppercase tracking-widest">{status}</span>
                 </div>
               </div>
             </div>
@@ -202,26 +202,26 @@ export default function UnifiedScanner() {
                     <div className="relative w-full h-full">
                       <img src={imgSource} className={`w-full h-full object-cover ${isAnalyzing ? 'blur-md opacity-50 scale-105' : ''} transition-all duration-700`} alt="Skin Capture" />
                       {isAnalyzing && (
-                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
-                            <motion.div 
-                              initial={{ top: "0%" }} animate={{ top: "100%" }} 
-                              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                              className="absolute left-0 right-0 h-[1px] bg-[#E1784F] shadow-[0_0_15px_#E1784F]"
-                            />
-                            <motion.div 
-                              key={scanStep}
-                              initial={{ opacity: 0, y: 5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="flex flex-col items-center gap-4 text-white text-center"
-                            >
-                              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                                {analysisSteps[scanStep].icon}
-                              </div>
-                              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">
-                                {analysisSteps[scanStep].text}
-                              </p>
-                            </motion.div>
-                         </div>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
+                          <motion.div
+                            initial={{ top: "0%" }} animate={{ top: "100%" }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                            className="absolute left-0 right-0 h-[1px] bg-[#E1784F] shadow-[0_0_15px_#E1784F]"
+                          />
+                          <motion.div
+                            key={scanStep}
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex flex-col items-center gap-4 text-white text-center"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                              {analysisSteps[scanStep].icon}
+                            </div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">
+                              {analysisSteps[scanStep].text}
+                            </p>
+                          </motion.div>
+                        </div>
                       )}
                     </div>
                   ) : (
@@ -237,7 +237,7 @@ export default function UnifiedScanner() {
               <div className="max-w-xs mx-auto space-y-4">
                 {isCapturing ? (
                   <button onClick={capture} className="w-16 h-16 mx-auto rounded-full border-4 border-[#E1784F] p-1 flex items-center justify-center active:scale-90 transition-transform">
-                     <div className="w-full h-full rounded-full bg-[#E1784F]" />
+                    <div className="w-full h-full rounded-full bg-[#E1784F]" />
                   </button>
                 ) : imgSource && !isAnalyzing ? (
                   <div className="space-y-3">
@@ -256,14 +256,14 @@ export default function UnifiedScanner() {
                     <button onClick={() => fileInputRef.current?.click()} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg">
                       <Search size={14} /> Choose Image from Device
                     </button>
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      className="hidden" 
-                      accept="image/*" 
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if(file) {
+                        if (file) {
                           const reader = new FileReader();
                           reader.onloadend = () => {
                             setImgSource(reader.result as string);
@@ -271,7 +271,7 @@ export default function UnifiedScanner() {
                           };
                           reader.readAsDataURL(file);
                         }
-                      }} 
+                      }}
                     />
                   </div>
                 )}
@@ -279,87 +279,98 @@ export default function UnifiedScanner() {
               </div>
             </div>
           ) : (
-            /* RESULTS HUB */
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
-              <div className="bg-black dark:bg-white text-white dark:text-black p-8 md:p-12 rounded-[3rem] space-y-8 text-left shadow-2xl">
-                <div className="flex justify-between items-start">
-                  <CheckCircle2 size={40} className="text-[#E1784F]" />
-                  <div className="text-right opacity-30">
-                    <p className="text-[8px] font-black uppercase tracking-widest">Afla-ID</p>
-                    <p className="text-[8px] font-mono uppercase">#{results.id.toString().slice(-6).toUpperCase()}</p>
+            /* 📊 UPDATED: CLINICAL DIAGNOSTIC RESULT HUB */
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full max-w-2xl mx-auto print:p-0"
+            >
+              <div className="bg-white dark:bg-[#0A0A0A] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden relative shadow-2xl border border-black/5 dark:border-white/10 print:border-none print:shadow-none">
+
+                {/* TOP SCANNED IMAGE SECTION */}
+                <div className="relative h-48 md:h-64 bg-gray-200 dark:bg-white/5">
+                  {imgSource && (
+                    <img
+                      src={imgSource}
+                      alt="Clinical Scan"
+                      className="w-full h-full object-cover opacity-80"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
+                  <div className="absolute bottom-6 left-8 md:bottom-10 md:left-12">
+                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#4DB6AC] mb-2">Scan Successful</p>
+                    <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter leading-none text-white">
+                      Diagnostic <br /> <span className="text-[#E1784F]">Report</span>
+                    </h2>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.3em]">AI Diagnosis</p>
-                  <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter leading-tight">
-                    {results.finding}
-                  </h2>
+                <div className="p-8 md:p-12 space-y-8 max-h-[60vh] overflow-y-auto no-scrollbar print:max-h-none">
+                  {/* FORMATTED CLINICAL FINDINGS */}
+                  <div className="space-y-6">
+                    {results.description ? (
+                      results.description.split('\n').map((line: string, index: number) => {
+                        const cleanLine = line.replace(/\*/g, '').trim();
+                        if (!cleanLine) return null;
+
+                        // Header Detection (1., 2., 3., etc)
+                        if (cleanLine.match(/^\d\./)) {
+                          return (
+                            <h4 key={index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
+                              {cleanLine}
+                            </h4>
+                          );
+                        }
+                        // Detail Content
+                        return (
+                          <p key={index} className="text-xs md:text-sm font-medium leading-relaxed opacity-80 dark:text-gray-300">
+                            {cleanLine}
+                          </p>
+                        );
+                      })
+                    ) : (
+                      <p className="text-center opacity-40 italic">Processing clinical details...</p>
+                    )}
+                  </div>
+
+                  {/* METADATA SUMMARY */}
+                  <div className="flex justify-between items-center py-6 px-8 bg-gray-50 dark:bg-white/5 rounded-3xl">
+                    <div className="text-left">
+                      <p className="text-[8px] font-black uppercase tracking-widest opacity-40">Reference ID</p>
+                      <p className="text-[10px] font-bold">#{results.id.toString().slice(-8).toUpperCase()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[8px] font-black uppercase tracking-widest opacity-40">Status</p>
+                      <p className="text-[10px] font-bold text-[#4DB6AC] uppercase italic">Verified Analysis</p>
+                    </div>
+                  </div>
                 </div>
 
-                {results.description && (
-                  <div className="py-6 border-y border-white/10 dark:border-black/10 space-y-3">
-                    <p className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-[0.3em]">Analysis Details</p>
-                    <p className="text-sm font-medium opacity-70 leading-relaxed">{results.description}</p>
+                {/* ACTIONS SECTION */}
+                <div className="p-8 space-y-4 print:hidden">
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      onClick={() => window.print()}
+                      className="flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black h-16 rounded-[1.5rem] font-black uppercase text-[9px] tracking-widest active:scale-95 transition-all"
+                    >
+                      Download PDF
+                    </button>
+                    <button
+                      onClick={() => setResults(null)}
+                      className="bg-gray-100 dark:bg-white/5 h-16 rounded-[1.5rem] font-black uppercase text-[9px] tracking-widest active:scale-95 transition-all"
+                    >
+                      New Scan
+                    </button>
                   </div>
-                )}
 
-                {results.conditions && results.conditions.length > 0 && (
-                  <div className="space-y-4">
-                    <p className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-[0.3em]">Detected Conditions</p>
-                    <div className="flex flex-wrap gap-2">
-                      {results.conditions.map((condition: string, idx: number) => (
-                        <span key={idx} className="px-4 py-2 bg-white/10 dark:bg-black/10 rounded-full text-[9px] font-bold uppercase tracking-tight">
-                          {condition}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {results.recommendations && results.recommendations.length > 0 && (
-                  <div className="space-y-4">
-                    <p className="text-[9px] font-black text-[#E1784F] uppercase tracking-[0.3em]">Recommended Care</p>
-                    <ul className="space-y-2">
-                      {results.recommendations.map((rec: string, idx: number) => (
-                        <li key={idx} className="flex gap-3 text-sm font-medium opacity-70">
-                          <span className="text-[#E1784F]">•</span>
-                          <span>{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {results.severity !== undefined && (
-                  <div className="space-y-3">
-                    <p className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-[0.3em]">Severity Score</p>
-                    <div className="w-full bg-white/10 dark:bg-black/10 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-[#4DB6AC] to-[#E1784F]" 
-                        style={{ width: `${Math.min(results.severity, 100)}%` }}
-                      />
-                    </div>
-                    <p className="text-[9px] font-mono opacity-50">{results.severity}%</p>
-                  </div>
-                )}
-
-                <div className="pt-4 border-t border-white/10 dark:border-black/10 space-y-4">
-                  <button onClick={() => router.push(`/marketplace?focus=${results.finding}`)} className="w-full py-5 bg-white dark:bg-black text-black dark:text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 group">
-                    View Care Plan <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  <button onClick={() => router.push('/specialist')} className="w-full py-5 border border-white/20 dark:border-black/20 text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 group hover:bg-white/5">
-                    Consult Specialist <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  <button onClick={() => router.push('/history')} className="w-full py-5 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 text-[#4DB6AC] rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2">
-                    View in History <ArrowRight size={14} />
+                  <button
+                    onClick={() => router.push(`/marketplace?focus=${results.finding}`)}
+                    className="w-full bg-[#E1784F] text-white h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                  >
+                    Order Recommended Care <ArrowRight size={14} />
                   </button>
                 </div>
               </div>
-
-              <button onClick={() => setResults(null)} className="w-full py-2 text-[9px] font-black opacity-30 uppercase tracking-widest flex items-center justify-center gap-2">
-                <RotateCcw size={12} /> New Scan
-              </button>
             </motion.div>
           )}
         </div>
