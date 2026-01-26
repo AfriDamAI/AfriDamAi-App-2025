@@ -37,7 +37,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await getScanHistory()
+        const response = await getScanHistory(user?.id || '')
         // 🛡️ HANDSHAKE: Your interceptor already unwraps resultData, 
         // but we add a safety check for array integrity.
         const data = response?.data || response || []
@@ -48,8 +48,8 @@ export default function Dashboard() {
         setLoadingHistory(false)
       }
     }
-    if (user) fetchHistory()
-  }, [user])
+    if (user?.id) fetchHistory()
+  }, [user?.id])
 
   // 💳 PAYSTACK HANDSHAKE
   const config = {
@@ -107,7 +107,7 @@ export default function Dashboard() {
         
         <nav className="flex-1 space-y-1">
           <SidebarItem icon={Home} label="Home Hub" path="/dashboard" />
-          <SidebarItem icon={Scan} label="AI Scanner" path="/scanner" />
+          <SidebarItem icon={Scan} label="AI Scanner" path="/ai-scanner" />
           <SidebarItem icon={MessageSquare} label="Specialists" path="/specialist" />
           <SidebarItem icon={ShoppingBag} label="Care Shop" path="/marketplace" />
           <SidebarItem icon={History} label="Clinical Diary" path="/history" />
@@ -167,7 +167,7 @@ export default function Dashboard() {
 
           {/* ACTION CARDS: RULE 1 MOBILE ERGONOMICS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <button onClick={() => router.push('/scanner')} className="group relative h-60 bg-black dark:bg-white text-white dark:text-black rounded-[3.5rem] p-10 flex flex-col justify-between items-start text-left overflow-hidden shadow-2xl">
+            <button onClick={() => router.push('/ai-scanner')} className="group relative h-60 bg-black dark:bg-white text-white dark:text-black rounded-[3.5rem] p-10 flex flex-col justify-between items-start text-left overflow-hidden shadow-2xl">
               <div className="absolute right-[-15%] top-[-15%] opacity-10 group-hover:scale-110 transition-transform duration-1000">
                  <Scan size={260} strokeWidth={1} />
               </div>
