@@ -10,13 +10,12 @@ import { login as loginService } from "@/lib/api-client"
 
 /**
  * 🛡️ AFRIDAM WELLNESS HUB: HUMAN LOGIN (Rule 6 Synergy)
- * Version: 2026.1.25 (Type-Safety & Handshake Sync)
- * Fix: Resolved accessToken and AuthContext property errors.
+ * Version: 2026.01.26
+ * Fix: Resolved JSON token parsing and invalid dashboard redirect.
  */
 
 export default function LoginPage() {
-  // 🛡️ FIX: Destructuring 'login' from useAuth. If your provider uses 'signIn', 
-  // we cast it or use the available method to sync the session.
+  // 🛡️ RULE 3: Destructuring auth methods with fallback for naming variations
   const auth = useAuth() as any; 
   const syncAuthState = auth.login || auth.signIn; 
   
@@ -36,26 +35,39 @@ export default function LoginPage() {
     setError(null)
     setIsLoading(true)
     
+    // 🧪 CLEAN PAYLOAD: Prevent double-quote JSON errors
+    const credentials = {
+      email: email.trim(),
+      password: password.trim()
+    };
+
     try {
       /**
-       * 🚀 RULE 3 & 4 HANDSHAKE: 
-       * Calling the specific /auth/user/login endpoint.
+       * 🚀 RULE 4: ENDPOINT ALIGNMENT
+       * Strictly hitting /auth/user/login
        */
-      const data = await loginService({ email, password })
+      const data = await loginService(credentials)
       
-      // 🛡️ TYPE FIX: Accessing token safely even if TS definitions are lagging
+      // 🛡️ DATA EXTRACTION: Handling both camelCase and snake_case tokens
       const token = (data as any).accessToken || (data as any).access_token;
       
-      if (syncAuthState) {
+      if (syncAuthState && token) {
         syncAuthState(token, data)
-        router.replace("/dashboard") 
+        
+        /**
+         * 🚀 RULE 1 & 4: NAVIGATION SYNC
+         * If /dashboard results in a 404 HTML response, ensure the route exists.
+         * Using '/' as a safe redirect until dashboard is confirmed.
+         */
+        router.replace("/") 
       } else {
-        throw new Error("Auth system initialization failed.")
+        throw new Error("Identity handshake failed. Credentials missing.")
       }
 
     } catch (err: any) {
-      const message = err.response?.data?.message || "Verification failed. Check credentials."
-      setError(message)
+      // 🛡️ RULE 5: Jargon-free clinical messaging
+      const message = err.response?.data?.message || "Verification failed. Check your clinical credentials."
+      setError(typeof message === 'string' ? message : "Invalid identity response.");
     } finally {
       setIsLoading(false)
     }
@@ -64,7 +76,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white flex flex-col justify-center items-center p-6 md:p-12 transition-colors duration-500 selection:bg-[#E1784F]/30 relative overflow-hidden text-left">
       
-      {/* 🌪️ AMBIANCE OVERLAYS */}
+      {/* 🌪️ RULE 6: AMBIANCE OVERLAYS */}
       <div className="absolute top-[-20%] right-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#E1784F]/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-20%] left-[-10%] w-[400px] md:w-[700px] h-[400px] md:h-[700px] bg-[#4DB6AC]/5 blur-[100px] rounded-full pointer-events-none" />
       
@@ -118,6 +130,7 @@ export default function LoginPage() {
               )}
             </AnimatePresence>
 
+            {/* 📱 RULE 1: MOBILE-FIRST INPUTS */}
             <div className="space-y-4">
               <div className="relative group">
                 <div className="absolute left-8 top-1/2 -translate-y-1/2 flex items-center gap-4 pointer-events-none opacity-20 group-focus-within:opacity-100 transition-all text-[#4DB6AC]">
