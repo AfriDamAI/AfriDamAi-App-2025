@@ -10,6 +10,7 @@ import { useState, useEffect } from "react"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 import { ProfileSidebar } from "@/components/profile-sidebar"
+import { MobileNav } from "@/components/mobile-nav"
 import type React from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
@@ -30,6 +31,9 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   // 🚀 RULE 6: Toggle Nav/Footer visibility based on current clinical node
   const showNav = !authRoutes.includes(pathname);
   const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route));
+
+  // 🛡️ OGA FIX: Show mobile nav only on internal dashboard-like pages, NOT on public auth pages
+  const showMobileNav = !authRoutes.includes(pathname);
 
   const handleSignIn = () => router.push("/login");
   const handleSignUp = () => router.push("/register");
@@ -94,6 +98,9 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
           />
         )}
       </AnimatePresence>
-    </div>
+
+      {/* 📱 5. BOTTOM MOBILE NAV */}
+      {showMobileNav && <MobileNav />}
+    </div >
   )
 }
