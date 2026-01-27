@@ -180,6 +180,12 @@ export const getSingleScanResult = async (resultId: string) => {
   return response.data;
 };
 
+export const deleteScanResult = async (resultId: string) => {
+    // 🛡️ API CHANGE: Endpoint updated to match user request (DELETE /api/v1/:id)
+    const response = await apiClient.delete(`/v1/${resultId}`); 
+    return response.data;
+};
+
 /** 🔬 AI SKIN DIAGNOSIS WITH USER CONTEXT **/
 export const analyzeSkinWithUserData = async (imgSource: string, userContext: any) => {
   const formData = new FormData();
