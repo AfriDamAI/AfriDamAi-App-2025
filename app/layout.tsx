@@ -12,9 +12,10 @@ import "./globals.css"
 import { ThemeProvider } from "@/providers/theme-provider"
 import { AuthProvider } from "@/providers/auth-provider"
 // 🚀 RULE 6 FIX: Corrected import path for AuthGuard
-import { AuthGuard } from "@/components/auth-guard" 
+import { AuthGuard } from "@/components/auth-guard"
 import { AppWrapper } from "@/components/app-wrapper"
-import { AIChatBot } from "@/components/ai/ai-chatbot" 
+import { AIChatBot } from "@/components/ai/ai-chatbot"
+import { IngredientAnalyzer } from "@/components/ai/ingredient-analyzer"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -35,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   const pathname = usePathname();
-  
+
   /** * 🛡️ RULE 6 Logic: 
    * Updated to remove '/auth' prefix per (auth) route group organization.
    * This ensures the AppWrapper (Sidebar/Nav) doesn't interfere with Auth pages.
@@ -47,20 +48,20 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <head>
         {/* 📱 VIEWPORT OPTIMIZATION - Mobile First (Rule 3) */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" /> 
-        
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+
         {/* 🛡️ CLINICAL BRANDING */}
         <title>AFRIDAM AI | Premium Melanin-Rich Skin Intelligence</title>
         <meta name="description" content="Clinical-grade AI diagnostics and verified skincare regimens for the African family." />
         <meta name="theme-color" content="#050505" />
-        
+
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-[#050505] text-black dark:text-white selection:bg-[#E1784F]/30 min-h-[100svh] relative overflow-x-hidden transition-colors duration-500`}>
-        
+
         {/* 🛡️ GLOBAL EDITORIAL TEXTURE */}
         <div className="fixed inset-0 z-[0] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-        
+
         {/* --- LIGHTING ORBS --- */}
         <div className="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#E1784F]/5 blur-[120px] rounded-full pointer-events-none z-[1]" />
         <div className="fixed bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#4DB6AC]/5 blur-[100px] rounded-full pointer-events-none z-[1]" />
@@ -84,16 +85,19 @@ export default function RootLayout({
                       {children}
                     </main>
                   ) : (
-                    <AppWrapper> 
+                    <AppWrapper>
                       {children}
                     </AppWrapper>
                   )}
                 </motion.div>
               </AnimatePresence>
-              
+
               {/* 💬 PERSISTENT SUPPORT */}
               <div className="fixed bottom-8 right-8 z-[100]">
                 <AIChatBot />
+              </div>
+              <div className="fixed bottom-8 left-8 z-[100]">
+                <IngredientAnalyzer />
               </div>
             </AuthGuard>
           </AuthProvider>

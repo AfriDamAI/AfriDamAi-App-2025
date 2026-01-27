@@ -21,12 +21,12 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
 
   // 🛡️ OGA FIX: Define routes that need a completely clean UI
   const authRoutes = ["/login", "/register", "/forgot-password"];
-  
+
   const hideFooterRoutes = [
-    "/dashboard", "/profile", "/scanner", "/analyzer", 
+    "/dashboard", "/profile", "/ai-scanner", "/analyzer",
     "/marketplace", "/specialist", "/history", ...authRoutes
   ];
-  
+
   // 🚀 RULE 6: Toggle Nav/Footer visibility based on current clinical node
   const showNav = !authRoutes.includes(pathname);
   const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route));
@@ -42,22 +42,22 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-background selection:bg-[#E1784F]/20">
-      
+
       {/* 🏛️ 1. NAVIGATION LAYER */}
       {showNav && (
-        <motion.header 
+        <motion.header
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="sticky top-0 z-[100]"
         >
-          <Navigation 
-            onSignInClick={handleSignIn} 
-            onSignUpClick={handleSignUp} 
-            onViewProfileClick={handleViewProfile} 
+          <Navigation
+            onSignInClick={handleSignIn}
+            onSignUpClick={handleSignUp}
+            onViewProfileClick={handleViewProfile}
           />
         </motion.header>
       )}
-      
+
       {/* 🚀 2. DYNAMIC CONTENT AREA */}
       <main className="flex-grow relative z-10">
         <AnimatePresence mode="wait">
@@ -73,24 +73,24 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
           </motion.div>
         </AnimatePresence>
       </main>
-      
+
       {/* 🎯 3. PUBLIC FOOTER */}
       {showFooter && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-20">
           {/* 🚀 RULE 6 FIX: Removed onSignUpClick to resolve ts(2322) */}
-          <Footer /> 
+          <Footer />
         </motion.div>
       )}
-      
+
       {/* 👤 4. WELLNESS SIDEBAR */}
       <AnimatePresence>
         {profileSidebarOpen && (
-          <ProfileSidebar 
-            isOpen={profileSidebarOpen} 
+          <ProfileSidebar
+            isOpen={profileSidebarOpen}
             onClose={() => {
               setProfileSidebarOpen(false);
               document.body.style.overflow = 'unset';
-            }} 
+            }}
           />
         )}
       </AnimatePresence>

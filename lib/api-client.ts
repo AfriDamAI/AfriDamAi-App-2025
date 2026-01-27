@@ -144,13 +144,13 @@ export const updateUser = async (id: string, updates: any) => {
 //   return response.data;
 // }
 
-export const analyzeIngredients = async (ingredients: string) => {
-  const response = await axios.post(`${aiURL}/ingredients-analysis`, { query: ingredients });
+export const analyzeIngredients = async (ingredients: string, more_info: any) => {
+  const response = await apiClient.post("/v1/ingredients-analysis", { query: ingredients, more_info });
   return response.data;
 };
 
-export const sendChatMessage = async (message: string) => {
-  const response = await axios.post(`${aiURL}/chatbot`, { query: message });
+export const sendChatMessage = async (message: string, more_info: any) => {
+  const response = await apiClient.post("/v1/chatbot", { query: message, more_info });
   return response.data;
 };
 

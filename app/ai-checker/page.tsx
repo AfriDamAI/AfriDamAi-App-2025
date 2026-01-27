@@ -65,8 +65,8 @@ export default function IngredientCheckerPage() {
   };
 
   const handleAnalyze = async () => {
-    const input = imgSource || manualText;
-    if (!input) return;
+    const input = manualText; // 🛡️ SYNC: Only manual text is supported for ingredient analysis
+    if (!input || !user) return; // 🛡️ SYNC: Ensure user is available and input exists
 
     setIsAnalyzing(true);
     setStatus("Checking Formula...");
@@ -74,17 +74,29 @@ export default function IngredientCheckerPage() {
     try {
       /**
        * 🚀 THE HYBRID HANDSHAKE (Rule 7)
-       * Image vs. Text routing.
+       * Constructing more_info with user data, mirroring the ai-scanner implementation.
        */
-      let data;
-      if (imgSource) {
-        // Sends to /analyzer/upload with 'ingredient_analysis' flag (Backend Logic)
-        data = await analyzeIngredients(imgSource);
-      } else {
-        // Sends to /ai/ingredients-analysis (AI Brain Logic)
-        data = await analyzeIngredients(manualText);
-      }
+      const moreInfo = {
+        region: "West Africa",
+        country: user.profile?.nationality || "Nigeria",
+        known_skintone_type: user.profile?.skinType || "",
+        skin_type_last_time_checked: new Date().toISOString(),
+        known_skin_condition: user.profile?.skinCondition || "none",
+        skin_condition_last_time_checked: new Date().toISOString(),
+        gender: (user.profile?.sex || user.sex || "female").toLowerCase(),
+        age: user.profile?.age || 30,
+        known_body_lotion: user.profile?.bodyLotion || "unknown",
+        known_body_lotion_brand: user.profile?.bodyLotionBrand || "unknown",
+        known_allergies: (user.profile?.allergies && Array.isArray(user.profile.allergies) && user.profile.allergies.length > 0)
+          ? user.profile.allergies
+          : [],
+        known_last_skin_treatment: user.profile?.lastSkinTreatment || new Date().toISOString(),
+        known_last_consultation_with_afridermatologists: user.profile?.lastConsultation || new Date().toISOString(),
+        user_activeness_on_app: "very_high"
+      };
 
+      const data = await analyzeIngredients(manualText, moreInfo); // 🛡️ SYNC: Pass moreInfo
+      
       /** * 📊 DATA MAPPING
        * riskLevel: Simplified safety status.
        * safetyScore: Number from 0 to 100.
@@ -93,14 +105,14 @@ export default function IngredientCheckerPage() {
         riskLevel: data?.risk_level || data?.status || "Balanced",
         safetyScore: data?.safety_score || data?.score || 85,
         isChildSafe: data?.child_safe || data?.isChildSafe || false,
-        summary: data?.summary || data?.description || "Analysis complete. This formula looks safe for your skin profile."
+        summary: data?.response || data?.summary || data?.description || "Analysis complete. This formula looks safe for your skin profile."
       });
 
       setStatus("Ready");
     } catch (err) {
       // 🛡️ Rule 4: Relatable English for internet/sync errors
       setStatus("Try Again");
-      console.error("Formula sync error");
+      console.error("Formula sync error", err);
     } finally {
       setIsAnalyzing(false);
     }

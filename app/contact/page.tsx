@@ -16,7 +16,7 @@ export default function ContactPage() {
 
     return (
         <main className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 overflow-x-hidden text-left">
-            
+
             {/* 1. HERO SECTION - CINEMATIC GLOW */}
             <section className="relative py-20 lg:py-32 overflow-hidden bg-[#1C1A19]">
                 <div className="absolute inset-0">
@@ -25,15 +25,15 @@ export default function ContactPage() {
                 </div>
 
                 <div className="relative max-w-7xl mx-auto px-6">
-                    <button 
+                    <button
                         onClick={() => router.push('/')}
                         className="inline-flex items-center gap-2 text-[#4DB6AC] text-[9px] font-black uppercase tracking-[0.3em] mb-10 hover:brightness-110 transition-all bg-white/5 backdrop-blur-md px-5 py-3 rounded-full border border-white/10 active:scale-95"
                     >
                         <ChevronLeft size={14} /> Back to Home
                     </button>
-                    
+
                     <div className="space-y-6">
-                        <motion.div 
+                        <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#E1784F] text-white shadow-xl mb-2"
@@ -70,9 +70,9 @@ export default function ContactPage() {
             {/* 3. MAIN CONTENT */}
             <section className="max-w-7xl mx-auto px-6 py-20">
                 <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-start">
-                    
+
                     {/* MESSAGE CARD */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -131,8 +131,8 @@ export default function ContactPage() {
                                 <p className="text-xs font-bold uppercase tracking-tight opacity-60 leading-relaxed">
                                     Global tools are often biased. We are building the first AI trained purely on African skin to give you answers you can trust.
                                 </p>
-                                <button 
-                                    onClick={() => router.push('/scanner')}
+                                <button
+                                    onClick={() => router.push('/ai-scanner')}
                                     className="bg-black dark:bg-white text-white dark:text-black px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#4DB6AC] hover:text-white transition-all shadow-xl active:scale-95"
                                 >
                                     Launch Scanner

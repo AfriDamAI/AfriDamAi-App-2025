@@ -1,15 +1,8 @@
-/**
- * 🛡️ AFRIDAM NEURAL ASSISTANT: CHAT (Rule 7 Precision Sync)
- * Version: 2026.1.25
- * Focus: High-Precision Response Parsing & Mobile-First UI.
- */
-
-"use client"
-
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageSquare, X, Send, User, Bot, Zap, Info, Loader2 } from "lucide-react"
 import { useTheme } from "@/providers/theme-provider"
+import { useAuth } from "@/providers/auth-provider" // 🚀 SYNC: Import useAuth to get user context
 // 🚀 SYNC: Using the verified chatbot endpoint from api-client
 import { sendChatMessage } from "@/lib/api-client"
 
@@ -21,6 +14,7 @@ interface Message {
 
 export function AIChatBot() {
   const { theme } = useTheme();
+  const { user } = useAuth(); // 🚀 SYNC: Get user from auth context
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -44,7 +38,7 @@ export function AIChatBot() {
   }, [messages, isTyping]);
 
   const handleSendMessage = async () => {
-    if (!input.trim() || isTyping) return;
+    if (!input.trim() || isTyping || !user) return; // 🛡️ SYNC: Ensure user is available
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -60,16 +54,35 @@ export function AIChatBot() {
     try {
       /**
        * 🚀 THE NEURAL HANDSHAKE (Rule 7)
-       * Communicates via baseURL -> aiURL bridge.
-       * The defaultAiContext is automatically attached in api-client.
+       * Constructing more_info with user data, mirroring the ai-scanner implementation.
        */
-      const data = await sendChatMessage(currentInput);
+      const moreInfo = {
+        region: "West Africa",
+        country: user.profile?.nationality || "Nigeria",
+        known_skintone_type: user.profile?.skinType || "",
+        skin_type_last_time_checked: new Date().toISOString(),
+        known_skin_condition: user.profile?.skinCondition || "none",
+        skin_condition_last_time_checked: new Date().toISOString(),
+        gender: (user.profile?.sex || user.sex || "female").toLowerCase(),
+        age: user.profile?.age || 30,
+        known_body_lotion: user.profile?.bodyLotion || "unknown",
+        known_body_lotion_brand: user.profile?.bodyLotionBrand || "unknown",
+        known_allergies: (user.profile?.allergies && Array.isArray(user.profile.allergies) && user.profile.allergies.length > 0)
+          ? user.profile.allergies
+          : [],
+        known_last_skin_treatment: user.profile?.lastSkinTreatment || new Date().toISOString(),
+        known_last_consultation_with_afridermatologists: user.profile?.lastConsultation || new Date().toISOString(),
+        user_activeness_on_app: "very_high"
+      };
+      
+      const data = await sendChatMessage(currentInput, moreInfo);
       
       /**
        * 🛡️ DATA EXTRACTION (Rule 7)
-       * Aligned with FastAPI chatbot response structure.
+       * Aligned with backend proxy response and apiClient interceptor.
+       * The interceptor unwraps 'resultData', so we access 'response' directly.
        */
-      const replyText = data?.reply || data?.content || data?.message || "Neural link active. I am processing your profile data.";
+      const replyText = data?.response || "Neural link active. I am processing your profile data.";
 
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -79,7 +92,7 @@ export function AIChatBot() {
       setMessages(prev => [...prev, assistantMsg]);
     } catch (err) {
       // 🛡️ Rule 4: Relatable, jargon-free error handling
-      console.error("Assistant sync failed");
+      console.error("Assistant sync failed", err);
       setMessages(prev => [...prev, {
         id: "error",
         role: "assistant",
