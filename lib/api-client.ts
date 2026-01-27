@@ -149,8 +149,8 @@ export const analyzeIngredients = async (ingredients: string) => {
   return response.data;
 };
 
-export const sendChatMessage = async (message: string) => {
-  const response = await axios.post(`${aiURL}/chatbot`, { query: message });
+export const sendChatMessage = async (message: string, more_info: any) => {
+  const response = await apiClient.post("/v1/chatbot", { query: message, more_info });
   return response.data;
 };
 
