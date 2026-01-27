@@ -55,12 +55,12 @@ const nextConfig = {
     return [
       {
         source: '/scan',
-        destination: '/scanner', 
+        destination: '/ai-scanner', 
         permanent: true,
       },
       {
         source: '/ingredients',
-        destination: '/lab', 
+        destination: '/ai-scanner', 
         permanent: true,
       }
     ];

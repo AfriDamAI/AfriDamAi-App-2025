@@ -34,7 +34,7 @@ export default function HomePageContent() {
 
   return (
     <div className="bg-background selection:bg-[#E1784F]/30 overflow-x-hidden">
-      
+
       {/* 🛡️ 1. WORLD-CLASS HERO SECTION */}
       <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden px-6 py-12 md:py-32">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
@@ -43,8 +43,8 @@ export default function HomePageContent() {
 
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -58,8 +58,8 @@ export default function HomePageContent() {
               </div>
 
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic uppercase tracking-tighter leading-[0.9] text-foreground text-balance">
-                Built by <br className="hidden md:block"/> 
-                <span className="text-[#E1784F]">Africans</span>, <br/> 
+                Built by <br className="hidden md:block" />
+                <span className="text-[#E1784F]">Africans</span>, <br />
                 for Africans.
               </h1>
 
@@ -69,7 +69,7 @@ export default function HomePageContent() {
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <button
-                  onClick={() => handleAction("/scanner")} // 🚀 Updated
+                  onClick={() => handleAction("/ai-scanner")} // 🚀 Updated
                   className="group px-8 py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl shadow-[#E1784F]/20 transition-all flex items-center justify-center gap-3 active:scale-95"
                 >
                   Start Journey <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -94,7 +94,7 @@ export default function HomePageContent() {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 1 }}
@@ -108,7 +108,7 @@ export default function HomePageContent() {
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-transparent to-transparent" />
-              
+
               <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-[#E1784F] rounded-2xl flex items-center justify-center text-white">

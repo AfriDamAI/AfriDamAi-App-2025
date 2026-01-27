@@ -20,6 +20,7 @@ import {
   Baby
 } from "lucide-react"
 import IngredientResults from "@/components/ingredient-results"
+import { useAuth } from "@/providers/auth-provider" // 🚀 SYNC: Import useAuth to get user context
 // 🚀 SYNC: Pointing to the verified api-client to resolve ts(2307)
 import { analyzeIngredients } from "@/lib/api-client" 
 
@@ -28,23 +29,43 @@ interface IngredientAnalyzerProps {
 }
 
 export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAnalyzerProps) {
+  const { user } = useAuth(); // 🚀 SYNC: Get user from auth context
   const [ingredientText, setIngredientText] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleAnalyze = async () => {
-    if (!ingredientText.trim()) return;
+    if (!ingredientText.trim() || !user) return; // 🛡️ SYNC: Ensure user is available
 
     setIsAnalyzing(true)
     setError(null)
 
     try {
-      /** * 🚀 THE NEURAL HANDSHAKE (Rule 7)
-       * Hits the FastAPI /ingredients-analysis endpoint.
-       * Automatically includes the melanin context from api-client.
+      /**
+       * 🚀 THE NEURAL HANDSHAKE (Rule 7)
+       * Constructing more_info with user data, mirroring the ai-scanner implementation.
        */
-      const data = await analyzeIngredients(ingredientText);
+      const moreInfo = {
+        region: "West Africa",
+        country: user.profile?.nationality || "Nigeria",
+        known_skintone_type: user.profile?.skinType || "",
+        skin_type_last_time_checked: new Date().toISOString(),
+        known_skin_condition: user.profile?.skinCondition || "none",
+        skin_condition_last_time_checked: new Date().toISOString(),
+        gender: (user.profile?.sex || user.sex || "female").toLowerCase(),
+        age: user.profile?.age || 30,
+        known_body_lotion: user.profile?.bodyLotion || "unknown",
+        known_body_lotion_brand: user.profile?.bodyLotionBrand || "unknown",
+        known_allergies: (user.profile?.allergies && Array.isArray(user.profile.allergies) && user.profile.allergies.length > 0)
+          ? user.profile.allergies
+          : [],
+        known_last_skin_treatment: user.profile?.lastSkinTreatment || new Date().toISOString(),
+        known_last_consultation_with_afridermatologists: user.profile?.lastConsultation || new Date().toISOString(),
+        user_activeness_on_app: "very_high"
+      };
+
+      const data = await analyzeIngredients(ingredientText, moreInfo); // 🛡️ SYNC: Pass moreInfo
       
       /** * 📊 DATA MAPPING
        * riskLevel: Maps 'risk_level' from FastAPI.
@@ -54,7 +75,7 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
         riskLevel: data?.risk_level || "Balanced",
         safetyScore: data?.safety_score || data?.score || 85,
         isChildSafe: data?.child_safe || false,
-        summary: data?.summary || data?.description || "Analysis complete."
+        summary: data?.response || data?.summary || data?.description || "Analysis complete." // 🛡️ SYNC: Prioritize data?.response
       };
 
       setResults(formattedResults)
