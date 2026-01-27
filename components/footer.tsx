@@ -23,9 +23,9 @@ export default function Footer() {
    * if they try to access a tool while logged out.
    */
   const handleProtectedClick = (e: React.MouseEvent, href: string) => {
-    // 🛡️ OGA FIX: Updated paths to match /scanner and /analyzer folders
-    const protectedRoutes = ["/scanner", "/analyzer", "/dashboard", "/profile"]
-    
+    // 🛡️ OGA FIX: Updated paths to match /ai-scanner and /analyzer folders
+    const protectedRoutes = ["/ai-scanner", "/analyzer", "/dashboard", "/profile"]
+
     if (protectedRoutes.some(route => href.startsWith(route)) && !user) {
       e.preventDefault()
       router.push("/register") // 🚀 Direct Bypass
@@ -35,10 +35,10 @@ export default function Footer() {
   return (
     <footer className="bg-background border-t border-border mt-24 transition-colors duration-500 relative overflow-hidden">
       <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-[#E1784F]/5 to-transparent pointer-events-none" />
-      
+
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-20">
-          
+
           {/* 🌍 1. BRAND COLUMN */}
           <div className="md:col-span-5 space-y-10">
             <Link href="/" className="inline-block active:scale-95 transition-transform">
@@ -49,14 +49,14 @@ export default function Footer() {
                 Restoring dignity in dermatology through ethical AI research. Optimized for the vibrant diversity of African skin phenotypes.
               </p>
               <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
-                 <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 rounded-2xl border border-border">
-                    <MapPin size={10} className="text-[#E1784F]" />
-                    <span className="text-[8px] font-black uppercase tracking-[0.3em]">Lagos, Nigeria</span>
-                 </div>
-                 <div className="flex items-center gap-2 px-4 py-2 bg-[#4DB6AC]/5 rounded-2xl border border-[#4DB6AC]/20">
-                    <Globe size={10} className="text-[#4DB6AC]" />
-                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">African Node</span>
-                 </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 rounded-2xl border border-border">
+                  <MapPin size={10} className="text-[#E1784F]" />
+                  <span className="text-[8px] font-black uppercase tracking-[0.3em]">Lagos, Nigeria</span>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-[#4DB6AC]/5 rounded-2xl border border-[#4DB6AC]/20">
+                  <Globe size={10} className="text-[#4DB6AC]" />
+                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">African Node</span>
+                </div>
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function Footer() {
             <ul className="space-y-5">
               {[
                 // 🛡️ OGA FIX: Updated to match your actual folder structure
-                { label: "Skin Scanner", href: "/scanner" },
+                { label: "Skin Scanner", href: "/ai-scanner" },
                 { label: "Safety Checker", href: "/analyzer" },
                 { label: "The Care Hub", href: "/marketplace" }
               ].map((link) => (
@@ -137,7 +137,7 @@ export default function Footer() {
                 AES-256 Cloud Encryption
               </p>
             </div>
-            
+
             <div className="flex items-center gap-3 px-8 py-3 bg-[#4DB6AC]/5 border border-[#4DB6AC]/20 rounded-[1.5rem] shadow-sm">
               <ShieldCheck size={14} className="text-[#4DB6AC]" />
               <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">
