@@ -130,7 +130,7 @@ export default function HistoryPage() {
                 <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20">Your journey begins with your first dermal scan.</p>
               </div>
               <button
-                onClick={() => router.push('/scanner')}
+                onClick={() => router.push('/ai-scanner')}
                 className="px-10 py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl active:scale-95 transition-all"
               >
                 Start New Scan
