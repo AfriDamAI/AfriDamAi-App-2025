@@ -9,7 +9,7 @@ import {
   CalendarDays, Zap, ArrowRight
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import apiClient, { getScanHistory } from "@/lib/api-client"
+import apiClient, { getScanHistory, deleteScanResult } from "@/lib/api-client"
 
 /**
  * 🛡️ AFRIDAM CLINICAL DIARY: HISTORY (Rule 6 Synergy)
@@ -25,6 +25,7 @@ export default function HistoryPage() {
   const [filter, setFilter] = useState<"all" | "skin" | "ingredient">("all")
   const [loading, setLoading] = useState(true)
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/")
@@ -49,13 +50,19 @@ export default function HistoryPage() {
     }
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
+    setDeletingId(id) // 🛡️ Trigger Confirmation Modal
+  }
+
+  const confirmDelete = async () => {
+    if (!deletingId) return
     try {
       // Optimistic Update
       const previousHistory = [...history]
-      setHistory(history.filter((r) => r.id !== id))
+      setHistory(history.filter((r) => r.id !== deletingId))
 
-      await apiClient.delete(`/history/${id}`)
+      await deleteScanResult(deletingId)
+      setDeletingId(null)
     } catch (err) {
       console.log("Purge failed - rolling back diary state")
       fetchUserHistory() // Rollback
@@ -276,6 +283,44 @@ export default function HistoryPage() {
                     className="bg-[#E1784F] text-white h-16 rounded-2xl font-black uppercase text-[9px] tracking-widest hover:shadow-lg transition-all"
                   >
                     Dismiss
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* 🛡️ DELETE CONFIRMATION MODAL */}
+        <AnimatePresence>
+          {deletingId && (
+            <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-white dark:bg-[#121212] w-full max-w-sm rounded-[2rem] p-8 border border-white/10 shadow-2xl space-y-6 text-center"
+              >
+                <div className="w-16 h-16 mx-auto bg-red-500/10 text-red-500 rounded-full flex items-center justify-center">
+                  <Trash2 size={32} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black italic uppercase tracking-tighter">Delete Record?</h3>
+                  <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest leading-relaxed">
+                    This clinical record will be permanently erased.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setDeletingId(null)}
+                    className="py-4 bg-gray-100 dark:bg-white/5 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    className="py-4 bg-red-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-red-600 transition-colors shadow-lg active:scale-95"
+                  >
+                    Yes, Delete
                   </button>
                 </div>
               </motion.div>
