@@ -299,12 +299,6 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      <div className="fixed bottom-0 left-0 right-0 h-24 bg-white/80 dark:bg-black/80 backdrop-blur-3xl border-t border-gray-100 dark:border-white/5 flex justify-around items-center px-10 lg:hidden z-50 pb-6">
-        <button onClick={() => router.push('/dashboard')} className="p-4 text-[#E1784F]"><Home size={26} /></button>
-        <button onClick={() => router.push('/ai-scanner')} className="p-4 opacity-20"><Scan size={26} /></button>
-        <button onClick={() => router.push('/history')} className="p-4 opacity-20"><Zap size={26} /></button>
-        <button onClick={() => router.push('/profile')} className="p-4 opacity-20"><UserIcon size={26} /></button>
-      </div>
     </main>
   )
 }
