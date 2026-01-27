@@ -10,9 +10,9 @@ import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import {
-  ChevronLeft, CheckCircle2, Zap,
+  ChevronLeft, CheckCircle2, Zap, ZapOff,
   RotateCcw, Scan, Info, ShieldCheck,
-  ArrowRight, Binary, Fingerprint, Search
+  ArrowRight, Binary, Fingerprint, Search, SwitchCamera
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { analyzeSkinWithUserData } from "@/lib/api-client"
@@ -28,6 +28,8 @@ export default function UnifiedScanner() {
   const [status, setStatus] = useState("System Ready")
   const [scanStep, setScanStep] = useState(0)
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
+  const [isTorchOn, setIsTorchOn] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -63,17 +65,63 @@ export default function UnifiedScanner() {
     setIsCapturing(true)
     setStatus("Activating Lens")
     try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: 1080, height: 1080 }, // Change to environment for back camera
+        video: {
+          facingMode: facingMode, // 🔄 Dynamic Camera
+          width: { ideal: 1080 },
+          height: { ideal: 1080 }
+        },
         audio: false
       })
       streamRef.current = stream
       if (videoRef.current) videoRef.current.srcObject = stream
+      setIsTorchOn(false) // Reset torch state on camera start
     } catch (err: any) {
       setIsCapturing(false)
       setErrorDetails("Please allow camera access in your settings.");
     }
   }
+
+  const toggleCamera = () => {
+    const newMode = facingMode === "user" ? "environment" : "user";
+    setFacingMode(newMode);
+    // ⚠️ We need to trigger startCamera AFTER state update, but React state is async.
+    // Ideally we use a useEffect or a direct call chain. 
+    // Here we'll manually stop and restart with the new mode instantly for speed.
+    // BUT since startCamera uses 'facingMode' state variable, we rely on useEffect or ensure state matches.
+  };
+
+  // 🔄 EFFECT: Restart camera when facingMode changes IF we are already capturing
+  useEffect(() => {
+    if (isCapturing) {
+      startCamera();
+    }
+  }, [facingMode]);
+
+  const toggleFlash = async () => {
+    if (!streamRef.current) return;
+    const track = streamRef.current.getVideoTracks()[0];
+    const capabilities = track.getCapabilities() as any; // 'torch' is not standard in generic Types yet
+
+    if (!capabilities.torch) {
+      setErrorDetails("Flashlight not available on this camera.");
+      setTimeout(() => setErrorDetails(null), 3000);
+      return;
+    }
+
+    try {
+      await track.applyConstraints({
+        advanced: [{ torch: !isTorchOn }] as any
+      });
+      setIsTorchOn(!isTorchOn);
+    } catch (err) {
+      console.error("Flash toggle failed", err);
+    }
+  };
 
   const capture = () => {
     if (videoRef.current) {
@@ -112,7 +160,7 @@ export default function UnifiedScanner() {
         skin_type_last_time_checked: new Date().toISOString(),
         known_skin_condition: user.profile?.skinCondition || "none",
         skin_condition_last_time_checked: new Date().toISOString(),
-        gender: user.profile?.sex || user.sex || "female",
+        gender: user.profile?.sex || (user as any).sex || "female",
         age: user.profile?.age || 0,
         known_body_lotion: user.profile?.bodyLotion || "unknown",
         known_body_lotion_brand: user.profile?.bodyLotionBrand || "unknown",
@@ -236,9 +284,22 @@ export default function UnifiedScanner() {
               {/* CONTROLS */}
               <div className="max-w-xs mx-auto space-y-4">
                 {isCapturing ? (
-                  <button onClick={capture} className="w-16 h-16 mx-auto rounded-full border-4 border-[#E1784F] p-1 flex items-center justify-center active:scale-90 transition-transform">
-                    <div className="w-full h-full rounded-full bg-[#E1784F]" />
-                  </button>
+                  <div className="flex items-center justify-between px-8">
+                    {/* 🔄 SWITCH CAMERA */}
+                    <button onClick={toggleCamera} className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white active:scale-90 transition-all">
+                      <SwitchCamera size={20} />
+                    </button>
+
+                    {/* 📸 CAPTURE BUTTON */}
+                    <button onClick={capture} className="w-20 h-20 rounded-full border-4 border-[#E1784F] p-1 flex items-center justify-center active:scale-90 transition-transform shadow-xl">
+                      <div className="w-full h-full rounded-full bg-[#E1784F]" />
+                    </button>
+
+                    {/* 🔦 FLASHLIGHT */}
+                    <button onClick={toggleFlash} className={`w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all active:scale-90 ${isTorchOn ? 'bg-[#E1784F] text-white shadow-[0_0_15px_#E1784F]' : 'bg-white/10 text-white'}`}>
+                      {isTorchOn ? <Zap size={20} fill="currentColor" /> : <ZapOff size={20} />}
+                    </button>
+                  </div>
                 ) : imgSource && !isAnalyzing ? (
                   <div className="space-y-3">
                     <button onClick={analyze} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-xl">
