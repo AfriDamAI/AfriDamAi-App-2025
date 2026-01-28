@@ -64,7 +64,7 @@ export default function LandingPage() {
 
           <div className="hidden lg:flex items-center gap-8 text-[10px] font-black uppercase tracking-widest">
             <NavLink href="/mission" label="Our Mission" />
-            <NavLink href="/marketplace" label="Care Hub" />
+            <NavLink href="/marketplace" label="Market Place" />
             <NavLink href="#contact" label="Contact" />
 
             <button onClick={toggleTheme} className="p-2 opacity-40 hover:opacity-100 transition-all ml-4">
