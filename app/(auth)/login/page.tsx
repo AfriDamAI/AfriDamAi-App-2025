@@ -100,7 +100,7 @@ export default function LoginPage() {
               whileTap={{ scale: 0.98 }}
               className="w-full bg-black dark:bg-white text-white dark:text-black font-black uppercase py-8 rounded-[2.5rem] flex items-center justify-center gap-6"
             >
-              {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>ENTER HUB <ArrowRight className="w-5 h-5" /></>}
+              {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>SIGN IN <ArrowRight className="w-5 h-5" /></>}
             </motion.button>
           </form>
         </div>
