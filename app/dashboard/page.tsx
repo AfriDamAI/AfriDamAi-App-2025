@@ -10,6 +10,7 @@ import {
 import { useAuth } from "@/providers/auth-provider"
 import { getScanHistory, initializePayment } from "@/lib/api-client"
 import { usePaystackPayment } from "react-paystack"
+import { SubscriptionModal } from "@/components/subscription-modal"
 
 /**
  * 🛡️ AFRIDAM WELLNESS HUB (Rule 6 Precision Sync)
@@ -25,6 +26,7 @@ export default function Dashboard() {
   const [loadingHistory, setLoadingHistory] = useState(true)
   // 🛡️ NEW: State for the clinical report modal
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null)
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false)
 
   const firstName = user?.firstName || user?.displayName?.split(' ')[0] || "User"
   const initials = user
@@ -167,11 +169,11 @@ export default function Dashboard() {
                 <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-5 opacity-40 flex items-center gap-2">Initiate Scan <ArrowRight size={12} /></p>
               </div>
             </button>
-            <button onClick={handleConsultation} className="group relative h-60 bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[3.5rem] p-10 flex flex-col justify-between items-start text-left hover:border-[#E1784F]/30 transition-all shadow-sm">
-              <div className="w-14 h-14 rounded-3xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center"><MessageSquare size={28} /></div>
+            <button onClick={() => setSubscriptionModalOpen(true)} className="group relative h-60 bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[3.5rem] p-10 flex flex-col justify-between items-start text-left hover:border-[#E1784F]/30 transition-all shadow-sm">
+              <div className="w-14 h-14 rounded-3xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center"><Sparkles size={28} /></div>
               <div>
-                <h3 className="text-4xl font-black italic uppercase leading-none tracking-tighter">Ingredient<br />Analyzer</h3>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-5 opacity-40 flex items-center gap-2">Expert Consultation <ArrowRight size={12} /></p>
+                <h3 className="text-4xl font-black italic uppercase leading-none tracking-tighter">Premium<br />Plans</h3>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-5 opacity-40 flex items-center gap-2">View Subscriptions <ArrowRight size={12} /></p>
               </div>
             </button>
           </div>
@@ -299,6 +301,7 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
+      <SubscriptionModal isOpen={subscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
     </main>
   )
 }
