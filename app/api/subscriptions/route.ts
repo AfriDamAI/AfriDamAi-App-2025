@@ -9,7 +9,8 @@ export async function POST(request: Request) {
         }
 
         const decodedToken: any = jwtDecode(token)
-        const userId = decodedToken.userId
+        console.log("Decoded Token:", decodedToken)
+        const userId = decodedToken.sub // Assuming 'sub' is the userId claim in the token
 
         const body = await request.json()
         const { planId, startDate, endDate } = body
@@ -25,7 +26,6 @@ export async function POST(request: Request) {
             planId,
             startDate,
             endDate,
-            status: 'ACTIVE',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         }
