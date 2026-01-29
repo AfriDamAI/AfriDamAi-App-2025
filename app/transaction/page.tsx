@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import { motion } from "framer-motion"
-import { Lock, Loader2, CheckCircle, ExternalLink, Shield } from 'lucide-react'
+import { Lock, Loader2, Shield } from 'lucide-react'
 import { jwtDecode } from 'jwt-decode'
 
 interface User {
@@ -23,7 +23,6 @@ function TransactionPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isProcessing, setIsProcessing] = useState(false)
-    const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
 
     useEffect(() => {
         try {
@@ -34,9 +33,9 @@ function TransactionPage() {
             }
             const decodedToken: any = jwtDecode(token)
             setUser({
-                id: decodedToken.userId,
-                name: decodedToken.name,
-                email: decodedToken.email
+                id: decodedToken.sub, // Assuming 'sub' is the userId claim in the token
+                name: decodedToken.name || 'User',   // Assuming 'name' is also in the token
+                email: decodedToken.email || 'user@example.com'  // Assuming 'email' is also in the token
             })
         } catch (err: any) {
             setError(err.message)
@@ -81,7 +80,7 @@ function TransactionPage() {
             }
 
             if (result.data && result.data.authorization_url) {
-                setCheckoutUrl(result.data.authorization_url)
+                window.open(result.data.authorization_url, '_blank')
             } else {
                 throw new Error('No authorization URL received.')
             }
@@ -143,35 +142,15 @@ function TransactionPage() {
                 <div className="bg-white dark:bg-zinc-800/50 rounded-2xl p-8 text-center">
                     {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
                     
-                    {!checkoutUrl ? (
-                        <>
-                            <p className="text-sm font-bold mb-6">Click the button below to generate your secure payment link.</p>
-                            <motion.button
-                                onClick={handlePayment}
-                                disabled={isProcessing}
-                                className="w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-xl shadow-sm text-md font-bold text-white bg-[#E1784F] hover:bg-[#d16a3f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E1784F] disabled:opacity-50 transition-all"
-                            >
-                                {isProcessing ? <Loader2 className="w-6 h-6 animate-spin" /> : <Lock size={18} />}
-                                {isProcessing ? 'Generating Link...' : 'Generate Payment Link'}
-                            </motion.button>
-                        </>
-                    ) : (
-                        <div className="space-y-6">
-                             <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
-                            <h4 className="text-xl font-bold">Your secure payment link is ready.</h4>
-                            <p className="text-xs opacity-70">Click the link below to complete your payment on Paystack's secure platform. This link will open in a new tab.</p>
-                             
-                            <a 
-                                href={checkoutUrl} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-xl shadow-sm text-md font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all"
-                            >
-                                <ExternalLink size={18} />
-                                Proceed to Payment
-                            </a>
-                        </div>
-                    )}
+                    <p className="text-sm font-bold mb-6">Click the button below to proceed to payment.</p>
+                    <motion.button
+                        onClick={handlePayment}
+                        disabled={isProcessing}
+                        className="w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-xl shadow-sm text-md font-bold text-white bg-[#E1784F] hover:bg-[#d16a3f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E1784F] disabled:opacity-50 transition-all"
+                    >
+                        {isProcessing ? <Loader2 className="w-6 h-6 animate-spin" /> : <Lock size={18} />}
+                        {isProcessing ? 'Processing...' : 'Proceed to Payment'}
+                    </motion.button>
                 </div>
             </motion.div>
         </div>
