@@ -31,6 +31,8 @@ export default function PlansPage() {
     const [plans, setPlans] = useState<PlanDisplay[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [subscriptionError, setSubscriptionError] = useState<string | null>(null)
+    const [isCreatingSubscription, setIsCreatingSubscription] = useState<string | null>(null)
 
     useEffect(() => {
         fetchPricingPlans()
@@ -39,69 +41,27 @@ export default function PlansPage() {
     const fetchPricingPlans = async () => {
         try {
             setLoading(true)
-
-            // Get the auth token from localStorage
             const token = localStorage.getItem('token')
-
             const response = await fetch('/api/pricing-plans', {
                 headers: {
                     'Content-Type': 'application/json',
                     ...(token && { 'Authorization': `Bearer ${token}` })
                 }
             })
-
             if (!response.ok) {
                 throw new Error('Failed to fetch pricing plans')
             }
-
             const data = await response.json()
-
-            // Map API data to display format with design properties
             const mappedPlans: PlanDisplay[] = data.map((plan: any, index: number) => {
-                // Assign icons and colors based on plan type or index
                 const designConfigs = [
-                    {
-                        icon: Star,
-                        color: "bg-gray-100 dark:bg-zinc-800",
-                        textColor: "text-black dark:text-white",
-                        buttonColor: "bg-black dark:bg-white text-white dark:text-black",
-                        popular: false
-                    },
-                    {
-                        icon: Zap,
-                        color: "bg-[#E1784F]",
-                        textColor: "text-white",
-                        buttonColor: "bg-white text-[#E1784F]",
-                        popular: true
-                    },
-                    {
-                        icon: Crown,
-                        color: "bg-black dark:bg-white",
-                        textColor: "text-white dark:text-black",
-                        buttonColor: "bg-[#E1784F] text-white",
-                        popular: false
-                    }
+                    { icon: Star, color: "bg-gray-100 dark:bg-zinc-800", textColor: "text-black dark:text-white", buttonColor: "bg-black dark:bg-white text-white dark:text-black", popular: false },
+                    { icon: Zap, color: "bg-[#E1784F]", textColor: "text-white", buttonColor: "bg-white text-[#E1784F]", popular: true },
+                    { icon: Crown, color: "bg-black dark:bg-white", textColor: "text-white dark:text-black", buttonColor: "bg-[#E1784F] text-white", popular: false }
                 ]
-
-                // Cycle through design configs if more than 3 plans
                 const config = designConfigs[index % designConfigs.length]
-
-                // Ensure features is always an array
-                // Backend might send 'description' as the features array
-                const features = Array.isArray(plan.features)
-                    ? plan.features
-                    : Array.isArray(plan.description)
-                        ? plan.description
-                        : []
-
-                return {
-                    ...plan,
-                    features, // Override with validated features array
-                    ...config,
-                    notIncluded: []
-                }
+                const features = Array.isArray(plan.features) ? plan.features : Array.isArray(plan.description) ? plan.description : []
+                return { ...plan, features, ...config, notIncluded: [] }
             })
-
             setPlans(mappedPlans)
             setError(null)
         } catch (err) {
@@ -112,11 +72,52 @@ export default function PlansPage() {
         }
     }
 
+    const handleChoosePlan = async (plan: PlanDisplay) => {
+        setIsCreatingSubscription(plan.id)
+        setSubscriptionError(null)
+        try {
+            const token = localStorage.getItem('token')
+            if (!token) {
+                throw new Error("You must be logged in to subscribe.")
+            }
+
+            const startDate = new Date()
+            const endDate = new Date()
+            endDate.setDate(startDate.getDate() + 30)
+
+            const response = await fetch('/api/subscriptions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    planId: plan.id,
+                    startDate: startDate.toISOString(),
+                    endDate: endDate.toISOString(),
+                })
+            })
+
+            const result = await response.json()
+
+            if (!response.ok || !result.status) {
+                throw new Error(result.message || "Failed to create subscription.")
+            }
+
+            const subscriptionId = result.data.id
+            router.push(`/transaction?subscriptionId=${subscriptionId}&price=${plan.price}&name=${encodeURIComponent(plan.name)}`)
+
+        } catch (err: any) {
+            setSubscriptionError(err.message)
+        } finally {
+            setIsCreatingSubscription(null)
+        }
+    }
+
     return (
         <main className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white relative overflow-hidden">
             <div className="fixed inset-0 z-[0] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-            {/* Header */}
             <header className="relative z-10 px-8 pt-12 pb-6 flex items-center justify-between max-w-7xl mx-auto w-full">
                 <button
                     onClick={() => router.back()}
@@ -125,7 +126,7 @@ export default function PlansPage() {
                     <ArrowLeft size={20} />
                 </button>
                 <h1 className="text-xl font-black italic tracking-tighter uppercase">Subscription <span className="text-[#E1784F]">Plans</span></h1>
-                <div className="w-12" /> {/* Spacer */}
+                <div className="w-12" />
             </header>
 
             <div className="relative z-10 max-w-7xl mx-auto px-8 py-10 pb-32">
@@ -137,6 +138,12 @@ export default function PlansPage() {
                         Unlock the full potential of Afridam AI with our tailored subscription tiers.
                     </p>
                 </div>
+
+                {subscriptionError && (
+                    <div className="text-center mb-8 p-4 bg-red-500/10 rounded-xl">
+                        <p className="text-red-500 font-bold">{subscriptionError}</p>
+                    </div>
+                )}
 
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
@@ -162,7 +169,6 @@ export default function PlansPage() {
                     </div>
                 ) : (
                     <div className="relative">
-                        {/* Horizontal Scroll Container */}
                         <div className="overflow-x-auto overflow-y-visible pb-8 -mx-8 px-8 scrollbar-hide">
                             <div className="flex gap-8 min-w-max md:min-w-0 md:grid md:grid-cols-3 md:gap-8">
                                 {plans.map((plan, idx) => (
@@ -219,15 +225,22 @@ export default function PlansPage() {
                                             ))}
                                         </div>
 
-                                        <button className={`w-full py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg active:scale-95 transition-all ${plan.buttonColor}`}>
-                                            Choose {plan.name}
+                                        <button
+                                            onClick={() => handleChoosePlan(plan)}
+                                            disabled={isCreatingSubscription === plan.id}
+                                            className={`w-full py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg active:scale-95 transition-all ${plan.buttonColor} disabled:opacity-50`}
+                                        >
+                                            {isCreatingSubscription === plan.id ? (
+                                                <Loader2 className="w-5 h-5 mx-auto animate-spin" />
+                                            ) : (
+                                                `Choose ${plan.name}`
+                                            )}
                                         </button>
                                     </motion.div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Scroll Indicator - Only show on mobile when there are more plans */}
                         {plans.length > 1 && (
                             <div className="md:hidden flex justify-center gap-2 mt-6">
                                 {plans.map((_, idx) => (
