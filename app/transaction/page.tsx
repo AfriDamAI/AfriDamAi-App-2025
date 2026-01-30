@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { motion } from "framer-motion"
 import { Lock, Loader2, Shield } from 'lucide-react'
 import { jwtDecode } from 'jwt-decode'
+import environment from '@/lib/environment'
 
 interface User {
     id: string;
@@ -48,32 +49,32 @@ function TransactionPage() {
         }
     }, [price])
 
+    // page.tsx - Inside handlePayment
     const handlePayment = async () => {
-        if (!subscriptionId || !user?.id || !amount) {
-            setError("Missing transaction details.")
-            return
-        }
-        setIsProcessing(true)
-        setError(null)
+        // ... validation ...
 
         try {
-            const token = localStorage.getItem('token')
-            const response = await fetch('/api/transactions/initiate', {
+            const token = localStorage.getItem('token');
+
+            // Use the subscriptionId directly from the URL (which is now the real ID)
+            const response = await fetch(`${environment.backendUrl}/transactions/initiate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     ...(token && { 'Authorization': `Bearer ${token}` })
                 },
                 body: JSON.stringify({
-                    subscriptionId: subscriptionId,
+                    subscriptionId: subscriptionId, // This is the ID passed from the Plans page
                     userId: user.id,
-                    amount: parseFloat(amount),
+                    amount: parseFloat(amount), // Auto-filled from URL 'price' param
                     gateway: "PAYSTACK",
-                    paymentMethod: "CARD"
+                    paymentMethod: "CARD",
+                    // email: user.email // Add if your backend requires it
                 })
-            })
+            });
 
-            const result = await response.json()
+            const result = await response.json();
+            // ... rest of the logic
 
             if (!response.ok || !result.status) {
                 throw new Error(result.message || 'Failed to initiate transaction.')
@@ -82,7 +83,12 @@ function TransactionPage() {
             if (result.data && result.data.authorization_url) {
                 window.open(result.data.authorization_url, '_blank')
             } else {
-                throw new Error('No authorization URL received.')
+                // If authorizationUrl is not directly in data, check if it's top-level
+                if (result.authorizationUrl) {
+                    window.open(result.authorizationUrl, '_blank')
+                } else {
+                    throw new Error('No authorization URL received.')
+                }
             }
 
         } catch (err: any) {
@@ -125,11 +131,11 @@ function TransactionPage() {
                 </div>
 
                 <div className="mt-6 bg-white dark:bg-zinc-800/50 rounded-2xl p-6">
-                     <h4 className="text-lg font-bold mb-2">Account Details</h4>
-                     <p className="text-sm text-gray-400">Paying as {user?.name} ({user?.email})</p>
+                    <h4 className="text-lg font-bold mb-2">Account Details</h4>
+                    <p className="text-sm text-gray-400">Paying as {user?.name} ({user?.email})</p>
                 </div>
 
-                 <div className="flex items-center gap-2 mt-6 text-xs text-gray-500">
+                <div className="flex items-center gap-2 mt-6 text-xs text-gray-500">
                     <Shield size={14} />
                     <span>Secure payment powered by Paystack.</span>
                 </div>
@@ -137,11 +143,11 @@ function TransactionPage() {
 
             {/* Payment Section */}
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-                 <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-6">Payment <span className="text-[#E1784F]">Gateway</span></h3>
+                <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-6">Payment <span className="text-[#E1784F]">Gateway</span></h3>
 
                 <div className="bg-white dark:bg-zinc-800/50 rounded-2xl p-8 text-center">
                     {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
-                    
+
                     <p className="text-sm font-bold mb-6">Click the button below to proceed to payment.</p>
                     <motion.button
                         onClick={handlePayment}

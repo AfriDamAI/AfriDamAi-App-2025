@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Check, X, ArrowLeft, Star, Zap, Crown, Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
+import environment from "@/lib/environment" // Import environment
+import { jwtDecode } from 'jwt-decode' // Import jwtDecode
 
 interface PricingPlan {
     id: string
@@ -81,17 +83,21 @@ export default function PlansPage() {
                 throw new Error("You must be logged in to subscribe.")
             }
 
+            const decodedToken: any = jwtDecode(token)
+            const userId = decodedToken.sub // Assuming 'sub' is the userId claim in the token
+
             const startDate = new Date()
             const endDate = new Date()
             endDate.setDate(startDate.getDate() + 30)
 
-            const response = await fetch('/api/subscriptions', {
+            const response = await fetch(`${environment.backendUrl}/subscriptions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
+                    userId: userId, // Include userId
                     planId: plan.id,
                     startDate: startDate.toISOString(),
                     endDate: endDate.toISOString(),
@@ -100,11 +106,11 @@ export default function PlansPage() {
 
             const result = await response.json()
 
-            if (!response.ok || !result.status) {
+            if (!response.ok || !result.id) { // Check for result.id as per Postman example
                 throw new Error(result.message || "Failed to create subscription.")
             }
 
-            const subscriptionId = result.data.id
+            const subscriptionId = result.id // Get ID directly from result as per Postman example
             router.push(`/transaction?subscriptionId=${subscriptionId}&price=${plan.price}&name=${encodeURIComponent(plan.name)}`)
 
         } catch (err: any) {
