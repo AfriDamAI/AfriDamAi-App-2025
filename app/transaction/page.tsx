@@ -69,26 +69,22 @@ function TransactionPage() {
                     amount: parseFloat(amount), // Auto-filled from URL 'price' param
                     gateway: "PAYSTACK",
                     paymentMethod: "CARD",
-                    // email: user.email // Add if your backend requires it
+                    email: user.email // Include user email for Paystack API
                 })
             });
 
             const result = await response.json();
             // ... rest of the logic
 
-            if (!response.ok || !result.status) {
-                throw new Error(result.message || 'Failed to initiate transaction.')
+            if (!response.ok || (!result.authorizationUrl && !(result.data && result.data.authorization_url))) {
+                throw new Error(result.message || 'Failed to initiate transaction or no authorization URL received.')
             }
 
-            if (result.data && result.data.authorization_url) {
-                window.open(result.data.authorization_url, '_blank')
+            const authUrl = result.authorizationUrl || (result.data && result.data.authorization_url);
+            if (authUrl) {
+                window.open(authUrl, '_blank')
             } else {
-                // If authorizationUrl is not directly in data, check if it's top-level
-                if (result.authorizationUrl) {
-                    window.open(result.authorizationUrl, '_blank')
-                } else {
-                    throw new Error('No authorization URL received.')
-                }
+                throw new Error('No authorization URL received.')
             }
 
         } catch (err: any) {
