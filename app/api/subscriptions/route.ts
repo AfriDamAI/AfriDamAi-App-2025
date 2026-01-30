@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
         // In a real app, you'd save this to a database
         const newSubscription = {
-            id: `cmkznwe5o0001vcj43ibt1nhx_${Date.now()}`, // Mocked ID
+            id: '',
             userId,
             planId,
             startDate,
