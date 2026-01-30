@@ -7,13 +7,17 @@
 
 const getBackendUrl = () => {
     // 1. Get the URL from environment variables
-    // UPDATED: Changed fallback to the live Render backend for stability.
     let url = process.env.NEXT_PUBLIC_API_URL || "/api/proxy";
     
     // 2. Remove any trailing slash first to avoid //api
     url = url.replace(/\/$/, "");
 
-    // 3. Ensure it ends with /api (Works for Render, Google, or Localhost)
+    // If the URL is the proxy, return it as is. The /api will be added by the rewrite.
+    if (url === "/api/proxy") {
+        return url;
+    }
+
+    // Ensure it ends with /api for direct backend calls
     if (!url.endsWith('/api')) {
         return `${url}/api`;
     }
