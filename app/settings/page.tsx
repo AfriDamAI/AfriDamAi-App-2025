@@ -90,7 +90,7 @@ export default function SettingsPage() {
             icon={User} 
             title="Personal Details" 
             subtitle="Update your name and phone number" 
-            onClick={() => router.push('/settings/profile')}
+            onClick={() => router.push('/settings/personal-details')}
           />
           <SettingTile 
             icon={ShieldCheck} 
@@ -127,7 +127,7 @@ export default function SettingsPage() {
             className="w-full h-20 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/10 rounded-[2.5rem] flex items-center justify-center gap-4 transition-all group active:scale-95"
            >
               <LogOut size={20} />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Sign Out from Hub</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Sign Out</span>
            </button>
            
            <div className="flex flex-col items-center gap-4 pt-10 opacity-20">
