@@ -425,6 +425,13 @@ export default function UnifiedScanner() {
                   </div>
 
                   <button
+                    onClick={() => router.push('/plans?plan=premium')}
+                    className="w-full bg-black dark:bg-white text-white dark:text-black h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                  >
+                    Visit a Specialist <ArrowRight size={14} />
+                  </button>
+
+                  <button
                     onClick={() => router.push(`/marketplace?focus=${results.finding}`)}
                     className="w-full bg-[#E1784F] text-white h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                   >

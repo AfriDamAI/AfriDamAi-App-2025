@@ -104,10 +104,6 @@ export default function Navigation({
                 onViewProfileClick={onViewProfileClick}
               />
             </div>
-
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-3 rounded-2xl bg-[#E1784F]/10 text-[#E1784F] border border-[#E1784F]/20 active:scale-90 transition-all">
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
           </div>
         </div>
       </div>
