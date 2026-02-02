@@ -75,10 +75,10 @@ function ProductCard({ products, onClick }: { products: Product[]; onClick?: (pr
                             <div className="flex flex-col">
                                 <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Price</span>
                                 <span className="text-xl font-black italic text-foreground">
-                                    ${product.price.toLocaleString()}
+                                    ₦{product.price.toLocaleString()}
                                 </span>
                             </div>
-                            
+
                             <div className="w-12 h-12 bg-[#E1784F]/10 text-[#E1784F] group-hover:bg-[#E1784F] group-hover:text-white rounded-2xl flex items-center justify-center transition-all shadow-lg">
                                 <ShoppingCart size={18} />
                             </div>

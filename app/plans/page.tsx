@@ -192,7 +192,7 @@ export default function PlansPage() {
                                             </div>
                                             <h3 className="text-2xl font-black italic uppercase tracking-tighter">{plan.name}</h3>
                                             <div className="mt-4 flex items-baseline">
-                                                <span className="text-5xl font-black tracking-tighter">${plan.price}</span>
+                                                <span className="text-5xl font-black tracking-tighter">₦{plan.price}</span>
                                                 <span className="ml-2 text-[10px] font-bold uppercase tracking-widest opacity-60">{plan.period}</span>
                                             </div>
                                             <div className="mt-4 space-y-1">

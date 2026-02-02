@@ -120,16 +120,16 @@ function TransactionPage() {
                     <div className="border-t border-white/10 my-4"></div>
                     <div className="flex justify-between items-center text-lg">
                         <span className="font-bold">Total Amount:</span>
-                        <span className="font-black text-2xl text-[#E1784F]">${amount}</span>
+                        <span className="font-black text-2xl text-[#E1784F]">₦{amount}</span>
                     </div>
                 </div>
 
                 <div className="mt-6 bg-white dark:bg-zinc-800/50 rounded-2xl p-6">
-                     <h4 className="text-lg font-bold mb-2">Account Details</h4>
-                     <p className="text-sm text-gray-400">Paying as {user?.name} ({user?.email})</p>
+                    <h4 className="text-lg font-bold mb-2">Account Details</h4>
+                    <p className="text-sm text-gray-400">Paying as {user?.name} ({user?.email})</p>
                 </div>
 
-                 <div className="flex items-center gap-2 mt-6 text-xs text-gray-500">
+                <div className="flex items-center gap-2 mt-6 text-xs text-gray-500">
                     <Shield size={14} />
                     <span>Secure payment powered by Paystack.</span>
                 </div>
@@ -137,11 +137,11 @@ function TransactionPage() {
 
             {/* Payment Section */}
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-                 <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-6">Payment <span className="text-[#E1784F]">Gateway</span></h3>
+                <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-6">Payment <span className="text-[#E1784F]">Gateway</span></h3>
 
                 <div className="bg-white dark:bg-zinc-800/50 rounded-2xl p-8 text-center">
                     {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
-                    
+
                     <p className="text-sm font-bold mb-6">Click the button below to proceed to payment.</p>
                     <motion.button
                         onClick={handlePayment}

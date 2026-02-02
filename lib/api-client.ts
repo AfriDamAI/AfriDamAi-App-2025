@@ -166,7 +166,7 @@ export const verifyPayment = async (transactionId: string) => {
 };
 
 export const getProducts = async () => {
-  const response = await apiClient.get("/product");
+  const response = await apiClient.get("/products");
   return response.data;
 };
 
