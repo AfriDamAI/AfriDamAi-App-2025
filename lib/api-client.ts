@@ -166,6 +166,7 @@ export const verifyPayment = async (transactionId: string) => {
 };
 
 export const getProducts = async () => {
+  // get products from the backend
   const response = await apiClient.get("/products");
   return response.data;
 };
