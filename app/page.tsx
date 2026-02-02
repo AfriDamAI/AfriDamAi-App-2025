@@ -52,7 +52,7 @@ export default function LandingPage() {
   );
 
   return (
-    <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 relative overflow-x-hidden no-scrollbar">
+    <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 relative no-scrollbar">
 
       {/* 🧭 1. NAVIGATION */}
       <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 px-6 py-4 md:px-12 ${scrolled ? 'bg-white/95 dark:bg-[#050505]/95 backdrop-blur-3xl py-4 shadow-sm border-b border-black/5 dark:border-white/5' : 'bg-transparent py-8'
@@ -62,7 +62,7 @@ export default function LandingPage() {
             <img src="/logo.png" alt="AfriDam" className={`h-7 md:h-9 w-auto object-contain ${isDark ? '' : 'invert'}`} />
           </Link>
 
-          <div className="hidden lg:flex items-center gap-8 text-[10px] font-black uppercase tracking-widest">
+          <div className=" lg:flex items-center gap-8 text-[10px] font-black uppercase tracking-widest">
             <NavLink href="/mission" label="Our Mission" />
             <NavLink href="/marketplace" label="Market Place" />
             <NavLink href="#contact" label="Contact" />
@@ -83,7 +83,7 @@ export default function LandingPage() {
             )}
           </div>
 
-          <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden p-2.5 bg-gray-100 dark:bg-white/5 rounded-xl">
+          <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden hover:opacity-75 transition-opacity" aria-label="Open menu">
             <Menu size={18} />
           </button>
         </div>
@@ -270,12 +270,25 @@ export default function LandingPage() {
       {/* MOBILE MENU */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div initial={{ opacity: 0, scale: 1.1 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="fixed inset-0 z-[200] bg-white dark:bg-[#050505] p-10 flex flex-col justify-between">
-            <header className="flex justify-between items-center">
-              <img src="/logo.png" className={`h-8 ${isDark ? '' : 'invert'}`} alt="Logo" />
-              <button onClick={() => setMobileMenuOpen(false)} className="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl"><X size={24} /></button>
-            </header>
-            <div className="space-y-12">
+          <motion.div initial={{ opacity: 0, scale: 1.1 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm p-6 flex flex-col">
+            {/* Close Button */}
+            <div className="flex justify-end mb-12">
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="w-8 h-8" />
+              </button>
+            </div>
+
+            {/* Logo */}
+            <div className="px-6 mb-12">
+              <img src="/logo.png" className={`h-8 w-auto ${isDark ? '' : 'invert'}`} alt="Logo" />
+            </div>
+
+            {/* Navigation Items */}
+            <div className="flex-1 px-6 flex flex-col gap-8">
               {['Mission', 'Care Hub', 'Contact', 'Login'].map((item) => (
                 <button
                   key={item}
@@ -285,13 +298,39 @@ export default function LandingPage() {
                     else if (item === 'Contact') document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
                     else handleFeatureAccess(item === 'Mission' ? '/mission' : '/marketplace');
                   }}
-                  className="block text-5xl font-black italic uppercase tracking-tighter text-left"
+                  className="text-5xl font-bold italic text-white hover:text-[#E1784F] transition-colors text-left"
                 >
                   {item}
                 </button>
               ))}
             </div>
-            <button onClick={() => navigateToAuth("register")} className="w-full py-8 bg-[#E1784F] text-white rounded-[2rem] font-black uppercase text-[12px] tracking-widest shadow-2xl">Get Started</button>
+
+            {/* Get Started Button */}
+            <div className="px-6 pb-12">
+              <button
+                onClick={() => navigateToAuth("register")}
+                className="w-full py-4 px-6 bg-[#E1784F] hover:bg-orange-500 text-white font-bold rounded-full transition-colors"
+              >
+                GET STARTED
+              </button>
+            </div>
+
+            {/* Bottom Chat Icon */}
+            <div className="absolute bottom-12 right-6 w-12 h-12 bg-teal-400 rounded-2xl flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 8h10M7 12h4m1 8l-4-2H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 2z"
+                />
+              </svg>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
