@@ -11,7 +11,7 @@ const products = [
         category: "Clinical Serums",
         description: "Advanced hydration protocol calibrated for melanin-rich skin types.",
         image: "https://images.unsplash.com/photo-1643379850623-7eb6442cd262?q=80&w=1080",
-        price: "$89",
+        price: "₦89",
         tag: "High Match"
     },
     {
@@ -20,7 +20,7 @@ const products = [
         category: "Barrier Care",
         description: "Organic ceramide complex to reinforce the African skin barrier.",
         image: "https://images.unsplash.com/photo-1609357912334-e96886c0212b?q=80&w=1080",
-        price: "$65",
+        price: "₦65",
         tag: "AI Choice"
     },
     {
@@ -29,7 +29,7 @@ const products = [
         category: "Treatments",
         description: "Intensive therapy for hyperpigmentation and uneven tones.",
         image: "https://images.unsplash.com/photo-1629051192950-d251e96ab1b0?q=80&w=1080",
-        price: "$75",
+        price: "₦75",
         tag: "Clinical"
     },
     {
@@ -38,7 +38,7 @@ const products = [
         category: "Protocols",
         description: "Complete 4-step routine curated for your specific AI profile.",
         image: "https://images.unsplash.com/photo-1760614034530-a0d34463e03d?q=80&w=1080",
-        price: "$199",
+        price: "₦199",
         tag: "Premium"
     }
 ];
@@ -47,7 +47,7 @@ export function ProductShowcase() {
     return (
         <div id="products" className="bg-background py-24 lg:py-32">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                
+
                 {/* 🏷️ HEADER SECTION */}
                 <div className="text-left mb-20 border-l-4 border-[#E1784F] pl-8">
                     <div className="inline-flex items-center gap-3 bg-[#E1784F]/10 text-[#E1784F] px-4 py-2 rounded-full mb-6">
@@ -79,7 +79,7 @@ export function ProductShowcase() {
                                     {product.tag}
                                 </div>
                             </div>
-                            
+
                             <div className="p-8 space-y-4">
                                 <div>
                                     <p className="text-[#4DB6AC] text-[9px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
@@ -102,7 +102,7 @@ export function ProductShowcase() {
                 {/* 🧬 CONVERSION BOX */}
                 <div className="bg-muted/30 rounded-[3.5rem] p-10 lg:p-16 border border-border overflow-hidden relative">
                     <div className="absolute top-0 right-0 p-12 opacity-5">
-                         <ShieldCheck size={200} />
+                        <ShieldCheck size={200} />
                     </div>
                     <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
                         <div className="space-y-8">
@@ -112,7 +112,7 @@ export function ProductShowcase() {
                             <p className="text-sm font-medium text-muted-foreground leading-relaxed uppercase tracking-tight">
                                 Our AI creates a customized clinical routine based on your scan. Stop guessing and start using products vetted for your phenotype.
                             </p>
-                            <button 
+                            <button
                                 onClick={() => window.location.href = '/ai-scanner'}
                                 className="bg-[#E1784F] hover:bg-[#ff8e5e] text-white px-10 py-6 rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] shadow-2xl transition-all flex items-center gap-3"
                             >
@@ -120,7 +120,7 @@ export function ProductShowcase() {
                                 Start AI Analysis
                             </button>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { val: "98%", label: "Accuracy Rate", color: "bg-[#4DB6AC]/10 text-[#4DB6AC]" },

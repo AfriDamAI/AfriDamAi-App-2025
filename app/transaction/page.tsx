@@ -122,7 +122,7 @@ function TransactionPage() {
                     <div className="border-t border-white/10 my-4"></div>
                     <div className="flex justify-between items-center text-lg">
                         <span className="font-bold">Total Amount:</span>
-                        <span className="font-black text-2xl text-[#E1784F]">${amount}</span>
+                        <span className="font-black text-2xl text-[#E1784F]">₦{amount}</span>
                     </div>
                 </div>
 
