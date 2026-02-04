@@ -24,6 +24,7 @@ export function MobileNav() {
     }
 
     return (
+        //nothing to see here
         <div className="fixed bottom-0 left-0 right-0 h-24 bg-white/80 dark:bg-black/80 backdrop-blur-3xl border-t border-gray-100 dark:border-white/5 flex justify-around items-center px-10 lg:hidden z-[9999] pb-6 pointer-events-auto">
             <NavItem icon={Home} path="/dashboard" />
             <NavItem icon={Scan} path="/ai-scanner" />
