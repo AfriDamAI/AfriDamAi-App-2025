@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 
 /**
  * 🛡️ AFRIDAM NEURAL DIAGNOSTICS: REPORT (Rule 7 Precision Sync)

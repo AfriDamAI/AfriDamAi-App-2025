@@ -7,7 +7,7 @@
  */
 
 import { analyzeSkinImage as runTensorFlowAnalysis } from "./tensorflow-model"
-import apiClient from "@/lib/api-client" 
+import { apiClient } from "@/lib/api-client" 
 
 export interface SkinObservation {
   name: string

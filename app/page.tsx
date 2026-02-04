@@ -191,7 +191,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               { title: "Check Skin", icon: Camera, text: "A precision scan to verify your skin health.", path: "/ai-scanner", color: "#E1784F" },
-              { title: "Safe Choice", icon: ShieldCheck, text: "Verify if your products are safe for melanin.", path: "/analyzer", color: "#4DB6AC" }
+              { title: "Safe Choice", icon: ShieldCheck, text: "Verify if your products are safe for melanin.", path: "/ingredient-analyzer", color: "#4DB6AC" }
             ].map((f, i) => (
               <div key={i} onClick={() => handleFeatureAccess(f.path)} className="group p-12 md:p-16 bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[4rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 text-white shadow-lg" style={{ backgroundColor: f.color }}>

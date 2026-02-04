@@ -8,7 +8,7 @@ import {
   Fingerprint, CheckCircle2, AlertCircle
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 
 /**
  * 🛡️ AFRIDAM SECURITY & PRIVACY (Rule 7 Precision Sync)

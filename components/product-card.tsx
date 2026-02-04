@@ -5,9 +5,13 @@ import Image from "next/image"
 import { type Product } from './our-product-section'
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, ShoppingCart } from "lucide-react"
+import { useCart } from '@/hooks/use-cart'
+import { useAuth } from '@/providers/auth-provider' // 👈 Import useAuth
 
 function ProductCard({ products, onClick }: { products: Product[]; onClick?: (product: Product) => void }) {
     const [loading, setLoading] = useState(true)
+    const { addToCart } = useCart()
+    const { user, isSignedIn } = useAuth() // 👈 Get user and isSignedIn status
 
     useEffect(() => {
         // 🛡️ RE-ENFORCED: Simulation for dev, but ready for real data sync
@@ -16,6 +20,19 @@ function ProductCard({ products, onClick }: { products: Product[]; onClick?: (pr
         }, 800)
         return () => clearTimeout(timer)
     }, [])
+
+    const handleAddToCart = (product: Product) => {
+        if (!isSignedIn || !user) {
+            // You might want to show a toast or redirect to login
+            alert("Please sign in to add items to your cart.");
+            return;
+        }
+        addToCart(user.id, {
+            productId: product.id,
+            quantity: 1,
+            price: product.price,
+        });
+    };
 
     if (loading) {
         return (
@@ -43,7 +60,7 @@ function ProductCard({ products, onClick }: { products: Product[]; onClick?: (pr
                     transition={{ delay: index * 0.05 }}
                     key={product.id}
                     className={`bg-card border border-border rounded-[2.5rem] hover:border-[#E1784F]/40 transition-all duration-500 overflow-hidden group shadow-sm hover:shadow-2xl ${onClick ? 'cursor-pointer' : ''}`}
-                    {...(onClick && { onClick: () => onClick(product) })}
+                    {...(onClick && !onClick.toString().includes('handleAddToCart') && { onClick: () => onClick(product) })}
                 >
                     {/* 🛡️ RE-ENFORCED: Product Image with Clinical Overlay */}
                     <div className="relative bg-muted aspect-square overflow-hidden">
@@ -79,9 +96,9 @@ function ProductCard({ products, onClick }: { products: Product[]; onClick?: (pr
                                 </span>
                             </div>
 
-                            <div className="w-12 h-12 bg-[#E1784F]/10 text-[#E1784F] group-hover:bg-[#E1784F] group-hover:text-white rounded-2xl flex items-center justify-center transition-all shadow-lg">
+                            <button onClick={() => handleAddToCart(product)} className="w-12 h-12 bg-[#E1784F]/10 text-[#E1784F] group-hover:bg-[#E1784F] group-hover:text-white rounded-2xl flex items-center justify-center transition-all shadow-lg">
                                 <ShoppingCart size={18} />
-                            </div>
+                            </button>
                         </div>
                     </div>
                 </motion.div>

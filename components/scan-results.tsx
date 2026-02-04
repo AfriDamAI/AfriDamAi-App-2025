@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card"
 import { motion } from "framer-motion"
 import { RotateCcw, Save, Zap, Loader2, CheckCircle2, Sparkles, Info } from "lucide-react"
 import Image from "next/image"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 
 interface ScanResultsProps {
   result: {

@@ -6,6 +6,8 @@ import { motion } from "framer-motion"
 import { Lock, Loader2, Shield } from 'lucide-react'
 import { jwtDecode } from 'jwt-decode'
 import environment from '@/lib/environment'
+import { apiClient } from '@/lib/api-client'
+import { Order } from '@/lib/types'
 
 interface User {
     id: string;
@@ -16,6 +18,7 @@ interface User {
 function TransactionPage() {
     const searchParams = useSearchParams()
     const subscriptionId = searchParams.get('subscriptionId')
+    const orderId = searchParams.get('orderId')
     const price = searchParams.get('price')
     const subscriptionName = searchParams.get('name') || 'Selected Plan';
 
@@ -24,6 +27,7 @@ function TransactionPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isProcessing, setIsProcessing] = useState(false)
+    const [order, setOrder] = useState<Order | null>(null)
 
     useEffect(() => {
         try {
@@ -47,34 +51,48 @@ function TransactionPage() {
         if (price) {
             setAmount(price)
         }
-    }, [price])
+
+        if (orderId) {
+            apiClient.get<Order>(`/orders/${orderId}`).then(response => {
+                setOrder(response.data)
+                setAmount(String(response.data.totalAmount))
+            }).catch(err => {
+                setError("Failed to fetch order details.")
+            })
+        }
+    }, [price, orderId])
 
     // page.tsx - Inside handlePayment
     const handlePayment = async () => {
-        // ... validation ...
+        if (!user) {
+            setError("User not found.")
+            return;
+        }
 
+        setIsProcessing(true)
         try {
             const token = localStorage.getItem('token');
 
-            // Use the subscriptionId directly from the URL (which is now the real ID)
+            const transactionData = {
+                userId: user.id,
+                amount: parseFloat(amount),
+                gateway: "PAYSTACK",
+                paymentMethod: "CARD",
+                email: user.email,
+                ...(subscriptionId && { subscriptionId }),
+                ...(orderId && { orderId }),
+            }
+
             const response = await fetch(`${environment.backendUrl}/transactions/initiate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     ...(token && { 'Authorization': `Bearer ${token}` })
                 },
-                body: JSON.stringify({
-                    subscriptionId: subscriptionId, // This is the ID passed from the Plans page
-                    userId: user.id,
-                    amount: parseFloat(amount), // Auto-filled from URL 'price' param
-                    gateway: "PAYSTACK",
-                    paymentMethod: "CARD",
-                    email: user.email // Include user email for Paystack API
-                })
+                body: JSON.stringify(transactionData)
             });
 
             const result = await response.json();
-            // ... rest of the logic
 
             if (!response.ok || (!result.authorizationUrl && !(result.data && result.data.authorization_url))) {
                 throw new Error(result.message || 'Failed to initiate transaction or no authorization URL received.')
@@ -113,7 +131,7 @@ function TransactionPage() {
                 <div className="bg-white dark:bg-zinc-800/50 rounded-2xl p-6 space-y-4">
                     <div className="flex justify-between items-center">
                         <span className="text-sm font-bold opacity-60">Plan:</span>
-                        <span className="text-sm font-bold">{subscriptionName}</span>
+                        <span className="text-sm font-bold">{order ? `Order #${order.id}` : subscriptionName}</span>
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-sm font-bold opacity-60">Billed:</span>

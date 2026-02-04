@@ -24,7 +24,7 @@ import {
   CheckCircle2
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import apiClient from "@/lib/api-client" 
+import { apiClient } from "@/lib/api-client" 
 
 export default function ProfilePage() {
   const { user, signOut, mutate } = useAuth()

@@ -6,7 +6,7 @@
  * Focus: High-speed local analysis with Cloud Aesthetic Enrichment.
  */
 
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 import { analyzeIngredients as runLocalAnalysis } from "./ingredient-nlp-engine"
 
 export interface IngredientResult {
