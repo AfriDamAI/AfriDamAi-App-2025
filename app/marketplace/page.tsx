@@ -9,7 +9,12 @@ import {
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { getProducts } from "@/lib/api-client"
+import { getProducts, apiClient } from "@/lib/api-client"
+import { useAuth } from "@/providers/auth-provider"
+import { useCart } from "@/hooks/use-cart"
+import { CartItem } from "@/lib/types"
+import { toast } from "sonner"
+
 
 /**
  * 🛡️ AFRIDAM CARE SHOP: MARKETPLACE (Rule 7 Precision Sync)
@@ -30,10 +35,20 @@ interface Product {
 
 export default function MarketplacePage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const { cart, fetchCart, addToCart: addItemToCart } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartCount, setCartCount] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAddingToCart, setIsAddingToCart] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchCart(user.id);
+    }
+  }, [user, fetchCart]);
+
+
 
   useEffect(() => {
     const fetchVendorProducts = async () => {
@@ -72,8 +87,29 @@ export default function MarketplacePage() {
     fetchVendorProducts();
   }, []);
 
-  const addToCart = () => {
-    setCartCount(prev => prev + 1);
+  const addToCart = async (product: Product) => {
+    if (!user) {
+      toast.error("Please login to add items to cart");
+      router.push("/login");
+      return;
+    }
+
+    setIsAddingToCart(product.id);
+    try {
+      const cartItem: CartItem = {
+        productId: product.id,
+        productName: product.name,
+        productImage: product.thumbnail,
+        quantity: 1,
+        price: product.price
+      };
+      await addItemToCart(user.id, cartItem);
+      toast.success(`${product.name} added to cart!`);
+    } catch (error) {
+      toast.error("Failed to add item to cart");
+    } finally {
+      setIsAddingToCart(null);
+    }
   };
 
   if (isLoading) {
@@ -113,12 +149,13 @@ export default function MarketplacePage() {
               </div>
               <Button onClick={() => router.push('/cart')} className="relative h-14 px-6 bg-black dark:bg-white text-white dark:text-black rounded-2xl shadow-xl transition-all active:scale-95">
                 <ShoppingBag size={18} />
-                {cartCount > 0 && (
+                {cart && cart.items.length > 0 && (
                   <span className="absolute -top-1 -right-1 w-6 h-6 bg-[#E1784F] text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#050505]">
-                    {cartCount}
+                    {cart.items.length}
                   </span>
                 )}
               </Button>
+
             </div>
           </div>
 
@@ -170,11 +207,13 @@ export default function MarketplacePage() {
                     </div>
 
                     <Button
-                      onClick={addToCart}
+                      onClick={() => addToCart(product)}
+                      disabled={isAddingToCart === product.id}
                       className="w-full bg-black dark:bg-white text-white dark:text-black rounded-xl h-14 font-black uppercase tracking-widest text-[9px] shadow-lg active:scale-95 transition-all"
                     >
-                      Add To Cart
+                      {isAddingToCart === product.id ? "Adding..." : "Add To Cart"}
                     </Button>
+
                   </div>
                 </Card>
               </motion.div>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Scan, MessageSquare, History, User as UserIcon,
-  Settings, Zap, Home, ShoppingBag, ArrowRight, Sparkles, Loader2, X
+  Settings, Zap, Home, ShoppingBag, ArrowRight, Sparkles, Loader2, X, FlaskConical
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { getScanHistory, initializePayment } from "@/lib/api-client"
@@ -84,45 +84,9 @@ export default function Dashboard() {
     )
   }
 
-  const SidebarItem = ({ icon: Icon, label, path }: any) => (
-    <button
-      onClick={() => router.push(path)}
-      className="w-full flex items-center gap-4 px-6 py-4 text-sm font-bold opacity-40 hover:opacity-100 transition-all rounded-2xl group"
-    >
-      <Icon size={20} className="group-hover:text-[#E1784F] transition-colors" />
-      <span className="uppercase tracking-widest text-[10px]">{label}</span>
-    </button>
-  )
-
   return (
-    <main className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white flex flex-col lg:flex-row relative">
+    <main className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white flex flex-col relative">
       <div className="fixed inset-0 z-[0] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-
-      {/* 🖥️ PC SIDEBAR */}
-      <aside className="hidden lg:flex flex-col w-72 border-r border-gray-100 dark:border-white/10 h-screen sticky top-0 p-8 space-y-10 z-10 bg-white dark:bg-[#050505]">
-        <div className="px-4 text-left">
-          <h1 className="text-xl font-black italic tracking-tighter uppercase">AFRIDAM <span className="text-[#E1784F]">AI</span></h1>
-        </div>
-        <nav className="flex-1 space-y-1">
-          <SidebarItem icon={Home} label="Home Hub" path="/dashboard" />
-          <SidebarItem icon={Scan} label="AI Scanner" path="/ai-scanner" />
-          <SidebarItem icon={MessageSquare} label="Specialists" path="/specialist" />
-          <SidebarItem icon={ShoppingBag} label="Market Place" path="/marketplace" />
-          <SidebarItem icon={History} label="Clinical Diary" path="/history" />
-          <SidebarItem icon={Settings} label="Settings" path="/settings" />
-        </nav>
-        <div className="p-6 bg-gray-50 dark:bg-white/5 rounded-[2.5rem] space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#E1784F] flex items-center justify-center text-white text-[11px] font-black italic shadow-lg">
-              {initials}
-            </div>
-            <span className="text-[10px] font-black uppercase tracking-tight truncate">{firstName}</span>
-          </div>
-          <button onClick={() => router.push('/profile')} className="w-full py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl text-[8px] font-black uppercase tracking-[0.2em] active:scale-95 transition-all">
-            Manage Profile
-          </button>
-        </div>
-      </aside>
 
       <div className="flex-1 pb-32 lg:pb-10 z-10">
         <header className="px-8 pt-12 pb-6 flex justify-between items-center text-left">
@@ -152,7 +116,7 @@ export default function Dashboard() {
                 </p>
               </div>
               <button onClick={handleConsultation} className="w-full md:w-auto bg-[#E1784F] text-white px-12 py-6 rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
-                Book for $15
+                Book for ₦3000
               </button>
             </div>
           </section>

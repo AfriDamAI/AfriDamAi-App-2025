@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { motion, AnimatePresence } from "framer-motion"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 
 export function AppointmentView() {
   const { user } = useAuth();
