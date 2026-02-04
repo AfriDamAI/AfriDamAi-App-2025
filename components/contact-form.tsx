@@ -3,7 +3,7 @@
 import { Check, Send, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import apiClient from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
 
 /**
  * 🛡️ AFRIDAM CARE HUB: CONTACT FORM (Rule 6 Synergy)

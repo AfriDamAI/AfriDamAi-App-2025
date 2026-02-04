@@ -75,7 +75,7 @@ export default function HomePageContent() {
                   Start Journey <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
-                  onClick={() => handleAction("/analyzer")} // 🚀 Updated
+                  onClick={() => handleAction("/ingredient-analyzer")} // 🚀 Updated
                   className="px-8 py-5 bg-transparent border border-border text-foreground rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-foreground/5 transition-all flex items-center justify-center gap-3"
                 >
                   Analyze Ingredients

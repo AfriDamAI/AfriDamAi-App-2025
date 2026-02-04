@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { VideoRoom } from "@/components/specialist/live/video-room"
 import { DoctorsNote } from "@/components/specialist/live/doctors-note"
 import { useSocket } from "@/hooks/use-socket"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 
 /**
  * 🛡️ AFRIDAM SPECIALIST CONSOLE (Rule 7 Precision Sync)

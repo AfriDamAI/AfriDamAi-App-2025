@@ -31,7 +31,7 @@ export interface AuthResponse {
     accessToken: string;
     refreshToken: string;
     isActive: boolean;
-    displayName: string;
+    displayName:string;
     role: string;
     user: {
       id: string;
@@ -53,4 +53,36 @@ export interface UpdateUserDto extends Partial<Omit<CreateUserDto, 'password'>> 
   primaryConcern?: string;
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
+}
+
+// 🛡️ CART & ORDER TYPES
+export interface CartItem {
+  id?: string;
+  cartId?: string;
+  productId: string;
+  productName?: string;
+  productImage?: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Cart {
+  id: string;
+  userId: string;
+  items: CartItem[];
+}
+
+export interface OrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  userId: string;
+  totalAmount: number;
+  shippingAddress: string;
+  items: OrderItem[];
+  status: string;
 }

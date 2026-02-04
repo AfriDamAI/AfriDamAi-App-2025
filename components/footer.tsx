@@ -24,7 +24,7 @@ export default function Footer() {
    */
   const handleProtectedClick = (e: React.MouseEvent, href: string) => {
     // 🛡️ OGA FIX: Updated paths to match /ai-scanner and /analyzer folders
-    const protectedRoutes = ["/ai-scanner", "/analyzer", "/dashboard", "/profile"]
+    const protectedRoutes = ["/ai-scanner", "/ingredient-analyzer", "/dashboard", "/profile"]
 
     if (protectedRoutes.some(route => href.startsWith(route)) && !user) {
       e.preventDefault()
@@ -68,7 +68,7 @@ export default function Footer() {
               {[
                 // 🛡️ OGA FIX: Updated to match your actual folder structure
                 { label: "Skin Scanner", href: "/ai-scanner" },
-                { label: "Safety Checker", href: "/analyzer" },
+                { label: "Safety Checker", href: "/ingredient-analyzer" },
                 { label: "The Care Hub", href: "/marketplace" }
               ].map((link) => (
                 <li key={link.label}>

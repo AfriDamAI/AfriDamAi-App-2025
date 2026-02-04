@@ -3,7 +3,7 @@
 import { Bell, Check, Clock, X, Trash2, ShieldCheck, Zap, Loader2 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 import { useAuth } from "@/providers/auth-provider"
 
 /**

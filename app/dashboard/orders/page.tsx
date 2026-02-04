@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { motion } from "framer-motion"
 import { useAuth } from "@/providers/auth-provider"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 
 export default function OrdersPage() {
   const router = useRouter()

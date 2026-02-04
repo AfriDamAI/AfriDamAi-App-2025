@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 /** * 🛡️ OGA FIX: We use the verified apiClient to ensure 
  * the Auth Token is attached when forwarding to Tobi's backend.
  */
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 
 export async function POST(request: NextRequest) {
   try {
