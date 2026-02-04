@@ -18,10 +18,10 @@ export function ProtectedLink({ href, children, className, onAuthRequired }: Pro
   const handleClick = (e: React.MouseEvent) => {
     // 🛡️ RE-ENFORCED: Comprehensive list of clinical & private routes
     const protectedRoutes = [
-      "/ai-scanner", 
-      "/ai-checker", 
-      "/dashboard", 
-      "/marketplace/cart", 
+      "/ai-scanner",
+      "/ingredient-analyzer",
+      "/dashboard",
+      "/marketplace/cart",
       "/profile",
       "/appointments",
       "/history"
@@ -32,7 +32,7 @@ export function ProtectedLink({ href, children, className, onAuthRequired }: Pro
     if (isProtected && !user) {
       // Stop the navigation
       e.preventDefault()
-      
+
       // 🛡️ RE-ENFORCED: Trigger the Auth Modal so the user isn't confused
       if (onAuthRequired) {
         onAuthRequired()

@@ -8,7 +8,7 @@ import {
   ExternalLink, Loader2, Search
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 import { motion, AnimatePresence } from "framer-motion"
 
 /**

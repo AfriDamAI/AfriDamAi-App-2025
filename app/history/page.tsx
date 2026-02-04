@@ -9,7 +9,7 @@ import {
   CalendarDays, Zap, ArrowRight
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import apiClient, { getScanHistory, deleteScanResult } from "@/lib/api-client"
+import { apiClient, getScanHistory, deleteScanResult } from "@/lib/api-client"
 
 /**
  * 🛡️ AFRIDAM CLINICAL DIARY: HISTORY (Rule 6 Synergy)

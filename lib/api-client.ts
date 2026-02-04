@@ -16,7 +16,7 @@ const sanitizeToken = (token: string | null): string | null => {
   return token.replace(/^"|"$/g, '');
 };
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL,
   headers: {
     "Content-Type": "application/json",
