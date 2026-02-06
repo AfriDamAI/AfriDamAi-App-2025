@@ -116,7 +116,7 @@ export default function Dashboard() {
                 </p>
               </div>
               <button onClick={handleConsultation} className="w-full md:w-auto bg-[#E1784F] text-white px-12 py-6 rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
-                Book for ₦3000
+                Book for ₦15000
               </button>
             </div>
           </section>
