@@ -44,6 +44,25 @@ export interface AuthResponse {
   };
 }
 
+export interface Chat {
+  id: string;
+  participant1Id: string;
+  participant2Id: string;
+  // Add other chat properties as they become known from the backend
+  createdAt?: string;
+  updatedAt?: string;
+  lastMessage?: Message; // Optional, might be populated for chat list previews
+}
+
+export interface Message {
+  id: string;
+  chatId: string;
+  senderId: string;
+  message: string;
+  timestamp: string; // Assuming ISO string date
+  read?: boolean; // Optional, for read status
+}
+
 /** 🛡️ RE-ENFORCED: Profile Update Type **/
 export interface UpdateUserDto extends Partial<Omit<CreateUserDto, 'password'>> {
   nationality?: string;
