@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
+import { UserLoginDto, CreateUserDto, AuthResponse, Chat, Message } from "@/lib/types";
 
 /**
  * 🛡️ AFRIDAM INFRASTRUCTURE SYNC
@@ -110,6 +110,38 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
+/** 💬 Multi-User Chat Endpoints **/
+export const initiateChat = async (participant1Id: string, participant2Id: string): Promise<Chat> => {
+  const response = await apiClient.post("/chats", { participant1Id, participant2Id });
+  return response.data;
+};
+
+export const getCurrentUserChats = async (): Promise<Chat[]> => {
+  const response = await apiClient.get("/chats/me");
+  return response.data;
+};
+
+export const getChatById = async (chatId: string): Promise<Chat> => {
+  const response = await apiClient.get(`/chats/${chatId}`);
+  return response.data;
+};
+
+export const getChatMessages = async (chatId: string): Promise<Message[]> => {
+  const response = await apiClient.get(`/chats/${chatId}/messages`);
+  return response.data;
+};
+
+export const sendUserChatMessage = async (chatId: string, senderId: string, message: string): Promise<Message> => {
+  const response = await apiClient.post("/chats/messages", { chatId, senderId, message });
+  return response.data;
+};
+
+export const markMessageAsRead = async (messageId: string): Promise<void> => {
+  const response = await apiClient.patch(`/chats/messages/${messageId}/read`);
+  return response.data;
+};
+
+
 /** 🔬 AI SCAN MODULE **/
 // export async function uploadImage(file: File | string): Promise<any> {
 //   const formData = new FormData();
@@ -149,7 +181,7 @@ export const analyzeIngredients = async (ingredients: string, more_info: any) =>
   return response.data;
 };
 
-export const sendChatMessage = async (message: string, more_info: any) => {
+export const sendAnalyzerChatMessage = async (message: string, more_info: any) => {
   const response = await apiClient.post("/v1/chatbot", { query: message, more_info });
   return response.data;
 };
