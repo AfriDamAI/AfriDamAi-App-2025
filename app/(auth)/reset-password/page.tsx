@@ -1,13 +1,18 @@
 "use client"
 
 import React, { useState } from "react"
-import { Mail, ArrowRight, Loader2, X, AlertCircle, CheckCircle } from "lucide-react"
+import { Lock, ArrowRight, Loader2, X, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+import { resetPassword } from "@/lib/api-client"
 
-export default function EnterResetCodePage() {
+export default function ResetPasswordPage() {
   const router = useRouter()
-  const [code, setCode] = useState("")
+  const [token, setToken] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -19,27 +24,30 @@ export default function EnterResetCodePage() {
     setError(null)
     setSuccess(false)
 
-    // Validation
-    if (!code.trim()) {
-      setError("Please enter the reset code from your email.")
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match")
+      return
+    }
+
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters")
       return
     }
 
     setIsLoading(true)
 
     try {
-      // Simulate code validation - in production, you can add backend validation
+      await resetPassword(token.trim(), newPassword)
       setSuccess(true)
-
-      // Redirect to password reset page with token
+      
       setTimeout(() => {
-        router.push(`/reset-password/new-password?token=${code.trim()}`)
-      }, 1500)
+        router.push("/login")
+      }, 2000)
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
         err.message ||
-        "Invalid code. Please check and try again."
+        "Failed to reset password. Please check your code."
       setError(typeof message === "string" ? message : "An error occurred.")
     } finally {
       setIsLoading(false)
@@ -53,15 +61,15 @@ export default function EnterResetCodePage() {
 
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl space-y-12 relative z-10">
         <div className="text-center space-y-8">
-          <motion.div className="w-20 h-20 bg-[#E1784F] text-white rounded-[2.2rem] flex items-center justify-center shadow-2xl mx-auto mb-6">
-            <Mail className="w-10 h-10" />
+          <motion.div className="w-20 h-20 bg-[#4DB6AC] text-white rounded-[2.2rem] flex items-center justify-center shadow-2xl mx-auto mb-6">
+            <Lock className="w-10 h-10" />
           </motion.div>
           <div className="space-y-4">
             <h1 className="text-6xl md:text-8xl font-black tracking-tight uppercase italic leading-[0.8] text-center">
-              Verify <br /> <span className="text-[#E1784F]">Code.</span>
+              New <br /> <span className="text-[#4DB6AC]">Password.</span>
             </h1>
             <p className="text-base md:text-lg opacity-50 font-bold max-w-lg mx-auto">
-              Enter the 6-digit code we sent to your email inbox.
+              Enter the code from your email and create a new password.
             </p>
           </div>
         </div>
@@ -96,7 +104,7 @@ export default function EnterResetCodePage() {
                   className="py-4 px-6 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-600 dark:text-green-400 text-[10px] font-black uppercase flex items-center gap-3"
                 >
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                  Code verified! Redirecting...
+                  Password reset successful! Redirecting to login...
                 </motion.div>
               )}
             </AnimatePresence>
@@ -104,41 +112,75 @@ export default function EnterResetCodePage() {
             <div className="space-y-4">
               <input
                 type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                maxLength={50}
-                className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 rounded-[2rem] px-10 py-7 text-lg font-bold focus:outline-none focus:border-[#E1784F] text-center tracking-widest"
-                placeholder="PASTE YOUR RESET CODE HERE"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 rounded-[2rem] px-10 py-7 text-lg font-bold focus:outline-none focus:border-[#4DB6AC]"
+                placeholder="RESET CODE"
                 required
                 disabled={success}
               />
-              <p className="text-xs font-bold opacity-40 px-4 text-center">
-                Copy and paste the code from your email
-              </p>
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 rounded-[2rem] px-10 py-7 text-lg font-bold focus:outline-none focus:border-[#4DB6AC]"
+                  placeholder="NEW PASSWORD"
+                  required
+                  disabled={success}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-black/30 dark:text-white/30 hover:text-[#4DB6AC]"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 rounded-[2rem] px-10 py-7 text-lg font-bold focus:outline-none focus:border-[#4DB6AC]"
+                  placeholder="CONFIRM PASSWORD"
+                  required
+                  disabled={success}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-black/30 dark:text-white/30 hover:text-[#4DB6AC]"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             <motion.button
               type="submit"
               disabled={isLoading || success}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-[#E1784F] text-white font-black uppercase py-8 rounded-[2.5rem] flex items-center justify-center gap-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#4DB6AC] text-white font-black uppercase py-8 rounded-[2.5rem] flex items-center justify-center gap-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
               ) : success ? (
-                "CODE VERIFIED"
+                "SUCCESS"
               ) : (
                 <>
-                  VERIFY CODE <ArrowRight className="w-5 h-5" />
+                  RESET PASSWORD <ArrowRight className="w-5 h-5" />
                 </>
               )}
             </motion.button>
 
-            <div className="text-center pt-2">
+            <div className="text-center">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="text-sm font-bold text-black/50 dark:text-white/50 hover:text-[#E1784F] transition-colors"
+                className="text-sm font-bold text-black/50 dark:text-white/50 hover:text-[#4DB6AC] transition-colors"
               >
                 Back to login
               </button>

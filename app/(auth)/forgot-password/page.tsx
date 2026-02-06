@@ -18,24 +18,18 @@ export default function ForgotPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setSuccess(false)
     setIsLoading(true)
 
     try {
       await forgotPassword(email.trim())
-      setSuccess(true)
-      
-      // Redirect to reset-password page to enter code
-      setTimeout(() => {
-        router.push("/reset-password")
-      }, 1500)
+      // Navigate immediately without showing success message
+      router.push("/reset-password")
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
         err.message ||
         "Failed to process request. Please try again."
       setError(typeof message === "string" ? message : "An error occurred.")
-    } finally {
       setIsLoading(false)
     }
   }
@@ -81,18 +75,6 @@ export default function ForgotPasswordPage() {
                   {error}
                 </motion.div>
               )}
-
-              {success && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="py-4 px-6 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-600 dark:text-green-400 text-[10px] font-black uppercase flex items-center gap-3"
-                >
-                  <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                  Email verified! Redirecting to code input...
-                </motion.div>
-              )}
             </AnimatePresence>
 
             <div className="space-y-4">
@@ -103,20 +85,18 @@ export default function ForgotPasswordPage() {
                 className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 rounded-[2rem] px-10 py-7 text-lg font-bold focus:outline-none focus:border-[#E1784F]"
                 placeholder="EMAIL ADDRESS"
                 required
-                disabled={success}
+                disabled={isLoading}
               />
             </div>
 
             <motion.button
               type="submit"
-              disabled={isLoading || success}
+              disabled={isLoading}
               whileTap={{ scale: 0.98 }}
               className="w-full bg-[#E1784F] text-white font-black uppercase py-8 rounded-[2.5rem] flex items-center justify-center gap-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
-              ) : success ? (
-                "SENT"
               ) : (
                 <>
                   SEND RESET LINK <ArrowRight className="w-5 h-5" />
