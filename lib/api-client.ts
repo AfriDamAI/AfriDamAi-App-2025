@@ -141,6 +141,17 @@ export const markMessageAsRead = async (messageId: string): Promise<void> => {
   return response.data;
 };
 
+/** 👨‍⚕️ Specialists Endpoints **/
+export const getAllSpecialists = async () => {
+  const response = await apiClient.get("/specialists");
+  return response.data;
+};
+
+export const getSpecialistById = async (id: string) => {
+  const response = await apiClient.get(`/specialists/${id}`);
+  return response.data;
+};
+
 
 /** 🔬 AI SCAN MODULE **/
 // export async function uploadImage(file: File | string): Promise<any> {

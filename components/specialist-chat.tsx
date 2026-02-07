@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { MessageSquare, Send, User, PlusCircle, Search, MoreVertical, Paperclip, Smile, Phone, Video } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
+import { useRouter } from "next/navigation";
 import {
   initiateChat,
   getCurrentUserChats,
@@ -16,6 +17,7 @@ import { Chat, Message } from "@/lib/types";
 
 export const SpecialistChat = () => {
   const { user } = useAuth();
+  const router = useRouter();
   const CURRENT_USER_ID = user?.id || "";
   
   const [chats, setChats] = useState<Chat[]>([]);
@@ -122,16 +124,8 @@ export const SpecialistChat = () => {
     }
   };
 
-  const handleNewChat = async (specialistId: string) => {
-    try {
-      const newChat = await initiateChat(CURRENT_USER_ID, specialistId);
-      setChats((prevChats) => [...prevChats, newChat]);
-      setSelectedChat(newChat);
-      fetchUserChats();
-    } catch (err) {
-      setError("Failed to start new chat.");
-      console.error("Error starting new chat:", err);
-    }
+  const handleNewChat = () => {
+    router.push("/specialists-list")
   };
 
   return (
@@ -143,7 +137,7 @@ export const SpecialistChat = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Messages</h2>
             <button
-              onClick={() => handleNewChat("specialist456")}
+              onClick={handleNewChat}
               className="p-2 rounded-full hover:bg-[#4DB6AC]/10 text-[#4DB6AC] transition-all"
               title="New Chat"
             >
