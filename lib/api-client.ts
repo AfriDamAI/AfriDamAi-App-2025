@@ -94,11 +94,6 @@ export const forgotPassword = async (email: string) => {
   return response.data;
 };
 
-export const resetPassword = async (token: string, newPassword: string) => {
-  const response = await apiClient.post("/auth/reset-password", { token, newPassword });
-  return response.data;
-};
-
 /** 👤 USER PROFILE HANDSHAKE **/
 export const getProfile = async () => {
   const response = await apiClient.get("/users/me");
@@ -115,16 +110,48 @@ export const updateUser = async (id: string, updates: any) => {
   return response.data;
 };
 
-/** 📋 USER PROFILE DETAILS (ONBOARDING & UPDATES) **/
-export const createUserProfile = async (profileData: any) => {
-  const response = await apiClient.post("/profile", profileData);
+/** 💬 Multi-User Chat Endpoints **/
+export const initiateChat = async (participant1Id: string, participant2Id: string): Promise<Chat> => {
+  const response = await apiClient.post("/chats", { participant1Id, participant2Id });
   return response.data;
 };
 
-export const updateUserProfile = async (profileData: any) => {
-  const response = await apiClient.put("/profile", profileData);
+export const getCurrentUserChats = async (): Promise<Chat[]> => {
+  const response = await apiClient.get("/chats/me");
   return response.data;
 };
+
+export const getChatById = async (chatId: string): Promise<Chat> => {
+  const response = await apiClient.get(`/chats/${chatId}`);
+  return response.data;
+};
+
+export const getChatMessages = async (chatId: string): Promise<Message[]> => {
+  const response = await apiClient.get(`/chats/${chatId}/messages`);
+  return response.data;
+};
+
+export const sendUserChatMessage = async (chatId: string, senderId: string, message: string): Promise<Message> => {
+  const response = await apiClient.post("/chats/messages", { chatId, senderId, message });
+  return response.data;
+};
+
+export const markMessageAsRead = async (messageId: string): Promise<void> => {
+  const response = await apiClient.patch(`/chats/messages/${messageId}/read`);
+  return response.data;
+};
+
+/** 👨‍⚕️ Specialists Endpoints **/
+export const getAllSpecialists = async () => {
+  const response = await apiClient.get("/specialists");
+  return response.data;
+};
+
+export const getSpecialistById = async (id: string) => {
+  const response = await apiClient.get(`/specialists/${id}`);
+  return response.data;
+};
+
 
 /** 🔬 AI SCAN MODULE **/
 // export async function uploadImage(file: File | string): Promise<any> {
