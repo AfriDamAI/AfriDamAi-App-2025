@@ -40,6 +40,9 @@ export default function ProfilePage() {
     firstName: "",
     lastName: "",
     phoneNo: "",
+    ageRange: 0,
+    skinType: "",
+    skinToneLevel: 0,
   })
 
   useEffect(() => {
@@ -52,6 +55,9 @@ export default function ProfilePage() {
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         phoneNo: user.phoneNo || "",
+        ageRange: user.profile?.ageRange || 0,
+        skinType: user.profile?.skinType || "",
+        skinToneLevel: user.profile?.skinToneLevel || 0,
       })
     }
   }, [user])
@@ -93,7 +99,12 @@ export default function ProfilePage() {
       await apiClient.patch(`/user/${user.id}`, {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phoneNo: formData.phoneNo
+        phoneNo: formData.phoneNo,
+        profile: {
+          ageRange: formData.ageRange,
+          skinType: formData.skinType,
+          skinToneLevel: formData.skinToneLevel,
+        }
       })
       
       await mutate()
@@ -234,6 +245,41 @@ export default function ProfilePage() {
                         className="w-full bg-gray-100 dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-[1.8rem] py-6 pl-16 pr-8 font-bold opacity-30 text-base uppercase tracking-tight"
                       />
                     </div>
+                 </div>
+
+                 <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30 ml-4">Age</label>
+                    <input 
+                      type="number" 
+                      value={formData.ageRange}
+                      onChange={(e) => setFormData({...formData, ageRange: parseInt(e.target.value) || 0})}
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[1.8rem] py-6 px-8 font-bold focus:border-[#E1784F] outline-none transition-all text-base uppercase tracking-tight shadow-inner"
+                      placeholder="Your Age"
+                    />
+                 </div>
+
+                 <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30 ml-4">Skin Type</label>
+                    <input 
+                      type="text" 
+                      value={formData.skinType}
+                      onChange={(e) => setFormData({...formData, skinType: e.target.value})}
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[1.8rem] py-6 px-8 font-bold focus:border-[#E1784F] outline-none transition-all text-base uppercase tracking-tight shadow-inner"
+                      placeholder="e.g., Brown, Dark, Light"
+                    />
+                 </div>
+
+                 <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30 ml-4">Skin Tone Level (1-6)</label>
+                    <input 
+                      type="number" 
+                      min="1"
+                      max="6"
+                      value={formData.skinToneLevel}
+                      onChange={(e) => setFormData({...formData, skinToneLevel: parseInt(e.target.value) || 0})}
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[1.8rem] py-6 px-8 font-bold focus:border-[#E1784F] outline-none transition-all text-base uppercase tracking-tight shadow-inner"
+                      placeholder="Fitzpatrick Scale (1-6)"
+                    />
                  </div>
               </div>
 
