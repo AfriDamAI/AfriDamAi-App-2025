@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserLoginDto, CreateUserDto, AuthResponse } from "@/lib/types";
+import { UserLoginDto, CreateUserDto, AuthResponse, Chat, Message } from "@/lib/types";
 
 /**
  * 🛡️ AFRIDAM INFRASTRUCTURE SYNC
@@ -165,7 +165,7 @@ export const analyzeIngredients = async (ingredients: string, more_info: any) =>
   return response.data;
 };
 
-export const sendChatMessage = async (message: string, more_info: any) => {
+export const sendAnalyzerChatMessage = async (message: string, more_info: any) => {
   const response = await apiClient.post("/v1/chatbot", { query: message, more_info });
   return response.data;
 };

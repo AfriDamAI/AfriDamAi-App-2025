@@ -160,7 +160,7 @@ export function ChatWindow() {
                </button>
             </div>
 
-            <form onSubmit={handleSend} className="relative flex items-center">
+            {/* <form onSubmit={handleSend} className="relative flex items-center">
                <input
                   type="text"
                   value={input}
@@ -175,7 +175,7 @@ export function ChatWindow() {
                >
                   <Send size={16} />
                </button>
-            </form>
+            </form> */}
             <div className="mt-4 flex items-center justify-center gap-2 opacity-30">
                <ShieldCheck size={10} className="text-[#4DB6AC]" />
                <span className="text-[7px] font-black uppercase tracking-[0.3em]">Privacy Guaranteed</span>

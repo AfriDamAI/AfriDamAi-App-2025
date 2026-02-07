@@ -4,7 +4,7 @@ import { MessageSquare, X, Send, User, Bot, Zap, Info, Loader2 } from "lucide-re
 import { useTheme } from "@/providers/theme-provider"
 import { useAuth } from "@/providers/auth-provider" // 🚀 SYNC: Import useAuth to get user context
 // 🚀 SYNC: Using the verified chatbot endpoint from api-client
-import { sendChatMessage } from "@/lib/api-client"
+import { sendAnalyzerChatMessage } from "@/lib/api-client"
 
 interface Message {
   id: string
@@ -75,7 +75,7 @@ export function AIChatBot() {
         user_activeness_on_app: "very_high"
       };
       
-      const data = await sendChatMessage(currentInput, moreInfo);
+      const data = await sendAnalyzerChatMessage(currentInput, moreInfo);
       
       /**
        * 🛡️ DATA EXTRACTION (Rule 7)
