@@ -116,6 +116,12 @@ export default function LoginPage() {
             >
               {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>SIGN IN <ArrowRight className="w-5 h-5" /></>}
             </motion.button>
+
+            <div className="text-center pt-4">
+              <Link href="/forgot-password" className="text-sm font-bold text-black/50 dark:text-white/50 hover:text-[#E1784F] transition-colors">
+                Forgot your password?
+              </Link>
+            </div>
           </form>
         </div>
       </motion.div>
