@@ -126,39 +126,7 @@ export const updateUserProfile = async (profileData: any) => {
   return response.data;
 };
 
-/** 🔬 AI SCAN MODULE **/
-// export async function uploadImage(file: File | string): Promise<any> {
-//   const formData = new FormData();
-//   if (typeof file === 'string') {
-//     try {
-//       const parts = file.split(',');
-//       const byteString = atob(parts[1]);
-//       const mimeString = parts[0].split(':')[1].split(';')[0];
-//       const ab = new ArrayBuffer(byteString.length);
-//       const ia = new Uint8Array(ab);
-//       for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-//       const blob = new Blob([ab], { type: mimeString });
-//       formData.append("file", blob, "scan_capture.jpg");
-//     } catch (e) { console.error("Image Processing Error:", e); }
-//   } else {
-//     formData.append("file", file);
-//   }
-//   // Default AI context
-//   formData.append("more_info", JSON.stringify({
-//     region: "West Africa",
-//     country: "Nigeria",
-//     known_skintone_type: "not_specified",
-//     gender: "female", 
-//     age: 25,
-//     known_allergies: [], 
-//     user_activeness_on_app: "moderate" 
-//   }));
-  
-//   const response = await axios.post(`${aiURL}/skin-diagnosis`, formData, {
-//     headers: { "Content-Type": "multipart/form-data" },
-//   });
-//   return response.data;
-// }
+// Work in progress
 
 export const analyzeIngredients = async (ingredients: string, more_info: any) => {
   const response = await apiClient.post("/v1/ingredients-analysis", { query: ingredients, more_info });
