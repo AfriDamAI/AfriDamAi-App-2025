@@ -94,6 +94,11 @@ export const forgotPassword = async (email: string) => {
   return response.data;
 };
 
+export const resetPassword = async (token: string, newPassword: string) => {
+  const response = await apiClient.post("/auth/reset-password", { token, newPassword });
+  return response.data;
+};
+
 /** 👤 USER PROFILE HANDSHAKE **/
 export const getProfile = async () => {
   const response = await apiClient.get("/users/me");
@@ -107,6 +112,16 @@ export const getUser = async (id: string) => {
 
 export const updateUser = async (id: string, updates: any) => {
   const response = await apiClient.patch(`/user/${id}`, updates);
+  return response.data;
+};
+
+export const createUserProfile = async (profileData: any) => {
+  const response = await apiClient.post("/profile", profileData);
+  return response.data;
+};
+
+export const updateUserProfile = async (id: string, profileData: any) => {
+  const response = await apiClient.patch(`/profile/${id}`, profileData);
   return response.data;
 };
 
