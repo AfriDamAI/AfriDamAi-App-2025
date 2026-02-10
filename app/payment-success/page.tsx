@@ -35,7 +35,7 @@ function PaymentSuccessContent() {
         const verifyTransaction = async () => {
             try {
                 const token = localStorage.getItem('token')
-                const response = await fetch(`${environment.backendUrl}/transactions/verify/${reference}`, {
+                const response = await fetch(`${environment.backendUrl}/transactions/reference/${reference}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -45,11 +45,17 @@ function PaymentSuccessContent() {
 
                 const result = await response.json()
 
-                if (response.ok && result.status === 'SUCCESS') {
+                // 🛡️ Rule 7 Sync: Support both legacy 'SUCCESS' and modern 'COMPLETED' statuses
+                // Also handles the resultData wrapper common in NestJS APIs
+                const data = result.resultData || result;
+                const isSuccessful = data.status === 'SUCCESS' || data.status === 'COMPLETED';
+
+                if (response.ok && isSuccessful) {
                     setStatus('success')
                     setMessage("Your transaction was successful!")
-                    setTransactionData(result)
+                    setTransactionData(data)
                 } else {
+                    console.error("Payment Verification Failed:", result);
                     setStatus('failed')
                     setMessage(result.message || "Transaction verification failed.")
                 }
