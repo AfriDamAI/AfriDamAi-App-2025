@@ -284,4 +284,35 @@ export const analyzeSkinWithUserData = async (imgSource: string, userContext: an
   return response.data;
 };
 
+/** 📅 APPOINTMENTS MODULE **/
+export const checkAppointmentEligibility = async () => {
+  const response = await apiClient.get("/appointments/eligibility");
+  return response.data;
+};
+
+export const createAppointment = async (data: {
+  subscriptionId?: string;
+  specialty: "DERMATOLOGIST" | "CONSULTANT";
+  scheduledAt: string;
+  notes?: string;
+}) => {
+  const response = await apiClient.post("/appointments", data);
+  return response.data;
+};
+
+export const getMyAppointments = async () => {
+  const response = await apiClient.get("/appointments");
+  return response.data;
+};
+
+export const getAppointmentPricing = async () => {
+  const response = await apiClient.get("/appointments/pricing");
+  return response.data;
+};
+
+export const getUserSubscriptions = async () => {
+  const response = await apiClient.get("/subscriptions");
+  return response.data;
+};
+
 export default apiClient;
