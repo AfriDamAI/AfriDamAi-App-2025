@@ -70,7 +70,7 @@ const nextConfig = {
     return [
       {
         source: '/api/proxy/:path*',
-        destination: 'https://afridamai-backend.onrender.com/api/:path*',
+        destination: 'https://afridam-backend-prod-107032494605.us-central1.run.app/api/:path*',
       },
     ];
   },
