@@ -24,7 +24,7 @@ import {
   CheckCircle2
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { apiClient } from "@/lib/api-client" 
+import { apiClient, getImageUrl } from "@/lib/api-client" 
 
 export default function ProfilePage() {
   const { user, signOut, mutate } = useAuth()
@@ -34,12 +34,21 @@ export default function ProfilePage() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(user?.profile?.avatarUrl || null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (user?.profile?.avatarUrl) {
+      setPreviewUrl(getImageUrl(user.profile.avatarUrl))
+    }
+  }, [user?.profile?.avatarUrl])
 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     phoneNo: "",
+    ageRange: 0,
+    skinType: "",
+    skinToneLevel: 0,
   })
 
   useEffect(() => {
@@ -52,6 +61,9 @@ export default function ProfilePage() {
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         phoneNo: user.phoneNo || "",
+        ageRange: user.profile?.ageRange || 0,
+        skinType: user.profile?.skinType || "",
+        skinToneLevel: user.profile?.skinToneLevel || 0,
       })
     }
   }, [user])
@@ -68,14 +80,27 @@ export default function ProfilePage() {
       const data = new FormData()
       data.append('file', file) 
 
-      // 🚀 THE HANDSHAKE: Synced with NestJS UserModule upload
-      await apiClient.post('/user/avatar', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      // 🚀 THE FIX: 2-Step Upload Process
+      // 1. Upload to storage via our reliable Next.js API route
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        body: data
+      })
+      
+      if (!uploadRes.ok) throw new Error('Upload failed')
+      
+      const { imageUrl } = await uploadRes.json()
+
+      // 2. Patch the user profile with the new URL
+      await apiClient.patch(`/user/${user.id}`, {
+        profile: {
+          avatarUrl: imageUrl
+        }
       })
 
       await mutate()
     } catch (err) {
-      console.log("Photo sync pending...")
+      console.log("Photo sync failed")
     } finally {
       setUploadingAvatar(false)
     }
@@ -93,7 +118,12 @@ export default function ProfilePage() {
       await apiClient.patch(`/user/${user.id}`, {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phoneNo: formData.phoneNo
+        phoneNo: formData.phoneNo,
+        profile: {
+          ageRange: formData.ageRange,
+          skinType: formData.skinType,
+          skinToneLevel: formData.skinToneLevel,
+        }
       })
       
       await mutate()
@@ -234,6 +264,41 @@ export default function ProfilePage() {
                         className="w-full bg-gray-100 dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-[1.8rem] py-6 pl-16 pr-8 font-bold opacity-30 text-base uppercase tracking-tight"
                       />
                     </div>
+                 </div>
+
+                 <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30 ml-4">Age</label>
+                    <input 
+                      type="number" 
+                      value={formData.ageRange}
+                      onChange={(e) => setFormData({...formData, ageRange: parseInt(e.target.value) || 0})}
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[1.8rem] py-6 px-8 font-bold focus:border-[#E1784F] outline-none transition-all text-base uppercase tracking-tight shadow-inner"
+                      placeholder="Your Age"
+                    />
+                 </div>
+
+                 <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30 ml-4">Skin Type</label>
+                    <input 
+                      type="text" 
+                      value={formData.skinType}
+                      onChange={(e) => setFormData({...formData, skinType: e.target.value})}
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[1.8rem] py-6 px-8 font-bold focus:border-[#E1784F] outline-none transition-all text-base uppercase tracking-tight shadow-inner"
+                      placeholder="e.g., Brown, Dark, Light"
+                    />
+                 </div>
+
+                 <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30 ml-4">Skin Tone Level (1-6)</label>
+                    <input 
+                      type="number" 
+                      min="1"
+                      max="6"
+                      value={formData.skinToneLevel}
+                      onChange={(e) => setFormData({...formData, skinToneLevel: parseInt(e.target.value) || 0})}
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[1.8rem] py-6 px-8 font-bold focus:border-[#E1784F] outline-none transition-all text-base uppercase tracking-tight shadow-inner"
+                      placeholder="Fitzpatrick Scale (1-6)"
+                    />
                  </div>
               </div>
 

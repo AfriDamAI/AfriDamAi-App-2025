@@ -10,6 +10,9 @@ import {
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { apiClient, getScanHistory, deleteScanResult } from "@/lib/api-client"
+import { hasFeatureAccess, SubscriptionTier } from "@/app/tier-config/route"
+import { HistoryLock, DownloadLock, SharingLock } from "@/components/feature-locks"
+import { SubscriptionModal } from "@/components/subscription-modal"
 
 /**
  * 🛡️ AFRIDAM CLINICAL DIARY: HISTORY (Rule 6 Synergy)
@@ -26,6 +29,8 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true)
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
+  const [lockType, setLockType] = useState<"download" | "sharing" | null>(null)
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/")
@@ -70,6 +75,10 @@ export default function HistoryPage() {
   }
 
   const handleDownload = () => {
+    if (!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'downloads')) {
+      setLockType("download")
+      return
+    }
     window.print();
   };
 
@@ -129,71 +138,79 @@ export default function HistoryPage() {
               <Loader2 className="animate-spin text-[#E1784F] w-8 h-8" />
               <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20">Accessing Cloud Diary</p>
             </div>
-          ) : history.length === 0 ? (
-            <div className="py-32 flex flex-col items-center justify-center text-center space-y-8 border-2 border-dashed border-black/5 dark:border-white/5 rounded-[3rem]">
-              <CalendarDays size={32} className="opacity-10" />
-              <div className="space-y-2 px-6">
-                <h3 className="text-2xl font-black italic uppercase tracking-tighter">Diary is Empty</h3>
-                <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20">Your journey begins with your first dermal scan.</p>
+        {!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'skinDiary') ? (
+          <HistoryLock onUnlock={() => setShowSubscriptionModal(true)} />
+        ) : (
+          <div className="min-h-[400px]">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-32 space-y-4 animate-pulse">
+                <Loader2 className="animate-spin text-[#E1784F] w-8 h-8" />
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-20">Retrieving Clinical Records</p>
               </div>
-              <button
-                onClick={() => router.push('/ai-scanner')}
-                className="px-10 py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl active:scale-95 transition-all"
-              >
-                Start New Scan
-              </button>
-            </div>
-          ) : (
-            <div className="grid gap-6">
-              <AnimatePresence mode="popLayout">
-                {history.filter(r => filter === 'all' || r.type === filter).map((record, i) => (
-                  <motion.div
-                    key={record.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[2.5rem] p-6 md:p-10 flex flex-col md:flex-row justify-between items-center gap-6"
-                  >
-                    <div className="flex items-center gap-6 w-full">
-                      <div className={`w-16 h-16 md:w-20 md:h-20 rounded-3xl flex items-center justify-center shrink-0 ${record.type === "skin" ? "bg-[#E1784F]/10 text-[#E1784F]" : "bg-[#4DB6AC]/10 text-[#4DB6AC]"
-                        }`}>
-                        {record.type === "skin" ? <Activity size={28} /> : <Zap size={28} />}
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-3 opacity-30">
-                          <span className="text-[8px] font-black uppercase tracking-widest">
-                            {new Date(record.createdAt).toLocaleDateString()}
-                          </span>
-                          <span className="text-[8px] font-black uppercase tracking-widest italic">• {record.id.slice(0, 8)}</span>
+            ) : history.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <AnimatePresence>
+                  {history.filter(r => filter === 'all' || r.type === filter).map((scan, idx) => (
+                    <motion.div
+                      key={scan.id || idx}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="group relative bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[3rem] p-8 hover:border-[#E1784F]/30 transition-all cursor-pointer shadow-sm hover:shadow-xl"
+                      onClick={() => setSelectedRecord(scan)}
+                    >
+                      <div className="flex items-start justify-between mb-8">
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white ${scan.type === "skin" ? "bg-[#E1784F]" : "bg-[#4DB6AC]"
+                          }`}>
+                          {scan.type === "skin" ? <Activity size={28} /> : <Zap size={28} />}
                         </div>
-                        <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter leading-none">
-                          {record.title || 'Diagnostic Review'}
-                        </h3>
+                        <div className="text-right">
+                          <p className="text-[8px] font-black uppercase tracking-widest opacity-30 mb-1">Scanned On</p>
+                          <p className="text-[10px] font-bold">{new Date(scan.createdAt).toLocaleDateString()}</p>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-3 w-full md:w-auto">
-                      <button
-                        onClick={() => setSelectedRecord(record)}
-                        className="flex-1 md:flex-none h-16 px-8 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[9px] tracking-widest shadow-lg transition-all active:scale-95"
-                      >
-                        Open Report
-                      </button>
-                      <button
-                        onClick={() => handleDelete(record.id)}
-                        className="w-16 h-16 rounded-2xl bg-red-500/5 text-red-500/20 hover:text-red-500 hover:bg-red-500/10 transition-all flex items-center justify-center"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <p className="text-[8px] font-black uppercase tracking-widest text-[#4DB6AC]">Clinical Observation</p>
+                          <h3 className="text-xl font-black italic uppercase tracking-tighter leading-none group-hover:text-[#E1784F] transition-colors line-clamp-1">
+                            {scan.title || "Diagnostic Review"}
+                          </h3>
+                        </div>
+
+                        <p className="text-[11px] font-medium leading-relaxed opacity-60 line-clamp-2 italic">
+                          "{scan.description?.split('\n')[1]?.replace(/\d\.\sEXPLANATION:\s/, '') || "Click to view full clinical details and management plan."}"
+                        </p>
+                      </div>
+
+                      <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-[#4DB6AC]" />
+                          <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40">System Verified</span>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletingId(scan.id);
+                          }}
+                          className="p-2 text-black/30 dark:text-white/30 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="min-h-[400px] flex flex-col items-center justify-center space-y-6 opacity-20 text-center">
+                <History size={48} strokeWidth={1} />
+                <p className="text-[9px] font-black uppercase tracking-[0.4em]">Your Clinical Diary is empty</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* MODAL: CLINICAL FINDINGS */}
         <AnimatePresence>
@@ -327,6 +344,33 @@ export default function HistoryPage() {
             </div>
           )}
         </AnimatePresence>
+
+        {/* 🛡️ PREMIUM FEATURES LOCKS */}
+        <AnimatePresence>
+          {lockType === "download" && (
+            <DownloadLock 
+              onUnlock={() => {
+                setLockType(null)
+                setShowSubscriptionModal(true)
+              }} 
+              onClose={() => setLockType(null)} 
+            />
+          )}
+          {lockType === "sharing" && (
+            <SharingLock 
+              onUnlock={() => {
+                setLockType(null)
+                setShowSubscriptionModal(true)
+              }} 
+              onClose={() => setLockType(null)} 
+            />
+          )}
+        </AnimatePresence>
+
+        <SubscriptionModal 
+          isOpen={showSubscriptionModal} 
+          onClose={() => setShowSubscriptionModal(false)} 
+        />
       </div>
     </main>
   )
