@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Forward the request to the backend with the user's auth token
-        const response = await fetch('https://afridamai-backend.onrender.com/api/pricing-plans', {
+        const response = await fetch('https://afridam-backend-prod-107032494605.us-central1.run.app/api/pricing-plans', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

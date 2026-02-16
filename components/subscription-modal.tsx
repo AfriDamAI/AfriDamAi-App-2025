@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { Check, X, Sparkles, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { PricingList } from "./pricing-list"
 
 interface SubscriptionModalProps {
     isOpen: boolean
@@ -48,43 +49,21 @@ export function SubscriptionModal({ isOpen, onClose }: SubscriptionModalProps) {
                     </div>
 
                     {/* Content */}
-                    <div className="p-8 space-y-8">
-                        <div className="space-y-4">
-                            <div className="flex items-start gap-4">
-                                <div className="w-8 h-8 rounded-full bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F] shrink-0">
-                                    <Check size={14} strokeWidth={3} />
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-black uppercase tracking-wide">Unlimited AI Scans</h4>
-                                    <p className="text-xs opacity-60 mt-1">Get unlimited access to our advanced skin analysis AI.</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <div className="w-8 h-8 rounded-full bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F] shrink-0">
-                                    <Check size={14} strokeWidth={3} />
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-black uppercase tracking-wide">Priority Specialist Review</h4>
-                                    <p className="text-xs opacity-60 mt-1">Skip the queue and get your results reviewed faster.</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <div className="w-8 h-8 rounded-full bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F] shrink-0">
-                                    <Check size={14} strokeWidth={3} />
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-black uppercase tracking-wide">Advanced Analytics</h4>
-                                    <p className="text-xs opacity-60 mt-1">Track your skin's progress with detailed charts and history.</p>
-                                </div>
-                            </div>
+                    <div className="p-8 md:p-12 space-y-10 max-h-[70vh] overflow-y-auto no-scrollbar">
+                        <div className="text-center space-y-2">
+                            <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-none">Unleash Full <span className="text-[#E1784F]">Potential</span></h3>
+                            <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest">Select a plan to activate instant access to premium tools.</p>
                         </div>
+                        
+                        <PricingList />
+                    </div>
 
-                        <button
-                            onClick={() => router.push('/plans')}
-                            className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3 hover:bg-[#c9623c]"
-                        >
-                            View All Plans <ArrowRight size={14} />
-                        </button>
+                    <div className="p-8 bg-gray-50 dark:bg-white/[0.02] border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+                        <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-30">Secure checkout via AfriDam Pay</p>
+                        <div className="flex gap-2">
+                             <div className="w-8 h-4 bg-black/5 dark:bg-white/5 rounded" />
+                             <div className="w-8 h-4 bg-black/5 dark:bg-white/5 rounded" />
+                        </div>
                     </div>
 
                 </motion.div>
