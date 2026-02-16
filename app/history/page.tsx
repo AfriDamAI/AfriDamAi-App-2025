@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   Trash2, Eye, Clock, ChevronLeft, Loader2,
   Sparkles, Heart, Activity, Search, ShieldAlert,
-  CalendarDays, Zap, ArrowRight
+  CalendarDays, Zap, ArrowRight, History
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { apiClient, getScanHistory, deleteScanResult } from "@/lib/api-client"
@@ -138,10 +138,10 @@ export default function HistoryPage() {
               <Loader2 className="animate-spin text-[#E1784F] w-8 h-8" />
               <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20">Accessing Cloud Diary</p>
             </div>
-        {!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'skinDiary') ? (
-          <HistoryLock onUnlock={() => setShowSubscriptionModal(true)} />
-        ) : (
-          <div className="min-h-[400px]">
+          ) : !hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'skinDiary') ? (
+            <HistoryLock onUnlock={() => setShowSubscriptionModal(true)} />
+          ) : (
+            <div className="min-h-[400px]">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-32 space-y-4 animate-pulse">
                 <Loader2 className="animate-spin text-[#E1784F] w-8 h-8" />
@@ -211,6 +211,7 @@ export default function HistoryPage() {
             )}
           </div>
         )}
+        </div>
 
         {/* MODAL: CLINICAL FINDINGS */}
         <AnimatePresence>

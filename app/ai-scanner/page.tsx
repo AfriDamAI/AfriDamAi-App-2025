@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation"
 import {
   ChevronLeft, CheckCircle2, Zap, ZapOff,
   RotateCcw, Scan, Info, ShieldCheck,
-  ArrowRight, Binary, Fingerprint, Search, SwitchCamera
+  ArrowRight, Binary, Fingerprint, Search, SwitchCamera, Lock
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { analyzeSkinWithUserData } from "@/lib/api-client"
@@ -421,7 +421,27 @@ export default function UnifiedScanner() {
                       }, []).map((item: any) => {
                          if (item.type === 'restricted_header') {
                             if (!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'detailedAnalysis')) {
-                                return null; // Completely hide for free users
+                                return (
+                                  <div key={`locked-${item.index}`} className="mt-8 p-6 bg-gray-50 dark:bg-white/5 rounded-[2rem] border border-dashed border-[#E1784F]/30 flex flex-col items-center justify-center text-center space-y-4">
+                                    <div className="w-12 h-12 rounded-full bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F]">
+                                       <Lock size={20} />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <p className="text-[10px] font-black uppercase tracking-widest text-[#E1784F]">
+                                        Premium Insight
+                                      </p>
+                                      <p className="text-xs font-medium opacity-60 max-w-xs mx-auto">
+                                        Subscribe to Premium to view detailed possibilities and advanced clinical breakdown.
+                                      </p>
+                                    </div>
+                                    <button 
+                                      onClick={() => setShowSubscriptionModal(true)}
+                                      className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-lg hover:scale-105 transition-transform"
+                                    >
+                                      Upgrade Now
+                                    </button>
+                                  </div>
+                                );
                             }
                             return (
                                 <h4 key={item.index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
