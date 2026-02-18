@@ -24,7 +24,7 @@ import {
   CheckCircle2
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { apiClient, getImageUrl } from "@/lib/api-client" 
+import { apiClient } from "@/lib/api-client" 
 
 export default function ProfilePage() {
   const { user, signOut, mutate } = useAuth()
@@ -34,13 +34,7 @@ export default function ProfilePage() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (user?.profile?.avatarUrl) {
-      setPreviewUrl(getImageUrl(user.profile.avatarUrl))
-    }
-  }, [user?.profile?.avatarUrl])
+  const [previewUrl, setPreviewUrl] = useState<string | null>(user?.profile?.avatarUrl || null)
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -80,27 +74,14 @@ export default function ProfilePage() {
       const data = new FormData()
       data.append('file', file) 
 
-      // 🚀 THE FIX: 2-Step Upload Process
-      // 1. Upload to storage via our reliable Next.js API route
-      const uploadRes = await fetch('/api/upload', {
-        method: 'POST',
-        body: data
-      })
-      
-      if (!uploadRes.ok) throw new Error('Upload failed')
-      
-      const { imageUrl } = await uploadRes.json()
-
-      // 2. Patch the user profile with the new URL
-      await apiClient.patch(`/user/${user.id}`, {
-        profile: {
-          avatarUrl: imageUrl
-        }
+      // 🚀 THE HANDSHAKE: Synced with NestJS UserModule upload
+      await apiClient.post('/user/avatar', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       })
 
       await mutate()
     } catch (err) {
-      console.log("Photo sync failed")
+      console.log("Photo sync pending...")
     } finally {
       setUploadingAvatar(false)
     }

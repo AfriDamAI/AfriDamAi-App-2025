@@ -250,7 +250,7 @@ export default function LandingPage() {
               <p className="text-[10px] font-black uppercase tracking-widest text-[#E1784F]">Navigation</p>
               <ul className="space-y-5 text-[10px] font-black uppercase tracking-widest opacity-30">
                 <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => router.push('/mission')}>Mission</li>
-                <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => handleFeatureAccess('/marketplace')}>Market Place</li>
+                <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => handleFeatureAccess('/marketplace')}>Care Hub</li>
               </ul>
             </div>
             <div className="space-y-8">
