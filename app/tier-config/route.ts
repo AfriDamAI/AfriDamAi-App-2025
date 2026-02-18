@@ -25,8 +25,8 @@ export const TIER_CONFIG: Record<SubscriptionTier, FeatureAccess> = {
     screenshots: false,
     unlimitedScans: false,
     priorityReview: false,
-    uploadFromDevice: false,
-    detailedAnalysis: false,
+    uploadFromDevice: true,
+    detailedAnalysis: true,
   },
   premium: {
     downloads: true,

@@ -192,6 +192,7 @@ export default function UnifiedScanner() {
         description: data?.description || "",
         severity: data?.severity_score || data?.severity || 0,
         conditions: data?.conditions || [],
+        predictions: data?.predictions || {}, // 🚀 Added predictions for Confidence Matrix
         image: imgSource,
         id: data?.id || "TEMP-" + Date.now()
       };
@@ -319,25 +320,9 @@ export default function UnifiedScanner() {
                     <button onClick={startCamera} className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg flex items-center justify-center gap-2">
                       <Scan size={14} /> Take Photo with Camera
                     </button>
-                    <div className="relative">
-                      <button 
-                        onClick={() => {
-                          if (!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'uploadFromDevice')) {
-                            setLockType("upload");
-                            return;
-                          }
-                          fileInputRef.current?.click();
-                        }}
-                        className="w-full py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex flex-col items-center justify-center gap-2 shadow-lg h-auto min-h-[5rem]"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Search size={14} /> Choose Image from Device
-                        </div>
-                        {!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'uploadFromDevice') && (
-                          <LockedBadge feature="Premium Feature" size="sm" />
-                        )}
-                      </button>
-                    </div>
+                    <button onClick={() => fileInputRef.current?.click()} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg">
+                      <Search size={14} /> Choose Image from Device
+                    </button>
                     <input
                       type="file"
                       ref={fileInputRef}
@@ -391,81 +376,63 @@ export default function UnifiedScanner() {
                   {/* FORMATTED CLINICAL FINDINGS */}
                   <div className="space-y-6">
                     {results.description ? (
-                      results.description.split('\n').reduce((acc: any[], line: string, index: number) => {
+                      results.description.split('\n').map((line: string, index: number) => {
                         const cleanLine = line.replace(/\*/g, '').trim();
-                        if (!cleanLine) return acc;
-
-                        // Check for Restricted Section
-                        if (cleanLine.includes("OTHER POSSIBILITIES")) {
-                           acc.push({ type: 'restricted_header', content: cleanLine, index });
-                           return acc;
-                        }
-                        
-                        // If we already hit the restriction for free users, skip subsequent lines (assuming they belong to that section)
-                        // This simplistic logic assumes 'OTHER POSSIBILITIES' is the last section or we want to hide everything after it.
-                        // Based on the user prompt "Should not be visible", hiding it is the goal.
-                        const hasAccess = hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'detailedAnalysis');
-                        const isRestrictedSection = acc.some(item => item.type === 'restricted_header');
-
-                        if (isRestrictedSection && !hasAccess) {
-                            return acc;
-                        }
+                        if (!cleanLine) return null;
 
                         // Header Detection (1., 2., 3., etc)
-                        if (cleanLine.match(/^\d\./)) {
-                          acc.push({ type: 'header', content: cleanLine, index });
-                        } else {
-                          acc.push({ type: 'text', content: cleanLine, index });
+                        if (cleanLine.match(/^\d\./) || cleanLine.includes("OTHER POSSIBILITIES")) {
+                          return (
+                            <h4 key={index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
+                              {cleanLine}
+                            </h4>
+                          );
                         }
-                        return acc;
-                      }, []).map((item: any) => {
-                         if (item.type === 'restricted_header') {
-                            if (!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'detailedAnalysis')) {
-                                return (
-                                  <div key={`locked-${item.index}`} className="mt-8 p-6 bg-gray-50 dark:bg-white/5 rounded-[2rem] border border-dashed border-[#E1784F]/30 flex flex-col items-center justify-center text-center space-y-4">
-                                    <div className="w-12 h-12 rounded-full bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F]">
-                                       <Lock size={20} />
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-[10px] font-black uppercase tracking-widest text-[#E1784F]">
-                                        Premium Insight
-                                      </p>
-                                      <p className="text-xs font-medium opacity-60 max-w-xs mx-auto">
-                                        Subscribe to Premium to view detailed possibilities and advanced clinical breakdown.
-                                      </p>
-                                    </div>
-                                    <button 
-                                      onClick={() => setShowSubscriptionModal(true)}
-                                      className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-lg hover:scale-105 transition-transform"
-                                    >
-                                      Upgrade Now
-                                    </button>
-                                  </div>
-                                );
-                            }
-                            return (
-                                <h4 key={item.index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
-                                  {item.content}
-                                </h4>
-                            );
-                         }
-                         if (item.type === 'header') {
-                            return (
-                                <h4 key={item.index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
-                                  {item.content}
-                                </h4>
-                            );
-                         }
-                         return (
-                            <p key={item.index} className="text-xs md:text-sm font-medium leading-relaxed opacity-80 dark:text-gray-300">
-                              {item.content}
-                            </p>
-                         );
+                        // Detail Content
+                        return (
+                          <p key={index} className="text-xs md:text-sm font-medium leading-relaxed opacity-80 dark:text-gray-300">
+                            {cleanLine}
+                          </p>
+                        );
                       })
                     ) : (
                       <p className="text-center opacity-40 italic">Processing clinical details...</p>
                     )}
                   </div>
+                  
+                  {/* 📊 NEW: AI CONFIDENCE MATRIX (OTHER POSSIBILITIES) */}
+                  {results.predictions && Object.keys(results.predictions).length > 0 && (
+                    <section className="bg-gray-50 dark:bg-white/5 rounded-[2rem] p-8 space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#E1784F]" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Other Possibilities</p>
+                      </div>
+                      <div className="space-y-4">
+                        {Object.entries(results.predictions)
+                          .sort(([, a]: any, [, b]: any) => b - a)
+                          .slice(1, 5) // Skip the first one as it's the main diagnosis
+                          .map(([key, value]: any) => (
+                            <div key={key} className="flex justify-between items-center group">
+                              <span className="text-xs font-bold uppercase tracking-tight opacity-70 group-hover:opacity-100 transition-opacity">
+                                {key.replace(/[\[\]']/g, '')}
+                              </span>
+                              <div className="flex items-center gap-4 flex-1 mx-6">
+                                <div className="flex-1 h-[2px] bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${value * 100}%` }}
+                                    className="h-full bg-[#E1784F]/40"
+                                  />
+                                </div>
+                                <span className="text-[10px] font-black text-[#E1784F] w-12 text-right">
+                                  {(value * 100).toFixed(2)}%
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </section>
+                  )}
 
                   {/* METADATA SUMMARY */}
                   <div className="flex justify-between items-center py-6 px-8 bg-gray-50 dark:bg-white/5 rounded-3xl">

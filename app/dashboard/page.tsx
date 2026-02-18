@@ -23,7 +23,7 @@ import Link from "next/link"
 
 export default function Dashboard() {
   const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth() as any
+  const { user, isLoading: authLoading, mutate } = useAuth()
 
   const [history, setHistory] = useState<any[]>([])
   const [loadingHistory, setLoadingHistory] = useState(true)
@@ -32,7 +32,7 @@ export default function Dashboard() {
   const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false)
   const [lockType, setLockType] = useState<"download" | "sharing" | null>(null)
 
-  const firstName = user?.firstName || user?.displayName?.split(' ')[0] || "User"
+  const firstName = user?.firstName || "User"
   const initials = user
     ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || user.firstName?.charAt(1) || ''}`.toUpperCase()
     : "A"
@@ -55,6 +55,19 @@ export default function Dashboard() {
     }
     if (user?.id) fetchHistory()
   }, [user?.id])
+
+  // 🛡️ REFRESH HANDSHAKE: Ensure tier updates immediately after payment redirect
+  useEffect(() => {
+    const handleFocus = () => {
+      mutate();
+    };
+
+    // Refresh on mount to catch redirect updates
+    mutate();
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [mutate]);
 
   // 💳 PAYSTACK HANDSHAKE
   const config = {
