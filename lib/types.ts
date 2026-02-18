@@ -20,6 +20,30 @@ export interface CreateUserDto {
   nationality?: string;
 }
 
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  sex: string;
+  phoneNo: string;
+  role: string;
+  onboardingCompleted: boolean;
+  subscriptionTier?: string;
+  profile?: {
+    nationality?: string;
+    age?: number;
+    skinType?: string;
+    skinCondition?: string;
+    bodyLotion?: string;
+    bodyLotionBrand?: string;
+    allergies?: string[];
+    lastSkinTreatment?: string;
+    lastConsultation?: string;
+    [key: string]: any;
+  };
+}
+
 /**
  * 🚀 THE SYNERGY FIX: WRAPPED AUTH RESPONSE
  * Synced with the 2026 NestJS 'resultData' Envelope.
@@ -33,14 +57,7 @@ export interface AuthResponse {
     isActive: boolean;
     displayName:string;
     role: string;
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      sex: string;
-      phoneNo: string;
-    };
+    user: User;
   };
 }
 

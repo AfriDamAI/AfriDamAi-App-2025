@@ -27,7 +27,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const authRoutes = ["/login", "/register", "/forgot-password"];
 
   const hideFooterRoutes = [
-    "/dashboard", "/profile", "/ai-scanner", "/ingredient-analyzer",
+    "/dashboard", "/profile", "/ai-scanner", "/plans",
     "/marketplace", "/specialist", "/history", ...authRoutes
   ];
 

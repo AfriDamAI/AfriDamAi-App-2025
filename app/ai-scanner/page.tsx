@@ -12,10 +12,13 @@ import { useRouter } from "next/navigation"
 import {
   ChevronLeft, CheckCircle2, Zap, ZapOff,
   RotateCcw, Scan, Info, ShieldCheck,
-  ArrowRight, Binary, Fingerprint, Search, SwitchCamera
+  ArrowRight, Binary, Fingerprint, Search, SwitchCamera, Lock
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { analyzeSkinWithUserData } from "@/lib/api-client"
+import { hasFeatureAccess, SubscriptionTier } from "@/app/tier-config/route"
+import { DownloadLock, SharingLock, UploadLock, LockedBadge } from "@/components/feature-locks"
+import { SubscriptionModal } from "@/components/subscription-modal"
 
 export default function UnifiedScanner() {
   const router = useRouter()
@@ -30,6 +33,8 @@ export default function UnifiedScanner() {
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
   const [isTorchOn, setIsTorchOn] = useState(false)
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
+  const [lockType, setLockType] = useState<"download" | "sharing" | "upload" | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -314,9 +319,25 @@ export default function UnifiedScanner() {
                     <button onClick={startCamera} className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg flex items-center justify-center gap-2">
                       <Scan size={14} /> Take Photo with Camera
                     </button>
-                    <button onClick={() => fileInputRef.current?.click()} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg">
-                      <Search size={14} /> Choose Image from Device
-                    </button>
+                    <div className="relative">
+                      <button 
+                        onClick={() => {
+                          if (!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'uploadFromDevice')) {
+                            setLockType("upload");
+                            return;
+                          }
+                          fileInputRef.current?.click();
+                        }}
+                        className="w-full py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex flex-col items-center justify-center gap-2 shadow-lg h-auto min-h-[5rem]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Search size={14} /> Choose Image from Device
+                        </div>
+                        {!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'uploadFromDevice') && (
+                          <LockedBadge feature="Premium Feature" size="sm" />
+                        )}
+                      </button>
+                    </div>
                     <input
                       type="file"
                       ref={fileInputRef}
@@ -370,24 +391,76 @@ export default function UnifiedScanner() {
                   {/* FORMATTED CLINICAL FINDINGS */}
                   <div className="space-y-6">
                     {results.description ? (
-                      results.description.split('\n').map((line: string, index: number) => {
+                      results.description.split('\n').reduce((acc: any[], line: string, index: number) => {
                         const cleanLine = line.replace(/\*/g, '').trim();
-                        if (!cleanLine) return null;
+                        if (!cleanLine) return acc;
+
+                        // Check for Restricted Section
+                        if (cleanLine.includes("OTHER POSSIBILITIES")) {
+                           acc.push({ type: 'restricted_header', content: cleanLine, index });
+                           return acc;
+                        }
+                        
+                        // If we already hit the restriction for free users, skip subsequent lines (assuming they belong to that section)
+                        // This simplistic logic assumes 'OTHER POSSIBILITIES' is the last section or we want to hide everything after it.
+                        // Based on the user prompt "Should not be visible", hiding it is the goal.
+                        const hasAccess = hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'detailedAnalysis');
+                        const isRestrictedSection = acc.some(item => item.type === 'restricted_header');
+
+                        if (isRestrictedSection && !hasAccess) {
+                            return acc;
+                        }
 
                         // Header Detection (1., 2., 3., etc)
                         if (cleanLine.match(/^\d\./)) {
-                          return (
-                            <h4 key={index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
-                              {cleanLine}
-                            </h4>
-                          );
+                          acc.push({ type: 'header', content: cleanLine, index });
+                        } else {
+                          acc.push({ type: 'text', content: cleanLine, index });
                         }
-                        // Detail Content
-                        return (
-                          <p key={index} className="text-xs md:text-sm font-medium leading-relaxed opacity-80 dark:text-gray-300">
-                            {cleanLine}
-                          </p>
-                        );
+                        return acc;
+                      }, []).map((item: any) => {
+                         if (item.type === 'restricted_header') {
+                            if (!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'detailedAnalysis')) {
+                                return (
+                                  <div key={`locked-${item.index}`} className="mt-8 p-6 bg-gray-50 dark:bg-white/5 rounded-[2rem] border border-dashed border-[#E1784F]/30 flex flex-col items-center justify-center text-center space-y-4">
+                                    <div className="w-12 h-12 rounded-full bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F]">
+                                       <Lock size={20} />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <p className="text-[10px] font-black uppercase tracking-widest text-[#E1784F]">
+                                        Premium Insight
+                                      </p>
+                                      <p className="text-xs font-medium opacity-60 max-w-xs mx-auto">
+                                        Subscribe to Premium to view detailed possibilities and advanced clinical breakdown.
+                                      </p>
+                                    </div>
+                                    <button 
+                                      onClick={() => setShowSubscriptionModal(true)}
+                                      className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-lg hover:scale-105 transition-transform"
+                                    >
+                                      Upgrade Now
+                                    </button>
+                                  </div>
+                                );
+                            }
+                            return (
+                                <h4 key={item.index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
+                                  {item.content}
+                                </h4>
+                            );
+                         }
+                         if (item.type === 'header') {
+                            return (
+                                <h4 key={item.index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
+                                  {item.content}
+                                </h4>
+                            );
+                         }
+                         return (
+                            <p key={item.index} className="text-xs md:text-sm font-medium leading-relaxed opacity-80 dark:text-gray-300">
+                              {item.content}
+                            </p>
+                         );
                       })
                     ) : (
                       <p className="text-center opacity-40 italic">Processing clinical details...</p>
@@ -411,7 +484,13 @@ export default function UnifiedScanner() {
                 <div className="p-8 space-y-4 print:hidden">
                   <div className="grid grid-cols-2 gap-4">
                     <button
-                      onClick={() => window.print()}
+                      onClick={() => {
+                        if (!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'downloads')) {
+                          setLockType("download");
+                          return;
+                        }
+                        window.print();
+                      }}
                       className="flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black h-16 rounded-[1.5rem] font-black uppercase text-[9px] tracking-widest active:scale-95 transition-all"
                     >
                       Download PDF
@@ -443,6 +522,41 @@ export default function UnifiedScanner() {
           )}
         </div>
       </div>
+      <SubscriptionModal 
+        isOpen={showSubscriptionModal} 
+        onClose={() => setShowSubscriptionModal(false)} 
+      />
+
+      {/* 🛡️ PREMIUM FEATURES LOCKS */}
+      <AnimatePresence>
+        {lockType === "download" && (
+          <DownloadLock 
+            onUnlock={() => {
+              setLockType(null)
+              setShowSubscriptionModal(true)
+            }} 
+            onClose={() => setLockType(null)} 
+          />
+        )}
+        {lockType === "sharing" && (
+          <SharingLock 
+            onUnlock={() => {
+              setLockType(null)
+              setShowSubscriptionModal(true)
+            }} 
+            onClose={() => setLockType(null)} 
+          />
+        )}
+        {lockType === "upload" && (
+          <UploadLock 
+            onUnlock={() => {
+              setLockType(null)
+              setShowSubscriptionModal(true)
+            }} 
+            onClose={() => setLockType(null)} 
+          />
+        )}
+      </AnimatePresence>
     </main>
   )
 }
