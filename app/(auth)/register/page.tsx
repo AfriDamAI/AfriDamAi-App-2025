@@ -7,7 +7,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Mail, Phone, Lock, ArrowRight, Loader2, X, ChevronLeft, ShieldCheck, Fingerprint } from "lucide-react"
+import { Mail, Phone, Lock, ArrowRight, Loader2, X, ChevronLeft, ShieldCheck, Fingerprint, Eye, EyeOff } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -27,6 +27,7 @@ export default function RegisterPage() {
     phoneNo: "",
     password: ""
   })
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -226,13 +227,20 @@ export default function RegisterPage() {
                             <Lock className="w-6 h-6 text-white" />
                         </div>
                         <input
-                            type="password"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-10 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/10"
+                            type={showPassword ? "text" : "password"}
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] md:rounded-[3rem] pl-20 md:pl-28 pr-20 md:pr-28 py-7 md:py-10 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-lg md:text-2xl placeholder:text-white/10"
                             placeholder="Create Password"
                             value={formData.password}
                             onChange={(e) => setFormData({...formData, password: e.target.value})}
                             required
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-8 md:right-12 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
+                        >
+                            {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
+                        </button>
                     </div>
 
                     <div className="flex items-start gap-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5">

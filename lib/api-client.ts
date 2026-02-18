@@ -17,11 +17,30 @@ const sanitizeToken = (token: string | null): string | null => {
 };
 
 export const apiClient = axios.create({
-  baseURL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://afridam-backend-prod-107032494605.us-central1.run.app/api',
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json'
   }
 });
+
+// Add interceptor for auth token
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+/** 🧼 HELPER: Formats image URLs if they are relative paths **/
+export const getImageUrl = (url: string | null | undefined): string | null => {
+  if (!url) return null;
+  if (url.startsWith('http') || url.startsWith('data:')) return url;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://afridam-backend-prod-107032494605.us-central1.run.app/api';
+  // Remove /api from base URL if the path already starts with it or if we want the root
+  const rootUrl = baseUrl.replace(/\/api$/, '');
+  return `${rootUrl}/${url.replace(/^\//, '')}`;
+};
 
 /** 🛡️ RULE 3: REQUEST GATEKEEPER **/
 apiClient.interceptors.request.use(
@@ -84,7 +103,11 @@ export const login = async (credentials: UserLoginDto): Promise<AuthResponse> =>
 
 export const register = async (userData: CreateUserDto) => {
   const { country, ...rest } = userData as any;
-  const payload = { ...rest, nationality: country || "Nigerian" };
+  const payload = { 
+    ...rest, 
+    nationality: country || "Nigerian",
+    subscriptionTier: "free" // 🛡️ RULE: All new users default to Free Tier
+  };
   const response = await apiClient.post("/auth/user/register", payload);
   return response.data;
 };
