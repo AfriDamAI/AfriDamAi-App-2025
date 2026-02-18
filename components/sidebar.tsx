@@ -3,11 +3,9 @@
 import { useRouter, usePathname } from "next/navigation"
 import {
     Scan, MessageSquare, History,
-    Settings, Home, ShoppingBag, FlaskConical,
-    Sparkles
+    Settings, Home, ShoppingBag, FlaskConical
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { getImageUrl } from "@/lib/api-client"
 
 export function Sidebar() {
     const router = useRouter()
@@ -46,7 +44,7 @@ export function Sidebar() {
             <nav className="flex-1 space-y-1">
                 <SidebarItem icon={Home} label="Home Hub" path="/dashboard" />
                 <SidebarItem icon={Scan} label="AI Scanner" path="/ai-scanner" />
-                <SidebarItem icon={Sparkles} label="Premium plans" path="/plans" />
+                <SidebarItem icon={FlaskConical} label="Ingredient Analyzer" path="/ingredient-analyzer" />
                 <SidebarItem icon={MessageSquare} label="Specialists" path="/specialist" />
                 <SidebarItem icon={ShoppingBag} label="Market Place" path="/marketplace" />
                 <SidebarItem icon={History} label="Clinical Diary" path="/history" />
@@ -54,16 +52,8 @@ export function Sidebar() {
             </nav>
             <div className="p-6 bg-gray-50 dark:bg-white/5 rounded-[2.5rem] space-y-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-[#E1784F] flex items-center justify-center text-white text-[11px] font-black italic shadow-lg overflow-hidden">
-                        {user?.profile?.avatarUrl ? (
-                            <img 
-                                src={getImageUrl(user.profile.avatarUrl)!} 
-                                alt={firstName} 
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            initials
-                        )}
+                    <div className="w-10 h-10 rounded-2xl bg-[#E1784F] flex items-center justify-center text-white text-[11px] font-black italic shadow-lg">
+                        {initials}
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-tight truncate">{firstName}</span>
                 </div>
