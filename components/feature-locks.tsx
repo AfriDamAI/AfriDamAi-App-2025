@@ -1,12 +1,5 @@
-/**
- * 🛡️ AFRIDAM PREMIUM: FEATURE LOCKS
- * Reusable components to gate access for free tier users.
- */
-
-"use client"
-
 import { motion } from "framer-motion"
-import { Lock, Zap, Download, Share2, ShieldAlert } from "lucide-react"
+import { Lock, Zap, Download, Share2, ShieldAlert, Sparkles, Check, X, ArrowRight } from "lucide-react"
 
 interface FeatureLockProps {
   featureName: string;
@@ -30,32 +23,50 @@ export function FeatureLock({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[250] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"
     >
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#0A0A0A] rounded-[3rem] overflow-hidden shadow-2xl border border-black/5 dark:border-white/10">
-        <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
-          <Lock size={120} />
+      <div className="relative w-full max-w-lg bg-[#0A0A0A] rounded-[3rem] overflow-hidden shadow-2xl border border-white/10">
+        {/* Header Section */}
+        <div className="relative h-64 bg-[#E1784F] flex flex-col items-center justify-center overflow-hidden">
+          {/* Background Sparkle Icon */}
+          <div className="absolute -right-8 -bottom-8 text-white/20 transform rotate-12 scale-150">
+            <Sparkles size={200} strokeWidth={1} />
+          </div>
+          
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="absolute top-6 right-6 w-10 h-10 bg-black/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/20 transition-all z-20 shadow-lg"
+            >
+              <X size={20} />
+            </button>
+          )}
+
+          <div className="relative z-10 text-center space-y-4">
+            <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-white">
+              Upgrade Your Experience
+            </span>
+            <div className="flex flex-col items-center">
+              <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-[0.9] text-white">
+                Unlock <br /> {featureName}
+              </h2>
+            </div>
+          </div>
         </div>
 
-        <div className="p-10 md:p-14 space-y-8 text-center">
-          <div className="mx-auto w-20 h-20 rounded-3xl bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F] shadow-inner">
-            {icon}
-          </div>
+        {/* Content Section */}
+        <div className="p-10 md:p-12 space-y-8 bg-black">
+          <p className="text-[11px] font-bold opacity-50 uppercase tracking-[0.1em] leading-relaxed text-center max-w-sm mx-auto">
+            {description}
+          </p>
 
-          <div className="space-y-3">
-            <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter leading-none">
-              {featureName} <span className="text-[#E1784F]">Locked</span>
-            </h2>
-            <p className="text-xs font-bold opacity-50 uppercase tracking-tight max-w-sm mx-auto leading-relaxed">
-              {description}
-            </p>
-          </div>
-
-          <div className="grid gap-3">
-            {benefits.map((benefit, i) => (
-              <div key={i} className="flex items-center gap-3 px-6 py-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-black/5">
-                <Zap size={14} className="text-[#E1784F]" fill="currentColor" />
-                <span className="text-[10px] font-black uppercase tracking-widest">{benefit}</span>
+          <div className="space-y-6">
+            {benefits.map((benefit: string, i: number) => (
+              <div key={i} className="flex items-center gap-5 group">
+                <div className="w-10 h-10 rounded-full bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F] shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                  <Check size={16} strokeWidth={4} />
+                </div>
+                <span className="text-[11px] font-black uppercase tracking-tight text-white">{benefit}</span>
               </div>
             ))}
           </div>
@@ -63,14 +74,14 @@ export function FeatureLock({
           <div className="pt-4 space-y-4">
             <button 
               onClick={onUnlock}
-              className="w-full py-6 bg-black dark:bg-white text-white dark:text-black rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.2em] shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="w-full py-6 bg-[#E1784F] text-white rounded-3xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
             >
-              Upgrade for Instant Access
+              Upgrade & Unlock Now <ArrowRight size={14} />
             </button>
             {onClose && (
               <button 
                 onClick={onClose}
-                className="w-full text-[9px] font-black opacity-30 uppercase tracking-[0.3em] hover:opacity-100 transition-all"
+                className="w-full text-[10px] font-black opacity-30 uppercase tracking-[0.3em] hover:opacity-100 transition-all text-center"
               >
                 Maybe Later
               </button>

@@ -4,7 +4,7 @@
  * It is used across the dashboard, scanner, and history modules to gate premium features.
  */
 
-export type SubscriptionTier = 'free' | 'premium' | 'pro' | 'enterprise';
+export type SubscriptionTier = 'free' | 'premium' | 'urgent' | 'monthly' | 'annual' | 'pro' | 'enterprise';
 
 export interface FeatureAccess {
   downloads: boolean;
@@ -17,6 +17,17 @@ export interface FeatureAccess {
   detailedAnalysis: boolean;
 }
 
+const PREMIUM_FEATURES: FeatureAccess = {
+  downloads: true,
+  sharing: true,
+  skinDiary: true,
+  screenshots: true,
+  unlimitedScans: true,
+  priorityReview: true,
+  uploadFromDevice: true,
+  detailedAnalysis: true,
+};
+
 export const TIER_CONFIG: Record<SubscriptionTier, FeatureAccess> = {
   free: {
     downloads: false,
@@ -28,36 +39,12 @@ export const TIER_CONFIG: Record<SubscriptionTier, FeatureAccess> = {
     uploadFromDevice: true,
     detailedAnalysis: true,
   },
-  premium: {
-    downloads: true,
-    sharing: true,
-    skinDiary: true,
-    screenshots: true,
-    unlimitedScans: true,
-    priorityReview: true,
-    uploadFromDevice: true,
-    detailedAnalysis: true,
-  },
-  pro: {
-    downloads: true,
-    sharing: true,
-    skinDiary: true,
-    screenshots: true,
-    unlimitedScans: true,
-    priorityReview: true,
-    uploadFromDevice: true,
-    detailedAnalysis: true,
-  },
-  enterprise: {
-    downloads: true,
-    sharing: true,
-    skinDiary: true,
-    screenshots: true,
-    unlimitedScans: true,
-    priorityReview: true,
-    uploadFromDevice: true,
-    detailedAnalysis: true,
-  },
+  premium: PREMIUM_FEATURES,
+  urgent: PREMIUM_FEATURES,
+  monthly: PREMIUM_FEATURES,
+  annual: PREMIUM_FEATURES,
+  pro: PREMIUM_FEATURES,
+  enterprise: PREMIUM_FEATURES,
 };
 
 /**
