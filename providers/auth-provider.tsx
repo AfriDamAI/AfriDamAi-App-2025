@@ -10,7 +10,28 @@ import {
   updateUser, 
   forgotPassword as forgotPasswordApi 
 } from "@/lib/api-client" 
-import { UserLoginDto, CreateUserDto, User } from "@/lib/types"
+import { UserLoginDto, CreateUserDto } from "@/lib/types"
+
+/**
+ * 🛡️ AFRIDAM AUTH PROVIDER (Rule 7 Precision Sync)
+ * Version: 2026.1.25
+ * Focus: High-Speed Mobile Transitions & Background Data Fetching.
+ */
+
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  onboardingCompleted: boolean;
+  phoneNo?: string;   
+  profile?: {
+    skinType?: string;
+    melaninTone?: string;
+    [key: string]: any;
+  };
+}
 
 interface AuthContextType {
   user: User | null
@@ -33,18 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [tokenLoaded, setTokenLoaded] = useState(false)
 
-  const extractUserData = (data: any) => {
-    const user = data?.user || data;
-    if (user && user.plan) {
-      const planType = user.plan.type?.toLowerCase();
-      if (['free', 'urgent', 'monthly', 'annual'].includes(planType)) {
-        user.subscriptionTier = planType;
-      } else if (planType === 'premium') {
-        user.subscriptionTier = 'monthly'; // Fallback
-      }
-    }
-    return user;
-  };
+  const extractUserData = (data: any) => data?.user || data;
 
   const fetchUserData = async () => {
     try {

@@ -8,12 +8,9 @@ import {
   Settings, Zap, Home, ShoppingBag, ArrowRight, Sparkles, Loader2, X, FlaskConical
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { getScanHistory, initializePayment, getImageUrl } from "@/lib/api-client"
+import { getScanHistory, initializePayment } from "@/lib/api-client"
 import { usePaystackPayment } from "react-paystack"
 import { SubscriptionModal } from "@/components/subscription-modal"
-import { hasFeatureAccess, SubscriptionTier } from "@/app/tier-config/route"
-import { LockedBadge, DownloadLock, SharingLock } from "@/components/feature-locks"
-import Link from "next/link"
 
 /**
  * 🛡️ AFRIDAM WELLNESS HUB (Rule 6 Precision Sync)
@@ -30,7 +27,6 @@ export default function Dashboard() {
   // 🛡️ NEW: State for the clinical report modal
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null)
   const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false)
-  const [lockType, setLockType] = useState<"download" | "sharing" | null>(null)
 
   const firstName = user?.firstName || user?.displayName?.split(' ')[0] || "User"
   const initials = user
@@ -95,24 +91,11 @@ export default function Dashboard() {
       <div className="flex-1 pb-32 lg:pb-10 z-10">
         <header className="px-8 pt-12 pb-6 flex justify-between items-center text-left">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-[1.4rem] bg-[#E1784F] flex items-center justify-center text-white font-black text-sm italic shadow-xl overflow-hidden">
-              {user?.profile?.avatarUrl ? (
-                <img 
-                  src={getImageUrl(user.profile.avatarUrl)!} 
-                  alt={firstName} 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                initials
-              )}
+            <div className="w-14 h-14 rounded-[1.4rem] bg-[#E1784F] flex items-center justify-center text-white font-black text-sm italic shadow-xl">
+              {initials}
             </div>
             <div>
-              <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-black italic uppercase tracking-tighter leading-none">Hello, {firstName}</h2>
-                <div className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-[0.2em] border ${user?.subscriptionTier && user.subscriptionTier !== 'free' ? 'bg-[#4DB6AC]/10 text-[#4DB6AC] border-[#4DB6AC]/20' : 'bg-[#E1784F]/10 text-[#E1784F] border-[#E1784F]/20'}`}>
-                  {user?.subscriptionTier && user.subscriptionTier !== 'free' ? 'Premium' : 'Free Plan'}
-                </div>
-              </div>
+              <h2 className="text-2xl font-black italic uppercase tracking-tighter leading-none">Hello, {firstName}</h2>
               <p className="text-[9px] font-black uppercase tracking-widest text-[#4DB6AC] mt-2">Ready for your skin check?</p>
             </div>
           </div>
@@ -150,26 +133,20 @@ export default function Dashboard() {
                 <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-5 opacity-40 flex items-center gap-2">Initiate Scan <ArrowRight size={12} /></p>
               </div>
             </button>
-            <Link href="/ingredient-analyzer" className="group relative h-60 bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[3.5rem] p-10 flex flex-col justify-between items-start text-left hover:border-[#E1784F]/30 transition-all shadow-sm">
-              <div className="w-14 h-14 rounded-3xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center"><FlaskConical size={28} /></div>
+            <button onClick={() => setSubscriptionModalOpen(true)} className="group relative h-60 bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[3.5rem] p-10 flex flex-col justify-between items-start text-left hover:border-[#E1784F]/30 transition-all shadow-sm">
+              <div className="w-14 h-14 rounded-3xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center"><Sparkles size={28} /></div>
               <div>
-                <h3 className="text-4xl font-black italic uppercase leading-none tracking-tighter">Ingredient<br />Analyzer</h3>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-5 opacity-40 flex items-center gap-2">View Analyzer <ArrowRight size={12} /></p>
+                <h3 className="text-4xl font-black italic uppercase leading-none tracking-tighter">Premium<br />Plans</h3>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-5 opacity-40 flex items-center gap-2">View Subscriptions <ArrowRight size={12} /></p>
               </div>
-            </Link>
+            </button>
           </div>
 
           {/* CLINICAL DIARY SECTION */}
           <section className="space-y-8 text-left pb-10">
             <div className="flex items-center justify-between px-4">
               <h4 className="text-[10px] font-black uppercase tracking-[0.5em] opacity-30">Clinical Diary</h4>
-              {!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'skinDiary') ? (
-                <button onClick={() => setSubscriptionModalOpen(true)}>
-                  <LockedBadge feature="Locked" size="sm" />
-                </button>
-              ) : (
-                <button onClick={() => router.push('/history')} className="text-[9px] font-black uppercase tracking-widest text-[#4DB6AC]">View All</button>
-              )}
+              <button onClick={() => router.push('/history')} className="text-[9px] font-black uppercase tracking-widest text-[#4DB6AC]">View All</button>
             </div>
             <div className="space-y-4">
               <AnimatePresence>
@@ -183,14 +160,8 @@ export default function Dashboard() {
                       key={scan.id || idx}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      // 🛡️ UPDATED: Open Modal with record data (check access)
-                      onClick={() => {
-                        if (hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'skinDiary')) {
-                          setSelectedRecord(scan);
-                        } else {
-                          setSubscriptionModalOpen(true);
-                        }
-                      }}
+                      // 🛡️ UPDATED: Open Modal with record data
+                      onClick={() => setSelectedRecord(scan)}
                       className="flex items-center justify-between p-6 bg-gray-50 dark:bg-white/5 rounded-[2.8rem] border border-transparent hover:border-[#E1784F]/20 transition-all cursor-pointer group"
                     >
                       <div className="flex items-center gap-6">
@@ -277,13 +248,7 @@ export default function Dashboard() {
               {/* MODAL FOOTER ACTIONS */}
               <div className="p-10 grid grid-cols-2 gap-4">
                 <button
-                  onClick={() => {
-                    if (!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'downloads')) {
-                      setLockType("download");
-                      return;
-                    }
-                    window.print();
-                  }}
+                  onClick={() => window.print()}
                   className="h-16 md:h-20 bg-black dark:bg-white text-white dark:text-black rounded-3xl font-black uppercase text-[10px] tracking-widest active:scale-95 transition-all shadow-xl"
                 >
                   Download PDF
@@ -301,28 +266,6 @@ export default function Dashboard() {
       </AnimatePresence>
 
       <SubscriptionModal isOpen={subscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
-
-      {/* 🛡️ PREMIUM FEATURES LOCKS */}
-      <AnimatePresence>
-        {lockType === "download" && (
-          <DownloadLock 
-            onUnlock={() => {
-              setLockType(null)
-              setSubscriptionModalOpen(true)
-            }} 
-            onClose={() => setLockType(null)} 
-          />
-        )}
-        {lockType === "sharing" && (
-          <SharingLock 
-            onUnlock={() => {
-              setLockType(null)
-              setSubscriptionModalOpen(true)
-            }} 
-            onClose={() => setLockType(null)} 
-          />
-        )}
-      </AnimatePresence>
     </main>
   )
 }
