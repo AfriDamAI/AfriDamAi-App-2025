@@ -77,8 +77,16 @@ export default function LandingPage() {
               </Link>
             ) : (
               <div className="flex items-center gap-6">
-                <button onClick={() => navigateToAuth("login")} className="opacity-50 hover:opacity-100 transition-all">Login</button>
-                <button onClick={() => navigateToAuth("register")} className="px-8 py-3 bg-[#E1784F] text-white rounded-lg uppercase tracking-widest font-black text-[9px] shadow-xl active:scale-95 transition-all">Get Started</button>
+                <button 
+                onClick={() => navigateToAuth("login")} 
+                className="opacity-50 hover:opacity-100 transition-all cursor-pointer">
+                  Login
+                </button>
+                <button 
+                onClick={() => navigateToAuth("register")} 
+                className="px-8 py-3 bg-[#E1784F] text-white rounded-lg uppercase tracking-widest font-black text-[9px] shadow-xl active:scale-95 transition-all cursor-pointer">
+                  Get Started
+                </button>
               </div>
             )}
           </div>
@@ -97,7 +105,7 @@ export default function LandingPage() {
               <Sparkles className="text-[#E1784F]" size={12} />
               <span className="text-[9px] font-black uppercase tracking-widest text-[#E1784F]">Clinical Excellence</span>
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tight uppercase italic text-black dark:text-white">
+            <h1 className="text-5xl md:text-7xl lg:text-7xl font-black leading-[1.1] tracking-tight uppercase italic text-black dark:text-white">
               Your <br /> Skin's <br /> <span className="text-[#E1784F]">Best Friend.</span>
             </h1>
             <p className="text-lg md:text-2xl font-black max-w-lg opacity-25 uppercase tracking-tighter leading-tight italic">
@@ -178,7 +186,7 @@ export default function LandingPage() {
       <section className="py-24 md:py-40 px-6 text-center">
         <div className="max-w-screen-xl mx-auto flex flex-col items-center">
           <Heart className="text-[#E1784F] mb-12" size={40} fill="currentColor" />
-          <h2 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
+          <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
             "Heritage is <br /> our <span className="text-[#4DB6AC]">Foundation</span>, <br /> Skin is our <span className="text-[#E1784F]">Legacy</span>."
           </h2>
           <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-20 mt-16 italic">A Founder's Promise</p>
@@ -207,10 +215,10 @@ export default function LandingPage() {
       </section>
 
       {/* 🏛️ 6. CONTACT & ACTION */}
-      <section id="contact" className="py-32 md:py-56 px-8 md:px-20">
-        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-24 md:gap-40 items-center">
-          <div className="space-y-12">
-            <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.85] text-black dark:text-white">Get <br /><span className="text-[#4DB6AC]">Started.</span></h2>
+      <section id="contact" className="py-16 md:py-24 px-8 md:px-20">
+        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-24 md:gap-24 items-center">
+          <div className="space-y-10">
+            <h2 className="text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-[0.85] text-black dark:text-white">Get <br /><span className="text-[#4DB6AC]">Started.</span></h2>
             <p className="text-xl md:text-2xl font-black opacity-20 uppercase tracking-tighter italic">Join the movement for <br />Melanin-Rich Health.</p>
             <button onClick={() => navigateToAuth("register")} className="w-full md:w-auto h-20 px-16 bg-[#4DB6AC] text-black font-black uppercase text-[11px] tracking-widest rounded-2xl shadow-xl hover:scale-105 transition-all">Create Profile</button>
           </div>
@@ -288,7 +296,7 @@ export default function LandingPage() {
             </div>
 
             {/* Navigation Items */}
-            <div className="flex-1 px-6 flex flex-col gap-8">
+            <div className="flex-1 px-6 flex flex-col gap-5">
               {['Mission', 'Care Hub', 'Contact', 'Login'].map((item) => (
                 <button
                   key={item}
