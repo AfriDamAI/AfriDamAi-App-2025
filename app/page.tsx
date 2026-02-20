@@ -118,7 +118,7 @@ export default function LandingPage() {
 
           <div className="lg:col-span-5 relative">
             <div className="aspect-[4/5] rounded-[3.5rem] overflow-hidden border-[10px] border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80" alt="AfriDam" className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0" />
+              <img src="./newimage.png" alt="AfriDam" className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0" />
               <div className="absolute inset-0 pointer-events-none">
                 <motion.div animate={{ top: ["0%", "100%", "0%"] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_30px_5px_#E1784F] z-20" />
               </div>
