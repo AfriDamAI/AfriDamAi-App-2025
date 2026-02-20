@@ -27,7 +27,7 @@ export default function MissionPage() {
         <div className="max-w-screen-xl mx-auto px-6 h-24 flex justify-between items-center">
           <button 
             onClick={() => router.back()} 
-            className="group flex items-center gap-3 text-[#E1784F] font-black uppercase text-[10px] tracking-[0.4em] transition-all"
+            className="group flex items-center gap-3 text-[#E1784F] font-black text-[10px] tracking-[0.4em] transition-all"
           >
             <ChevronLeft size={16} className="group-hover:-translate-x-2 transition-transform" /> 
             <span className="hidden sm:inline">Return</span>
@@ -35,12 +35,12 @@ export default function MissionPage() {
           
           <div className="flex items-center gap-4">
             <Fingerprint size={18} className="text-[#4DB6AC] opacity-40" />
-            <span className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30 hidden sm:inline text-black dark:text-white">Clinical Protocol 2026.1</span>
+            <span className="text-[9px] font-black tracking-[0.5em] opacity-30 hidden sm:inline text-black dark:text-white">Clinical Protocol 2026.1</span>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-screen-xl mx-auto px-6 py-16 md:py-32 space-y-32 md:space-y-56 relative z-10">
+      <div className="max-w-screen-xl mx-auto px-6 py-16 md:py-32 space-y-24 md:space-y-28 relative z-10">
         
         {/* 1. THE MANIFESTO HEADER */}
         <motion.div 
@@ -52,12 +52,12 @@ export default function MissionPage() {
         >
           <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
              <div className="w-1.5 h-1.5 rounded-full bg-[#4DB6AC] animate-pulse" />
-             <span className="text-black dark:text-white text-[10px] font-black uppercase tracking-[0.4em]">The Mandate</span>
+             <span className="text-black dark:text-white text-[10px] font-black tracking-[0.4em]">The Mandate</span>
           </div>
-          <h1 className="text-7xl md:text-[12rem] font-black italic uppercase tracking-[-0.06em] leading-[0.8] text-black dark:text-white">
+          <h1 className="text-7xl md:text-[6rem] font-black italic capitalize tracking-[-0.06em] leading-[0.8] text-black dark:text-white">
             Bridging the <br /> <span className="text-[#E1784F]">Care Gap.</span>
           </h1>
-          <p className="text-xl md:text-3xl font-medium leading-tight max-w-3xl opacity-60 uppercase tracking-tighter">
+          <p className="text-xl md:text-3xl font-medium leading-tight max-w-3xl opacity-60 tracking-tighter">
             AfriDam AI was born in <span className="text-black dark:text-white font-black underline decoration-[#E1784F] underline-offset-8">Lagos</span> to address a global oversight: Skincare technology was never engineered for melanin-rich profiles.
           </p>
         </motion.div>
@@ -65,7 +65,7 @@ export default function MissionPage() {
         {/* 2. CLINICAL REALITY (The "Why") */}
         <section className="grid lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-10">
-            <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9]">
+            <h2 className="text-5xl md:text-4xl font-black italic tracking-tighter leading-[0.9]">
               The Reality <br />of African Care
             </h2>
             <div className="space-y-8 text-lg font-medium opacity-50 leading-relaxed max-w-xl">
@@ -79,22 +79,22 @@ export default function MissionPage() {
             
             <div className="flex items-center gap-6 p-8 bg-gray-50 dark:bg-white/5 rounded-[3rem] border border-gray-100 dark:border-white/10">
                <ShieldCheck className="text-[#4DB6AC]" size={32} />
-               <p className="text-[11px] font-black uppercase tracking-[0.2em] leading-relaxed opacity-60">
+               <p className="text-[11px] font-black tracking-[0.2em] leading-relaxed opacity-60">
                  We are re-engineering the vision engine to prioritize melanin-rich health.
                </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-12 bg-black dark:bg-white text-white dark:text-black rounded-[4rem] text-center space-y-4 shadow-2xl">
+            <div className="p-10 bg-black dark:bg-white text-white dark:text-black rounded-[4rem] text-center space-y-4 shadow-2xl">
               <Users className="mx-auto opacity-30" size={28} />
-              <p className="text-5xl font-black italic tracking-tighter">1:1M</p>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Doctor Ratio</p>
+              <p className="text-4xl font-black italic tracking-tighter">1:1M</p>
+              <p className="text-[10px] font-black capitalize tracking-[0.3em] opacity-40">Doctor Ratio</p>
             </div>
-            <div className="p-12 bg-gray-50 dark:bg-white/5 rounded-[4rem] border border-gray-100 dark:border-white/10 text-center space-y-4">
+            <div className="p-10 bg-gray-50 dark:bg-white/5 rounded-[4rem] border border-gray-100 dark:border-white/10 text-center space-y-4">
               <Stethoscope className="mx-auto text-[#E1784F]" size={28} />
-              <p className="text-5xl font-black italic tracking-tighter">Biased</p>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Global Models</p>
+              <p className="text-4xl font-black italic tracking-tighter">Biased</p>
+              <p className="text-[10px] font-black capitalize tracking-[0.3em] opacity-40">Global Models</p>
             </div>
           </div>
         </section>
@@ -111,8 +111,8 @@ export default function MissionPage() {
                 <item.icon size={32} strokeWidth={1.5} />
               </div>
               <div className="space-y-4">
-                <h3 className="text-3xl font-black italic uppercase tracking-tighter leading-none">{item.title}</h3>
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em] opacity-40 leading-relaxed">{item.text}</p>
+                <h3 className="text-3xl font-black italic tracking-tighter leading-none">{item.title}</h3>
+                <p className="text-[11px] font-bold tracking-[0.2em] opacity-40 leading-relaxed">{item.text}</p>
               </div>
             </div>
           ))}
@@ -126,15 +126,15 @@ export default function MissionPage() {
             viewport={{ once: true }}
             className="p-12 md:p-20 bg-black dark:bg-white text-white dark:text-black rounded-[5rem] relative overflow-hidden shadow-2xl"
           >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#E1784F]/20 blur-[100px] rounded-full" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#E1784F]/20 blur-[100px] rounded-full" />
             
             <div className="flex gap-6 items-center mb-16 relative z-10">
               <div className="w-20 h-20 rounded-3xl bg-[#E1784F] flex items-center justify-center text-white font-black text-3xl italic shadow-xl">
                 OO
               </div>
               <div className="space-y-1">
-                <h3 className="text-2xl font-black italic uppercase tracking-tighter">Ogirima Obey</h3>
-                <p className="opacity-50 text-[10px] font-black uppercase tracking-[0.4em]">Founder • RN & AI Dev</p>
+                <h3 className="text-2xl font-black italic tracking-tighter">Ogirima Obey</h3>
+                <p className="opacity-50 text-[10px] font-black tracking-[0.4em]">Founder • RN & AI Dev</p>
               </div>
             </div>
             
@@ -144,13 +144,13 @@ export default function MissionPage() {
           </motion.div>
 
           <div className="space-y-12 py-10">
-            <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9]">The Vision</h2>
+            <h2 className="text-5xl md:text-7xl font-black italic capitalize tracking-tighter leading-[0.9]">The Vision</h2>
             <p className="text-xl font-medium opacity-50 leading-relaxed">
               We are engineering the continent's most sophisticated clinical vision engine. By merging precision analysis with a vetted marketplace, we empower you to take total charge of your skin health, instantly and securely.
             </p>
             <button 
               onClick={() => router.push('/dashboard')}
-              className="group flex items-center gap-4 text-[#E1784F] font-black uppercase text-[12px] tracking-[0.4em]"
+              className="group flex items-center gap-4 text-[#E1784F] font-black text-[12px] tracking-[0.4em]"
             >
               Enter Clinic <ArrowRight size={20} className="group-hover:translate-x-3 transition-transform" />
             </button>
@@ -160,12 +160,12 @@ export default function MissionPage() {
         {/* 5. FINAL CTA */}
         <div className="py-24 text-center space-y-16">
           <div className="space-y-4">
-             <p className="text-[10px] font-black uppercase tracking-[0.8em] opacity-30">© 2026 AfriDam AI Clinical Systems</p>
-             <h4 className="text-2xl font-black uppercase italic tracking-tighter opacity-20">Lagos • London • Nairobi</h4>
+             <p className="text-[10px] font-black tracking-[0.8em] opacity-30">© 2026 AfriDam AI Clinical Systems</p>
+             <h4 className="text-2xl font-black italic tracking-tighter opacity-20">Lagos • London • Nairobi</h4>
           </div>
           <button 
             onClick={() => router.push('/register')}
-            className="w-full md:w-auto px-16 py-8 bg-[#E1784F] text-white font-black uppercase text-[12px] tracking-[0.4em] rounded-[2.5rem] shadow-[0_30px_60px_rgba(225,120,79,0.3)] hover:scale-105 transition-all"
+            className="w-full md:w-auto px-16 py-8 bg-[#E1784F] text-white font-black text-[12px] tracking-[0.4em] rounded-[2.5rem] shadow-[0_30px_60px_rgba(225,120,79,0.3)] hover:scale-105 transition-all"
           >
             Start Your Analysis
           </button>
