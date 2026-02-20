@@ -136,18 +136,10 @@ export default function HistoryPage() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-32 space-y-4 animate-pulse">
               <Loader2 className="animate-spin text-[#E1784F] w-8 h-8" />
-              <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-20">Accessing Cloud Diary</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-20">Retrieving Clinical Records</p>
             </div>
-          ) : !hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'skinDiary') ? (
-            <HistoryLock onUnlock={() => setShowSubscriptionModal(true)} />
           ) : (
-            <div className="min-h-[400px]">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-32 space-y-4 animate-pulse">
-                <Loader2 className="animate-spin text-[#E1784F] w-8 h-8" />
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-20">Retrieving Clinical Records</p>
-              </div>
-            ) : history.length > 0 ? (
+            history.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <AnimatePresence>
                   {history.filter(r => filter === 'all' || r.type === filter).map((scan, idx) => (
@@ -208,9 +200,8 @@ export default function HistoryPage() {
                 <History size={48} strokeWidth={1} />
                 <p className="text-[9px] font-black uppercase tracking-[0.4em]">Your Clinical Diary is empty</p>
               </div>
-            )}
-          </div>
-        )}
+            )
+          )}
         </div>
 
         {/* MODAL: CLINICAL FINDINGS */}

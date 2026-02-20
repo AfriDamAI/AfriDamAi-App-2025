@@ -32,7 +32,7 @@ export const TIER_CONFIG: Record<SubscriptionTier, FeatureAccess> = {
   free: {
     downloads: false,
     sharing: false,
-    skinDiary: false,
+    skinDiary: true,
     screenshots: false,
     unlimitedScans: false,
     priorityReview: false,

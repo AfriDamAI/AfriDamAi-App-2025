@@ -176,13 +176,7 @@ export default function Dashboard() {
           <section className="space-y-8 text-left pb-10">
             <div className="flex items-center justify-between px-4">
               <h4 className="text-[10px] font-black uppercase tracking-[0.5em] opacity-30">Clinical Diary</h4>
-              {!hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'skinDiary') ? (
-                <button onClick={() => setSubscriptionModalOpen(true)}>
-                  <LockedBadge feature="Locked" size="sm" />
-                </button>
-              ) : (
-                <button onClick={() => router.push('/history')} className="text-[9px] font-black uppercase tracking-widest text-[#4DB6AC]">View All</button>
-              )}
+              <button onClick={() => router.push('/history')} className="text-[9px] font-black uppercase tracking-widest text-[#4DB6AC]">View All</button>
             </div>
             <div className="space-y-4">
               <AnimatePresence>
@@ -197,13 +191,7 @@ export default function Dashboard() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       // 🛡️ UPDATED: Open Modal with record data (check access)
-                      onClick={() => {
-                        if (hasFeatureAccess((user?.subscriptionTier as SubscriptionTier) || 'free', 'skinDiary')) {
-                          setSelectedRecord(scan);
-                        } else {
-                          setSubscriptionModalOpen(true);
-                        }
-                      }}
+                      onClick={() => setSelectedRecord(scan)}
                       className="flex items-center justify-between p-6 bg-gray-50 dark:bg-white/5 rounded-[2.8rem] border border-transparent hover:border-[#E1784F]/20 transition-all cursor-pointer group"
                     >
                       <div className="flex items-center gap-6">

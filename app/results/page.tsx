@@ -7,11 +7,14 @@ import { useRouter, useSearchParams } from "next/navigation"
 import {
   Loader2, ChevronLeft, ArrowRight,
   AlertCircle, ShieldCheck, Fingerprint, Activity,
-  Zap, Info
+  Zap, Info, Lock
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { apiClient } from "@/lib/api-client"
+import { useAuth } from "@/providers/auth-provider"
+import { hasFeatureAccess, SubscriptionTier } from "@/app/tier-config/route"
+import { SubscriptionModal } from "@/components/subscription-modal"
 
 /**
  * 🛡️ AFRIDAM NEURAL DIAGNOSTICS: REPORT (Rule 7 Precision Sync)
@@ -20,11 +23,13 @@ import { apiClient } from "@/lib/api-client"
  */
 
 function ResultsContent() {
+  const { user, isLoading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(true)
   const [analysisData, setAnalysisData] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
 
   const scanId = searchParams.get('id')
 
@@ -138,7 +143,7 @@ function ResultsContent() {
                 "{analysisData.finding}"
               </p>
               <div className="flex items-start gap-3 pt-6 border-t border-white/5">
-                <Info className="text-[#E1784F] shrink-0" size={16} />
+                <span className="text-[#E1784F] shrink-0"><Info size={16} /></span>
                 <p className="text-[9px] font-bold uppercase tracking-widest opacity-30 leading-relaxed">
                   AI results are for guidance only. Talk to our specialists for expert care.
                 </p>
@@ -171,6 +176,11 @@ function ResultsContent() {
           </div>
         </motion.div>
       ) : null}
+
+      <SubscriptionModal 
+        isOpen={showSubscriptionModal} 
+        onClose={() => setShowSubscriptionModal(false)} 
+      />
     </div>
   )
 }
