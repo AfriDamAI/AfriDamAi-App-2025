@@ -15,6 +15,7 @@ import { useTheme } from "@/providers/theme-provider"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+import TeamMemberSection from "@/components/team-member-section"
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -216,7 +217,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 🏛️ 6. CONTACT & ACTION */}
+      {/* 👥 6. TEAM MEMBERS */}
+      <TeamMemberSection />
+
+      {/* 🏛️ 7. CONTACT & ACTION */}
       <section id="contact" className="py-16 md:py-24 px-8 md:px-20">
         <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-24 md:gap-24 items-center">
           <div className="space-y-10">
