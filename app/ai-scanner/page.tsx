@@ -213,19 +213,19 @@ export default function UnifiedScanner() {
           <header className="space-y-6 text-left">
             <button
               onClick={() => router.push('/dashboard')}
-              className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] opacity-40 hover:opacity-100 transition-all"
+              className="group flex items-center gap-2 text-[10px] font-black tracking-[0.3em] opacity-40 hover:opacity-100 transition-all"
             >
               <ChevronLeft size={14} /> Dashboard
             </button>
 
             <div className="space-y-2">
-              <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
+              <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter leading-none">
                 Skin <span className="text-[#E1784F]">Scan</span>
               </h1>
               <div className="flex items-center gap-3">
                 <div className="px-3 py-1 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-[#E1784F] animate-pulse" />
-                  <span className="text-[8px] font-black uppercase tracking-widest">{status}</span>
+                  <span className="text-[8px] font-black tracking-widest">{status}</span>
                 </div>
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function UnifiedScanner() {
                             <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
                               {analysisSteps[scanStep].icon}
                             </div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">
+                            <p className="text-[10px] font-black tracking-[0.3em] text-[#E1784F]">
                               {analysisSteps[scanStep].text}
                             </p>
                           </motion.div>
@@ -275,7 +275,7 @@ export default function UnifiedScanner() {
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full opacity-10">
                       <Scan size={60} />
-                      <p className="text-[9px] font-black uppercase tracking-widest mt-4">Lens Ready</p>
+                      <p className="text-[9px] font-black tracking-widest mt-4">Lens Ready</p>
                     </div>
                   )}
                 </AnimatePresence>
@@ -302,19 +302,19 @@ export default function UnifiedScanner() {
                   </div>
                 ) : imgSource && !isAnalyzing ? (
                   <div className="space-y-3">
-                    <button onClick={analyze} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-xl">
+                    <button onClick={analyze} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-xl">
                       Start Analysis <Zap size={14} fill="currentColor" />
                     </button>
-                    <button onClick={() => { setImgSource(null); startCamera(); }} className="w-full text-[9px] font-black opacity-40 uppercase tracking-widest py-2">
+                    <button onClick={() => { setImgSource(null); startCamera(); }} className="w-full text-[9px] font-black opacity-40 tracking-widest py-2">
                       Retake Photo
                     </button>
                   </div>
                 ) : !isAnalyzing && (
                   <div className="space-y-3">
-                    <button onClick={startCamera} className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg flex items-center justify-center gap-2">
+                    <button onClick={startCamera} className="w-full py-5 bg-[#E1784F] text-white rounded-2xl font-black text-[10px] tracking-[0.2em] shadow-lg flex items-center justify-center gap-2">
                       <Scan size={14} /> Take Photo with Camera
                     </button>
-                    <button onClick={() => fileInputRef.current?.click()} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg">
+                    <button onClick={() => fileInputRef.current?.click()} className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg">
                       <Search size={14} /> Choose Image from Device
                     </button>
                     <input
@@ -336,7 +336,7 @@ export default function UnifiedScanner() {
                     />
                   </div>
                 )}
-                {errorDetails && <p className="text-center text-red-500 text-[9px] font-black uppercase">{errorDetails}</p>}
+                {errorDetails && <p className="text-center text-red-500 text-[9px] font-black">{errorDetails}</p>}
               </div>
             </div>
           ) : (
@@ -359,8 +359,8 @@ export default function UnifiedScanner() {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
                   <div className="absolute bottom-6 left-8 md:bottom-10 md:left-12">
-                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#4DB6AC] mb-2">Scan Successful</p>
-                    <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter leading-none text-white">
+                    <p className="text-[9px] font-black tracking-[0.4em] text-[#4DB6AC] mb-2">Scan Successful</p>
+                    <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter leading-none text-white">
                       Diagnostic <br /> <span className="text-[#E1784F]">Report</span>
                     </h2>
                   </div>
@@ -377,7 +377,7 @@ export default function UnifiedScanner() {
                         // Header Detection (1., 2., 3., etc)
                         if (cleanLine.match(/^\d\./)) {
                           return (
-                            <h4 key={index} className="text-[#E1784F] text-[10px] font-black uppercase tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
+                            <h4 key={index} className="text-[#E1784F] text-[10px] font-black tracking-widest pt-4 border-t border-black/5 dark:border-white/5">
                               {cleanLine}
                             </h4>
                           );
@@ -397,12 +397,12 @@ export default function UnifiedScanner() {
                   {/* METADATA SUMMARY */}
                   <div className="flex justify-between items-center py-6 px-8 bg-gray-50 dark:bg-white/5 rounded-3xl">
                     <div className="text-left">
-                      <p className="text-[8px] font-black uppercase tracking-widest opacity-40">Reference ID</p>
+                      <p className="text-[8px] font-black tracking-widest opacity-40">Reference ID</p>
                       <p className="text-[10px] font-bold">#{results.id.toString().slice(-8).toUpperCase()}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[8px] font-black uppercase tracking-widest opacity-40">Status</p>
-                      <p className="text-[10px] font-bold text-[#4DB6AC] uppercase italic">Verified Analysis</p>
+                      <p className="text-[8px] font-black tracking-widest opacity-40">Status</p>
+                      <p className="text-[10px] font-bold text-[#4DB6AC] italic">Verified Analysis</p>
                     </div>
                   </div>
                 </div>
@@ -412,13 +412,13 @@ export default function UnifiedScanner() {
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       onClick={() => window.print()}
-                      className="flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black h-16 rounded-[1.5rem] font-black uppercase text-[9px] tracking-widest active:scale-95 transition-all"
+                      className="flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black h-16 rounded-[1.5rem] font-black text-[9px] tracking-widest active:scale-95 transition-all"
                     >
                       Download PDF
                     </button>
                     <button
                       onClick={() => setResults(null)}
-                      className="bg-gray-100 dark:bg-white/5 h-16 rounded-[1.5rem] font-black uppercase text-[9px] tracking-widest active:scale-95 transition-all"
+                      className="bg-gray-100 dark:bg-white/5 h-16 rounded-[1.5rem] font-black text-[9px] tracking-widest active:scale-95 transition-all"
                     >
                       New Scan
                     </button>
@@ -426,14 +426,14 @@ export default function UnifiedScanner() {
 
                   <button
                     onClick={() => router.push('/plans?plan=premium')}
-                    className="w-full bg-black dark:bg-white text-white dark:text-black h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                    className="w-full bg-black dark:bg-white text-white dark:text-black h-16 rounded-[1.5rem] font-black tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                   >
                     Visit a Specialist <ArrowRight size={14} />
                   </button>
 
                   <button
                     onClick={() => router.push(`/marketplace?focus=${results.finding}`)}
-                    className="w-full bg-[#E1784F] text-white h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                    className="w-full bg-[#E1784F] text-white h-16 rounded-[1.5rem] font-black tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                   >
                     Order Recommended Care <ArrowRight size={14} />
                   </button>
