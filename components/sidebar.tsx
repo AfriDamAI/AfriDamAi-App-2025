@@ -31,7 +31,7 @@ export function Sidebar() {
                     }`}
             >
                 <Icon size={20} className={`${isActive ? 'text-[#E1784F]' : 'group-hover:text-[#E1784F]'} transition-colors`} />
-                <span className="uppercase tracking-widest text-[10px]">{label}</span>
+                <span className="capitalize tracking-widest text-xs">{label}</span>
             </button>
         )
     }
@@ -44,7 +44,6 @@ export function Sidebar() {
             <nav className="flex-1 space-y-1">
                 <SidebarItem icon={Home} label="Home Hub" path="/dashboard" />
                 <SidebarItem icon={Scan} label="AI Scanner" path="/ai-scanner" />
-                <SidebarItem icon={FlaskConical} label="Ingredient Analyzer" path="/ingredient-analyzer" />
                 <SidebarItem icon={MessageSquare} label="Specialists" path="/specialist" />
                 <SidebarItem icon={ShoppingBag} label="Market Place" path="/marketplace" />
                 <SidebarItem icon={History} label="Clinical Diary" path="/history" />
@@ -57,9 +56,9 @@ export function Sidebar() {
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-tight truncate">{firstName}</span>
                 </div>
-                <button onClick={() => router.push('/profile')} className="w-full py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl text-[8px] font-black uppercase tracking-[0.2em] active:scale-95 transition-all">
-                    Manage Profile
-                </button>
+                <div className="w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-2xl text-[9px] font-black uppercase tracking-[0.15em] text-center">
+                    {user?.plan?.name || 'Free Plan'}
+                </div>
             </div>
         </aside>
     )

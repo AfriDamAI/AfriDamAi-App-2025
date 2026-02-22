@@ -1,0 +1,30 @@
+African Skincare Model Images from Unsplash
+============================================
+
+You can use these URLs directly in your Next.js Image component or download them.
+
+Option 1 - Direct Unsplash URL (recommended for Next.js):
+https://images.unsplash.com/photo-1594708767771-a7502f8a6775?w=800&q=80
+(African American woman with beautiful skin, skincare context)
+
+Option 2 - Alternative URL:
+https://images.unsplash.com/photo-1536940385103-c729049165e6?w=800&q=80
+(African woman portrait, natural beauty)
+
+Option 3 - Another option:
+https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80
+(Beautiful African model portrait)
+
+Usage in Next.js:
+-----------------
+import Image from 'next/image';
+
+<Image 
+  src="https://images.unsplash.com/photo-1594708767771-a7502f8a6775?w=800&q=80"
+  alt="African skincare model"
+  width={800}
+  height={600}
+  className="object-cover"
+/>
+
+Note: Add 'images.unsplash.com' to your next.config.ts domains if needed.
