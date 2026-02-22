@@ -53,7 +53,7 @@ export default function LandingPage() {
   );
 
   return (
-    <div className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 relative no-scrollbar">
+    <div className="min-h-svh bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 relative no-scrollbar">
 
       {/* 🧭 1. NAVIGATION */}
       <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 px-6 py-4 md:px-12 ${scrolled ? 'bg-white/95 dark:bg-[#050505]/95 backdrop-blur-3xl py-4 shadow-sm border-b border-black/5 dark:border-white/5' : 'bg-transparent py-8'
@@ -120,7 +120,7 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="lg:col-span-5 relative">
-            <div className="aspect-[4/5] rounded-[3.5rem] overflow-hidden border-[10px] border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
+            <div className="aspect-4/5 rounded-[3.5rem] overflow-hidden border-10 border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
               <img src="./newimage.png" alt="AfriDam" className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0" />
               <div className="absolute inset-0 pointer-events-none">
                 <motion.div animate={{ top: ["0%", "100%", "0%"] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_30px_5px_#E1784F] z-20" />

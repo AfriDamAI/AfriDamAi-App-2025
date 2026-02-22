@@ -4,35 +4,57 @@ import { motion } from "framer-motion"
 import { Sparkles } from "lucide-react"
 import Image from "next/image"
 
-// Team members data array with Unsplash images
+// Import team member images from public/pics folder
+import ogImage from "@/public/pics/og.png"
+import anaduImage from "@/public/pics/anadu.png"
+import tobImage from "@/public/pics/tob.png"
+import anuImage from "@/public/pics/anu.png"
+import natImage from "@/public/pics/nat.png"
+
+// Team members data array with local images
 const teamMembers = [
   {
     id: 1,
-    name: "Dr. Amara Okonkwo",
-    title: "CTO",
-    description: "Leading our technical vision with expertise in AI and machine learning for dermatological applications.",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face",
+    name: "Ogirima Obey",
+    title: "Founder & CEO",
+    description: "Registered Nurse & Venture Builder. Bridges clinical gaps with tech systems.",
+    image: ogImage,
   },
   {
     id: 2,
-    name: "Chidi Eze",
-    title: "Lead Developer",
-    description: "Architecting scalable solutions that power our skin analysis platform with precision and reliability.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    name: "Dr. Anadu",
+    title: "CMO",
+    description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
+    image: anaduImage,
   },
   {
     id: 3,
-    name: "Ngozi Adeyemi",
-    title: "Head of Research",
-    description: "Pioneering research in melanin-rich skin care with a focus on clinical accuracy and cultural sensitivity.",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face",
+    name: "Tobi",
+    title: "Technical Lead",
+    description: "Leads the Node.js/NestJS architecture and API integration.",
+    image: tobImage,
   },
   {
     id: 4,
-    name: "Emeka Obi",
-    title: "Product Designer",
-    description: "Crafting intuitive experiences that bridge technology and human-centered design for wellness.",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+    name: "Tochi",
+    title: "AI Coordinator",
+    description: "Manages the African datasets and model training for the scanner.",
+    image: anuImage,
+  },
+  
+  {
+    id: 5,
+    name: "Mistura",
+    title: "Workflow Coordinator",
+    description: "Ensures the seamless handoff between AI detection and specialist consultation.",
+    image: natImage,
+  },
+  {
+    id: 5,
+    name: "Mistura",
+    title: "Workflow Coordinator",
+    description: "Ensures the seamless handoff between AI detection and specialist consultation.",
+    image: "",
   },
 ]
 
@@ -58,7 +80,7 @@ export default function TeamMemberSection() {
         </div>
 
         {/* Team Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 md:gap-8">
           {teamMembers.map((member, index) => (
             <motion.div
               key={member.id}
@@ -71,7 +93,7 @@ export default function TeamMemberSection() {
               <div className="bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 p-6 md:p-8 shadow-sm hover:shadow-2xl transition-all duration-500 hover:border-[#E1784F]/30 h-full flex flex-col items-center text-center">
                 
                 {/* Rounded Image */}
-                <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden mb-6 border-4 border-gray-100 dark:border-white/10 group-hover:border-[#E1784F]/30 transition-all duration-500">
+                <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden mb-6 border-4 border-gray-100 dark:border-white/10 group-hover:border-[#E1784F]/30 transition-all duration-500">
                   <motion.div
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.3 }}
@@ -82,7 +104,7 @@ export default function TeamMemberSection() {
                       alt={member.name}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 112px, 128px"
+                      sizes="(max-width: 768px) 144px, 176px"
                     />
                   </motion.div>
                 </div>

@@ -36,6 +36,8 @@ export default function Navigation({
   const router = useRouter(); // 🚀 Added
   const isDark = theme === "dark";
 
+  console.log("dd", user)
+
   useEffect(() => {
     if (user) {
       fetchCart(user.id);
@@ -67,9 +69,9 @@ export default function Navigation({
 
   const navLinks = user
     ? [
-      { href: "/dashboard", label: "Dashboard" },
-      { href: "/marketplace", label: "Care Hub" },
-      { href: "/profile", label: "Profile" },
+      // { href: "/dashboard", label: "Dashboard" },
+      // { href: "/marketplace", label: "Care Hub" },
+      // { href: "/profile", label: "Profile" },
       // { href: "/cart", label: "Cart" },
     ]
     : [
