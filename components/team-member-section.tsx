@@ -44,13 +44,13 @@ const teamMembers = [
   
   {
     id: 5,
-    name: "Mistura",
-    title: "Workflow Coordinator",
-    description: "Ensures the seamless handoff between AI detection and specialist consultation.",
+    name: "Nathan Isong",
+    title: "Head of AI",
+    description: "Lead the model architecture",
     image: natImage,
   },
   {
-    id: 5,
+    id: 6,
     name: "Mistura",
     title: "Workflow Coordinator",
     description: "Ensures the seamless handoff between AI detection and specialist consultation.",
