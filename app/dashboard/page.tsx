@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Scan, MessageSquare, History, User as UserIcon,
-  Settings, Zap, Home, ShoppingBag, ArrowRight, Sparkles, Loader2, X, FlaskConical
+  Settings, Zap, Home, ShoppingBag, ArrowRight, Sparkles, Loader2, X, FlaskConical, ShieldAlert
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { getScanHistory, initializePayment } from "@/lib/api-client"
+import { getScanHistory, initializePayment, getSingleScanResult } from "@/lib/api-client"
 import { usePaystackPayment } from "react-paystack"
 import { SubscriptionModal } from "@/components/subscription-modal"
 
@@ -26,6 +26,8 @@ export default function Dashboard() {
   const [loadingHistory, setLoadingHistory] = useState(true)
   // 🛡️ NEW: State for the clinical report modal
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null)
+  const [loadingRecord, setLoadingRecord] = useState<string | null>(null)
+  const [reportError, setReportError] = useState<string | null>(null)
   const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false)
 
   const firstName = user?.firstName || user?.displayName?.split(' ')[0] || "User"
@@ -65,6 +67,28 @@ export default function Dashboard() {
   }
 
   const initializePaystack = usePaystackPayment(config)
+
+  /**
+   * 🛡️ PREMIUM GATE: Fetch full report via GET /v1/{id}
+   * This endpoint is subscription-restricted on the backend.
+   */
+  const handleOpenReport = async (scan: any) => {
+    setLoadingRecord(scan.id)
+    setReportError(null)
+    try {
+      const detailedResult = await getSingleScanResult(scan.id)
+      setSelectedRecord(detailedResult)
+    } catch (err: any) {
+      const status = err?.response?.status
+      if (status === 403 || status === 401) {
+        setReportError("Upgrade to a premium plan to access your full diagnostic report.")
+      } else {
+        setReportError("Unable to load this report. Please try again.")
+      }
+    } finally {
+      setLoadingRecord(null)
+    }
+  }
 
   const handleConsultation = async () => {
     try {
@@ -177,17 +201,12 @@ export default function Dashboard() {
                       key={scan.id || idx}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      // 🛡️ UPDATED: Open Modal with record data only if not restricted
-                      onClick={() => !isRestrictedPlan && setSelectedRecord(scan)}
-                      className={`flex items-center justify-between p-5 bg-gray-50 dark:bg-white/5 rounded-[2rem] border border-transparent transition-all group ${
-                        isRestrictedPlan 
-                          ? 'cursor-not-allowed opacity-50' 
-                          : 'hover:border-[#E1784F]/20 cursor-pointer'
-                      }`}
+                      onClick={() => handleOpenReport(scan)}
+                      className="flex items-center justify-between p-5 bg-gray-50 dark:bg-white/5 rounded-[2rem] border border-transparent hover:border-[#E1784F]/20 transition-all cursor-pointer group"
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center shrink-0 bg-[#4DB6AC]/10 text-[#4DB6AC]">
-                          <Zap size={22} />
+                          {loadingRecord === scan.id ? <Loader2 size={20} className="animate-spin" /> : <Zap size={22} />}
                         </div>
                         <div>
                           <h5 className="text-[11px] font-black italic tracking-tight leading-none mb-0.5">{scan.label || "Diagnostic Review"}</h5>
@@ -215,8 +234,8 @@ export default function Dashboard() {
           {/* UPGRADE BUTTON FOR FREE TIER */}
           {user?.plan?.name?.toLowerCase() === 'test plan' && (
             <div className="pb-6">
-              <button 
-                onClick={() => setSubscriptionModalOpen(true)} 
+              <button
+                onClick={() => setSubscriptionModalOpen(true)}
                 className="w-full py-3.5 bg-gradient-to-r from-[#E1784F] to-[#4DB6AC] text-white rounded-xl font-black text-[10px] tracking-widest shadow-lg active:scale-95 transition-all"
               >
                 Upgrade to Premium Plans
@@ -295,6 +314,44 @@ export default function Dashboard() {
                   className="h-12 md:h-14 bg-[#E1784F] text-white rounded-2xl font-black text-[9px] tracking-widest active:scale-95 transition-all shadow-xl"
                 >
                   Dismiss
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 🔒 RESTRICTED ACCESS MODAL */}
+      <AnimatePresence>
+        {reportError && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-[300]">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white dark:bg-[#121212] w-full max-w-xs rounded-2xl p-6 border border-white/10 shadow-2xl space-y-5 text-center"
+            >
+              <div className="w-14 h-14 mx-auto bg-[#E1784F]/10 text-[#E1784F] rounded-full flex items-center justify-center">
+                <ShieldAlert size={28} />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-base font-black italic tracking-tighter">Premium Access Required</h3>
+                <p className="text-[9px] font-bold opacity-40 tracking-widest leading-relaxed">
+                  {reportError}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setReportError(null)}
+                  className="py-3 bg-gray-100 dark:bg-white/5 rounded-xl text-[8px] font-bold tracking-widest hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { setReportError(null); setSubscriptionModalOpen(true); }}
+                  className="py-3 bg-[#E1784F] text-white rounded-xl text-[8px] font-bold tracking-widest hover:bg-[#d4693f] transition-colors shadow-lg active:scale-95"
+                >
+                  Upgrade Plan
                 </button>
               </div>
             </motion.div>

@@ -20,14 +20,14 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
   if (!isSignedIn) {
     return (
       <div className="flex items-center gap-2">
-        <button 
-          onClick={onSignInClick} 
+        <button
+          onClick={onSignInClick}
           className="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-foreground hover:text-[#E1784F] transition-all"
         >
           Login
         </button>
-        <button 
-          onClick={onSignUpClick} 
+        <button
+          onClick={onSignUpClick}
           className="px-8 py-3 bg-[#E1784F] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[#E1784F]/20 active:scale-95 transition-all hidden sm:inline-flex"
         >
           Get Started
@@ -49,13 +49,13 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
         <div className="w-10 h-10 bg-[#E1784F] rounded-2xl flex items-center justify-center text-white shadow-lg border border-white/10">
           <span className="text-sm font-black italic">{userInitial}</span>
         </div>
-        
+
         <div className="hidden sm:flex flex-col text-left leading-none gap-1">
           <span className="text-[10px] font-black uppercase tracking-tighter italic text-foreground">
             {fullName}
           </span>
           <span className="text-[8px] font-bold text-[#4DB6AC] uppercase tracking-widest">
-            Clinical Account
+            {(user as any)?.plan?.name || "Clinical Account"}
           </span>
         </div>
         <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
@@ -64,7 +64,7 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
       {/* 🛡️ RE-ENFORCED: PREMIUM DROPDOWN */}
       <AnimatePresence>
         {dropdownOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -76,32 +76,32 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
             </div>
 
             <div className="px-2 space-y-1">
-                <Link href="/dashboard"
-                  onClick={() => setDropdownOpen(false)}
-                  className="w-full text-left px-4 py-3 text-[9px] font-black uppercase tracking-widest text-foreground hover:bg-[#E1784F] hover:text-white rounded-xl transition-all flex items-center gap-3"
-                >
-                  <LayoutDashboard size={14} />
-                  Dashboard
-                </Link>
+              <Link href="/dashboard"
+                onClick={() => setDropdownOpen(false)}
+                className="w-full text-left px-4 py-3 text-[9px] font-black uppercase tracking-widest text-foreground hover:bg-[#E1784F] hover:text-white rounded-xl transition-all flex items-center gap-3"
+              >
+                <LayoutDashboard size={14} />
+                Dashboard
+              </Link>
 
-                <Link href="/profile"
-                  onClick={() => setDropdownOpen(false)}
-                  className="w-full text-left px-4 py-3 text-[9px] font-black uppercase tracking-widest text-foreground hover:bg-muted rounded-xl transition-all flex items-center gap-3"
-                >
-                  <User size={14} />
-                  Edit Profile
-                </Link>
+              <Link href="/profile"
+                onClick={() => setDropdownOpen(false)}
+                className="w-full text-left px-4 py-3 text-[9px] font-black uppercase tracking-widest text-foreground hover:bg-muted rounded-xl transition-all flex items-center gap-3"
+              >
+                <User size={14} />
+                Edit Profile
+              </Link>
 
-                <button
-                  onClick={() => {
-                    signOut()
-                    setDropdownOpen(false)
-                  }}
-                  className="w-full text-left px-4 py-3 text-[9px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 rounded-xl transition-all flex items-center gap-3 mt-4"
-                >
-                  <LogOut size={14} />
-                  Sign Out
-                </button>
+              <button
+                onClick={() => {
+                  signOut()
+                  setDropdownOpen(false)
+                }}
+                className="w-full text-left px-4 py-3 text-[9px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 rounded-xl transition-all flex items-center gap-3 mt-4"
+              >
+                <LogOut size={14} />
+                Sign Out
+              </button>
             </div>
           </motion.div>
         )}

@@ -28,7 +28,7 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             // 🛡️ SECURITY SYNC: Backend and AI Brain Whitelisting
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https: https://afridamai-backend.onrender.com https://afridam-ai2-api-131829695574.us-central1.run.app;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream:; connect-src 'self' https: https://afridam-backend-prod-107032494605.us-central1.run.app https://afridam-ai2-api-131829695574.us-central1.run.app;",
           },
           {
             key: 'Strict-Transport-Security',
