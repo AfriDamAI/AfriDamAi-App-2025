@@ -9,7 +9,7 @@ import {
   CalendarDays, Zap, ArrowRight
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { apiClient, getScanHistory, deleteScanResult } from "@/lib/api-client"
+import { apiClient, getScanHistory, deleteScanResult, getSingleScanResult } from "@/lib/api-client"
 
 /**
  * 🛡️ AFRIDAM CLINICAL DIARY: HISTORY (Rule 6 Synergy)
@@ -25,6 +25,8 @@ export default function HistoryPage() {
   const [filter, setFilter] = useState<"all" | "skin" | "ingredient">("all")
   const [loading, setLoading] = useState(true)
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null)
+  const [loadingRecord, setLoadingRecord] = useState<string | null>(null)
+  const [reportError, setReportError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -47,6 +49,28 @@ export default function HistoryPage() {
       setHistory([])
     } finally {
       setLoading(false)
+    }
+  }
+
+  /**
+   * 🛡️ PREMIUM GATE: Fetch full report via GET /v1/{id}
+   * This endpoint is subscription-restricted on the backend.
+   */
+  const handleOpenReport = async (record: any) => {
+    setLoadingRecord(record.id)
+    setReportError(null)
+    try {
+      const detailedResult = await getSingleScanResult(record.id)
+      setSelectedRecord(detailedResult)
+    } catch (err: any) {
+      const status = err?.response?.status
+      if (status === 403 || status === 401) {
+        setReportError("Upgrade to a premium plan to access your full diagnostic report.")
+      } else {
+        setReportError("Unable to load this report. Please try again.")
+      }
+    } finally {
+      setLoadingRecord(null)
     }
   }
 
@@ -176,10 +200,13 @@ export default function HistoryPage() {
 
                     <div className="flex items-center gap-2 w-full md:w-auto">
                       <button
-                        onClick={() => setSelectedRecord(record)}
-                        className="flex-1 md:flex-none h-11 px-5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold text-[8px] tracking-widest shadow-lg transition-all active:scale-95"
+                        onClick={() => handleOpenReport(record)}
+                        disabled={loadingRecord === record.id}
+                        className="flex-1 md:flex-none h-11 px-5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold text-[8px] tracking-widest shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait flex items-center justify-center gap-2"
                       >
-                        Open Report
+                        {loadingRecord === record.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : "Open Report"}
                       </button>
                       <button
                         onClick={() => handleDelete(record.id)}
@@ -283,6 +310,44 @@ export default function HistoryPage() {
                     className="bg-[#E1784F] text-white h-11 rounded-xl font-bold text-[8px] tracking-widest hover:shadow-lg transition-all"
                   >
                     Dismiss
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* 🔒 RESTRICTED ACCESS MODAL */}
+        <AnimatePresence>
+          {reportError && (
+            <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-[200]">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-white dark:bg-[#121212] w-full max-w-xs rounded-2xl p-6 border border-white/10 shadow-2xl space-y-5 text-center"
+              >
+                <div className="w-14 h-14 mx-auto bg-[#E1784F]/10 text-[#E1784F] rounded-full flex items-center justify-center">
+                  <ShieldAlert size={28} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-base font-black italic tracking-tighter">Premium Access Required</h3>
+                  <p className="text-[9px] font-bold opacity-40 tracking-widest leading-relaxed">
+                    {reportError}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setReportError(null)}
+                    className="py-3 bg-gray-100 dark:bg-white/5 rounded-xl text-[8px] font-bold tracking-widest hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => { setReportError(null); router.push('/settings'); }}
+                    className="py-3 bg-[#E1784F] text-white rounded-xl text-[8px] font-bold tracking-widest hover:bg-[#d4693f] transition-colors shadow-lg active:scale-95"
+                  >
+                    Upgrade Plan
                   </button>
                 </div>
               </motion.div>
