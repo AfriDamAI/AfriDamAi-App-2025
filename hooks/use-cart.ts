@@ -22,7 +22,7 @@ export const useCart = create<CartState>((set) => ({
     try {
       // 🛡️ SYNERGY DIAGNOSTIC: Using capitalized "Cart" as per Swagger
       const response = await apiClient.get<Cart>(`/Cart/${userId}`);
-      console.log("🛒 FETCH CART SUCCESS:", response.data);
+      
       if (response.data) {
         set({ cart: response.data, loading: false });
       } else {
@@ -128,7 +128,7 @@ export const useCart = create<CartState>((set) => ({
   },
   removeFromCart: async (userId, productId) => {
     try {
-      console.log("🛒 REMOVING ITEM:", { userId, productId });
+      
       try {
         await apiClient.delete(`/Cart/${userId}/items/${productId}`);
       } catch (delError) {

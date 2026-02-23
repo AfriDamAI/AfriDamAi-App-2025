@@ -8,7 +8,7 @@
 
 import type React from "react"
 import Link from "next/link"
-import { Heart, ShieldCheck, Instagram, Twitter, Linkedin, Globe, MapPin, ExternalLink } from "lucide-react"
+import { ShieldCheck, Instagram, Twitter, Linkedin, Globe, MapPin } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 

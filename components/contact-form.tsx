@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
  * Focus: High-Precision Support Handshake & Mobile-First Inputs.
  */
 
-const API_ENDPOINT = "https://afridam-backend-prod-107032494605.us-central1.run.app/api/docs";
+const ENDPOINT = "https://afridam-backend-prod-107032494605.us-central1.run.app/api/consultation";
 
 interface FormData {
   name: string;
@@ -52,7 +52,7 @@ export function ContactForm() {
     setError(null);
 
     try {
-      const response = await fetch(API_ENDPOINT, {
+      const response = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
