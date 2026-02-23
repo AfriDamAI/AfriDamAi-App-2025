@@ -41,7 +41,7 @@ interface EligibilityResponse {
 
 const AppointmentPage = () => {
   const router = useRouter();
-  const [specialty, setSpecialty] = useState<"DERMATOLOGIST" | "CONSULTANT">(
+  const [specialty, setSpecialty] = useState<"DERMATOLOGIST" | "SKINCARE_CONSULTANT" | "REGISTERED_NURSE" | "MEDICAL_OFFICER">(
     "DERMATOLOGIST"
   );
   const [scheduledAt, setScheduledAt] = useState<Date | undefined>(undefined);
@@ -164,7 +164,7 @@ const AppointmentPage = () => {
               <Label htmlFor="specialty">Specialty</Label>
               <Select
                 value={specialty}
-                onValueChange={(value: "DERMATOLOGIST" | "CONSULTANT") =>
+                onValueChange={(value: "DERMATOLOGIST" | "SKINCARE_CONSULTANT" | "REGISTERED_NURSE" | "MEDICAL_OFFICER") =>
                   setSpecialty(value)
                 }
               >
@@ -173,7 +173,9 @@ const AppointmentPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="DERMATOLOGIST">Dermatologist</SelectItem>
-                  <SelectItem value="CONSULTANT">Consultant</SelectItem>
+                  <SelectItem value="SKINCARE_CONSULTANT">Skincare Consultant</SelectItem>
+                  <SelectItem value="REGISTERED_NURSE">Registered Nurse</SelectItem>
+                  <SelectItem value="MEDICAL_OFFICER">Medical Officer</SelectItem>
                 </SelectContent>
               </Select>
             </div>

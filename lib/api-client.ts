@@ -293,7 +293,7 @@ export const checkAppointmentEligibility = async () => {
 
 export const createAppointment = async (data: {
   subscriptionId?: string;
-  specialty: "DERMATOLOGIST" | "CONSULTANT";
+  specialty: "DERMATOLOGIST" | "SKINCARE_CONSULTANT" | "REGISTERED_NURSE" | "MEDICAL_OFFICER";
   scheduledAt: string;
   notes?: string;
 }) => {
