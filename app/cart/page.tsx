@@ -82,10 +82,10 @@ export default function CartPage() {
         })),
       }
 
-      console.log("🛒 ATTEMPTING ORDER CREATION (Simplified Path):", orderData);
+      // console.log("🛒 ATTEMPTING ORDER CREATION (Simplified Path):", orderData);
 
       const newOrder = await apiClient.post<Order>('/orders', orderData)
-      console.log("🛒 ORDER CREATED SUCCESS:", newOrder.data);
+      // console.log("🛒 ORDER CREATED SUCCESS:", newOrder.data);
       router.push(`/transaction?orderId=${newOrder.data.id}`)
     } catch (error: any) {
       console.error("🛒 ORDER CREATION FAILURE:", error.response?.data || error.message)

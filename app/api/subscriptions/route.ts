@@ -9,7 +9,7 @@ export async function POST(request: Request) {
         }
 
         const decodedToken: any = jwtDecode(token)
-        console.log("Decoded Token:", decodedToken)
+        // console.log("Decoded Token:", decodedToken)
         const userId = decodedToken.sub // Assuming 'sub' is the userId claim in the token
 
         const body = await request.json()
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
             updatedAt: new Date().toISOString(),
         }
 
-        console.log("Created new subscription:", newSubscription)
+        // console.log("Created new subscription:", newSubscription)
 
         return NextResponse.json({
             status: true,
