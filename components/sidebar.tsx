@@ -1,16 +1,21 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import {
     Scan, MessageSquare, History,
     Settings, Home, ShoppingBag, FlaskConical
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
+import { useSubscription } from "@/hooks/use-subscription"
+import { SubscriptionModal } from "@/components/subscription-modal"
 
 export function Sidebar() {
     const router = useRouter()
     const pathname = usePathname()
     const { user } = useAuth() as any
+    const { isFreeTier } = useSubscription()
+    const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
 
     if (!user) return null
 
@@ -19,12 +24,20 @@ export function Sidebar() {
         ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || user.firstName?.charAt(1) || ''}`.toUpperCase()
         : "A"
 
-    const SidebarItem = ({ icon: Icon, label, path }: any) => {
+    const handleSpecialistClick = () => {
+        if (isFreeTier()) {
+            setShowSubscriptionModal(true)
+        } else {
+            router.push('/specialist')
+        }
+    }
+
+    const SidebarItem = ({ icon: Icon, label, path, onClick }: any) => {
         const isActive = pathname === path || (path !== '/dashboard' && pathname.startsWith(path))
 
         return (
             <button
-                onClick={() => router.push(path)}
+                onClick={onClick || (() => router.push(path))}
                 className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-bold transition-all rounded-2xl group ${isActive
                         ? 'opacity-100 bg-[#E1784F]/5 text-[#E1784F]'
                         : 'opacity-40 hover:opacity-100'
@@ -44,7 +57,7 @@ export function Sidebar() {
             <nav className="flex-1 space-y-1">
                 <SidebarItem icon={Home} label="Home Hub" path="/dashboard" />
                 <SidebarItem icon={Scan} label="AI Scanner" path="/ai-scanner" />
-                <SidebarItem icon={MessageSquare} label="Specialists" path="/specialist" />
+                <SidebarItem icon={MessageSquare} label="Specialists" path="/specialist" onClick={handleSpecialistClick} />
                 <SidebarItem icon={ShoppingBag} label="Market Place" path="/marketplace" />
                 <SidebarItem icon={History} label="Clinical Diary" path="/history" />
                 <SidebarItem icon={Settings} label="Settings" path="/settings" />
@@ -60,6 +73,12 @@ export function Sidebar() {
                     {user?.plan?.name || 'Free Plan'}
                 </div>
             </div>
+
+            {/* Subscription Modal for Free Tier Users */}
+            <SubscriptionModal 
+                isOpen={showSubscriptionModal} 
+                onClose={() => setShowSubscriptionModal(false)} 
+            />
         </aside>
     )
 }
