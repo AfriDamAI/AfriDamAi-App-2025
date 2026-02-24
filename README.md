@@ -1,6 +1,5 @@
 
-
-
+# AfriDamAi-App-2025
 
 Project: AI Dermatology (Skin Scanner & Ingredient Analyzer)
 

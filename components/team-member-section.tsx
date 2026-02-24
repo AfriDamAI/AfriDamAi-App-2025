@@ -10,6 +10,7 @@ import anaduImage from "@/public/pics/anadu.png"
 import tobImage from "@/public/pics/tob.png"
 import anuImage from "@/public/pics/anu.png"
 import natImage from "@/public/pics/nat.png"
+import matImage from "@/public/pics/mott.jpeg"
 
 // Team members data array with local images
 const teamMembers = [
@@ -54,7 +55,7 @@ const teamMembers = [
     name: "Mistura",
     title: "Workflow Coordinator",
     description: "Ensures the seamless handoff between AI detection and specialist consultation.",
-    image: "",
+    image: matImage,
   },
 ]
 
