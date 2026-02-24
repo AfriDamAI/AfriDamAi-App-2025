@@ -235,7 +235,8 @@ export const getScanHistory = async (userId: string) => {
 };
 
 export const getSingleScanResult = async (resultId: string) => {
-  const response = await apiClient.get(`/v1/result/${resultId}`);
+  // 🛡️ API SYNC: Using GET /v1/{id} — restricted endpoint with subscription guard
+  const response = await apiClient.get(`/v1/${resultId}`);
   return response.data;
 };
 

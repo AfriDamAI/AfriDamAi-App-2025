@@ -17,7 +17,7 @@ const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     if (process.env.NEXT_PUBLIC_SOCKET_URL) {
       return process.env.NEXT_PUBLIC_SOCKET_URL;
     }
-    
+
     // Fallback: Use the baseURL from apiClient and strip /api if present
     const baseURL = apiClient.defaults.baseURL;
     if (baseURL && typeof baseURL === 'string') {
@@ -27,9 +27,9 @@ const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       }
       return baseURL;
     }
-    
+
     // Default fallback if all else fails
-    return "https://afridamai-backend.onrender.com"; 
+    return "https://afridam-backend-prod-107032494605.us-central1.run.app";
   };
 
   const socketUrl = getSocketUrl();

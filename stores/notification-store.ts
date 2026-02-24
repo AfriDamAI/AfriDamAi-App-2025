@@ -87,7 +87,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
 
   initializeSocketListeners: (listen) => {
     listen("newNotification", (data) => {
-        console.log("New notification received via socket:", data);
+        // console.log("New notification received via socket:", data);
         get().fetchNotifications(); // Re-fetch all notifications to update state
         toast.info("New Notification", { description: data.content });
     });
