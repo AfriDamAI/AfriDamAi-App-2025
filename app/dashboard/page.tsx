@@ -37,7 +37,7 @@ export default function Dashboard() {
 
   // Check if user has a restricted plan (free tier or test test plan)
   const planName = user?.plan?.name?.toLowerCase() || ''
-  const isRestrictedPlan = planName === 'free tier' || planName === 'test test plan' || planName === 'test plan'
+  const isRestrictedPlan = planName === 'free tier' || planName === 'plan' || planName === 'test plan'
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login")
@@ -232,7 +232,7 @@ export default function Dashboard() {
           </section>
 
           {/* UPGRADE BUTTON FOR FREE TIER */}
-          {user?.plan?.name?.toLowerCase() === 'test plan' && (
+          {isRestrictedPlan && (
             <div className="pb-6">
               <button
                 onClick={() => setSubscriptionModalOpen(true)}
