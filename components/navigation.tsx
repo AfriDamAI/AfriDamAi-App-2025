@@ -36,7 +36,7 @@ export default function Navigation({
   const router = useRouter(); // 🚀 Added
   const isDark = theme === "dark";
 
-  console.log("dd", user)
+
 
   useEffect(() => {
     if (user) {
