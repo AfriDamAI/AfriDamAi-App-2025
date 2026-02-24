@@ -10,7 +10,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   ShoppingBag, ChevronLeft, Trash2,
-  Plus, Minus, Lock, ArrowRight, ShieldCheck
+  Plus, Minus, Lock, ArrowRight
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
