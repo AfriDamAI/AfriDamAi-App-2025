@@ -125,7 +125,7 @@ export const SpecialistChat = () => {
   };
 
   const handleNewChat = () => {
-    router.push("/specialists-list")
+    router.push("/appointment")
   };
 
   return (

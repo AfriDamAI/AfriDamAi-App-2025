@@ -15,11 +15,14 @@ import {
   ArrowRight, Binary, Fingerprint, Search, SwitchCamera
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
+import { useSubscription } from "@/hooks/use-subscription"
 import { analyzeSkinWithUserData } from "@/lib/api-client"
+import { SubscriptionModal } from "@/components/subscription-modal"
 
 export default function UnifiedScanner() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
+  const { isFreeTier } = useSubscription()
 
   const [imgSource, setImgSource] = useState<string | null>(null)
   const [isCapturing, setIsCapturing] = useState(false)
@@ -30,6 +33,7 @@ export default function UnifiedScanner() {
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
   const [isTorchOn, setIsTorchOn] = useState(false)
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -411,7 +415,13 @@ export default function UnifiedScanner() {
                 <div className="p-8 space-y-4 print:hidden">
                   <div className="grid grid-cols-2 gap-4">
                     <button
-                      onClick={() => window.print()}
+                      onClick={() => {
+                        if (isFreeTier()) {
+                          setShowSubscriptionModal(true)
+                        } else {
+                          window.print()
+                        }
+                      }}
                       className="flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black h-16 rounded-[1.5rem] font-black text-[9px] tracking-widest active:scale-95 transition-all"
                     >
                       Download PDF
@@ -443,6 +453,12 @@ export default function UnifiedScanner() {
           )}
         </div>
       </div>
+
+      {/* Subscription Modal for Free Tier Users */}
+      <SubscriptionModal 
+        isOpen={showSubscriptionModal} 
+        onClose={() => setShowSubscriptionModal(false)} 
+      />
     </main>
   )
 }

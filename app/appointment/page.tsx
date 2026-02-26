@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -41,7 +41,7 @@ interface EligibilityResponse {
 
 const AppointmentPage = () => {
   const router = useRouter();
-  const [specialty, setSpecialty] = useState<"DERMATOLOGIST" | "CONSULTANT">(
+  const [specialty, setSpecialty] = useState<"DERMATOLOGIST" | "SKINCARE_CONSULTANT" | "REGISTERED_NURSE" | "MEDICAL_OFFICER">(
     "DERMATOLOGIST"
   );
   const [scheduledAt, setScheduledAt] = useState<Date | undefined>(undefined);
@@ -126,6 +126,15 @@ const AppointmentPage = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-[400px]">
+        <div className="pl-5">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="flex items-center gap-2 text-[#4DB6AC] text-sm font-bold hover:opacity-70 transition-opacity"
+          >
+            <ChevronLeft size={18} />
+            <span className="uppercase tracking-widest text-xs">Dashboard</span>
+          </button>
+         </div>
           <CardHeader>
             <CardTitle>Appointment Booking</CardTitle>
             <CardDescription>
@@ -150,8 +159,20 @@ const AppointmentPage = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-[450px]">
+    <div className="min-h-screen bg-gray-100">
+      {/* Back to Dashboard Button */}
+      <div className="fixed top-6 left-6 z-50">
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="flex items-center gap-2 text-[#4DB6AC] text-sm font-bold hover:opacity-70 transition-opacity"
+        >
+          <ChevronLeft size={18} />
+          <span className="uppercase tracking-widest text-xs">Dashboard</span>
+        </button>
+      </div>
+
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-[450px]">
         <CardHeader>
           <CardTitle>Book an Appointment</CardTitle>
           <CardDescription>
@@ -164,7 +185,7 @@ const AppointmentPage = () => {
               <Label htmlFor="specialty">Specialty</Label>
               <Select
                 value={specialty}
-                onValueChange={(value: "DERMATOLOGIST" | "CONSULTANT") =>
+                onValueChange={(value: "DERMATOLOGIST" | "SKINCARE_CONSULTANT" | "REGISTERED_NURSE" | "MEDICAL_OFFICER") =>
                   setSpecialty(value)
                 }
               >
@@ -173,7 +194,9 @@ const AppointmentPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="DERMATOLOGIST">Dermatologist</SelectItem>
-                  <SelectItem value="CONSULTANT">Consultant</SelectItem>
+                  <SelectItem value="SKINCARE_CONSULTANT">Skincare Consultant</SelectItem>
+                  <SelectItem value="REGISTERED_NURSE">Registered Nurse</SelectItem>
+                  <SelectItem value="MEDICAL_OFFICER">Medical Officer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -245,6 +268,7 @@ const AppointmentPage = () => {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
