@@ -44,6 +44,14 @@ export default function RootLayout({
   const publicRoutes = ["/", "/login", "/register", "/forgot-password"];
   const isPublicPage = publicRoutes.includes(pathname);
 
+  /**
+   * 🤖 AI ChatBot Visibility Logic
+   * Routes where the AIChatBot component should be hidden.
+   * These pages have their own specialized interfaces.
+   */
+  const hideChatBotRoutes = ["/", "/ingredient-analyzer", "/specialist"];
+  const shouldShowChatBot = !hideChatBotRoutes.includes(pathname);
+
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <head>
@@ -93,11 +101,13 @@ export default function RootLayout({
               </AnimatePresence>
 
               {/* 💬 PERSISTENT SUPPORT */}
-              <div className="fixed bottom-8 right-8 z-[100]">
-                <AIChatBot />
-              </div>
+              {shouldShowChatBot && (
+                <div className="fixed bottom-8 right-8 z-[100]">
+                  <AIChatBot />
+                </div>
+              )}
               <div className="fixed bottom-8 left-8 z-[100]">
-                <IngredientAnalyzer />
+                {/* <IngredientAnalyzer /> */}
               </div>
             </AuthGuard>
           </AuthProvider>

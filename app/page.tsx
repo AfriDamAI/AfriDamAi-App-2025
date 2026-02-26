@@ -16,6 +16,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import TeamMemberSection from "@/components/team-member-section"
+import Footer from "@/components/footer"
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -251,35 +252,7 @@ export default function LandingPage() {
       </section>
 
       {/* 🏷️ 7. FOOTER */}
-      <footer className="pt-32 pb-16 px-10 border-t border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-[#050505]">
-        <div className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16 text-center md:text-left">
-          <div className="md:col-span-6 space-y-10">
-            <img src="/logo.png" className={`h-10 w-auto mx-auto md:mx-0 ${isDark ? '' : 'invert'}`} alt="Logo" />
-            <p className="text-[11px] font-bold tracking-widest leading-loose opacity-20 max-w-sm mx-auto md:mx-0 italic">
-              Caring for melanin-rich skin through high-precision technology and love.
-            </p>
-          </div>
-          <div className="md:col-span-6 flex gap-16 justify-center md:justify-end">
-            <div className="space-y-8">
-              <p className="text-[10px] font-black capitalize tracking-widest text-[#E1784F]">Navigation</p>
-              <ul className="space-y-5 text-[10px] font-black capitalize tracking-widest opacity-30">
-                <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => router.push('/mission')}>Mission</li>
-                <li className="hover:text-[#E1784F] cursor-pointer" onClick={() => handleFeatureAccess('/marketplace')}>Care Hub</li>
-              </ul>
-            </div>
-            <div className="space-y-8">
-              <p className="text-[10px] font-black capitalize tracking-widest text-[#4DB6AC]">Legal</p>
-              <ul className="space-y-5 text-[10px] font-black tracking-widest opacity-30">
-                <li className="hover:text-[#4DB6AC] cursor-pointer" onClick={() => navigateToAuth('login')}>Login</li>
-                <li className="hover:text-[#4DB6AC] cursor-pointer">Security</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-screen-xl mx-auto mt-24 pt-10 border-t border-black/5 dark:border-white/5 text-center">
-          <p className="text-[9px] font-black tracking-[0.6em] opacity-10 italic">© 2026 AFRIDAM AI CLINICAL VISION ARCHITECTURE.</p>
-        </div>
-      </footer>
+      <Footer/>
 
       {/* MOBILE MENU */}
       <AnimatePresence>
@@ -330,7 +303,7 @@ export default function LandingPage() {
             </div>
 
             {/* Bottom Chat Icon */}
-            <div className="absolute bottom-12 right-6 w-12 h-12 bg-teal-400 rounded-2xl flex items-center justify-center">
+            {/* <div className="absolute bottom-12 right-6 w-12 h-12 bg-teal-400 rounded-2xl flex items-center justify-center">
               <svg
                 className="w-6 h-6 text-white"
                 fill="none"
@@ -344,7 +317,7 @@ export default function LandingPage() {
                   d="M7 8h10M7 12h4m1 8l-4-2H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 2z"
                 />
               </svg>
-            </div>
+            </div> */}
           </motion.div>
         )}
       </AnimatePresence>

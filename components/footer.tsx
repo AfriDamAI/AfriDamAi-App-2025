@@ -69,7 +69,7 @@ export default function Footer() {
                 // 🛡️ OGA FIX: Updated to match your actual folder structure
                 { label: "Skin Scanner", href: "/ai-scanner" },
                 { label: "Safety Checker", href: "/ingredient-analyzer" },
-                { label: "The Care Hub", href: "/marketplace" }
+                { label: "The Care Hub", href: "/contact" }
               ].map((link) => (
                 <li key={link.label}>
                   <Link
