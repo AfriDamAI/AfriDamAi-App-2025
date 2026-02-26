@@ -10,13 +10,26 @@ import { io, Socket } from "socket.io-client";
 
 // 🧬 Define the Message Data structure
 export interface SocketData {
-  content: string;
+  chatId?: string;
+  content?: string;
+  message?: string; // Support both 'content' and 'message'
   senderId?: string;
   userId?: string;
+  type?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'MISSED_CALL' | 'SYSTEM';
+  attachmentUrl?: string;
+  mimeType?: string;
+  fileSize?: number;
+  duration?: number;
   payload?: {
     note?: string;
     isTyping?: boolean;
     isNote?: boolean;
+    offer?: any;
+    answer?: any;
+    candidate?: any;
+    callType?: 'voice' | 'video';
+    from?: string;
+    to?: string;
   };
   timestamp?: string;
 }
@@ -62,16 +75,14 @@ export const useSocket = (url: string) => {
   }, [url]);
 
   /** 🛡️ listen: Type-Safe Listener **/
-  const listen = useCallback((event: string, callback: (data: SocketData) => void) => {
+  const listen = useCallback((event: string, callback: (data: any) => void) => {
     if (socket) {
-      socket.on(event, (data: SocketData) => {
-        callback(data);
-      });
+      socket.on(event, callback);
     }
   }, [socket]);
 
   /** 🛡️ emit: Type-Safe Emitter **/
-  const emit = useCallback((event: string, data: SocketData) => {
+  const emit = useCallback((event: string, data: any) => {
     if (socket) {
       socket.emit(event, {
         ...data,
@@ -80,5 +91,5 @@ export const useSocket = (url: string) => {
     }
   }, [socket]);
 
-  return { isConnected, listen, emit };
+  return { isConnected, listen, emit, socket };
 };

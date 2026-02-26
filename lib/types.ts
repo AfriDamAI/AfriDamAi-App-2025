@@ -59,6 +59,11 @@ export interface Message {
   chatId: string;
   senderId: string;
   message: string;
+  type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'MISSED_CALL' | 'SYSTEM';
+  attachmentUrl?: string;
+  mimeType?: string;
+  fileSize?: number;
+  duration?: number;
   timestamp: string; // Assuming ISO string date
   read?: boolean; // Optional, for read status
 }

@@ -146,8 +146,37 @@ export const getChatMessages = async (chatId: string): Promise<Message[]> => {
   return response.data;
 };
 
-export const sendUserChatMessage = async (chatId: string, senderId: string, message: string): Promise<Message> => {
-  const response = await apiClient.post("/chats/messages", { chatId, senderId, message });
+export const sendUserChatMessage = async (
+  chatId: string, 
+  senderId: string, 
+  message?: string,
+  type: string = 'TEXT',
+  attachmentUrl?: string,
+  mimeType?: string,
+  fileSize?: number,
+  duration?: number
+): Promise<Message> => {
+  const response = await apiClient.post("/chats/messages", { 
+    chatId, 
+    senderId, 
+    message,
+    type,
+    attachmentUrl,
+    mimeType,
+    fileSize,
+    duration
+  });
+  return response.data;
+};
+
+export const uploadFile = async (file: File): Promise<{ url: string; mimeType: string; size: number }> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiClient.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
 
