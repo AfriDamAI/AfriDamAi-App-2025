@@ -81,7 +81,7 @@ export function AppointmentBooking() {
         ) : (
           <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12">
             <div className="flex items-center gap-6">
-              <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 flex items-center justify-center border border-white/10 shadow-2xl">
+              <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center border border-white/10 shadow-2xl">
                 <Sparkles className="text-[#4DB6AC]" size={28} />
               </div>
               <div className="space-y-1">
@@ -101,7 +101,7 @@ export function AppointmentBooking() {
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full h-24 px-10 bg-white/5 border border-white/10 rounded-[2rem] text-white font-black uppercase text-lg focus:border-[#4DB6AC] outline-none transition-all appearance-none"
+                  className="w-full h-24 px-10 bg-white/5 border border-white/10 rounded-4xl text-white font-black uppercase text-lg focus:border-[#4DB6AC] outline-none transition-all appearance-none"
                   required
                 />
               </div>
@@ -116,7 +116,7 @@ export function AppointmentBooking() {
                   <select
                     value={formData.time}
                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full h-24 px-10 bg-white/5 border border-white/10 rounded-[2rem] text-white font-black uppercase text-lg focus:border-[#4DB6AC] outline-none transition-all appearance-none cursor-pointer"
+                    className="w-full h-24 px-10 bg-white/5 border border-white/10 rounded-4xl text-white font-black uppercase text-lg focus:border-[#4DB6AC] outline-none transition-all appearance-none cursor-pointer"
                     required
                   >
                     <option value="" className="bg-[#050505]">Select Priority Time</option>
