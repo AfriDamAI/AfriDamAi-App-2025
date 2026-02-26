@@ -28,7 +28,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   useEffect(() => {
     // 🔍 OGA DIAGNOSTIC
-    console.log("🛡️ GUARD_CHECK:", { pathname, isSignedIn, isLoading });
+    // console.log("🛡️ GUARD_CHECK:", { pathname, isSignedIn, isLoading });
 
     if (isLoading) return
 

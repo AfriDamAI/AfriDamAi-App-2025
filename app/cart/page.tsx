@@ -10,7 +10,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   ShoppingBag, ChevronLeft, Trash2,
-  Plus, Minus, Lock, ArrowRight, ShieldCheck
+  Plus, Minus, Lock, ArrowRight
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
@@ -82,10 +82,10 @@ export default function CartPage() {
         })),
       }
 
-      console.log("🛒 ATTEMPTING ORDER CREATION (Simplified Path):", orderData);
+      // console.log("🛒 ATTEMPTING ORDER CREATION (Simplified Path):", orderData);
 
       const newOrder = await apiClient.post<Order>('/orders', orderData)
-      console.log("🛒 ORDER CREATED SUCCESS:", newOrder.data);
+      // console.log("🛒 ORDER CREATED SUCCESS:", newOrder.data);
       router.push(`/transaction?orderId=${newOrder.data.id}`)
     } catch (error: any) {
       console.error("🛒 ORDER CREATION FAILURE:", error.response?.data || error.message)

@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation"
 // 🛡️ THE FIX: Explicit import to resolve ts(2304) and ts(2552)
 import { motion, AnimatePresence } from "framer-motion"
 import { 
-  ChevronLeft, Bell, MessageSquare, 
+  ChevronLeft, MessageSquare, 
   Sparkles, ShoppingBag, Loader2, 
-  CheckCircle2, Fingerprint, ShieldAlert
+  CheckCircle2, Fingerprint
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { apiClient } from "@/lib/api-client"

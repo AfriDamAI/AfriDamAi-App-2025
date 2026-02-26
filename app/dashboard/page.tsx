@@ -35,6 +35,10 @@ export default function Dashboard() {
     ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || user.firstName?.charAt(1) || ''}`.toUpperCase()
     : "A"
 
+  // Check if user has a restricted plan (free tier or test test plan)
+  const planName = user?.plan?.name?.toLowerCase() || ''
+  const isRestrictedPlan = planName === 'free tier' || planName === 'plan' || planName === 'test plan'
+
   useEffect(() => {
     if (!authLoading && !user) router.push("/login")
   }, [user, authLoading, router])
@@ -170,8 +174,21 @@ export default function Dashboard() {
           <section className="space-y-5 text-left pb-6">
             <div className="flex items-center justify-between px-3">
               <h4 className="text-[9px] font-black tracking-[0.4em] opacity-30">Clinical Diary</h4>
-              <button onClick={() => router.push('/history')} className="text-[8px] font-black tracking-widest text-[#4DB6AC]">View All</button>
+              <button 
+                onClick={() => !isRestrictedPlan && router.push('/history')} 
+                disabled={isRestrictedPlan}
+                className={`text-[8px] font-black tracking-widest ${isRestrictedPlan ? 'opacity-30 cursor-not-allowed' : 'text-[#4DB6AC] cursor-pointer'}`}
+              >
+                View All
+              </button>
             </div>
+            {isRestrictedPlan && (
+              <div className="px-3 py-2 bg-[#E1784F]/10 rounded-xl border border-[#E1784F]/20">
+                <p className="text-[8px] font-bold text-[#E1784F] tracking-wide">
+                  🔒 Upgrade your plan to access Clinical Diary history
+                </p>
+              </div>
+            )}
             <div className="space-y-3">
               <AnimatePresence>
                 {loadingHistory ? (
@@ -196,7 +213,11 @@ export default function Dashboard() {
                           <p className="text-[8px] font-bold opacity-30 tracking-widest">{new Date(scan.createdAt).toLocaleDateString()}</p>
                         </div>
                       </div>
-                      <div className="w-9 h-9 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center opacity-20 group-hover:opacity-100 group-hover:text-[#E1784F] transition-all">
+                      <div className={`w-9 h-9 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center transition-all ${
+                        isRestrictedPlan 
+                          ? 'opacity-20' 
+                          : 'opacity-20 group-hover:opacity-100 group-hover:text-[#E1784F]'
+                      }`}>
                         <ArrowRight size={14} />
                       </div>
                     </motion.div>
@@ -211,7 +232,7 @@ export default function Dashboard() {
           </section>
 
           {/* UPGRADE BUTTON FOR FREE TIER */}
-          {user?.plan?.name?.toLowerCase() === 'test plan' && (
+          {isRestrictedPlan && (
             <div className="pb-6">
               <button
                 onClick={() => setSubscriptionModalOpen(true)}
