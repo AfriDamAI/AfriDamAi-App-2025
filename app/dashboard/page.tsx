@@ -138,13 +138,13 @@ export default function Dashboard() {
                   <Zap size={9} fill="currentColor" />
                   <span className="text-[7px] font-black tracking-[0.15em]">Priority Service</span>
                 </div>
-                <h3 className="text-2xl font-black italic tracking-tighter leading-none">Specialist <br />Review</h3>
+                <h3 className="text-2xl font-black italic tracking-tighter leading-none">Book an <br />Urgent Appointment</h3>
                 <p className="text-[9px] font-bold opacity-50 tracking-tight max-w-[200px] leading-relaxed">
-                  Verified specialist clinical feedback within 24 hours.
+                  No waiting time, connect with a specialist in minutes.
                 </p>
               </div>
               <button onClick={() => router.push('/appointment')} className="w-full md:w-auto bg-[#E1784F] text-white px-8 py-4 rounded-xl font-black text-[9px] tracking-[0.15em] shadow-2xl active:scale-95 transition-all">
-                Book for ₦15000
+                Book a session
               </button>
             </div>
           </section>
