@@ -7,7 +7,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Mail, Phone, Lock, ArrowRight, Loader2, X, ChevronLeft, ShieldCheck, Fingerprint } from "lucide-react"
+import { Mail, Phone, Lock, ArrowRight, Loader2, X, ChevronLeft, ShieldCheck, Fingerprint, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -29,6 +29,7 @@ export default function RegisterPage() {
   })
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false)
 
   const handleCancel = () => {
     router.push("/");
@@ -42,6 +43,12 @@ export default function RegisterPage() {
         setStep(2)
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return
+    }
+    
+    // Require privacy policy acceptance on step 2
+    if (step === 2 && !acceptPrivacy) {
+      setError("Please accept the privacy policy to create an account.")
+      return
     }
     
     setError(null)
@@ -105,14 +112,7 @@ export default function RegisterPage() {
 
         {/* --- THE ENTRY PORTAL --- */}
         <div className="relative">
-            <button 
-                type="button"
-                onClick={handleCancel}
-                className="absolute -top-6 -right-2 md:-top-8 md:-right-8 p-3 md:p-4 text-white/20 hover:text-[#4DB6AC] hover:scale-110 transition-all z-[100]"
-            >
-                <X className="w-5 h-5 md:w-6 md:h-6" />
-            </button>
-
+           
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-8">
             
             {error && (
@@ -241,6 +241,22 @@ export default function RegisterPage() {
                             Your medical data is encrypted and protected.
                         </p>
                     </div>
+
+                    {/* Privacy Policy Checkbox */}
+                    <div className="flex items-start gap-3 p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/5">
+                        <div className="shrink-0 pt-0.5">
+                            <input
+                                type="checkbox"
+                                id="privacy-policy"
+                                checked={acceptPrivacy}
+                                onChange={(e) => setAcceptPrivacy(e.target.checked)}
+                                className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#4DB6AC] focus:ring-[#4DB6AC] focus:ring-offset-0 cursor-pointer"
+                            />
+                        </div>
+                        <label htmlFor="privacy-policy" className="text-[9px] text-white/40 font-medium leading-relaxed cursor-pointer">
+                            I accept the <a href="/privacy-policy" className="text-[#4DB6AC] hover:underline underline-offset-2">Privacy Policy</a> and consent to the use of my data for AI training purposes as described therein.
+                        </label>
+                    </div>
                 </motion.div>
                 )}
             </AnimatePresence>
@@ -248,8 +264,8 @@ export default function RegisterPage() {
             <div className="space-y-4">
                 <button
                     type="submit"
-                    disabled={isLoading}
-                    className="group w-full bg-[#E1784F] text-white font-black uppercase text-xs md:text-sm tracking-[0.3em] py-4 md:py-5 rounded-xl md:rounded-2xl shadow-[0_10px_30px_rgba(225,120,79,0.3)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 hover:bg-[#ff8a5c] active:scale-[0.97]"
+                    disabled={isLoading || (step === 2 && !acceptPrivacy)}
+                    className="group w-full bg-[#E1784F] text-white font-black uppercase text-xs md:text-sm tracking-[0.3em] py-4 md:py-5 rounded-xl md:rounded-2xl shadow-[0_10px_30px_rgba(225,120,79,0.3)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#ff8a5c] active:scale-[0.97]"
                 >
                     {isLoading ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
@@ -259,6 +275,16 @@ export default function RegisterPage() {
                             <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform" />
                         </>
                     )}
+                </button>
+                
+                {/* Back Button */}
+                <button
+                    type="button"
+                    onClick={() => window.history.back()}
+                    className="w-full flex items-center justify-center gap-2 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] py-3 hover:text-white transition-all"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Go Back
                 </button>
             </div>
             </form>
