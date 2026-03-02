@@ -5,7 +5,7 @@ import { Lock, Mail, ArrowRight, Loader2, X, Fingerprint, Eye, EyeOff, ArrowLeft
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { login as loginService } from "@/lib/api-client"
 
 export default function LoginPage() {
