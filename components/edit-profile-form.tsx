@@ -13,7 +13,8 @@ import {
   ChevronDown,
   X,
   History,
-  Thermometer
+  Thermometer,
+  ShieldCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -49,8 +50,12 @@ export const EditProfileForm = ({
     ageRange: 25,
     skinType: "",
     skinToneLevel: 4,
+    melaninTone: "",
+    primaryConcern: "",
+    environment: "",
     allergies: "",
-    previousTreatments: "",
+    knownSkinAllergies: [] as string[],
+    previousTreatments: [] as string[],
   });
 
   const [loading, setLoading] = useState(false);
@@ -71,8 +76,12 @@ export const EditProfileForm = ({
         ageRange: user.profile?.ageRange || 25,
         skinType: user.profile?.skinType || "",
         skinToneLevel: user.profile?.skinToneLevel || 4,
-        allergies: user.profile?.knownSkinAllergies?.join(", ") || "",
-        previousTreatments: user.profile?.previousTreatments?.join(", ") || "",
+        melaninTone: user.profile?.melaninTone || "",
+        primaryConcern: user.profile?.primaryConcern || "",
+        environment: user.profile?.environment || "",
+        allergies: user.profile?.allergies || "",
+        knownSkinAllergies: user.profile?.knownSkinAllergies || [],
+        previousTreatments: user.profile?.previousTreatments || [],
       });
     }
   }, [user]);
@@ -103,8 +112,12 @@ export const EditProfileForm = ({
         ageRange: Number(formData.ageRange),
         skinType: formData.skinType,
         skinToneLevel: Number(formData.skinToneLevel),
-        knownSkinAllergies: formData.allergies.split(",").map(s => s.trim()).filter(Boolean),
-        previousTreatments: formData.previousTreatments.split(",").map(s => s.trim()).filter(Boolean),
+        melaninTone: formData.melaninTone,
+        primaryConcern: formData.primaryConcern,
+        environment: formData.environment,
+        allergies: formData.allergies,
+        knownSkinAllergies: formData.knownSkinAllergies,
+        previousTreatments: formData.previousTreatments,
         onboardingSkipped: false
       });
 
@@ -216,6 +229,11 @@ export const EditProfileForm = ({
                 ))}
               </div>
             </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Primary Concern</label>
+              <input type="text" name="primaryConcern" value={formData.primaryConcern} onChange={handleChange} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" placeholder="Hyperpigmentation, Acne, etc." />
+            </div>
           </div>
 
           {/* CLINICAL METRICS */}
@@ -245,6 +263,16 @@ export const EditProfileForm = ({
             </div>
 
             <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Melanin Tone</label>
+              <input type="text" name="melaninTone" value={formData.melaninTone} onChange={handleChange} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" placeholder="Deep Melanin, etc." />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Environment</label>
+              <input type="text" name="environment" value={formData.environment} onChange={handleChange} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" placeholder="High Humidity, Dry, etc." />
+            </div>
+
+            <div className="space-y-2">
               <div className="flex items-center gap-2 ml-2">
                 <Thermometer size={12} className="text-[#E1784F]" />
                 <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Skin Tone (Fitzpatrick)</label>
@@ -264,11 +292,25 @@ export const EditProfileForm = ({
             <div className="space-y-2">
               <div className="flex items-center gap-2 ml-2">
                 <AlertTriangle className="text-red-500" size={12} />
-                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Known Allergies</label>
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Allergy Notes (Raw)</label>
               </div>
               <textarea
                 name="allergies" value={formData.allergies} onChange={handleChange}
                 rows={2} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] resize-none min-h-[80px]"
+                placeholder="Detailed raw notes about allergies..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 ml-2">
+                <ShieldCheck className="text-[#4DB6AC]" size={12} />
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Known Skin Allergies (Tags)</label>
+              </div>
+              <input
+                type="text"
+                value={formData.knownSkinAllergies.join(", ")}
+                onChange={(e) => setFormData({ ...formData, knownSkinAllergies: e.target.value.split(",").map(s => s.trim()).filter(Boolean) })}
+                className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]"
                 placeholder="Fragrance, Vitamin C, etc."
               />
             </div>
@@ -276,11 +318,13 @@ export const EditProfileForm = ({
             <div className="space-y-2">
               <div className="flex items-center gap-2 ml-2">
                 <History className="text-[#4DB6AC]" size={12} />
-                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Previous Treatments</label>
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Previous Treatments (Tags)</label>
               </div>
-              <textarea
-                name="previousTreatments" value={formData.previousTreatments} onChange={handleChange}
-                rows={2} className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] resize-none min-h-[80px]"
+              <input
+                type="text"
+                value={formData.previousTreatments.join(", ")}
+                onChange={(e) => setFormData({ ...formData, previousTreatments: e.target.value.split(",").map(s => s.trim()).filter(Boolean) })}
+                className="w-full py-4 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]"
                 placeholder="Laser therapy, Chemical peels, etc."
               />
             </div>
