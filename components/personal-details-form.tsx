@@ -19,6 +19,7 @@ import {
   ChevronDown,
   Heart,
   Pill,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -104,7 +105,13 @@ interface PersonalDetailsData {
 
 /* -------------------- COMPONENT -------------------- */
 
-export const PersonalDetailsForm = () => {
+export const PersonalDetailsForm = ({ 
+  onSuccess, 
+  onClose 
+}: { 
+  onSuccess?: () => void; 
+  onClose?: () => void; 
+}) => {
   const { user, refreshUser } = useAuth();
 
   const [formData, setFormData] = useState<PersonalDetailsData>({
@@ -199,19 +206,19 @@ export const PersonalDetailsForm = () => {
     setError(null);
 
     try {
-      // 🛡️ FORMAT DATA FOR API (Matching POST/PUT endpoint schema)
-      // ⚠️ FIXED: Only send fields that the backend UpdateUserDto expects
-      // Note: Profile data should be wrapped in a 'profile' object for the API
+      // 🛡️ FORMAT DATA FOR API (Matching PUT /api/profile schema)
+      const fitzpatrickMap: Record<string, number> = { "I": 1, "II": 2, "III": 3, "IV": 4, "V": 5, "VI": 6 };
+      
       const profilePayload = {
-        profile: {
-          ageRange: formData.age ? Number(formData.age) : 0,
-          skinType: formData.fitzpatrickSkinType,
-          knownSkinAllergies: formData.knownAllergies,
-          previousTreatments: [
-            formData.lastSkinTreatment,
-            formData.lastDermatologistConsultation
-          ].filter(Boolean),
-        }
+        ageRange: formData.age ? Number(formData.age) : 0,
+        skinType: formData.fitzpatrickSkinType,
+        skinToneLevel: fitzpatrickMap[formData.fitzpatrickSkinType] || 0,
+        knownSkinAllergies: formData.knownAllergies,
+        previousTreatments: [
+          formData.lastSkinTreatment,
+          formData.lastDermatologistConsultation
+        ].filter(Boolean),
+        onboardingSkipped: false
       };
 
       // 🚀 Determine if creating (first time) or updating (existing profile)
@@ -225,10 +232,20 @@ export const PersonalDetailsForm = () => {
         await createProfileAPI(profilePayload);
       }
 
+      // 🛡️ ALSO UPDATE BASIC USER INFO (Gender, Nationality) if they changed
+      if (user?.id) {
+        await useAuth().updateUserProfile({
+          sex: formData.gender,
+          nationality: formData.country === "Other" ? formData.otherCountry : formData.country
+        });
+      }
+
       setSuccess(true);
       
       // 🔄 Refresh user data to sync with new profile
       await refreshUser();
+      
+      if (onSuccess) onSuccess();
       
       setTimeout(() => setSuccess(false), 4000);
     } catch (err: any) {
@@ -243,7 +260,16 @@ export const PersonalDetailsForm = () => {
   /* -------------------- JSX -------------------- */
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {onClose && (
+        <button 
+          onClick={onClose}
+          className="absolute right-0 top-0 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-all z-50"
+        >
+          <X size={24} />
+        </button>
+      )}
+
       {/* HEADER */}
       <div className="space-y-3">
         <h2 className="text-4xl md:text-5xl font-black uppercase italic">
