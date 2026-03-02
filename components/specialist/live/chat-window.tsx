@@ -38,6 +38,7 @@ interface Message {
 export function ChatWindow() {
    const { user } = useAuth();
    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001/api";
+   console.log("logsocket", process.env.NEXT_PUBLIC_SOCKET_URL)
    const { isConnected, emit, listen } = useSocket(socketUrl);
 
    const [messages, setMessages] = useState<Message[]>([

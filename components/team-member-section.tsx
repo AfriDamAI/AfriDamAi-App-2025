@@ -23,7 +23,7 @@ const teamMembers = [
   },
   {
     id: 2,
-    name: "Dr. Anadu Urheka",
+    name: "Dr. Anand Urheka",
     title: "CMO",
     description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
     image: anaduImage,
