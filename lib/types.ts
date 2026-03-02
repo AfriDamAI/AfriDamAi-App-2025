@@ -49,12 +49,18 @@ export interface AuthResponse {
 export interface UserProfile {
   id?: string;
   userId?: string;
-  ageRange: number;
-  skinType: string;
-  skinToneLevel: number;
-  knownSkinAllergies: string[];
-  previousTreatments: string[];
-  onboardingSkipped: boolean;
+  ageRange?: number;
+  skinType?: string;
+  skinToneLevel?: number; // Fitzpatrick scale (1-6)
+  melaninTone?: string;
+  primaryConcern?: string;
+  environment?: string;
+  avatarUrl?: string;
+  allergies?: string; // Textarea version for raw notes
+  knownSkinAllergies?: string[];
+  previousTreatments?: string[];
+  onboardingSkipped?: boolean;
+  onboardingCompleted?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -100,19 +106,24 @@ export interface Message {
 export interface UpdateUserProfileDto {
   ageRange?: number;
   skinType?: string;
-  skinToneLevel?: number;
+  melaninTone?: string;
+  primaryConcern?: string;
+  environment?: string;
+  avatarUrl?: string;
+  allergies?: string;
+  onboardingCompleted?: boolean;
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
   onboardingSkipped?: boolean;
 }
 
-export interface CreateUserProfileDto extends UpdateUserProfileDto {
-  ageRange: number;
-  skinType: string;
-  skinToneLevel: number;
-  knownSkinAllergies: string[];
-  previousTreatments: string[];
-  onboardingSkipped: boolean;
+export interface CreateUserProfileDto {
+  ageRange?: number;
+  skinType?: string;
+  skinToneLevel?: number;
+  knownSkinAllergies?: string[];
+  previousTreatments?: string[];
+  onboardingSkipped?: boolean;
 }
 
 /** 🛡️ RE-ENFORCED: Profile Update Type **/
