@@ -106,6 +106,7 @@ export interface Message {
 export interface UpdateUserProfileDto {
   ageRange?: number;
   skinType?: string;
+  skinToneLevel?: number;
   melaninTone?: string;
   primaryConcern?: string;
   environment?: string;
@@ -121,6 +122,12 @@ export interface CreateUserProfileDto {
   ageRange?: number;
   skinType?: string;
   skinToneLevel?: number;
+  melaninTone?: string;
+  primaryConcern?: string;
+  environment?: string;
+  avatarUrl?: string;
+  allergies?: string;
+  onboardingCompleted?: boolean;
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
   onboardingSkipped?: boolean;
@@ -131,8 +138,14 @@ export interface UpdateUserDto extends Partial<Omit<CreateUserDto, 'password'>> 
   nationality?: string;
   // Rule 6: These match the Profile model in Prisma linked via AnalyzerService
   ageRange?: number;
-  skinToneLevel?: string; // Synced with 'Fitzpatrick Level' in AnalyzerService
+  skinType?: string;
+  skinToneLevel?: number;
+  melaninTone?: string;
   primaryConcern?: string;
+  environment?: string;
+  avatarUrl?: string;
+  allergies?: string;
+  onboardingCompleted?: boolean;
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
 }
