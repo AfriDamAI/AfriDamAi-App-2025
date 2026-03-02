@@ -40,8 +40,37 @@ export interface AuthResponse {
       lastName: string;
       sex: string;
       phoneNo: string;
+      onboardingCompleted?: boolean;
+      profile?: UserProfile | null;
     };
   };
+}
+
+export interface UserProfile {
+  id?: string;
+  userId?: string;
+  ageRange: number;
+  skinType: string;
+  skinToneLevel: number;
+  knownSkinAllergies: string[];
+  previousTreatments: string[];
+  onboardingSkipped: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  sex: string;
+  phoneNo: string;
+  isActive: boolean;
+  isSuspended: boolean;
+  lastLoginAt?: string;
+  onboardingCompleted: boolean;
+  profile: UserProfile | null;
 }
 
 export interface Chat {
@@ -66,6 +95,24 @@ export interface Message {
   duration?: number;
   timestamp: string; // Assuming ISO string date
   read?: boolean; // Optional, for read status
+}
+
+export interface UpdateUserProfileDto {
+  ageRange?: number;
+  skinType?: string;
+  skinToneLevel?: number;
+  knownSkinAllergies?: string[];
+  previousTreatments?: string[];
+  onboardingSkipped?: boolean;
+}
+
+export interface CreateUserProfileDto extends UpdateUserProfileDto {
+  ageRange: number;
+  skinType: string;
+  skinToneLevel: number;
+  knownSkinAllergies: string[];
+  previousTreatments: string[];
+  onboardingSkipped: boolean;
 }
 
 /** 🛡️ RE-ENFORCED: Profile Update Type **/
