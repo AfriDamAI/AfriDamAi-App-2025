@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM IDENTITY: PROFILE (Rule 7 Precision Sync)
- * Version: 2026.1.25
- * Focus: High-Precision Patch Handshake & Mobile-First Data Entry.
+ * Version: 2026.3.2
+ * Focus: Consolidated Profile Management with Modals.
  */
 
 "use client"
@@ -18,48 +18,33 @@ import {
   ShieldCheck, 
   Loader2, 
   LogOut,
-  Save,
   Fingerprint,
-  CheckCircle2
+  Edit3,
+  PlusCircle,
+  UserCircle,
+  Activity,
+  Calendar,
+  Layers,
+  Heart
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { apiClient } from "@/lib/api-client" 
+import { motion, AnimatePresence } from "framer-motion"
+import { PersonalDetailsForm } from "@/components/personal-details-form"
+import { EditProfileForm } from "@/components/edit-profile-form"
 
 export default function ProfilePage() {
   const { user, signOut, mutate } = useAuth()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
-  const [isUpdating, setIsUpdating] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
+  const [activeModal, setActiveModal] = useState<'profile' | 'user' | null>(null)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(user?.profile?.avatarUrl || null)
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phoneNo: "",
-    ageRange: 0,
-    skinType: "",
-    skinToneLevel: 0,
-  })
 
   useEffect(() => {
     if (!user) router.push("/login")
   }, [user, router])
-
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        phoneNo: user.phoneNo || "",
-        ageRange: user.profile?.ageRange || 0,
-        skinType: user.profile?.skinType || "",
-        skinToneLevel: user.profile?.skinToneLevel || 0,
-      })
-    }
-  }, [user])
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -86,35 +71,7 @@ export default function ProfilePage() {
     }
   }
 
-  const handleSaveProfile = async () => {
-    if (!user?.id) return
-    setIsUpdating(true)
-    setIsSuccess(false)
-    try {
-      /**
-       * 🛡️ RULE 7 SYNC: 
-       * Using PATCH /user/:id to match UserService and api-client logic.
-       */
-      await apiClient.patch(`/user/${user.id}`, {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phoneNo: formData.phoneNo,
-        profile: {
-          ageRange: formData.ageRange,
-          skinType: formData.skinType,
-          skinToneLevel: formData.skinToneLevel,
-        }
-      })
-      
-      await mutate()
-      setIsSuccess(true)
-      setTimeout(() => setIsSuccess(false), 3000)
-    } catch (err) {
-      console.log("Profile update paused - check internet")
-    } finally {
-      setIsUpdating(false)
-    }
-  }
+  const hasProfile = user?.profile && Object.keys(user.profile).length > 0;
 
   if (!user) return null
 
@@ -151,159 +108,249 @@ export default function ProfilePage() {
           </button>
         </header>
 
-        <section className="grid lg:grid-cols-2 gap-8 items-start">
-           {/* AVATAR PORTAL */}
-           <div className="flex flex-col items-center lg:items-start gap-6">
-              <div className="relative group">
-                 <div className="w-40 h-40 md:w-52 md:h-52 rounded-2xl overflow-hidden bg-gray-50 dark:bg-white/5 border-2 border-white dark:border-white/10 shadow-lg transition-all">
-                   {previewUrl ? (
-                     <img src={previewUrl} className="w-full h-full object-cover" alt="User" />
-                   ) : (
-                     <div className="w-full h-full flex items-center justify-center opacity-10">
-                       <User size={60} strokeWidth={1} />
-                     </div>
-                   )}
-                   {uploadingAvatar && (
-                     <div className="absolute inset-0 bg-black/40 backdrop-blur-md flex flex-col items-center justify-center space-y-2">
-                       <Loader2 className="animate-spin text-white" size={20} />
-                       <p className="text-[7px] font-black tracking-widest text-white">Saving photo...</p>
-                     </div>
-                   )}
-                 </div>
-                 <button 
-                   onClick={() => fileInputRef.current?.click()}
-                   className="absolute -bottom-2 -right-2 w-11 h-11 bg-[#E1784F] text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-all border-2 border-white dark:border-[#050505]"
-                 >
-                   <Camera size={18} />
-                 </button>
-                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleAvatarChange} />
+        <section className="grid lg:grid-cols-3 gap-8 items-start">
+           {/* LEFT COLUMN: IDENTITY CARD */}
+           <div className="lg:col-span-1 space-y-6">
+              <div className="bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[2.5rem] p-8 space-y-8 shadow-sm">
+                <div className="flex flex-col items-center gap-6">
+                  <div className="relative group">
+                    <div className="w-40 h-40 md:w-48 md:h-48 rounded-3xl overflow-hidden bg-white dark:bg-black border-2 border-white dark:border-white/10 shadow-xl transition-all">
+                      {previewUrl ? (
+                        <img src={previewUrl} className="w-full h-full object-cover" alt="User" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center opacity-10">
+                          <User size={60} strokeWidth={1} />
+                        </div>
+                      )}
+                      {uploadingAvatar && (
+                        <div className="absolute inset-0 bg-black/40 backdrop-blur-md flex flex-col items-center justify-center space-y-2">
+                          <Loader2 className="animate-spin text-white" size={20} />
+                          <p className="text-[7px] font-black tracking-widest text-white">Saving...</p>
+                        </div>
+                      )}
+                    </div>
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute -bottom-2 -right-2 w-11 h-11 bg-[#E1784F] text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-all border-2 border-white dark:border-[#050505]"
+                    >
+                      <Camera size={18} />
+                    </button>
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                  </div>
+                  
+                  <div className="text-center space-y-1">
+                    <h2 className="text-2xl font-black italic uppercase tracking-tighter">
+                      {user.firstName} {user.lastName}
+                    </h2>
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40">{user.email}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-black/5 dark:border-white/5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#E1784F]/10 flex items-center justify-center text-[#E1784F]">
+                      <Phone size={14} />
+                    </div>
+                    <p className="text-[10px] font-bold opacity-60">{user.phoneNo || "No phone linked"}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#4DB6AC]/10 flex items-center justify-center text-[#4DB6AC]">
+                      <MapPin size={14} />
+                    </div>
+                    <p className="text-[10px] font-bold opacity-60">{user.nationality || user.profile?.country || "Nigeria"}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+                      <UserCircle size={14} />
+                    </div>
+                    <p className="text-[10px] font-bold opacity-60 uppercase">{user.sex || "Unspecified"}</p>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => setActiveModal('user')}
+                  className="w-full py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-xl"
+                >
+                  <Edit3 size={14} /> Edit User Info
+                </button>
               </div>
-              <div className="space-y-2">
-                 <h3 className="text-xl font-black italic tracking-tighter leading-none">My Identity</h3>
-                 <p className="text-[10px] font-bold opacity-40 leading-relaxed max-w-sm tracking-tight">Updating your profile helps us personalize your skin journey. Keep your details current for the best results.</p>
+
+              <div className="bg-[#4DB6AC]/5 border border-[#4DB6AC]/10 rounded-3xl p-6 flex items-center gap-4">
+                 <ShieldCheck className="text-[#4DB6AC]" size={24} />
+                 <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC]">Privacy Guard Active</p>
+                    <p className="text-[8px] font-bold opacity-40">Your data is encrypted and synced with our clinical engine.</p>
+                 </div>
               </div>
            </div>
 
-           {/* DATA ENTRY GRID */}
-           <div className="space-y-6">
-              <div className="grid grid-cols-1 gap-4">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+           {/* RIGHT COLUMN: CLINICAL DATA */}
+           <div className="lg:col-span-2 space-y-6">
+              <div className="bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[2.5rem] p-8 md:p-10 space-y-10 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
+                  <Fingerprint size={120} />
+                </div>
+
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-black italic uppercase tracking-tighter">Clinical Profile</h3>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">AI-Diagnostic Context</p>
+                  </div>
+                  
+                  {hasProfile ? (
+                    <button 
+                      onClick={() => setActiveModal('profile')}
+                      className="px-6 py-4 bg-[#E1784F] text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg shadow-[#E1784F]/20 hover:scale-[1.02] transition-all"
+                    >
+                      <Edit3 size={14} /> Update Metrics
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => setActiveModal('profile')}
+                      className="px-6 py-4 bg-[#4DB6AC] text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg shadow-[#4DB6AC]/20 hover:scale-[1.02] transition-all animate-bounce"
+                    >
+                      <PlusCircle size={14} /> Create Profile
+                    </button>
+                  )}
+                </div>
+
+                {hasProfile ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white dark:bg-white/5 rounded-3xl p-6 space-y-4 border border-black/5 dark:border-white/10">
+                      <div className="flex items-center gap-3 text-[#E1784F]">
+                        <Activity size={18} />
+                        <h4 className="text-[10px] font-black uppercase tracking-widest">Dermal Metrics</h4>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-bold opacity-40 uppercase tracking-wider">Skin Type</span>
+                          <span className="text-xs font-black">{user.profile?.skinType || "Not Set"}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-bold opacity-40 uppercase tracking-wider">Tone Level</span>
+                          <span className="text-xs font-black">Fitzpatrick {user.profile?.skinToneLevel || "0"}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-bold opacity-40 uppercase tracking-wider">Age Range</span>
+                          <span className="text-xs font-black">{user.profile?.ageRange || "Not Set"} yrs</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-white/5 rounded-3xl p-6 space-y-4 border border-black/5 dark:border-white/10">
+                      <div className="flex items-center gap-3 text-[#4DB6AC]">
+                        <Heart size={18} />
+                        <h4 className="text-[10px] font-black uppercase tracking-widest">Health Context</h4>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold opacity-40 uppercase tracking-wider">Known Allergies</span>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {user.profile?.knownSkinAllergies?.length > 0 ? (
+                              user.profile.knownSkinAllergies.map((a: string) => (
+                                <span key={a} className="px-3 py-1 bg-red-500/10 text-red-500 text-[8px] font-black uppercase rounded-full">
+                                  {a}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-[10px] font-bold opacity-30 italic">None recorded</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold opacity-40 uppercase tracking-wider">Recent Treatments</span>
+                          <p className="text-[10px] font-bold leading-relaxed">
+                            {user.profile?.previousTreatments?.join(", ") || "No treatment history recorded."}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-2 bg-white dark:bg-white/5 rounded-3xl p-6 space-y-4 border border-black/5 dark:border-white/10">
+                       <div className="flex items-center gap-3 text-purple-500">
+                          <Layers size={18} />
+                          <h4 className="text-[10px] font-black uppercase tracking-widest">Environmental Context</h4>
+                       </div>
+                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="space-y-1">
+                             <p className="text-[8px] font-bold opacity-30 uppercase tracking-widest">Region</p>
+                             <p className="text-[10px] font-black">{user.profile?.region || "West Africa"}</p>
+                          </div>
+                          <div className="space-y-1">
+                             <p className="text-[8px] font-bold opacity-30 uppercase tracking-widest">App Usage</p>
+                             <p className="text-[10px] font-black uppercase">{user.profile?.appActiveness || "Moderate"}</p>
+                          </div>
+                          <div className="space-y-1">
+                             <p className="text-[8px] font-bold opacity-30 uppercase tracking-widest">Lotion</p>
+                             <p className="text-[10px] font-black">{user.profile?.knownBodyLotion || "Not Set"}</p>
+                          </div>
+                          <div className="space-y-1">
+                             <p className="text-[8px] font-bold opacity-30 uppercase tracking-widest">Brand</p>
+                             <p className="text-[10px] font-black">{user.profile?.bodyLotionBrand || "Not Set"}</p>
+                          </div>
+                       </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-20 space-y-6 text-center">
+                    <div className="w-20 h-20 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center text-gray-400">
+                      <Calendar size={40} strokeWidth={1} />
+                    </div>
                     <div className="space-y-2">
-                        <label className="text-[8px] font-black tracking-[0.2em] opacity-30 ml-3">First Name</label>
-                        <input 
-                        type="text" 
-                        value={formData.firstName}
-                        onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl py-4 px-5 font-bold focus:border-[#E1784F] outline-none transition-all text-sm tracking-tight shadow-inner"
-                        />
+                      <h4 className="text-xl font-black italic uppercase tracking-tighter">No Profile Found</h4>
+                      <p className="text-[10px] font-bold opacity-40 max-w-xs uppercase tracking-widest leading-loose">
+                        Your clinical metrics are empty. Create a profile to unlock personalized AI analysis.
+                      </p>
                     </div>
-                    <div className="space-y-2">
-                        <label className="text-[8px] font-black tracking-[0.2em] opacity-30 ml-3">Last Name</label>
-                        <input 
-                        type="text" 
-                        value={formData.lastName}
-                        onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl py-4 px-5 font-bold focus:border-[#E1784F] outline-none transition-all text-sm tracking-tight shadow-inner"
-                        />
-                    </div>
-                 </div>
-                
-                 <div className="space-y-2">
-                    <label className="text-[8px] font-black tracking-[0.2em] opacity-30 ml-3">Email Address</label>
-                    <div className="relative">
-                      <Mail className="absolute left-5 top-1/2 -translate-y-1/2 opacity-20" size={14} />
-                      <input 
-                        type="email" 
-                        disabled
-                        value={user.email}
-                        className="w-full bg-gray-100 dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-xl py-4 pl-12 pr-5 font-bold opacity-30 cursor-not-allowed text-sm tracking-tight"
-                      />
-                    </div>
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[8px] font-black tracking-[0.2em] opacity-30 ml-3">Phone Number</label>
-                    <div className="relative">
-                      <Phone className="absolute left-5 top-1/2 -translate-y-1/2 opacity-20" size={14} />
-                      <input 
-                        type="tel" 
-                        value={formData.phoneNo}
-                        onChange={(e) => setFormData({...formData, phoneNo: e.target.value})}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl py-4 pl-12 pr-5 font-bold focus:border-[#E1784F] outline-none transition-all text-sm tracking-tight shadow-inner"
-                        placeholder="Mobile Number"
-                      />
-                    </div>
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[8px] font-black tracking-[0.2em] opacity-30 ml-3">Home Region</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 opacity-20" size={14} />
-                      <input 
-                        type="text" 
-                        disabled
-                        value={user.profile?.country || "Nigeria"}
-                        className="w-full bg-gray-100 dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-xl py-4 pl-12 pr-5 font-bold opacity-30 text-sm tracking-tight"
-                      />
-                    </div>
-                 </div>
-
-                 <div className="space-y-2">
-                    <label className="text-[8px] font-black tracking-[0.2em] opacity-30 ml-3">Age</label>
-                    <input 
-                      type="number" 
-                      value={formData.ageRange}
-                      onChange={(e) => setFormData({...formData, ageRange: parseInt(e.target.value) || 0})}
-                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl py-4 px-5 font-bold focus:border-[#E1784F] outline-none transition-all text-sm tracking-tight shadow-inner"
-                      placeholder="Your Age"
-                    />
-                 </div>
-
-                 <div className="space-y-2">
-                    <label className="text-[8px] font-black tracking-[0.2em] opacity-30 ml-3">Skin Type</label>
-                    <input 
-                      type="text" 
-                      value={formData.skinType}
-                      onChange={(e) => setFormData({...formData, skinType: e.target.value})}
-                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl py-4 px-5 font-bold focus:border-[#E1784F] outline-none transition-all text-sm tracking-tight shadow-inner"
-                      placeholder="e.g., Brown, Dark, Light"
-                    />
-                 </div>
-
-                 <div className="space-y-2">
-                    <label className="text-[8px] font-black tracking-[0.2em] opacity-30 ml-3">Skin Tone Level (1-6)</label>
-                    <input 
-                      type="number" 
-                      min="1"
-                      max="6"
-                      value={formData.skinToneLevel}
-                      onChange={(e) => setFormData({...formData, skinToneLevel: parseInt(e.target.value) || 0})}
-                      className="w-full bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl py-4 px-5 font-bold focus:border-[#E1784F] outline-none transition-all text-sm tracking-tight shadow-inner"
-                      placeholder="Fitzpatrick Scale (1-6)"
-                    />
-                 </div>
-              </div>
-
-              <div className="pt-4 space-y-4">
-                 <button 
-                  onClick={handleSaveProfile}
-                  disabled={isUpdating}
-                  className={`w-full h-14 rounded-xl font-black text-[10px] tracking-[0.3em] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-2 ${
-                      isSuccess ? 'bg-[#4DB6AC] text-white shadow-[#4DB6AC]/20' : 'bg-[#E1784F] text-white shadow-[#E1784F]/20'
-                  }`}
-                 >
-                   {isUpdating ? <Loader2 className="animate-spin" /> : isSuccess ? <><CheckCircle2 size={16} /> Profile Updated</> : <>Save Changes <Save size={16} /></>}
-                 </button>
-
-                 <div className="flex flex-col items-center gap-2 opacity-20">
-                    <div className="flex items-center gap-2">
-                       <ShieldCheck size={10} className="text-[#4DB6AC]" />
-                       <p className="text-[7px] font-black tracking-widest">Privacy verified</p>
-                    </div>
-                    <Fingerprint size={16} />
-                 </div>
+                  </div>
+                )}
               </div>
            </div>
         </section>
       </div>
+
+      {/* --- MODAL OVERLAYS --- */}
+      <AnimatePresence>
+        {activeModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white dark:bg-[#0A0A0A] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative scrollbar-hide"
+            >
+              <div className="p-6 md:p-10">
+                {activeModal === 'profile' ? (
+                  <PersonalDetailsForm 
+                    onSuccess={() => setActiveModal(null)} 
+                    onClose={() => setActiveModal(null)} 
+                  />
+                ) : (
+                  <EditProfileForm 
+                    onSuccess={() => setActiveModal(null)} 
+                    onClose={() => setActiveModal(null)} 
+                  />
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </main>
   )
 }
