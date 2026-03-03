@@ -16,6 +16,7 @@ import { AuthGuard } from "@/components/auth-guard"
 import { AppWrapper } from "@/components/app-wrapper"
 import { AIChatBot } from "@/components/ai/ai-chatbot"
 import { IngredientAnalyzer } from "@/components/ai/ingredient-analyzer"
+import { CallProvider } from "@/providers/call-provider"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -78,37 +79,39 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <AuthGuard>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={pathname}
-                  className="min-h-[100svh] w-full relative z-10 flex flex-col"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                >
-                  {/* 🚀 RULE 6: High-speed route management */}
-                  {isPublicPage ? (
-                    <main className="w-full flex-1">
-                      {children}
-                    </main>
-                  ) : (
-                    <AppWrapper>
-                      {children}
-                    </AppWrapper>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+              <CallProvider>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={pathname}
+                    className="min-h-[100svh] w-full relative z-10 flex flex-col"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                  >
+                    {/* 🚀 RULE 6: High-speed route management */}
+                    {isPublicPage ? (
+                      <main className="w-full flex-1">
+                        {children}
+                      </main>
+                    ) : (
+                      <AppWrapper>
+                        {children}
+                      </AppWrapper>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
 
-              {/* 💬 PERSISTENT SUPPORT */}
-              {shouldShowChatBot && (
-                <div className="fixed bottom-8 right-8 z-[100]">
-                  <AIChatBot />
+                {/* 💬 PERSISTENT SUPPORT */}
+                {shouldShowChatBot && (
+                  <div className="fixed bottom-8 right-8 z-[100]">
+                    <AIChatBot />
+                  </div>
+                )}
+                <div className="fixed bottom-8 left-8 z-[100]">
+                  {/* <IngredientAnalyzer /> */}
                 </div>
-              )}
-              <div className="fixed bottom-8 left-8 z-[100]">
-                {/* <IngredientAnalyzer /> */}
-              </div>
+              </CallProvider>
             </AuthGuard>
           </AuthProvider>
         </ThemeProvider>
