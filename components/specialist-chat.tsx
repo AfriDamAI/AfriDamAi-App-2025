@@ -222,7 +222,7 @@ export const SpecialistChat = () => {
   };
 
   return (
-    <div className={`flex h-screen overflow-hidden ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
+    <div className={`flex h-[calc(100vh-80px)] md:h-[calc(100vh-96px)] overflow-hidden ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
 
       {/* Left Sidebar: Chat List */}
       <div className={`w-80 flex flex-col ${isDark ? 'bg-[#151312] border-r border-white/5' : 'bg-white border-r border-gray-200'}`}>
@@ -321,7 +321,7 @@ export const SpecialistChat = () => {
                         {renderMessageContent(msg)}
                       </div>
                       <span className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">
-                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(msg.timestamp || msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   </div>
