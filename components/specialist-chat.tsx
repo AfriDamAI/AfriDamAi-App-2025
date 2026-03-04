@@ -16,18 +16,16 @@ import {
 } from "@/lib/api-client";
 import { Chat, Message } from "@/lib/types";
 import { useSocket } from "@/hooks/use-socket";
-import { useCall } from "@/hooks/use-call";
-import { environment } from "@/lib/environment";
-import { IncomingCall } from "./specialist/live/incoming-call";
 import { VoiceRecorder } from "./specialist/live/voice-recorder";
 import { CallControls } from "./specialist/live/call-controls";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCallContext } from "@/providers/call-provider";
 
 export const SpecialistChat = () => {
   const { user } = useAuth();
   const router = useRouter();
   const CURRENT_USER_ID = user?.id || "";
-  
+
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,11 +34,15 @@ export const SpecialistChat = () => {
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  
-  // Call States
-  const [incomingCallData, setIncomingCallData] = useState<{from: string, type: 'voice' | 'video', offer: any, chatId: string} | null>(null);
-  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-  
+
+  const {
+    isCalling,
+    callType,
+    remoteUserId,
+    startCall,
+    endCall
+  } = useCallContext();
+
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -48,44 +50,8 @@ export const SpecialistChat = () => {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
 
-  const socketUrl = environment.backendUrl.replace("/api", "");
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
   const { socket, listen, emit } = useSocket(socketUrl);
-
-  const {
-    isCalling,
-    callType,
-    remoteUserId,
-    localStream,
-    startCall,
-    acceptCall,
-    endCall,
-    cleanup
-  } = useCall({
-    socket,
-    currentUserId: CURRENT_USER_ID,
-    onIncomingCall: (from, type, offer, chatId) => {
-      setIncomingCallData({ from, type, offer, chatId });
-    },
-    onRemoteStream: (stream) => {
-      setRemoteStream(stream);
-    },
-    onCallEnded: () => {
-      setRemoteStream(null);
-      setIncomingCallData(null);
-    }
-  });
-
-  useEffect(() => {
-    if (remoteStream && remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = remoteStream;
-    }
-  }, [remoteStream]);
-
-  useEffect(() => {
-    if (localStream && localVideoRef.current && callType === 'video') {
-      localVideoRef.current.srcObject = localStream;
-    }
-  }, [localStream, callType]);
 
   useEffect(() => {
     fetchUserChats();
@@ -99,7 +65,7 @@ export const SpecialistChat = () => {
           markMessageAsRead(msg.id);
         }
         // Update chat list last message
-        setChats(prev => prev.map(chat => 
+        setChats(prev => prev.map(chat =>
           chat.id === msg.chatId ? { ...chat, lastMessage: msg } : chat
         ));
       };
@@ -223,20 +189,6 @@ export const SpecialistChat = () => {
     startCall(otherUserId, selectedChat.id, type);
   };
 
-  const handleAcceptCall = () => {
-    if (incomingCallData) {
-      acceptCall(incomingCallData.from, incomingCallData.chatId, incomingCallData.type, incomingCallData.offer);
-      setIncomingCallData(null);
-    }
-  };
-
-  const handleRejectCall = () => {
-    if (incomingCallData && socket) {
-      socket.emit('call-end', { to: incomingCallData.from, chatId: incomingCallData.chatId });
-      setIncomingCallData(null);
-    }
-  };
-
   const renderMessageContent = (msg: Message) => {
     switch (msg.type) {
       case 'IMAGE':
@@ -271,16 +223,6 @@ export const SpecialistChat = () => {
 
   return (
     <div className={`flex h-screen overflow-hidden ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
-      <AnimatePresence>
-        {incomingCallData && (
-          <IncomingCall 
-            fromName={incomingCallData.from}
-            callType={incomingCallData.type}
-            onAccept={handleAcceptCall}
-            onReject={handleRejectCall}
-          />
-        )}
-      </AnimatePresence>
 
       {/* Left Sidebar: Chat List */}
       <div className={`w-80 flex flex-col ${isDark ? 'bg-[#151312] border-r border-white/5' : 'bg-white border-r border-gray-200'}`}>
@@ -296,9 +238,8 @@ export const SpecialistChat = () => {
             <input
               type="text"
               placeholder="Search conversations..."
-              className={`w-full pl-10 pr-4 py-2 rounded-lg text-sm outline-none transition-all ${
-                isDark ? 'bg-white/5 border border-white/10 focus:border-[#4DB6AC]/50' : 'bg-gray-100 border border-gray-200 focus:border-[#4DB6AC]'
-              }`}
+              className={`w-full pl-10 pr-4 py-2 rounded-lg text-sm outline-none transition-all ${isDark ? 'bg-white/5 border border-white/10 focus:border-[#4DB6AC]/50' : 'bg-gray-100 border border-gray-200 focus:border-[#4DB6AC]'
+                }`}
             />
           </div>
         </div>
@@ -319,9 +260,8 @@ export const SpecialistChat = () => {
                 <button
                   key={chat.id}
                   onClick={() => setSelectedChat(chat)}
-                  className={`flex items-center gap-3 p-4 w-full text-left transition-all ${
-                    isActive ? 'bg-[#4DB6AC]/10 border-l-4 border-[#4DB6AC]' : 'hover:bg-gray-50 dark:hover:bg-white/5 border-l-4 border-transparent'
-                  }`}
+                  className={`flex items-center gap-3 p-4 w-full text-left transition-all ${isActive ? 'bg-[#4DB6AC]/10 border-l-4 border-[#4DB6AC]' : 'hover:bg-gray-50 dark:hover:bg-white/5 border-l-4 border-transparent'
+                    }`}
                 >
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold">
                     {otherUserId[0].toUpperCase()}
@@ -343,47 +283,7 @@ export const SpecialistChat = () => {
       <div className="flex-1 flex flex-col relative">
         {selectedChat ? (
           <>
-            {/* Call Overlay */}
-            <AnimatePresence>
-              {isCalling && (
-                <motion.div 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-[150] bg-black flex flex-col items-center justify-center"
-                >
-                  {callType === 'video' ? (
-                    <>
-                      <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
-                      <div className="absolute top-6 right-6 w-32 h-48 rounded-2xl border-2 border-white/20 overflow-hidden bg-gray-900 shadow-2xl">
-                        <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover mirror" />
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex flex-col items-center gap-6">
-                      <div className="w-32 h-32 rounded-full bg-[#4DB6AC] flex items-center justify-center text-white text-4xl font-bold animate-pulse shadow-2xl shadow-[#4DB6AC]/20">
-                        {remoteUserId?.[0].toUpperCase()}
-                      </div>
-                      <h2 className="text-2xl font-bold text-white">{remoteUserId}</h2>
-                      <p className="text-[#4DB6AC] uppercase tracking-[0.4em] text-[10px] font-black">In Voice Call...</p>
-                    </div>
-                  )}
-                  
-                  <div className="absolute bottom-12">
-                    <CallControls 
-                      isMuted={false}
-                      isVideoOff={callType === 'voice'}
-                      onToggleMic={() => {}}
-                      onToggleVideo={() => {}}
-                      onHangUp={() => {
-                         const otherId = selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id;
-                         endCall(otherId, selectedChat.id);
-                      }}
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Call Overlay handled by CallProvider */}
 
             {/* Chat Header */}
             <div className={`px-6 py-4 border-b flex items-center justify-between ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
@@ -416,9 +316,8 @@ export const SpecialistChat = () => {
                 return (
                   <div key={msg.id} className={`flex gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[70%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
-                      <div className={`px-4 py-2.5 rounded-2xl text-sm ${
-                        isOwn ? 'bg-[#4DB6AC] text-white rounded-br-md' : (isDark ? 'bg-[#1F1E1D] text-gray-200 rounded-bl-md border border-white/5' : 'bg-white text-gray-800 rounded-bl-md border border-gray-200')
-                      }`}>
+                      <div className={`px-4 py-2.5 rounded-2xl text-sm ${isOwn ? 'bg-[#4DB6AC] text-white rounded-br-md' : (isDark ? 'bg-[#1F1E1D] text-gray-200 rounded-bl-md border border-white/5' : 'bg-white text-gray-800 rounded-bl-md border border-gray-200')
+                        }`}>
                         {renderMessageContent(msg)}
                       </div>
                       <span className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">
@@ -434,37 +333,37 @@ export const SpecialistChat = () => {
             <div className={`p-4 border-t ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
               <div className="flex items-end gap-3">
                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-                
+
                 {isRecording ? (
                   <VoiceRecorder onSend={handleVoiceNote} onCancel={() => setIsRecording(false)} />
                 ) : (
                   <>
-                    <button 
-                      onClick={() => fileInputRef.current?.click()} 
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
                       className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1"
                     >
                       {isUploading ? <Loader2 size={20} className="animate-spin text-[#4DB6AC]" /> : <Paperclip size={20} />}
                     </button>
-                    
+
                     <div className={`flex-1 rounded-2xl border transition-all ${isDark ? 'bg-[#1F1E1D] border-white/10 focus-within:border-[#4DB6AC]/50' : 'bg-gray-50 border-gray-200 focus-within:border-[#4DB6AC]'}`}>
                       <textarea
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }}}
+                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
                         placeholder="Type message..."
                         rows={1}
                         className="w-full px-4 py-3 bg-transparent outline-none resize-none text-sm"
                       />
                     </div>
-                    
-                    <button 
+
+                    <button
                       onClick={() => setIsRecording(true)}
                       className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1"
                     >
                       <Mic size={20} />
                     </button>
-                    
+
                     <button
                       onClick={() => handleSendMessage()}
                       disabled={!inputMessage.trim()}
