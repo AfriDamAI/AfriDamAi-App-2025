@@ -51,11 +51,11 @@ export const useSocket = (url: string) => {
       reconnection: true,
       reconnectionAttempts: 10,
       timeout: 20000,
+      forceNew: true, // 🚀 Ensure a fresh connection to avoid session reuse issues
       auth: {
         token: typeof window !== 'undefined' ? localStorage.getItem("token") : null
       }
     });
-
     socketInstance.on("connect", () => {
       setIsConnected(true);
       // 🛡️ Soft Tone: Keep it relatable
