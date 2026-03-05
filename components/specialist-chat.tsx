@@ -52,7 +52,7 @@ export const SpecialistChat = () => {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
 
-  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "https://afridam-backend-prod-107032494605.us-central1.run.app";
   const { socket, listen, emit } = useSocket(socketUrl);
 
   useEffect(() => {
