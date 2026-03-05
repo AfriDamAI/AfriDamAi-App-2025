@@ -56,6 +56,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         offer: any;
         chatId: string;
     } | null>(null);
+    const [missedCalls, setMissedCalls] = useState<Array<{ from: string, type: 'voice' | 'video', time: string }>>([]);
+    const ringtoneRef = useRef<HTMLAudioElement | null>(null);
 
     const {
         isCalling,
@@ -72,15 +74,43 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentUserId: user?.id || "",
         onIncomingCall: (from, type, offer, chatId) => {
             setIncomingCallData({ from, type, offer, chatId });
+            // 🎙️ Ringtone logic
+            try {
+                if (!ringtoneRef.current) {
+                    ringtoneRef.current = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3");
+                    ringtoneRef.current.loop = true;
+                }
+                ringtoneRef.current.play().catch(e => console.log("Audio play blocked", e));
+            } catch (e) {
+                console.error("Failed to play ringtone", e);
+            }
         },
         onCallAccepted: (answer) => {
             console.log("Call accepted by remote user");
+            if (ringtoneRef.current) {
+                ringtoneRef.current.pause();
+                ringtoneRef.current.currentTime = 0;
+            }
         },
         onCallEnded: () => {
             setRemoteStream(null);
             setIncomingCallData(null);
+            if (ringtoneRef.current) {
+                ringtoneRef.current.pause();
+                ringtoneRef.current.currentTime = 0;
+            }
             if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
             if (localVideoRef.current) localVideoRef.current.srcObject = null;
+        },
+        onMissedCall: (from, type, chatId) => {
+            setMissedCalls(prev => [{ from, type, time: new Date().toISOString() }, ...prev]);
+            setIncomingCallData(null);
+            if (ringtoneRef.current) {
+                ringtoneRef.current.pause();
+                ringtoneRef.current.currentTime = 0;
+            }
+            // 🚨 Trigger a notification (browser toast or custom)
+            alert(`Missed ${type} call from ${from}`);
         },
         onRemoteStream: (stream) => {
             setRemoteStream(stream);
