@@ -46,7 +46,7 @@ export const useSocket = (url: string) => {
      * Ensuring the token is pulled from local storage for the specialist sync.
      */
     const socketInstance = io(url, {
-      transports: ["websocket"],
+      transports: ["polling", "websocket"],
       secure: true,
       reconnection: true,
       auth: {

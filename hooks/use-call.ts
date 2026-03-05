@@ -14,6 +14,7 @@ interface UseCallProps {
   onIncomingCall?: (from: string, type: 'voice' | 'video', offer: any, chatId: string) => void;
   onCallAccepted?: (answer: any) => void;
   onCallEnded?: () => void;
+  onMissedCall?: (from: string, type: 'voice' | 'video', chatId: string) => void;
   onRemoteStream?: (stream: MediaStream) => void;
 }
 
@@ -23,6 +24,7 @@ export const useCall = ({
   onIncomingCall, 
   onCallAccepted, 
   onCallEnded,
+  onMissedCall,
   onRemoteStream
 }: UseCallProps) => {
   const [isCalling, setIsCalling] = useState(false);
@@ -193,7 +195,12 @@ export const useCall = ({
       }
     };
 
-    const handleCallEnded = () => {
+    const handleCallEnded = (data?: any) => {
+      // If we were in an incoming call state (incomingCallData in provider) but not yet calling
+      // Or if isCalling is false but we were notified of an incoming call
+      if (onMissedCall && data?.wasMissed) {
+        onMissedCall(data.from, data.type, data.chatId);
+      }
       cleanup();
       if (onCallEnded) onCallEnded();
     };
@@ -202,14 +209,18 @@ export const useCall = ({
     socket.on('call-answer', handleCallAccepted);
     socket.on('ice-candidate', handleIceCandidate);
     socket.on('call-end', handleCallEnded);
+    socket.on('call-missed', (data: any) => {
+      if (onMissedCall) onMissedCall(data.from, data.type, data.chatId);
+    });
 
     return () => {
       socket.off('call-offer', handleIncomingCall);
       socket.off('call-answer', handleCallAccepted);
       socket.off('ice-candidate', handleIceCandidate);
       socket.off('call-end', handleCallEnded);
+      socket.off('call-missed');
     };
-  }, [socket, onIncomingCall, onCallAccepted, onCallEnded, cleanup]);
+  }, [socket, onIncomingCall, onCallAccepted, onCallEnded, onMissedCall, cleanup]);
 
   return {
     isCalling,
