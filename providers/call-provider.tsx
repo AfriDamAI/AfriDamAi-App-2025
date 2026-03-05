@@ -1,0 +1,209 @@
+"use client";
+
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
+import { useSocket } from "@/hooks/use-socket";
+import { useAuth } from "@/providers/auth-provider";
+import { useCall } from "@/hooks/use-call";
+import { IncomingCall } from "@/components/specialist/live/incoming-call";
+import { CallControls } from "@/components/specialist/live/call-controls";
+import { AnimatePresence, motion } from "framer-motion";
+import { apiClient } from "@/lib/api-client";
+import { PhoneOff } from "lucide-react";
+
+interface CallContextType {
+    isCalling: boolean;
+    callType: 'voice' | 'video' | null;
+    remoteUserId: string | null;
+    currentChatId: string | null;
+    localStream: MediaStream | null;
+    remoteStream: MediaStream | null;
+    startCall: (targetId: string, chatId: string, type: 'voice' | 'video') => Promise<MediaStream>;
+    acceptCall: () => Promise<MediaStream>;
+    rejectCall: () => void;
+    endCall: () => void;
+}
+
+const CallContext = createContext<CallContextType | undefined>(undefined);
+
+export const useCallContext = () => {
+    const context = useContext(CallContext);
+    if (!context) {
+        throw new Error("useCallContext must be used within a CallProvider");
+    }
+    return context;
+};
+
+export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { user } = useAuth();
+    const remoteVideoRef = useRef<HTMLVideoElement>(null);
+    const localVideoRef = useRef<HTMLVideoElement>(null);
+
+    const getSocketUrl = () => {
+        if (process.env.NEXT_PUBLIC_SOCKET_URL) return process.env.NEXT_PUBLIC_SOCKET_URL;
+        const baseURL = apiClient.defaults.baseURL;
+        if (baseURL && typeof baseURL === 'string') {
+            if (baseURL.endsWith("/api")) return baseURL.slice(0, -4);
+            return baseURL;
+        }
+        return "https://afridam-backend-prod-107032494605.us-central1.run.app";
+    };
+
+    const { socket } = useSocket(getSocketUrl());
+    const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+    const [incomingCallData, setIncomingCallData] = useState<{
+        from: string;
+        type: 'voice' | 'video';
+        offer: any;
+        chatId: string;
+    } | null>(null);
+
+    const {
+        isCalling,
+        callType,
+        remoteUserId,
+        currentChatId,
+        localStream,
+        startCall: baseStartCall,
+        acceptCall: baseAcceptCall,
+        endCall: baseEndCall,
+        cleanup
+    } = useCall({
+        socket,
+        currentUserId: user?.id || "",
+        onIncomingCall: (from, type, offer, chatId) => {
+            setIncomingCallData({ from, type, offer, chatId });
+        },
+        onCallAccepted: (answer) => {
+            console.log("Call accepted by remote user");
+        },
+        onCallEnded: () => {
+            setRemoteStream(null);
+            setIncomingCallData(null);
+            if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+            if (localVideoRef.current) localVideoRef.current.srcObject = null;
+        },
+        onRemoteStream: (stream) => {
+            setRemoteStream(stream);
+        }
+    });
+
+    useEffect(() => {
+        if (remoteStream && remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = remoteStream;
+        }
+    }, [remoteStream, isCalling]);
+
+    useEffect(() => {
+        if (localStream && localVideoRef.current && callType === 'video') {
+            localVideoRef.current.srcObject = localStream;
+        }
+    }, [localStream, callType, isCalling]);
+
+    const startCall = async (targetId: string, chatId: string, type: 'voice' | 'video') => {
+        return baseStartCall(targetId, chatId, type);
+    };
+
+    const acceptCall = async () => {
+        if (!incomingCallData) throw new Error("No incoming call to accept");
+        const stream = await baseAcceptCall(
+            incomingCallData.from,
+            incomingCallData.chatId,
+            incomingCallData.type,
+            incomingCallData.offer
+        );
+        setIncomingCallData(null);
+        return stream;
+    };
+
+    const rejectCall = () => {
+        if (incomingCallData && socket) {
+            socket.emit('call-end', {
+                to: incomingCallData.from,
+                chatId: incomingCallData.chatId
+            });
+        }
+        setIncomingCallData(null);
+    };
+
+    const endCall = () => {
+        if (remoteUserId && currentChatId) {
+            baseEndCall(remoteUserId, currentChatId);
+        }
+        setRemoteStream(null);
+        cleanup();
+    };
+
+    return (
+        <CallContext.Provider value={{
+            isCalling,
+            callType,
+            remoteUserId,
+            currentChatId,
+            localStream,
+            remoteStream,
+            startCall,
+            acceptCall,
+            rejectCall,
+            endCall
+        }}>
+            {children}
+
+            <AnimatePresence>
+                {incomingCallData && (
+                    <IncomingCall
+                        fromName={incomingCallData.from}
+                        callType={incomingCallData.type}
+                        onAccept={acceptCall}
+                        onReject={rejectCall}
+                    />
+                )}
+
+                {isCalling && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 100 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 100 }}
+                        className="fixed inset-0 z-[150] bg-black/95 flex flex-col items-center justify-center p-6"
+                    >
+                        {callType === 'video' ? (
+                            <div className="relative w-full h-full max-w-4xl max-h-[80vh] rounded-3xl overflow-hidden bg-gray-900 shadow-2xl">
+                                <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
+                                <div className="absolute top-6 right-6 w-32 h-48 rounded-2xl border-2 border-white/20 overflow-hidden bg-black shadow-2xl z-20">
+                                    <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover mirror" />
+                                </div>
+                                {!remoteStream && (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/20 backdrop-blur-sm">
+                                        <div className="w-20 h-20 rounded-full bg-[#4DB6AC] animate-pulse flex items-center justify-center text-white text-2xl font-bold">
+                                            {remoteUserId?.[0].toUpperCase()}
+                                        </div>
+                                        <p className="text-white text-sm font-bold uppercase tracking-widest animate-pulse">Connecting Video...</p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center gap-8">
+                                <div className="w-40 h-40 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white text-5xl font-bold animate-pulse shadow-2xl shadow-[#4DB6AC]/20">
+                                    {remoteUserId?.[0].toUpperCase()}
+                                </div>
+                                <div className="text-center">
+                                    <h2 className="text-3xl font-bold text-white mb-2">{remoteUserId}</h2>
+                                    <p className="text-[#4DB6AC] uppercase tracking-[0.4em] text-[12px] font-black">In Voice Call...</p>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="mt-12">
+                            <CallControls
+                                isMuted={false}
+                                isVideoOff={callType === 'voice'}
+                                onToggleMic={() => { }}
+                                onToggleVideo={() => { }}
+                                onHangUp={endCall}
+                            />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </CallContext.Provider>
+    );
+};

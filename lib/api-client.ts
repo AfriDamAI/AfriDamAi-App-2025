@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserLoginDto, CreateUserDto, AuthResponse, Chat, Message } from "@/lib/types";
+import { UserLoginDto, CreateUserDto, AuthResponse, Chat, Message, User, CreateUserProfileDto, UpdateUserProfileDto, UserProfile } from "@/lib/types";
 
 /**
  * 🛡️ AFRIDAM INFRASTRUCTURE SYNC
@@ -101,27 +101,37 @@ export const resetPassword = async (token: string, newPassword: string) => {
 
 /** 👤 USER PROFILE HANDSHAKE **/
 export const getProfile = async () => {
+  const response = await apiClient.get("/profile");
+  return response.data;
+};
+
+export const getUserMe = async (): Promise<User> => {
   const response = await apiClient.get("/users/me");
   return response.data;
 };
 
 export const getUser = async (id: string) => {
-  const response = await apiClient.get(`/user/${id}`);
+  const response = await apiClient.get(`/users/${id}`);
   return response.data;
 };
 
 export const updateUser = async (id: string, updates: any) => {
-  const response = await apiClient.patch(`/user/${id}`, updates);
+  const response = await apiClient.put(`/users/${id}`, updates);
   return response.data;
 };
 
-export const createUserProfile = async (profileData: any) => {
+export const createUserProfile = async (profileData: CreateUserProfileDto): Promise<UserProfile> => {
   const response = await apiClient.post("/profile", profileData);
   return response.data;
 };
 
-export const updateUserProfile = async (id: string, profileData: any) => {
-  const response = await apiClient.patch(`/profile/${id}`, profileData);
+export const updateUserProfile = async (profileData: UpdateUserProfileDto): Promise<UserProfile> => {
+  const response = await apiClient.put("/profile", profileData);
+  return response.data;
+};
+
+export const skipOnboarding = async () => {
+  const response = await apiClient.post("/profile/skip-onboarding");
   return response.data;
 };
 
