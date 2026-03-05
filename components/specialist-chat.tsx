@@ -13,6 +13,7 @@ import {
   sendUserChatMessage,
   markMessageAsRead,
   uploadFile,
+  getAllSpecialists,
 } from "@/lib/api-client";
 import { Chat, Message } from "@/lib/types";
 import { useSocket } from "@/hooks/use-socket";
@@ -34,6 +35,7 @@ export const SpecialistChat = () => {
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [specialists, setSpecialists] = useState<any[]>([]);
 
   const {
     isCalling,
@@ -55,7 +57,23 @@ export const SpecialistChat = () => {
 
   useEffect(() => {
     fetchUserChats();
+    fetchSpecialists();
   }, []);
+
+  const fetchSpecialists = async () => {
+    try {
+      const data = await getAllSpecialists();
+      setSpecialists(data);
+    } catch (err) {
+      console.error("Error fetching specialists:", err);
+    }
+  };
+
+  const getDisplayName = (id: string) => {
+    const specialist = specialists.find(s => s.id === id);
+    if (specialist) return `${specialist.firstName} ${specialist.lastName}`;
+    return id === CURRENT_USER_ID ? "Me" : id;
+  };
 
   useEffect(() => {
     if (socket) {
@@ -183,6 +201,28 @@ export const SpecialistChat = () => {
     }
   };
 
+  const formatMessageTime = (msg: any) => {
+    try {
+      const dateSource = msg.timestamp || msg.createdAt || msg.created_at || msg.sentAt || msg.sent_at;
+      if (!dateSource) return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      let date = new Date(dateSource);
+
+      // Handle numeric timestamps (e.g., from some APIs or sockets)
+      if (isNaN(date.getTime()) && (typeof dateSource === 'number' || !isNaN(Number(dateSource)))) {
+        date = new Date(Number(dateSource));
+      }
+
+      if (isNaN(date.getTime())) {
+        return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+  };
+
   const handleInitiateCall = (type: 'voice' | 'video') => {
     if (!selectedChat) return;
     const otherUserId = selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id;
@@ -263,11 +303,13 @@ export const SpecialistChat = () => {
                   className={`flex items-center gap-3 p-4 w-full text-left transition-all ${isActive ? 'bg-[#4DB6AC]/10 border-l-4 border-[#4DB6AC]' : 'hover:bg-gray-50 dark:hover:bg-white/5 border-l-4 border-transparent'
                     }`}
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold">
-                    {otherUserId[0].toUpperCase()}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold flex-shrink-0">
+                    {getDisplayName(otherUserId).split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-semibold text-sm truncate ${isActive ? 'text-[#4DB6AC]' : ''}`}>{otherUserId}</p>
+                    <p className={`font-semibold text-sm truncate ${isActive ? 'text-[#4DB6AC]' : ''}`}>
+                      {getDisplayName(otherUserId)}
+                    </p>
                     <p className="text-xs text-gray-500 truncate">
                       {chat.lastMessage?.type === 'TEXT' ? chat.lastMessage.message : `[${chat.lastMessage?.type || 'No message'}]`}
                     </p>
@@ -288,11 +330,11 @@ export const SpecialistChat = () => {
             {/* Chat Header */}
             <div className={`px-6 py-4 border-b flex items-center justify-between ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
               <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold shadow-md">
-                  {(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id)[0].toUpperCase()}
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold shadow-md flex-shrink-0">
+                  {getDisplayName(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id).split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-base">{selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id}</h3>
+                  <h3 className="font-semibold text-base">{getDisplayName(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id)}</h3>
                   <p className="text-xs text-green-500">Active now</p>
                 </div>
               </div>
@@ -321,7 +363,7 @@ export const SpecialistChat = () => {
                         {renderMessageContent(msg)}
                       </div>
                       <span className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">
-                        {new Date(msg.timestamp || msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatMessageTime(msg)}
                       </span>
                     </div>
                   </div>
@@ -330,7 +372,7 @@ export const SpecialistChat = () => {
             </div>
 
             {/* Message Input */}
-            <div className={`p-4 border-t ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
+            <div className={`p-4 border-t pb-32 lg:pb-4 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
               <div className="flex items-end gap-3">
                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
 
@@ -343,7 +385,7 @@ export const SpecialistChat = () => {
                       disabled={isUploading}
                       className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1"
                     >
-                      {isUploading ? <Loader2 size={20} className="animate-spin text-[#4DB6AC]" /> : <Paperclip size={20} />}
+                      <Paperclip size={20} />
                     </button>
 
                     <div className={`flex-1 rounded-2xl border transition-all ${isDark ? 'bg-[#1F1E1D] border-white/10 focus-within:border-[#4DB6AC]/50' : 'bg-gray-50 border-gray-200 focus-within:border-[#4DB6AC]'}`}>
