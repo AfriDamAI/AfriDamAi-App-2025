@@ -81,6 +81,7 @@ export const useCall = ({
   }, [socket, onRemoteStream]);
 
   const startCall = async (targetId: string, chatId: string, type: 'voice' | 'video') => {
+    console.log(`📡 CALL ENGINE: Initiating ${type} call to ${targetId}...`);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -105,6 +106,7 @@ export const useCall = ({
           chatId: chatId,
           type: type
         });
+        console.log(`✅ CALL ENGINE: Offer sent to ${targetId}`);
       }
 
       setIsCalling(true);
@@ -121,6 +123,7 @@ export const useCall = ({
   };
 
   const acceptCall = async (targetId: string, chatId: string, type: 'voice' | 'video', offer: any) => {
+    console.log(`📞 CALL ENGINE: Accepting incoming ${type} call from ${targetId}...`);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -144,6 +147,7 @@ export const useCall = ({
           answer: answer,
           chatId: chatId
         });
+        console.log(`✅ CALL ENGINE: Answer sent to ${targetId}`);
       }
 
       setIsCalling(true);
@@ -166,6 +170,7 @@ export const useCall = ({
         chatId: chatId
       });
     }
+    console.log("🛑 CALL ENGINE: Call ended locally.");
     cleanup();
   };
 
@@ -173,12 +178,14 @@ export const useCall = ({
     if (!socket) return;
 
     const handleIncomingCall = (data: any) => {
+      console.log(`🚨 CALL ENGINE: Incoming call from ${data.from} (${data.type})`);
       if (onIncomingCall) {
         onIncomingCall(data.from, data.type, data.offer, data.chatId);
       }
     };
 
     const handleCallAccepted = async (data: any) => {
+      console.log(`🤝 CALL ENGINE: Call accepted by ${remoteUserId || 'remote user'}`);
       if (peerConnectionRef.current) {
         await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.answer));
         if (onCallAccepted) onCallAccepted(data.answer);
@@ -196,9 +203,11 @@ export const useCall = ({
     };
 
     const handleCallEnded = (data?: any) => {
+      console.log("📴 CALL ENGINE: Remote user ended call or connection lost.");
       // If we were in an incoming call state (incomingCallData in provider) but not yet calling
       // Or if isCalling is false but we were notified of an incoming call
       if (onMissedCall && data?.wasMissed) {
+        console.log(`📩 CALL ENGINE: Missed call logged from ${data.from}`);
         onMissedCall(data.from, data.type, data.chatId);
       }
       cleanup();
@@ -210,6 +219,7 @@ export const useCall = ({
     socket.on('ice-candidate', handleIceCandidate);
     socket.on('call-end', handleCallEnded);
     socket.on('call-missed', (data: any) => {
+      console.log(`📩 CALL ENGINE: Incoming Missed Call Notification from ${data.from}`);
       if (onMissedCall) onMissedCall(data.from, data.type, data.chatId);
     });
 
