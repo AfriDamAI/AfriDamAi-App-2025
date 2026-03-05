@@ -23,21 +23,21 @@ const teamMembers = [
   },
   {
     id: 2,
-    name: "Dr. Anadu",
+    name: "Dr. Anadu Urheka",
     title: "CMO",
     description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
     image: anaduImage,
   },
   {
     id: 3,
-    name: "Tobi",
+    name: "Oluwatobi Adejoro",
     title: "Technical Lead",
     description: "Leads the Node.js/NestJS architecture and API integration.",
     image: tobImage,
   },
   {
     id: 4,
-    name: "Tochi",
+    name: "Tochi Omeche",
     title: "AI Coordinator",
     description: "Manages the African datasets and model training for the scanner.",
     image: anuImage,
@@ -52,7 +52,7 @@ const teamMembers = [
   },
   {
     id: 6,
-    name: "Mistura",
+    name: "Mistura Agbabiaka",
     title: "Workflow Coordinator",
     description: "Ensures the seamless handoff between AI detection and specialist consultation.",
     image: matImage,
