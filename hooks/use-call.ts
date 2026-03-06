@@ -34,6 +34,7 @@ export const useCall = ({
   
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+  const pendingCandidatesRef = useRef<RTCIceCandidateInit[]>([]);
 
   const configuration: RTCConfiguration = {
     iceServers: [
@@ -51,10 +52,27 @@ export const useCall = ({
       localStreamRef.current.getTracks().forEach(track => track.stop());
       localStreamRef.current = null;
     }
+    pendingCandidatesRef.current = [];
     setIsCalling(false);
     setCallType(null);
     setRemoteUserId(null);
     setCurrentChatId(null);
+  }, []);
+
+  const processPendingCandidates = useCallback(async () => {
+    if (!peerConnectionRef.current || !peerConnectionRef.current.remoteDescription) return;
+    
+    console.log(`📦 CALL ENGINE: Processing ${pendingCandidatesRef.current.length} pending ICE candidates`);
+    while (pendingCandidatesRef.current.length > 0) {
+      const candidate = pendingCandidatesRef.current.shift();
+      if (candidate) {
+        try {
+          await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+          console.error("Error adding queued ice candidate", e);
+        }
+      }
+    }
   }, []);
 
   const createPeerConnection = useCallback((targetId: string, chatId: string) => {
@@ -71,9 +89,14 @@ export const useCall = ({
     };
 
     pc.ontrack = (event) => {
+      console.log("🎵 CALL ENGINE: Remote track received");
       if (onRemoteStream) {
         onRemoteStream(event.streams[0]);
       }
+    };
+
+    pc.onconnectionstatechange = () => {
+      console.log(`🌐 CALL ENGINE: Connection state: ${pc.connectionState}`);
     };
 
     peerConnectionRef.current = pc;
@@ -155,6 +178,9 @@ export const useCall = ({
       setRemoteUserId(targetId);
       setCurrentChatId(chatId);
       
+      // Process any candidates that arrived while waiting for user to accept
+      await processPendingCandidates();
+      
       return stream;
     } catch (err) {
       console.error("Failed to accept call:", err);
@@ -188,17 +214,22 @@ export const useCall = ({
       console.log(`🤝 CALL ENGINE: Call accepted by ${remoteUserId || 'remote user'}`);
       if (peerConnectionRef.current) {
         await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.answer));
+        // Now that remote description is set, we can process pending candidates
+        await processPendingCandidates();
         if (onCallAccepted) onCallAccepted(data.answer);
       }
     };
 
     const handleIceCandidate = async (data: any) => {
-      if (peerConnectionRef.current) {
+      if (peerConnectionRef.current && peerConnectionRef.current.remoteDescription) {
         try {
           await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data.candidate));
         } catch (e) {
           console.error("Error adding received ice candidate", e);
         }
+      } else {
+        console.log("⏳ CALL ENGINE: Queuing ICE candidate (PC or RemoteDesc not ready)");
+        pendingCandidatesRef.current.push(data.candidate);
       }
     };
 
