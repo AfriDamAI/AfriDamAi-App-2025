@@ -37,6 +37,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { user } = useAuth();
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const localVideoRef = useRef<HTMLVideoElement>(null);
+    const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
     const getSocketUrl = () => {
         if (process.env.NEXT_PUBLIC_SOCKET_URL) return process.env.NEXT_PUBLIC_SOCKET_URL;
@@ -50,6 +51,9 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { socket } = useSocket(getSocketUrl());
     const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+    const [isMuted, setIsMuted] = useState(false);
+    const [isVideoOff, setIsVideoOff] = useState(false);
+
     const [incomingCallData, setIncomingCallData] = useState<{
         from: string;
         type: 'voice' | 'video';
@@ -95,12 +99,15 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         onCallEnded: () => {
             setRemoteStream(null);
             setIncomingCallData(null);
+            setIsMuted(false);
+            setIsVideoOff(false);
             if (ringtoneRef.current) {
                 ringtoneRef.current.pause();
                 ringtoneRef.current.currentTime = 0;
             }
             if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
             if (localVideoRef.current) localVideoRef.current.srcObject = null;
+            if (remoteAudioRef.current) remoteAudioRef.current.srcObject = null;
         },
         onMissedCall: (from, type, chatId) => {
             setMissedCalls(prev => [{ from, type, time: new Date().toISOString() }, ...prev]);
@@ -113,15 +120,20 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
             alert(`Missed ${type} call from ${from}`);
         },
         onRemoteStream: (stream) => {
+            console.log("🎵 CALL PROVIDER: Remote stream received");
             setRemoteStream(stream);
         }
     });
 
     useEffect(() => {
-        if (remoteStream && remoteVideoRef.current) {
-            remoteVideoRef.current.srcObject = remoteStream;
+        if (remoteStream) {
+            if (callType === 'video' && remoteVideoRef.current) {
+                remoteVideoRef.current.srcObject = remoteStream;
+            } else if (callType === 'voice' && remoteAudioRef.current) {
+                remoteAudioRef.current.srcObject = remoteStream;
+            }
         }
-    }, [remoteStream, isCalling]);
+    }, [remoteStream, callType, isCalling]);
 
     useEffect(() => {
         if (localStream && localVideoRef.current && callType === 'video') {
@@ -129,12 +141,38 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, [localStream, callType, isCalling]);
 
+    const toggleMic = () => {
+        if (localStream) {
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (audioTrack) {
+                audioTrack.enabled = isMuted;
+                setIsMuted(!isMuted);
+                console.log(`🎤 Mic ${isMuted ? 'Enabled' : 'Disabled'}`);
+            }
+        }
+    };
+
+    const toggleVideo = () => {
+        if (localStream && callType === 'video') {
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.enabled = isVideoOff;
+                setIsVideoOff(!isVideoOff);
+                console.log(`📷 Video ${isVideoOff ? 'Enabled' : 'Disabled'}`);
+            }
+        }
+    };
+
     const startCall = async (targetId: string, chatId: string, type: 'voice' | 'video') => {
+        setIsMuted(false);
+        setIsVideoOff(false);
         return baseStartCall(targetId, chatId, type);
     };
 
     const acceptCall = async () => {
         if (!incomingCallData) throw new Error("No incoming call to accept");
+        setIsMuted(false);
+        setIsVideoOff(false);
         const stream = await baseAcceptCall(
             incomingCallData.from,
             incomingCallData.chatId,
@@ -177,6 +215,9 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
             endCall
         }}>
             {children}
+
+            {/* Hidden audio element for voice calls */}
+            <audio ref={remoteAudioRef} autoPlay />
 
             <AnimatePresence>
                 {incomingCallData && (
@@ -224,10 +265,10 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                         <div className="mt-12">
                             <CallControls
-                                isMuted={false}
-                                isVideoOff={callType === 'voice'}
-                                onToggleMic={() => { }}
-                                onToggleVideo={() => { }}
+                                isMuted={isMuted}
+                                isVideoOff={isVideoOff}
+                                onToggleMic={toggleMic}
+                                onToggleVideo={toggleVideo}
                                 onHangUp={endCall}
                             />
                         </div>
