@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { MessageSquare, Send, User, PlusCircle, Search, MoreVertical, Paperclip, Smile, Phone, Video, Mic, Image as ImageIcon, X, Play, Pause, Download, PhoneOff } from "lucide-react";
+import { MessageSquare, Send, User, PlusCircle, Search, MoreVertical, Paperclip, Smile, Phone, Video, Mic, Image as ImageIcon, X, Play, Pause, Download, PhoneOff, PanelLeftOpen, PanelLeftClose, ChevronLeft } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
@@ -36,6 +36,7 @@ export const SpecialistChat = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [specialists, setSpecialists] = useState<any[]>([]);
+  const [isListCollapsed, setIsListCollapsed] = useState(false);
 
   const {
     isCalling,
@@ -95,8 +96,9 @@ export const SpecialistChat = () => {
     }
   }, [socket, selectedChat]);
 
+  // Removed automatic selection of first chat on mobile to allow viewing list
   useEffect(() => {
-    if (chats.length > 0 && !selectedChat) {
+    if (chats.length > 0 && !selectedChat && window.innerWidth > 768) {
       setSelectedChat(chats[0]);
     }
   }, [chats, selectedChat]);
@@ -252,7 +254,7 @@ export const SpecialistChat = () => {
       case 'MISSED_CALL':
         return (
           <div className="flex items-center gap-2 text-red-500 italic text-xs font-bold py-1">
-            <PhoneOff size={14} />
+            <Phone size={14} className="rotate-[135deg]" />
             Missed {msg.message}
           </div>
         );
@@ -261,27 +263,47 @@ export const SpecialistChat = () => {
     }
   };
 
+  const toggleListCollapse = () => setIsListCollapsed(!isListCollapsed);
+
   return (
     <div className={`flex h-[calc(100vh-80px)] md:h-[calc(100vh-96px)] overflow-hidden ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
 
       {/* Left Sidebar: Chat List */}
-      <div className={`w-80 flex flex-col ${isDark ? 'bg-[#151312] border-r border-white/5' : 'bg-white border-r border-gray-200'}`}>
+      <div className={`
+        ${selectedChat ? 'hidden md:flex' : 'flex'} 
+        ${isListCollapsed ? 'w-24' : 'w-80'} 
+        flex-col transition-all duration-300 relative
+        ${isDark ? 'bg-[#151312] border-r border-white/5' : 'bg-white border-r border-gray-200'}
+      `}>
         <div className="p-4 border-b border-gray-200 dark:border-white/5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Messages</h2>
-            <button onClick={() => router.push("/specialists-list")} className="p-2 rounded-full hover:bg-[#4DB6AC]/10 text-[#4DB6AC]">
-              <PlusCircle size={22} />
-            </button>
+            {!isListCollapsed && <h2 className="text-xl font-bold">Messages</h2>}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => router.push("/specialists-list")}
+                className="p-2 rounded-full hover:bg-[#4DB6AC]/10 text-[#4DB6AC]"
+              >
+                <PlusCircle size={22} />
+              </button>
+              <button
+                onClick={toggleListCollapse}
+                className="hidden md:flex p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400"
+              >
+                {isListCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+              </button>
+            </div>
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search conversations..."
-              className={`w-full pl-10 pr-4 py-2 rounded-lg text-sm outline-none transition-all ${isDark ? 'bg-white/5 border border-white/10 focus:border-[#4DB6AC]/50' : 'bg-gray-100 border border-gray-200 focus:border-[#4DB6AC]'
-                }`}
-            />
-          </div>
+          {!isListCollapsed && (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search conversations..."
+                className={`w-full pl-10 pr-4 py-2 rounded-lg text-sm outline-none transition-all ${isDark ? 'bg-white/5 border border-white/10 focus:border-[#4DB6AC]/50' : 'bg-gray-100 border border-gray-200 focus:border-[#4DB6AC]'
+                  }`}
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto">
@@ -290,7 +312,7 @@ export const SpecialistChat = () => {
           ) : chats.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-6 text-center opacity-40">
               <MessageSquare size={48} className="mb-3" />
-              <p className="text-sm">No conversations yet</p>
+              {!isListCollapsed && <p className="text-sm">No conversations yet</p>}
             </div>
           ) : (
             chats.map((chat) => {
@@ -300,20 +322,23 @@ export const SpecialistChat = () => {
                 <button
                   key={chat.id}
                   onClick={() => setSelectedChat(chat)}
+                  title={isListCollapsed ? getDisplayName(otherUserId) : undefined}
                   className={`flex items-center gap-3 p-4 w-full text-left transition-all ${isActive ? 'bg-[#4DB6AC]/10 border-l-4 border-[#4DB6AC]' : 'hover:bg-gray-50 dark:hover:bg-white/5 border-l-4 border-transparent'
-                    }`}
+                    } ${isListCollapsed ? 'justify-center' : ''}`}
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold flex-shrink-0 shadow-sm">
                     {getDisplayName(otherUserId).split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-semibold text-sm truncate ${isActive ? 'text-[#4DB6AC]' : ''}`}>
-                      {getDisplayName(otherUserId)}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {chat.lastMessage?.type === 'TEXT' ? chat.lastMessage.message : `[${chat.lastMessage?.type || 'No message'}]`}
-                    </p>
-                  </div>
+                  {!isListCollapsed && (
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-semibold text-sm truncate ${isActive ? 'text-[#4DB6AC]' : ''}`}>
+                        {getDisplayName(otherUserId)}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {chat.lastMessage?.type === 'TEXT' ? chat.lastMessage.message : `[${chat.lastMessage?.type || 'No message'}]`}
+                      </p>
+                    </div>
+                  )}
                 </button>
               );
             })
@@ -322,20 +347,25 @@ export const SpecialistChat = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col relative">
+      <div className={`flex-1 flex flex-col relative ${!selectedChat ? 'hidden md:flex' : 'flex'}`}>
         {selectedChat ? (
           <>
-            {/* Call Overlay handled by CallProvider */}
-
             {/* Chat Header */}
             <div className={`px-6 py-4 border-b flex items-center justify-between ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
               <div className="flex items-center gap-4">
+                {/* Back Button for Mobile */}
+                <button
+                  onClick={() => setSelectedChat(null)}
+                  className="md:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[#4DB6AC]"
+                >
+                  <ChevronLeft size={24} />
+                </button>
                 <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold shadow-md flex-shrink-0">
                   {getDisplayName(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id).split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
                 <div>
                   <h3 className="font-semibold text-base">{getDisplayName(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id)}</h3>
-                  <p className="text-xs text-green-500">Active now</p>
+                  <p className="text-xs text-green-500 font-medium">Active now</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -357,8 +387,8 @@ export const SpecialistChat = () => {
                 const isOwn = msg.senderId === CURRENT_USER_ID;
                 return (
                   <div key={msg.id} className={`flex gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[70%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
-                      <div className={`px-4 py-2.5 rounded-2xl text-sm ${isOwn ? 'bg-[#4DB6AC] text-white rounded-br-md' : (isDark ? 'bg-[#1F1E1D] text-gray-200 rounded-bl-md border border-white/5' : 'bg-white text-gray-800 rounded-bl-md border border-gray-200')
+                    <div className={`max-w-[85%] md:max-w-[70%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
+                      <div className={`px-4 py-2.5 rounded-2xl text-sm ${isOwn ? 'bg-[#4DB6AC] text-white rounded-br-md shadow-sm' : (isDark ? 'bg-[#1F1E1D] text-gray-200 rounded-bl-md border border-white/5' : 'bg-white text-gray-800 rounded-bl-md border border-gray-200 shadow-sm')
                         }`}>
                         {renderMessageContent(msg)}
                       </div>
@@ -372,7 +402,7 @@ export const SpecialistChat = () => {
             </div>
 
             {/* Message Input */}
-            <div className={`p-4 border-t pb-32 lg:pb-4 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
+            <div className={`p-4 border-t pb-24 md:pb-4 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
               <div className="flex items-end gap-3">
                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
 
@@ -395,7 +425,7 @@ export const SpecialistChat = () => {
                         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
                         placeholder="Type message..."
                         rows={1}
-                        className="w-full px-4 py-3 bg-transparent outline-none resize-none text-sm"
+                        className="w-full px-4 py-3 bg-transparent outline-none resize-none text-sm min-h-[44px]"
                       />
                     </div>
 
@@ -421,8 +451,9 @@ export const SpecialistChat = () => {
         ) : (
           <div className="flex-1 flex items-center justify-center opacity-30">
             <div className="text-center">
-              <MessageSquare size={80} className="mx-auto mb-4" />
-              <h3 className="text-xl font-bold uppercase tracking-widest">Select Consultation</h3>
+              <MessageSquare size={80} className="mx-auto mb-4 text-[#4DB6AC]" />
+              <h3 className="text-xl font-bold uppercase tracking-widest italic">Select Consultation</h3>
+              <p className="text-sm mt-2 font-medium">Choose a chat to start messaging</p>
             </div>
           </div>
         )}
