@@ -72,7 +72,7 @@ export const useCall = ({
 
     pc.ontrack = (event) => {
       if (onRemoteStream) {
-        onRemoteStream(event.streams[0]);
+        if (event.streams && event.streams[0]) { onRemoteStream(event.streams[0]); } else { const stream = new MediaStream(); stream.addTrack(event.track); onRemoteStream(stream); }
       }
     };
 
@@ -142,7 +142,7 @@ export const useCall = ({
       await pc.setLocalDescription(answer);
 
       if (socket) {
-        socket.emit('call-answer', {
+        socket.emit('call-answer', { type: type,
           to: targetId,
           answer: answer,
           chatId: chatId
