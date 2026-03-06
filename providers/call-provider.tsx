@@ -17,6 +17,7 @@ interface CallContextType {
     currentChatId: string | null;
     localStream: MediaStream | null;
     remoteStream: MediaStream | null;
+    callDuration: string;
     startCall: (targetId: string, chatId: string, type: 'voice' | 'video') => Promise<MediaStream>;
     acceptCall: () => Promise<MediaStream>;
     rejectCall: () => void;
@@ -68,6 +69,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         callType,
         remoteUserId,
         currentChatId,
+        callDuration,
         localStream,
         startCall: baseStartCall,
         acceptCall: baseAcceptCall,
@@ -209,6 +211,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
             currentChatId,
             localStream,
             remoteStream,
+            callDuration,
             startCall,
             acceptCall,
             rejectCall,
@@ -239,6 +242,11 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         {callType === 'video' ? (
                             <div className="relative w-full h-full max-w-4xl max-h-[80vh] rounded-3xl overflow-hidden bg-gray-900 shadow-2xl">
                                 <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
+                                <div className="absolute top-6 left-6 flex flex-col gap-2 z-30">
+                                   <div className="px-4 py-2 bg-black/50 backdrop-blur-md rounded-full border border-white/10">
+                                      <p className="text-white text-xs font-mono">{callDuration}</p>
+                                   </div>
+                                </div>
                                 <div className="absolute top-6 right-6 w-32 h-48 rounded-2xl border-2 border-white/20 overflow-hidden bg-black shadow-2xl z-20">
                                     <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover mirror" />
                                 </div>
@@ -258,7 +266,10 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
                                 </div>
                                 <div className="text-center">
                                     <h2 className="text-3xl font-bold text-white mb-2">{remoteUserId}</h2>
-                                    <p className="text-[#4DB6AC] uppercase tracking-[0.4em] text-[12px] font-black">In Voice Call...</p>
+                                    <div className="flex flex-col items-center gap-2">
+                                        <p className="text-[#4DB6AC] uppercase tracking-[0.4em] text-[12px] font-black">In Voice Call...</p>
+                                        <p className="text-white/60 font-mono text-sm">{callDuration}</p>
+                                    </div>
                                 </div>
                             </div>
                         )}
