@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { MessageSquare, Send, User, PlusCircle, Search, MoreVertical, Paperclip, Smile, Phone, Video, Mic, Image as ImageIcon, X, Play, Pause, Download } from "lucide-react";
+import { MessageSquare, Send, User, PlusCircle, Search, MoreVertical, Paperclip, Smile, Phone, Video, Mic, Image as ImageIcon, X, Play, Pause, Download, PhoneOff } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
