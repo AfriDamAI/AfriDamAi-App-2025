@@ -31,6 +31,8 @@ export const useCall = ({
   const [callType, setCallType] = useState<'voice' | 'video' | null>(null);
   const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [callDuration, setCallDuration] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -43,7 +45,30 @@ export const useCall = ({
     ]
   };
 
+  const startTimer = useCallback(() => {
+    if (timerRef.current) return;
+    setCallDuration(0);
+    timerRef.current = setInterval(() => {
+      setCallDuration(prev => prev + 1);
+    }, 1000);
+  }, []);
+
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const cleanup = useCallback(() => {
+    stopTimer();
+    setCallDuration(0);
     if (peerConnectionRef.current) {
       peerConnectionRef.current.close();
       peerConnectionRef.current = null;
@@ -57,7 +82,7 @@ export const useCall = ({
     setCallType(null);
     setRemoteUserId(null);
     setCurrentChatId(null);
-  }, []);
+  }, [stopTimer]);
 
   const processPendingCandidates = useCallback(async () => {
     if (!peerConnectionRef.current || !peerConnectionRef.current.remoteDescription) return;
@@ -90,6 +115,8 @@ export const useCall = ({
 
     pc.ontrack = (event) => {
       console.log("🎵 CALL ENGINE: Remote track received");
+      // Start timer when we actually get media from the other end
+      startTimer();
       if (onRemoteStream) {
         if (event.streams && event.streams[0]) { onRemoteStream(event.streams[0]); } else { const stream = new MediaStream(); stream.addTrack(event.track); onRemoteStream(stream); }
       }
@@ -97,11 +124,16 @@ export const useCall = ({
 
     pc.onconnectionstatechange = () => {
       console.log(`🌐 CALL ENGINE: Connection state: ${pc.connectionState}`);
+      if (pc.connectionState === 'connected') {
+        startTimer();
+      } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+        stopTimer();
+      }
     };
 
     peerConnectionRef.current = pc;
     return pc;
-  }, [socket, onRemoteStream]);
+  }, [socket, onRemoteStream, startTimer, stopTimer]);
 
   const startCall = async (targetId: string, chatId: string, type: 'voice' | 'video') => {
     console.log(`📡 CALL ENGINE: Initiating ${type} call to ${targetId}...`);
@@ -214,6 +246,8 @@ export const useCall = ({
       console.log(`🤝 CALL ENGINE: Call accepted by ${remoteUserId || 'remote user'}`);
       if (peerConnectionRef.current) {
         await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.answer));
+        // Start timer when connection is accepted (or when media starts flowing)
+        startTimer();
         // Now that remote description is set, we can process pending candidates
         await processPendingCandidates();
         if (onCallAccepted) onCallAccepted(data.answer);
@@ -260,14 +294,16 @@ export const useCall = ({
       socket.off('ice-candidate', handleIceCandidate);
       socket.off('call-end', handleCallEnded);
       socket.off('call-missed');
+      stopTimer();
     };
-  }, [socket, onIncomingCall, onCallAccepted, onCallEnded, onMissedCall, cleanup]);
+  }, [socket, onIncomingCall, onCallAccepted, onCallEnded, onMissedCall, cleanup, startTimer, stopTimer, remoteUserId, processPendingCandidates]);
 
   return {
     isCalling,
     callType,
     remoteUserId,
     currentChatId,
+    callDuration: formatDuration(callDuration),
     localStream: localStreamRef.current,
     startCall,
     acceptCall,
