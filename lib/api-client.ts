@@ -241,12 +241,12 @@ export const getSpecialistById = async (id: string) => {
 // }
 
 export const analyzeIngredients = async (ingredients: string, more_info: any) => {
-  const response = await apiClient.post("/v1/ingredients-analysis", { query: ingredients, more_info });
+  const response = await apiClient.post("/v2/ingredients-analysis", { query: ingredients, more_info });
   return response.data;
 };
 
 export const sendAnalyzerChatMessage = async (message: string, more_info: any) => {
-  const response = await apiClient.post("/v1/chatbot", { query: message, more_info });
+  const response = await apiClient.post("/v2/chatbot", { query: message, more_info });
   return response.data;
 };
 
@@ -268,19 +268,19 @@ export const getProducts = async () => {
 };
 
 export const getScanHistory = async (userId: string) => {
-  const response = await apiClient.get(`/v1/result/${userId}`); 
+  const response = await apiClient.get(`/v2/result/${userId}`); 
   return response.data;
 };
 
 export const getSingleScanResult = async (resultId: string) => {
-  // 🛡️ API SYNC: Using GET /v1/{id} — restricted endpoint with subscription guard
-  const response = await apiClient.get(`/v1/${resultId}`);
+  // 🛡️ API SYNC: Using GET /v2/{id} — restricted endpoint with subscription guard
+  const response = await apiClient.get(`/v2/${resultId}`);
   return response.data;
 };
 
 export const deleteScanResult = async (resultId: string) => {
-    // 🛡️ API CHANGE: Endpoint updated to match user request (DELETE /api/v1/:id)
-    const response = await apiClient.delete(`/v1/${resultId}`); 
+    // 🛡️ API CHANGE: Endpoint updated to match user request (DELETE /api/v2/:id)
+    const response = await apiClient.delete(`/v2/${resultId}`); 
     return response.data;
 };
 
@@ -317,7 +317,7 @@ export const analyzeSkinWithUserData = async (imgSource: string, userContext: an
   };
   formData.append("more_info", JSON.stringify(defaultUserContext));
   
-  const response = await apiClient.post("/v1/skin-diagnosis", formData, {
+  const response = await apiClient.post("/v2/skin-diagnosis", formData, {
     headers: { "Content-Type": "multipart/form-data" }
   });
   return response.data;
