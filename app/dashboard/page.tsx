@@ -69,7 +69,7 @@ export default function Dashboard() {
   const initializePaystack = usePaystackPayment(config)
 
   /**
-   * 🛡️ PREMIUM GATE: Fetch full report via GET /v1/{id}
+   * 🛡️ PREMIUM GATE: Fetch full report via GET /v2/{id}
    * This endpoint is subscription-restricted on the backend.
    */
   const handleOpenReport = async (scan: any) => {
@@ -214,8 +214,8 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className={`w-9 h-9 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center transition-all ${isRestrictedPlan
-                          ? 'opacity-20'
-                          : 'opacity-20 group-hover:opacity-100 group-hover:text-[#E1784F]'
+                        ? 'opacity-20'
+                        : 'opacity-20 group-hover:opacity-100 group-hover:text-[#E1784F]'
                         }`}>
                         <ArrowRight size={14} />
                       </div>
