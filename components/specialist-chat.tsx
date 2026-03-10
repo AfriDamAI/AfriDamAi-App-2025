@@ -43,7 +43,8 @@ export const SpecialistChat = () => {
     callType,
     remoteUserId,
     startCall,
-    endCall
+    endCall,
+    receiveExternalSignal
   } = useCallContext();
 
   const { theme } = useTheme();
@@ -97,27 +98,6 @@ export const SpecialistChat = () => {
     }
   }, [socket, selectedChat]);
 
-  // Removed automatic selection of first chat on mobile to allow viewing list
-  useEffect(() => {
-    if (chats.length > 0 && !selectedChat && window.innerWidth > 768) {
-      setSelectedChat(chats[0]);
-    }
-  }, [chats, selectedChat]);
-
-  useEffect(() => {
-    if (selectedChat) {
-      fetchChatMessages(selectedChat.id);
-    } else {
-      setMessages([]);
-    }
-  }, [selectedChat]);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
-
   const fetchUserChats = async () => {
     try {
       const userChats = await getCurrentUserChats();
@@ -134,6 +114,7 @@ export const SpecialistChat = () => {
   const fetchChatMessages = async (chatId: string) => {
     try {
       const chatMessages = await getChatMessages(chatId);
+      // 🛡️ Filter out SYSTEM messages from the UI (Rule 3)
       const filteredMessages = chatMessages.filter((msg: any) => msg.type !== 'SYSTEM');
       setMessages(filteredMessages);
       setError(null);
@@ -141,6 +122,63 @@ export const SpecialistChat = () => {
       setError("Failed to fetch messages.");
     }
   };
+
+  // Removed automatic selection of first chat on mobile to allow viewing list
+  useEffect(() => {
+    if (chats.length > 0 && !selectedChat && window.innerWidth > 768) {
+      setSelectedChat(chats[0]);
+    }
+  }, [chats, selectedChat]);
+
+  useEffect(() => {
+    if (selectedChat) {
+      fetchChatMessages(selectedChat.id);
+    } else {
+      setMessages([]);
+    }
+  }, [selectedChat]);
+
+  // 🛡️ DURABLE SIGNALING SCAN
+  useEffect(() => {
+    messages.forEach(msg => {
+      if (msg.type === 'SYSTEM' && (msg as any).message?.startsWith('CALL_OFFER:')) {
+        const processedKey = `processed_signal_${msg.id}`;
+        if (typeof window !== 'undefined' && localStorage.getItem(processedKey)) return;
+
+        const msgTime = new Date(msg.timestamp || (msg as any).createdAt).getTime();
+        if (Date.now() - msgTime > 60000) return;
+
+        const parts = (msg as any).message.split(':');
+        const type = parts[1] as 'voice' | 'video';
+        const offerStr = parts.slice(2).join(':');
+        try {
+          const offer = JSON.parse(offerStr);
+          if (typeof window !== 'undefined') localStorage.setItem(processedKey, 'true');
+          receiveExternalSignal({
+            from: msg.senderId,
+            type,
+            offer,
+            chatId: msg.chatId
+          });
+        } catch (e) { console.error('Failed to parse persistent signal', e); }
+      }
+    });
+  }, [messages, receiveExternalSignal]);
+
+  // 🔄 SILENT POLLING FALLBACK (Cross-instance sync)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (selectedChat) fetchChatMessages(selectedChat.id);
+      fetchUserChats();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [selectedChat, fetchUserChats, fetchChatMessages]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSendMessage = async (text?: string, type: string = 'TEXT', metadata: any = {}) => {
     const msgText = text || inputMessage;

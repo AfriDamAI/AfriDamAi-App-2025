@@ -22,6 +22,7 @@ interface CallContextType {
     acceptCall: () => Promise<MediaStream>;
     rejectCall: () => void;
     endCall: () => void;
+    receiveExternalSignal: (data: any) => void;
 }
 
 const CallContext = createContext<CallContextType | undefined>(undefined);
@@ -78,8 +79,11 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } = useCall({
         socket,
         currentUserId: user?.id || "",
-        onIncomingCall: (from, type, offer, chatId) => {
+        onIncomingCall: (from, type, offer, chatId, signalId) => {
             setIncomingCallData({ from, type, offer, chatId });
+            if (signalId && typeof window !== 'undefined') {
+                localStorage.setItem(`processed_signal_${signalId}`, 'true');
+            }
             // 🎙️ Ringtone logic
             try {
                 if (!ringtoneRef.current) {
@@ -203,6 +207,13 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cleanup();
     };
 
+    const receiveExternalSignal = (data: any) => {
+        if (isCalling || (incomingCallData && incomingCallData.chatId === data.chatId)) return;
+        // In the patient app, useCall hook exposes handleIncomingCall directly via internal logic
+        // but since it's not exported, we simulate it by setting state if not already calling.
+        setIncomingCallData({ from: data.from, type: data.type, offer: data.offer, chatId: data.chatId });
+    };
+
     return (
         <CallContext.Provider value={{
             isCalling,
@@ -215,7 +226,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
             startCall,
             acceptCall,
             rejectCall,
-            endCall
+            endCall,
+            receiveExternalSignal
         }}>
             {children}
 
@@ -243,9 +255,9 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             <div className="relative w-full h-full max-w-4xl max-h-[80vh] rounded-3xl overflow-hidden bg-gray-900 shadow-2xl">
                                 <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
                                 <div className="absolute top-6 left-6 flex flex-col gap-2 z-30">
-                                   <div className="px-4 py-2 bg-black/50 backdrop-blur-md rounded-full border border-white/10">
-                                      <p className="text-white text-xs font-mono">{callDuration}</p>
-                                   </div>
+                                    <div className="px-4 py-2 bg-black/50 backdrop-blur-md rounded-full border border-white/10">
+                                        <p className="text-white text-xs font-mono">{callDuration}</p>
+                                    </div>
                                 </div>
                                 <div className="absolute top-6 right-6 w-32 h-48 rounded-2xl border-2 border-white/20 overflow-hidden bg-black shadow-2xl z-20">
                                     <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover mirror" />
