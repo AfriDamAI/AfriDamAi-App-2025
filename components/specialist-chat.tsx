@@ -114,7 +114,39 @@ export const SpecialistChat = () => {
   const fetchChatMessages = async (chatId: string) => {
     try {
       const chatMessages = await getChatMessages(chatId);
-      // 🛡️ Filter out SYSTEM messages from the UI (Rule 3)
+
+      // 🛡️ DURABLE SIGNALING SCAN (Perform BEFORE filtering for UI)
+      chatMessages.forEach((msg: any) => {
+        if (msg.type === 'SYSTEM' && (msg.message || msg.text)?.startsWith('CALL_OFFER:') || (msg.message || msg.text)?.startsWith('CALL_ANSWER:')) {
+          const isOffer = (msg.message || msg.text)?.startsWith('CALL_OFFER:');
+          const signalType = isOffer ? 'offer' : 'answer';
+
+          const processedKey = `processed_signal_${msg.id}`;
+          if (typeof window !== 'undefined' && localStorage.getItem(processedKey)) return;
+
+          const msgTime = new Date(msg.timestamp || msg.createdAt).getTime();
+          if (Date.now() - msgTime > 60000) return;
+
+          const signalText = msg.message || msg.text || '';
+          const parts = signalText.split(':');
+          const type = parts[1] as 'voice' | 'video';
+          const payloadStr = parts.slice(2).join(':');
+          try {
+            const payload = JSON.parse(payloadStr);
+            console.log(`🛡️ Durable Signal Pickup (Patient - ${signalType}):`, msg.id);
+            if (typeof window !== 'undefined') localStorage.setItem(processedKey, 'true');
+            receiveExternalSignal({
+              from: msg.senderId,
+              type,
+              [isOffer ? 'offer' : 'answer']: payload,
+              chatId: msg.chatId,
+              signalType: signalType
+            });
+          } catch (e) { console.error('Failed to parse persistent signal', e); }
+        }
+      });
+
+      // 📺 Filter out SYSTEM messages from the UI (Rule 3)
       const filteredMessages = chatMessages.filter((msg: any) => msg.type !== 'SYSTEM');
       setMessages(filteredMessages);
       setError(null);
@@ -138,32 +170,9 @@ export const SpecialistChat = () => {
     }
   }, [selectedChat]);
 
-  // 🛡️ DURABLE SIGNALING SCAN
-  useEffect(() => {
-    messages.forEach(msg => {
-      if (msg.type === 'SYSTEM' && (msg as any).message?.startsWith('CALL_OFFER:')) {
-        const processedKey = `processed_signal_${msg.id}`;
-        if (typeof window !== 'undefined' && localStorage.getItem(processedKey)) return;
-
-        const msgTime = new Date(msg.timestamp || (msg as any).createdAt).getTime();
-        if (Date.now() - msgTime > 60000) return;
-
-        const parts = (msg as any).message.split(':');
-        const type = parts[1] as 'voice' | 'video';
-        const offerStr = parts.slice(2).join(':');
-        try {
-          const offer = JSON.parse(offerStr);
-          if (typeof window !== 'undefined') localStorage.setItem(processedKey, 'true');
-          receiveExternalSignal({
-            from: msg.senderId,
-            type,
-            offer,
-            chatId: msg.chatId
-          });
-        } catch (e) { console.error('Failed to parse persistent signal', e); }
-      }
-    });
-  }, [messages, receiveExternalSignal]);
+  // 🛡️ DURABLE SIGNALING SCAN (Legacy watcher removed, integrated into fetch)
+  // This is now redundant but kept as a safety fallback with raw data access should be avoided
+  // Removed to avoid duplicate processing.
 
   // 🔄 SILENT POLLING FALLBACK (Cross-instance sync)
   useEffect(() => {
