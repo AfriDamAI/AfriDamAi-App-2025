@@ -1,11 +1,11 @@
 "use client"
 
 import React, { useState } from "react"
-import { Lock, Mail, ArrowRight, Loader2, X, Fingerprint, Eye, EyeOff } from "lucide-react"
+import { Lock, Mail, ArrowRight, Loader2, X, Fingerprint, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { login as loginService } from "@/lib/api-client"
 
 export default function LoginPage() {
@@ -150,6 +150,16 @@ export default function LoginPage() {
                     <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform" />
                   </>
                 )}
+              </button>
+
+              {/* Back Button */}
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="w-full flex items-center justify-center gap-2 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] py-3 hover:text-white transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Go Back
               </button>
 
               <div className="text-center">
