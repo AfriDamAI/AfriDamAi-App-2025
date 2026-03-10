@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserLoginDto, CreateUserDto, AuthResponse, Chat, Message } from "@/lib/types";
+import { UserLoginDto, CreateUserDto, AuthResponse, Chat, Message, User, CreateUserProfileDto, UpdateUserProfileDto, UserProfile } from "@/lib/types";
 
 /**
  * 🛡️ AFRIDAM INFRASTRUCTURE SYNC
@@ -101,27 +101,37 @@ export const resetPassword = async (token: string, newPassword: string) => {
 
 /** 👤 USER PROFILE HANDSHAKE **/
 export const getProfile = async () => {
+  const response = await apiClient.get("/profile");
+  return response.data;
+};
+
+export const getUserMe = async (): Promise<User> => {
   const response = await apiClient.get("/users/me");
   return response.data;
 };
 
 export const getUser = async (id: string) => {
-  const response = await apiClient.get(`/user/${id}`);
+  const response = await apiClient.get(`/users/${id}`);
   return response.data;
 };
 
 export const updateUser = async (id: string, updates: any) => {
-  const response = await apiClient.patch(`/user/${id}`, updates);
+  const response = await apiClient.put(`/users/${id}`, updates);
   return response.data;
 };
 
-export const createUserProfile = async (profileData: any) => {
+export const createUserProfile = async (profileData: CreateUserProfileDto): Promise<UserProfile> => {
   const response = await apiClient.post("/profile", profileData);
   return response.data;
 };
 
-export const updateUserProfile = async (id: string, profileData: any) => {
-  const response = await apiClient.patch(`/profile/${id}`, profileData);
+export const updateUserProfile = async (profileData: UpdateUserProfileDto): Promise<UserProfile> => {
+  const response = await apiClient.put("/profile", profileData);
+  return response.data;
+};
+
+export const skipOnboarding = async () => {
+  const response = await apiClient.post("/profile/skip-onboarding");
   return response.data;
 };
 
@@ -146,8 +156,36 @@ export const getChatMessages = async (chatId: string): Promise<Message[]> => {
   return response.data;
 };
 
-export const sendUserChatMessage = async (chatId: string, senderId: string, message: string): Promise<Message> => {
-  const response = await apiClient.post("/chats/messages", { chatId, senderId, message });
+export const sendUserChatMessage = async (
+  chatId: string,
+  senderId: string,
+  message: string = "",
+  type: string = 'TEXT',
+  attachmentUrl: string = "",
+  mimeType: string = "",
+  fileSize: number = 0,
+  duration: number = 0
+): Promise<Message> => {
+  const response = await apiClient.post("/chats/messages", {
+    chatId,
+    senderId,
+    message,
+    type,
+    attachmentUrl,
+    mimeType,
+    fileSize,
+    duration
+  });
+  return response.data;
+};
+export const uploadFile = async (file: File): Promise<{ url: string; mimeType: string; size: number }> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiClient.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
 
@@ -203,12 +241,12 @@ export const getSpecialistById = async (id: string) => {
 // }
 
 export const analyzeIngredients = async (ingredients: string, more_info: any) => {
-  const response = await apiClient.post("/v1/ingredients-analysis", { query: ingredients, more_info });
+  const response = await apiClient.post("/v2/ingredients-analysis", { query: ingredients, more_info });
   return response.data;
 };
 
 export const sendAnalyzerChatMessage = async (message: string, more_info: any) => {
-  const response = await apiClient.post("/v1/chatbot", { query: message, more_info });
+  const response = await apiClient.post("/v2/chatbot", { query: message, more_info });
   return response.data;
 };
 
@@ -230,19 +268,19 @@ export const getProducts = async () => {
 };
 
 export const getScanHistory = async (userId: string) => {
-  const response = await apiClient.get(`/v1/result/${userId}`); 
+  const response = await apiClient.get(`/v2/result/${userId}`); 
   return response.data;
 };
 
 export const getSingleScanResult = async (resultId: string) => {
-  // 🛡️ API SYNC: Using GET /v1/{id} — restricted endpoint with subscription guard
-  const response = await apiClient.get(`/v1/${resultId}`);
+  // 🛡️ API SYNC: Using GET /v2/{id} — restricted endpoint with subscription guard
+  const response = await apiClient.get(`/v2/${resultId}`);
   return response.data;
 };
 
 export const deleteScanResult = async (resultId: string) => {
-    // 🛡️ API CHANGE: Endpoint updated to match user request (DELETE /api/v1/:id)
-    const response = await apiClient.delete(`/v1/${resultId}`); 
+    // 🛡️ API CHANGE: Endpoint updated to match user request (DELETE /api/v2/:id)
+    const response = await apiClient.delete(`/v2/${resultId}`); 
     return response.data;
 };
 
@@ -279,7 +317,7 @@ export const analyzeSkinWithUserData = async (imgSource: string, userContext: an
   };
   formData.append("more_info", JSON.stringify(defaultUserContext));
   
-  const response = await apiClient.post("/v1/skin-diagnosis", formData, {
+  const response = await apiClient.post("/v2/skin-diagnosis", formData, {
     headers: { "Content-Type": "multipart/form-data" }
   });
   return response.data;
