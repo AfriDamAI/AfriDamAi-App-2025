@@ -12,6 +12,8 @@ import { getScanHistory, initializePayment, getSingleScanResult } from "@/lib/ap
 import { usePaystackPayment } from "react-paystack"
 import { SubscriptionModal } from "@/components/subscription-modal"
 
+console.log("logsocket", process.env.NEXT_PUBLIC_SOCKET_URL)
+
 /**
  * 🛡️ AFRIDAM WELLNESS HUB (Rule 6 Precision Sync)
  * Version: 2026.01.26
