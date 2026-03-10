@@ -76,6 +76,7 @@ export interface UserProfile {
   updatedAt?: string;
 }
 
+//* nothing
 export interface User {
   id: string;
   email: string;
