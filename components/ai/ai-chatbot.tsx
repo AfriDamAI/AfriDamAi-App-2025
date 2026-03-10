@@ -60,19 +60,19 @@ export function AIChatBot() {
       const moreInfo = {
         region: "West Africa",
         country: getCountryIsoCode(user.profile?.nationality || "NG"),
-        known_skintone_type: user.profile?.skinType || "",
-        skin_type_last_time_checked: new Date().toISOString(),
-        known_skin_condition: user.profile?.skinCondition || "none",
-        skin_condition_last_time_checked: new Date().toISOString(),
+        known_skintone_type: user.profile?.skinType || "string",
+        skin_type_last_time_checked: user.profile?.updatedAt || "9999-01-01T10:38:38.511Z",
+        known_skin_condition: user.profile?.primaryConcern || "none",
+        skin_condition_last_time_checked: user.profile?.updatedAt || "9999-01-01T19:25:48.468Z",
         gender: (user.profile?.sex || user.sex || "female").toLowerCase(),
-        age: user.profile?.age || 30,
-        known_body_lotion: user.profile?.bodyLotion || "unknown",
-        known_body_lotion_brand: user.profile?.bodyLotionBrand || "unknown",
-        known_allergies: (user.profile?.allergies && Array.isArray(user.profile.allergies) && user.profile.allergies.length > 0)
-          ? user.profile.allergies
+        age: user.profile?.ageRange || 25,
+        known_body_lotion: user.profile?.bodyLotion || "string",
+        known_body_lotion_brand: user.profile?.bodyLotionBrand || "string",
+        known_allergies: (user.profile?.knownSkinAllergies && Array.isArray(user.profile.knownSkinAllergies) && user.profile.knownSkinAllergies.length > 0)
+          ? user.profile.knownSkinAllergies
           : [],
-        known_last_skin_treatment: user.profile?.lastSkinTreatment || new Date().toISOString(),
-        known_last_consultation_with_afridermatologists: user.profile?.lastConsultation || new Date().toISOString(),
+        known_last_skin_treatment: user.profile?.lastSkinTreatment || "9999-01-01T21:11:39.461Z",
+        known_last_consultation_with_afridermatologists: user.profile?.lastConsultation || "9999-01-01T12:14:05.225Z",
         user_activeness_on_app: "very_high"
       };
 
