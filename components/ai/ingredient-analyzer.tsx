@@ -4,6 +4,7 @@ import { ScanText, X, Send, User, Zap, Info, Loader2, FlaskConical } from "lucid
 import { useTheme } from "@/providers/theme-provider"
 import { useAuth } from "@/providers/auth-provider"
 import { analyzeIngredients } from "@/lib/api-client"
+import { getCountryIsoCode } from "@/lib/country-utils"
 
 interface Message {
     id: string
@@ -52,7 +53,7 @@ export function IngredientAnalyzer() {
         try {
             const moreInfo = {
                 region: "West Africa",
-                country: user.profile?.nationality || "Nigeria",
+                country: getCountryIsoCode(user.profile?.nationality || "NG"),
                 known_skintone_type: user.profile?.skinType || "",
                 skin_type_last_time_checked: new Date().toISOString(),
                 known_skin_condition: user.profile?.skinCondition || "none",

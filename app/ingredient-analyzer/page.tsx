@@ -14,6 +14,7 @@ import {
   Send, User, Loader2, Info
 } from "lucide-react"
 import { analyzeIngredients } from "@/lib/api-client"
+import { getCountryIsoCode } from "@/lib/country-utils"
 
 interface Message {
   id: string
@@ -61,7 +62,7 @@ export default function IngredientCheckerPage() {
     try {
       const moreInfo = {
         region: "West Africa",
-        country: user.profile?.nationality || "Nigeria",
+        country: getCountryIsoCode(user.profile?.nationality || "NG"),
         known_skintone_type: user.profile?.skinType || "",
         skin_type_last_time_checked: new Date().toISOString(),
         known_skin_condition: user.profile?.skinCondition || "none",
@@ -142,14 +143,14 @@ export default function IngredientCheckerPage() {
               >
                 <div className={`flex gap-2 max-w-[88%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${msg.role === 'assistant'
-                      ? 'bg-[#E1784F]/10 border-[#E1784F]/20 text-[#E1784F]'
-                      : 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20 text-[#4DB6AC]'
+                    ? 'bg-[#E1784F]/10 border-[#E1784F]/20 text-[#E1784F]'
+                    : 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20 text-[#4DB6AC]'
                     }`}>
                     {msg.role === 'assistant' ? <FlaskConical size={13} /> : <User size={13} />}
                   </div>
                   <div className={`px-4 py-3 rounded-2xl text-[12px] font-medium leading-relaxed shadow-sm ${msg.role === 'assistant'
-                      ? 'bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 text-gray-700 dark:text-gray-300'
-                      : 'bg-black dark:bg-white text-white dark:text-black font-bold'
+                    ? 'bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 text-gray-700 dark:text-gray-300'
+                    : 'bg-black dark:bg-white text-white dark:text-black font-bold'
                     }`}>
                     {msg.content}
                   </div>
@@ -261,14 +262,14 @@ export default function IngredientCheckerPage() {
                 >
                   <div className={`max-w-[80%] flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${msg.role === 'assistant'
-                        ? 'bg-[#E1784F]/10 border-[#E1784F]/20 text-[#E1784F]'
-                        : 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20 text-[#4DB6AC]'
+                      ? 'bg-[#E1784F]/10 border-[#E1784F]/20 text-[#E1784F]'
+                      : 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20 text-[#4DB6AC]'
                       }`}>
                       {msg.role === 'assistant' ? <FlaskConical size={16} /> : <User size={16} />}
                     </div>
                     <div className={`p-4 rounded-[1.5rem] text-[12px] font-medium leading-relaxed shadow-sm ${msg.role === 'assistant'
-                        ? 'bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 text-gray-700 dark:text-gray-300'
-                        : 'bg-black dark:bg-white text-white dark:text-black font-bold'
+                      ? 'bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 text-gray-700 dark:text-gray-300'
+                      : 'bg-black dark:bg-white text-white dark:text-black font-bold'
                       }`}>
                       {msg.content}
                     </div>
