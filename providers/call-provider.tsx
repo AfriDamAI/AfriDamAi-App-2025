@@ -23,6 +23,7 @@ interface CallContextType {
     rejectCall: () => void;
     endCall: () => void;
     receiveExternalSignal: (data: any) => void;
+    handleIncomingAnswer: (data: any) => Promise<void>;
 }
 
 const CallContext = createContext<CallContextType | undefined>(undefined);
@@ -75,6 +76,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         startCall: baseStartCall,
         acceptCall: baseAcceptCall,
         endCall: baseEndCall,
+        handleIncomingAnswer: baseHandleIncomingAnswer,
         cleanup
     } = useCall({
         socket,
@@ -208,10 +210,14 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const receiveExternalSignal = (data: any) => {
-        if (isCalling || (incomingCallData && incomingCallData.chatId === data.chatId)) return;
-        // In the patient app, useCall hook exposes handleIncomingCall directly via internal logic
-        // but since it's not exported, we simulate it by setting state if not already calling.
-        setIncomingCallData({ from: data.from, type: data.type, offer: data.offer, chatId: data.chatId });
+        // 🛡️ DUAL-SIGNALING HANDSHAKE (Rule 6 Multi-Instance Fix)
+        if (data.signalType === 'offer') {
+            if (isCalling || (incomingCallData && incomingCallData.chatId === data.chatId)) return;
+            setIncomingCallData({ from: data.from, type: data.type, offer: data.offer, chatId: data.chatId });
+        } else if (data.signalType === 'answer') {
+            // Caller picks up an answer via durable polling
+            baseHandleIncomingAnswer(data);
+        }
     };
 
     return (
@@ -227,7 +233,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
             acceptCall,
             rejectCall,
             endCall,
-            receiveExternalSignal
+            receiveExternalSignal,
+            handleIncomingAnswer: baseHandleIncomingAnswer
         }}>
             {children}
 

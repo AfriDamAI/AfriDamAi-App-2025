@@ -249,6 +249,17 @@ export const useCall = ({
     cleanup();
   };
 
+  const handleIncomingAnswer = useCallback(async (data: any) => {
+    console.log(`🤝 CALL ENGINE: Answer received (Durable/Socket)`);
+    if (peerConnectionRef.current) {
+      if (peerConnectionRef.current.signalingState === 'stable') return;
+      await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.answer));
+      startTimer();
+      await processPendingCandidates();
+      if (onCallAccepted) onCallAccepted(data.answer);
+    }
+  }, [onCallAccepted, startTimer, processPendingCandidates]);
+
   useEffect(() => {
     if (!socket) return;
 
@@ -260,15 +271,7 @@ export const useCall = ({
     };
 
     const handleCallAccepted = async (data: any) => {
-      console.log(`🤝 CALL ENGINE: Call accepted by ${remoteUserId || 'remote user'}`);
-      if (peerConnectionRef.current) {
-        await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.answer));
-        // Start timer when connection is accepted (or when media starts flowing)
-        startTimer();
-        // Now that remote description is set, we can process pending candidates
-        await processPendingCandidates();
-        if (onCallAccepted) onCallAccepted(data.answer);
-      }
+      await handleIncomingAnswer(data);
     };
 
     const handleIceCandidate = async (data: any) => {
@@ -325,6 +328,7 @@ export const useCall = ({
     startCall,
     acceptCall,
     endCall,
+    handleIncomingAnswer,
     cleanup
   };
 };
