@@ -79,6 +79,7 @@ export const SpecialistChat = () => {
   useEffect(() => {
     if (socket) {
       const handleNewMessage = (msg: Message) => {
+        if (msg.type === 'SYSTEM') return;
         if (selectedChat && msg.chatId === selectedChat.id) {
           setMessages(prev => [...prev, msg]);
           markMessageAsRead(msg.id);
@@ -133,7 +134,8 @@ export const SpecialistChat = () => {
   const fetchChatMessages = async (chatId: string) => {
     try {
       const chatMessages = await getChatMessages(chatId);
-      setMessages(chatMessages);
+      const filteredMessages = chatMessages.filter((msg: any) => msg.type !== 'SYSTEM');
+      setMessages(filteredMessages);
       setError(null);
     } catch (err) {
       setError("Failed to fetch messages.");
