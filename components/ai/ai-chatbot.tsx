@@ -5,6 +5,7 @@ import { useTheme } from "@/providers/theme-provider"
 import { useAuth } from "@/providers/auth-provider" // 🚀 SYNC: Import useAuth to get user context
 // 🚀 SYNC: Using the verified chatbot endpoint from api-client
 import { sendAnalyzerChatMessage } from "@/lib/api-client"
+import { getCountryIsoCode } from "@/lib/country-utils"
 
 interface Message {
   id: string
@@ -18,7 +19,7 @@ export function AIChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -50,7 +51,7 @@ export function AIChatBot() {
     const currentInput = input;
     setInput("");
     setIsTyping(true);
-    
+
     try {
       /**
        * 🚀 THE NEURAL HANDSHAKE (Rule 7)
@@ -58,7 +59,7 @@ export function AIChatBot() {
        */
       const moreInfo = {
         region: "West Africa",
-        country: user.profile?.nationality || "Nigeria",
+        country: getCountryIsoCode(user.profile?.nationality || "NG"),
         known_skintone_type: user.profile?.skinType || "",
         skin_type_last_time_checked: new Date().toISOString(),
         known_skin_condition: user.profile?.skinCondition || "none",
@@ -74,9 +75,9 @@ export function AIChatBot() {
         known_last_consultation_with_afridermatologists: user.profile?.lastConsultation || new Date().toISOString(),
         user_activeness_on_app: "very_high"
       };
-      
+
       const data = await sendAnalyzerChatMessage(currentInput, moreInfo);
-      
+
       /**
        * 🛡️ DATA EXTRACTION (Rule 7)
        * Aligned with backend proxy response and apiClient interceptor.
@@ -106,7 +107,7 @@ export function AIChatBot() {
   return (
     <>
       {/* 🚀 TOGGLE HUB (Mobile Optimized Position) */}
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-28 right-6 md:bottom-10 md:right-10 z-[999] w-16 h-16 bg-[#4DB6AC] text-white rounded-[1.5rem] shadow-[0_20px_40px_rgba(77,182,172,0.4)] flex items-center justify-center active:scale-90 transition-all group border-2 border-white/10"
       >
@@ -126,13 +127,12 @@ export function AIChatBot() {
       {/* 🏛️ CHAT CONSOLE */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.98 }}
-            className={`fixed bottom-24 right-4 left-4 md:left-auto md:right-10 z-[998] md:w-[420px] h-[70vh] md:h-[600px] rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] border flex flex-col overflow-hidden backdrop-blur-3xl transition-all ${
-              isDark ? 'bg-[#0A0A0A]/95 border-white/10' : 'bg-white/95 border-black/5'
-            }`}
+            className={`fixed bottom-24 right-4 left-4 md:left-auto md:right-10 z-[998] md:w-[420px] h-[70vh] md:h-[600px] rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] border flex flex-col overflow-hidden backdrop-blur-3xl transition-all ${isDark ? 'bg-[#0A0A0A]/95 border-white/10' : 'bg-white/95 border-black/5'
+              }`}
           >
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#E1784F]/10 blur-3xl rounded-full pointer-events-none" />
 
@@ -160,16 +160,14 @@ export function AIChatBot() {
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[90%] flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border ${
-                      msg.role === 'assistant' ? 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20 text-[#4DB6AC]' : 'bg-[#E1784F]/10 border-[#E1784F]/20 text-[#E1784F]'
-                    }`}>
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border ${msg.role === 'assistant' ? 'bg-[#4DB6AC]/10 border-[#4DB6AC]/20 text-[#4DB6AC]' : 'bg-[#E1784F]/10 border-[#E1784F]/20 text-[#E1784F]'
+                      }`}>
                       {msg.role === 'assistant' ? <Bot size={20} /> : <User size={20} />}
                     </div>
-                    <div className={`p-5 rounded-[1.8rem] text-[13px] font-medium leading-relaxed shadow-sm ${
-                      msg.role === 'assistant' 
-                        ? (isDark ? 'bg-white/5 text-gray-300' : 'bg-black/5 text-gray-700')
-                        : 'bg-black dark:bg-white text-white dark:text-black font-bold'
-                    }`}>
+                    <div className={`p-5 rounded-[1.8rem] text-[13px] font-medium leading-relaxed shadow-sm ${msg.role === 'assistant'
+                      ? (isDark ? 'bg-white/5 text-gray-300' : 'bg-black/5 text-gray-700')
+                      : 'bg-black dark:bg-white text-white dark:text-black font-bold'
+                      }`}>
                       {msg.content}
                     </div>
                   </div>
@@ -177,30 +175,30 @@ export function AIChatBot() {
               ))}
               {isTyping && (
                 <div className="flex items-center gap-3 pl-14">
-                   <Loader2 className="animate-spin text-[#4DB6AC]" size={16} />
-                   <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-30">Generating Profile Insight</p>
+                  <Loader2 className="animate-spin text-[#4DB6AC]" size={16} />
+                  <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-30">Generating Profile Insight</p>
                 </div>
               )}
             </div>
 
             {/* COMPLIANCE FOOTER */}
             <div className="px-8 py-3 bg-gray-50 dark:bg-white/5 flex items-center gap-3 border-y border-gray-100 dark:border-white/10">
-               <Info size={12} className="opacity-20 text-[#E1784F]" />
-               <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-30">Wellness Guidance Only • Secured Sync</p>
+              <Info size={12} className="opacity-20 text-[#E1784F]" />
+              <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-30">Wellness Guidance Only • Secured Sync</p>
             </div>
 
             {/* INPUT NODE */}
             <div className="p-6 md:p-8">
               <div className="relative flex items-center group">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Inquire about clinical safety..." 
+                  placeholder="Inquire about clinical safety..."
                   className="w-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[2rem] px-8 py-6 text-sm font-bold outline-none focus:border-[#4DB6AC] transition-all placeholder:opacity-20 shadow-inner"
                 />
-                <button 
+                <button
                   onClick={handleSendMessage}
                   disabled={!input.trim() || isTyping}
                   className="absolute right-3 w-14 h-14 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center active:scale-95 shadow-2xl transition-all disabled:opacity-20 group-focus-within:bg-[#E1784F] group-focus-within:text-white"
