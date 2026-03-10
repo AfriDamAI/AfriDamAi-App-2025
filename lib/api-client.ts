@@ -1,5 +1,6 @@
 import axios from "axios";
 import { UserLoginDto, CreateUserDto, AuthResponse, Chat, Message, User, CreateUserProfileDto, UpdateUserProfileDto, UserProfile } from "@/lib/types";
+import { getCountryIsoCode } from "@/lib/country-utils";
 
 /**
  * 🛡️ AFRIDAM INFRASTRUCTURE SYNC
@@ -301,7 +302,7 @@ export const analyzeSkinWithUserData = async (imgSource: string, userContext: an
   // Create a default user context for AI analysis based on successful Postman request
   const defaultUserContext = {
     region: userContext.region || "West Africa",
-    country: userContext.country || "Nigeria",
+    country: getCountryIsoCode(userContext.country || "NG"),
     known_skintone_type: "string", // Placeholder from successful Postman
     skin_type_last_time_checked: "9999-01-01T10:38:38.511Z", // Placeholder from successful Postman
     known_skin_condition: userContext.known_skin_condition || "none",

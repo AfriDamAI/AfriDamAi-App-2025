@@ -59,6 +59,17 @@ export interface UserProfile {
   allergies?: string; // Textarea version for raw notes
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
+  
+  // 🛡️ AI CONTEXT FIELDS (Rule 6 Synergy)
+  nationality?: string;
+  sex?: string;
+  age?: number;
+  skinCondition?: string;
+  bodyLotion?: string;
+  bodyLotionBrand?: string;
+  lastSkinTreatment?: string;
+  lastConsultation?: string;
+
   onboardingSkipped?: boolean;
   onboardingCompleted?: boolean;
   createdAt?: string;

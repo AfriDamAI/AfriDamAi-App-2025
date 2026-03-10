@@ -17,6 +17,7 @@ import {
 import { useAuth } from "@/providers/auth-provider"
 import { useSubscription } from "@/hooks/use-subscription"
 import { analyzeSkinWithUserData } from "@/lib/api-client"
+import { getCountryIsoCode } from "@/lib/country-utils"
 import { SubscriptionModal } from "@/components/subscription-modal"
 
 export default function UnifiedScanner() {
@@ -159,7 +160,7 @@ export default function UnifiedScanner() {
       // Populate more_info with user data - matching exact API spec
       const moreInfo = {
         region: "West Africa",
-        country: user.profile?.nationality || "Nigeria",
+        country: getCountryIsoCode(user.profile?.nationality || "NG"),
         known_skintone_type: user.profile?.skinType || "brown",
         skin_type_last_time_checked: new Date().toISOString(),
         known_skin_condition: user.profile?.skinCondition || "none",
@@ -455,9 +456,9 @@ export default function UnifiedScanner() {
       </div>
 
       {/* Subscription Modal for Free Tier Users */}
-      <SubscriptionModal 
-        isOpen={showSubscriptionModal} 
-        onClose={() => setShowSubscriptionModal(false)} 
+      <SubscriptionModal
+        isOpen={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
       />
     </main>
   )
