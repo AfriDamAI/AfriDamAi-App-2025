@@ -10,19 +10,20 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { 
-  Loader2, 
-  Zap, 
-  AlertCircle, 
-  ShieldCheck, 
-  ClipboardList, 
+import {
+  Loader2,
+  Zap,
+  AlertCircle,
+  ShieldCheck,
+  ClipboardList,
   RotateCcw,
   Baby
 } from "lucide-react"
 import IngredientResults from "@/components/ingredient-results"
 import { useAuth } from "@/providers/auth-provider" // 🚀 SYNC: Import useAuth to get user context
 // 🚀 SYNC: Pointing to the verified api-client to resolve ts(2307)
-import { analyzeIngredients } from "@/lib/api-client" 
+import { analyzeIngredients } from "@/lib/api-client"
+import { getCountryIsoCode } from "@/lib/country-utils"
 
 interface IngredientAnalyzerProps {
   onAnalysisComplete: (results: any) => void
@@ -48,7 +49,7 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
        */
       const moreInfo = {
         region: "West Africa",
-        country: user.profile?.nationality || "Nigeria",
+        country: getCountryIsoCode(user.profile?.nationality || "NG"),
         known_skintone_type: user.profile?.skinType || "",
         skin_type_last_time_checked: new Date().toISOString(),
         known_skin_condition: user.profile?.skinCondition || "none",
@@ -66,7 +67,7 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
       };
 
       const data = await analyzeIngredients(ingredientText, moreInfo); // 🛡️ SYNC: Pass moreInfo
-      
+
       /** * 📊 DATA MAPPING
        * riskLevel: Maps 'risk_level' from FastAPI.
        * safetyScore: Maps 'safety_score' from FastAPI.
@@ -100,8 +101,8 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
     return (
       <div className="space-y-8 animate-in fade-in duration-500 text-left">
         <IngredientResults data={results} onRetry={handleReset} />
-        <Button 
-          onClick={handleReset} 
+        <Button
+          onClick={handleReset}
           className="w-full h-16 bg-muted/20 border border-white/5 text-muted-foreground rounded-[2rem] font-black uppercase text-[9px] tracking-widest hover:text-white transition-all active:scale-95"
         >
           <RotateCcw className="mr-2" size={14} /> Check New Product
@@ -127,8 +128,8 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
           <div className="flex items-center justify-between px-2">
             <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Paste Ingredient List</label>
             <div className="flex items-center gap-2">
-               <Baby size={12} className="text-[#4DB6AC]" />
-               <span className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-widest leading-none">Family-Safe</span>
+              <Baby size={12} className="text-[#4DB6AC]" />
+              <span className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-widest leading-none">Family-Safe</span>
             </div>
           </div>
           <textarea
@@ -170,8 +171,8 @@ export default function IngredientAnalyzer({ onAnalysisComplete }: IngredientAna
               <>Check Formula <Zap className="ml-3 fill-current" size={16} /></>
             )}
           </Button>
-          <Button 
-            onClick={handleReset} 
+          <Button
+            onClick={handleReset}
             className="h-20 bg-muted/50 text-muted-foreground border border-border rounded-[1.8rem] font-black uppercase text-[10px] tracking-widest px-10 hover:text-foreground transition-all"
           >
             Clear
