@@ -9,6 +9,7 @@ import { CallControls } from "@/components/specialist/live/call-controls";
 import { AnimatePresence, motion } from "framer-motion";
 import { apiClient } from "@/lib/api-client";
 import { PhoneOff } from "lucide-react";
+import { toast } from "sonner";
 
 interface CallContextType {
     isCalling: boolean;
@@ -130,6 +131,12 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         onRemoteStream: (stream) => {
             console.log("🎵 CALL PROVIDER: Remote stream received");
             setRemoteStream(stream);
+        },
+        onPeerReconnect: (userId) => {
+            toast.success("Connection restored with peer", {
+                description: "The call connection has been successfully recovered.",
+                duration: 3000
+            });
         }
     });
 
