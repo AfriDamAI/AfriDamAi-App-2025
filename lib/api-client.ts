@@ -325,6 +325,17 @@ export const analyzeSkinWithUserData = async (imgSource: string, userContext: an
 };
 
 /** 📅 APPOINTMENTS MODULE **/
+
+export const getAppointmentById = async (id: string): Promise<any> => {
+  const response = await apiClient.get(`/appointments/${id}`);
+  return response.data;
+};
+
+export const joinAppointmentSession = async (id: string): Promise<{ meetLink: string }> => {
+  const response = await apiClient.get(`/appointments/${id}/join`);
+  return response.data;
+};
+
 export const checkAppointmentEligibility = async () => {
   const response = await apiClient.get("/appointments/eligibility");
   return response.data;
