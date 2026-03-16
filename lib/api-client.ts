@@ -10,6 +10,19 @@ import { getCountryIsoCode } from "@/lib/country-utils";
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://afridam-backend-prod-107032494605.us-central1.run.app/api";
 const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api/v1";
 
+// 🖼️ ASSET HIERARCHY: Synced with Google Cloud Storage / NestJS static uploads
+export const STORAGE_BASE_URL = "https://afridam-backend-prod-107032494605.us-central1.run.app/";
+
+/** 🖼️ HELPER: Generates a full URL for clinical assets stored on the backend **/
+export const getImageUrl = (path?: string | null): string => {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("data:")) return path; // Handle base64 previews
+  // Ensure we don't double slash
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  return `${STORAGE_BASE_URL}${cleanPath}`;
+};
+
 // 🧼 HELPER: Ensures the token is a clean string (No double quotes)
 const sanitizeToken = (token: string | null): string | null => {
   if (!token) return null;
@@ -118,6 +131,17 @@ export const getUser = async (id: string) => {
 
 export const updateUser = async (id: string, updates: any) => {
   const response = await apiClient.put(`/users/${id}`, updates);
+  return response.data;
+};
+
+export const uploadAvatar = async (file: File): Promise<{ url: string }> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiClient.post("/users/avatar", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
 

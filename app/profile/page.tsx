@@ -28,7 +28,7 @@ import {
   Heart
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { apiClient } from "@/lib/api-client" 
+import { apiClient, uploadAvatar, getImageUrl } from "@/lib/api-client" 
 import { motion, AnimatePresence } from "framer-motion"
 import { PersonalDetailsForm } from "@/components/personal-details-form"
 import { EditProfileForm } from "@/components/edit-profile-form"
@@ -50,22 +50,20 @@ export default function ProfilePage() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    // Preprocessing for instant UI feedback
     const objectUrl = URL.createObjectURL(file)
     setPreviewUrl(objectUrl)
     setUploadingAvatar(true)
 
     try {
-      const data = new FormData()
-      data.append('file', file) 
+      // 🚀 THE SYNERGY UPLOAD: Using the dedicated avatar endpoint
+      await uploadAvatar(file)
 
-      // 🚀 THE HANDSHAKE: Synced with NestJS UserModule upload
-      await apiClient.post('/user/avatar', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-
+      // 🛡️ RE-SYNC: Refreshing auth state to get the new avatarUrl from the backend
       await mutate()
     } catch (err) {
-      console.log("Photo sync pending...")
+      console.error("Clinical Profile Sync Error:", err)
+      // Fallback is handled by keeping the preview or showing error
     } finally {
       setUploadingAvatar(false)
     }
@@ -115,8 +113,12 @@ export default function ProfilePage() {
                 <div className="flex flex-col items-center gap-6">
                   <div className="relative group">
                     <div className="w-40 h-40 md:w-48 md:h-48 rounded-3xl overflow-hidden bg-white dark:bg-black border-2 border-white dark:border-white/10 shadow-xl transition-all">
-                      {previewUrl ? (
-                        <img src={previewUrl} className="w-full h-full object-cover" alt="User" />
+                      {(previewUrl || user?.profile?.avatarUrl) ? (
+                        <img 
+                          src={getImageUrl(previewUrl || user?.profile?.avatarUrl)} 
+                          className="w-full h-full object-cover" 
+                          alt="User" 
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center opacity-10">
                           <User size={60} strokeWidth={1} />
