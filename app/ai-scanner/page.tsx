@@ -49,9 +49,6 @@ export default function UnifiedScanner() {
     { icon: <ShieldCheck size={16} />, text: "Finalizing Safe Routine" }
   ];
 
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/");
-  }, [user, authLoading, router]);
 
   useEffect(() => {
     let interval: any;

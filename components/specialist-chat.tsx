@@ -1,26 +1,24 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { MessageSquare, Send, User, PlusCircle, Search, MoreVertical, Paperclip, Smile, Phone, Video, Mic, Image as ImageIcon, X, Play, Pause, Download, PhoneOff, PanelLeftOpen, PanelLeftClose, ChevronLeft } from "lucide-react";
+import { MessageSquare, Send, PlusCircle, Search, MoreVertical, Paperclip, Mic, Video, PanelLeftOpen, PanelLeftClose, ChevronLeft } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
 import {
-  initiateChat,
   getCurrentUserChats,
-  getChatById,
   getChatMessages,
   sendUserChatMessage,
   markMessageAsRead,
   uploadFile,
   getAllSpecialists,
+  joinAppointmentSession,
 } from "@/lib/api-client";
 import { Chat, Message } from "@/lib/types";
 import { useSocket } from "@/hooks/use-socket";
 import { VoiceRecorder } from "./specialist/live/voice-recorder";
-import { CallControls } from "./specialist/live/call-controls";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCallContext } from "@/providers/call-provider";
+import { toast } from "sonner";
 
 export const SpecialistChat = () => {
   const { user } = useAuth();
@@ -37,15 +35,7 @@ export const SpecialistChat = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [specialists, setSpecialists] = useState<any[]>([]);
   const [isListCollapsed, setIsListCollapsed] = useState(false);
-
-  const {
-    isCalling,
-    callType,
-    remoteUserId,
-    startCall,
-    endCall,
-    receiveExternalSignal
-  } = useCallContext();
+  const [isJoiningMeet, setIsJoiningMeet] = useState(false);
 
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -114,44 +104,34 @@ export const SpecialistChat = () => {
   const fetchChatMessages = async (chatId: string) => {
     try {
       const chatMessages = await getChatMessages(chatId);
-
-      // 🛡️ DURABLE SIGNALING SCAN (Perform BEFORE filtering for UI)
-      chatMessages.forEach((msg: any) => {
-        if (msg.type === 'SYSTEM' && (msg.message || msg.text)?.startsWith('CALL_OFFER:') || (msg.message || msg.text)?.startsWith('CALL_ANSWER:')) {
-          const isOffer = (msg.message || msg.text)?.startsWith('CALL_OFFER:');
-          const signalType = isOffer ? 'offer' : 'answer';
-
-          const processedKey = `processed_signal_${msg.id}`;
-          if (typeof window !== 'undefined' && localStorage.getItem(processedKey)) return;
-
-          const msgTime = new Date(msg.timestamp || msg.createdAt).getTime();
-          if (Date.now() - msgTime > 60000) return;
-
-          const signalText = msg.message || msg.text || '';
-          const parts = signalText.split(':');
-          const type = parts[1] as 'voice' | 'video';
-          const payloadStr = parts.slice(2).join(':');
-          try {
-            const payload = JSON.parse(payloadStr);
-            console.log(`🛡️ Durable Signal Pickup (Patient - ${signalType}):`, msg.id);
-            if (typeof window !== 'undefined') localStorage.setItem(processedKey, 'true');
-            receiveExternalSignal({
-              from: msg.senderId,
-              type,
-              [isOffer ? 'offer' : 'answer']: payload,
-              chatId: msg.chatId,
-              signalType: signalType
-            });
-          } catch (e) { console.error('Failed to parse persistent signal', e); }
-        }
-      });
-
-      // 📺 Filter out SYSTEM messages from the UI (Rule 3)
+      // Filter out SYSTEM messages from the UI
       const filteredMessages = chatMessages.filter((msg: any) => msg.type !== 'SYSTEM');
       setMessages(filteredMessages);
       setError(null);
     } catch (err) {
       setError("Failed to fetch messages.");
+    }
+  };
+
+  const handleJoinMeet = async () => {
+    const appointmentId = typeof window !== 'undefined' ? localStorage.getItem('activeAppointmentId') : null;
+    if (!appointmentId) {
+      toast.error('No active session found. Please wait for your specialist to start the session.');
+      return;
+    }
+    setIsJoiningMeet(true);
+    try {
+      const result = await joinAppointmentSession(appointmentId);
+      if (result?.meetLink) {
+        window.open(result.meetLink, '_blank', 'noopener,noreferrer');
+      } else {
+        toast.error('Session not started yet. Please wait for your specialist.');
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Session not available';
+      toast.error(msg);
+    } finally {
+      setIsJoiningMeet(false);
     }
   };
 
@@ -274,11 +254,7 @@ export const SpecialistChat = () => {
     }
   };
 
-  const handleInitiateCall = (type: 'voice' | 'video') => {
-    if (!selectedChat) return;
-    const otherUserId = selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id;
-    startCall(otherUserId, selectedChat.id, type);
-  };
+  // WebRTC calls replaced by Google Meet — handleInitiateCall removed
 
   const renderMessageContent = (msg: Message) => {
     switch (msg.type) {
@@ -418,11 +394,15 @@ export const SpecialistChat = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => handleInitiateCall('voice')} className="p-2 rounded-full hover:bg-[#4DB6AC]/10 text-[#4DB6AC] transition-all">
-                  <Phone size={20} />
-                </button>
-                <button onClick={() => handleInitiateCall('video')} className="p-2 rounded-full hover:bg-[#4DB6AC]/10 text-[#4DB6AC] transition-all">
-                  <Video size={20} />
+                {/* Google Meet Join Button — replaces old WebRTC call buttons */}
+                <button
+                  onClick={handleJoinMeet}
+                  disabled={isJoiningMeet}
+                  title="Join on Google Meet"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-60 shadow-sm"
+                >
+                  <Video size={16} />
+                  {isJoiningMeet ? 'Opening...' : 'Join Meet'}
                 </button>
                 <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
                   <MoreVertical size={20} />
