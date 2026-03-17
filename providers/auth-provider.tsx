@@ -2,15 +2,18 @@
 
 import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react"
 import { jwtDecode } from "jwt-decode";
-import { 
-  login, 
-  register, 
-  setAuthToken, 
-  getProfile,
-  updateUser, 
-  forgotPassword as forgotPasswordApi 
-} from "@/lib/api-client" 
-import { UserLoginDto, CreateUserDto } from "@/lib/types"
+import {
+  login,
+  register,
+  setAuthToken,
+  getUserMe as getProfile,
+  updateUser,
+  forgotPassword as forgotPasswordApi,
+  createUserProfile,
+  updateUserProfile as updateUserProfileApi,
+  skipOnboarding as skipOnboardingApi
+} from "@/lib/api-client"
+import { UserLoginDto, CreateUserDto, User, CreateUserProfileDto, UpdateUserProfileDto, UserProfile } from "@/lib/types"
 
 /**
  * 🛡️ AFRIDAM AUTH PROVIDER (Rule 7 Precision Sync)
@@ -18,33 +21,23 @@ import { UserLoginDto, CreateUserDto } from "@/lib/types"
  * Focus: High-Speed Mobile Transitions & Background Data Fetching.
  */
 
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  onboardingCompleted: boolean;
-  phoneNo?: string;   
-  profile?: {
-    skinType?: string;
-    melaninTone?: string;
-    [key: string]: any;
-  };
-}
+// 🛡️ User type is now imported from lib/types.ts
 
 interface AuthContextType {
   user: User | null
   isSignedIn: boolean
   isLoading: boolean
-  requiresOnboarding: boolean 
+  requiresOnboarding: boolean
   signIn: (credentials: UserLoginDto) => Promise<void>
   signUp: (userData: CreateUserDto) => Promise<void>
   signOut: () => void
   forgotPassword: (email: string) => Promise<void>
   updateUserProfile: (updates: Partial<any>) => Promise<User | null>
-  refreshUser: () => Promise<void> 
-  mutate: () => Promise<void>     
+  createProfile: (profileData: CreateUserProfileDto) => Promise<UserProfile | null>
+  updateProfile: (profileData: UpdateUserProfileDto) => Promise<UserProfile | null>
+  skipOnboarding: () => Promise<void>
+  refreshUser: () => Promise<void>
+  mutate: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -80,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             signOut();
           } else {
             setAuthToken(token);
-            setTokenLoaded(true); 
+            setTokenLoaded(true);
             // Background fetch for mobile speed
             fetchUserData();
           }
@@ -99,21 +92,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data: any = await login(credentials);
       // 🚀 THE FIX: Catching token from various backend response styles
       const accessToken = data?.accessToken || data?.access_token || data?.token;
-      
+
       if (!accessToken) throw new Error("Connection failed: Please check your details.");
 
       localStorage.setItem("token", accessToken);
       setAuthToken(accessToken);
-      
+
       // 🛡️ IMMEDIATE ACCESS: Set state before background fetching profile
-      setTokenLoaded(true); 
-      
+      setTokenLoaded(true);
+
       const userData = extractUserData(data);
       if (userData) setUser(userData);
 
       // We don't 'await' this so the user enters the dashboard instantly
       fetchUserData();
-      
+
     } catch (error) {
       signOut();
       throw error;
@@ -153,11 +146,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user?.id) return null;
     try {
       const { id, email, ...cleanUpdates } = updates;
+      // If profile is in updates, we might need to handle it differently if the backend expects /profile
+      // but if the user record update works, we keep it for compatibility.
       const response = await updateUser(user.id, cleanUpdates);
       const updatedData = extractUserData(response);
       setUser(prev => prev ? { ...prev, ...updatedData } : updatedData);
       return updatedData;
     } catch (error: any) {
+      throw error;
+    }
+  }
+
+  const createProfile = async (profileData: CreateUserProfileDto) => {
+    try {
+      const response = await createUserProfile(profileData);
+      await refreshUser(); // Refresh user to get the updated profile and onboardingCompleted status
+      return response;
+    } catch (error: any) {
+      console.error("Create Profile Failed:", error);
+      throw error;
+    }
+  }
+
+  const updateProfile = async (profileData: UpdateUserProfileDto) => {
+    try {
+      const response = await updateUserProfileApi(profileData);
+      await refreshUser();
+      return response;
+    } catch (error: any) {
+      console.error("Update Profile Failed:", error);
+      throw error;
+    }
+  }
+
+  const skipOnboarding = async () => {
+    try {
+      await skipOnboardingApi();
+      await refreshUser();
+    } catch (error: any) {
+      console.error("Skip Onboarding Failed:", error);
       throw error;
     }
   }
@@ -172,8 +199,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
     forgotPassword: forgotPasswordApi,
     updateUserProfile,
+    createProfile,
+    updateProfile,
+    skipOnboarding,
     refreshUser,
-    mutate: refreshUser 
+    mutate: refreshUser
   }), [user, isLoading, tokenLoaded]);
 
   return (

@@ -40,8 +40,43 @@ export interface AuthResponse {
       lastName: string;
       sex: string;
       phoneNo: string;
+      onboardingCompleted?: boolean;
+      profile?: UserProfile | null;
     };
   };
+}
+
+export interface UserProfile {
+  id?: string;
+  userId?: string;
+  ageRange?: number;
+  skinType?: string;
+  skinToneLevel?: number; // Fitzpatrick scale (1-6)
+  melaninTone?: string;
+  primaryConcern?: string;
+  environment?: string;
+  avatarUrl?: string;
+  allergies?: string; // Textarea version for raw notes
+  knownSkinAllergies?: string[];
+  previousTreatments?: string[];
+  onboardingSkipped?: boolean;
+  onboardingCompleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  sex: string;
+  phoneNo: string;
+  isActive: boolean;
+  isSuspended: boolean;
+  lastLoginAt?: string;
+  onboardingCompleted: boolean;
+  profile: UserProfile | null;
 }
 
 export interface Chat {
@@ -59,8 +94,43 @@ export interface Message {
   chatId: string;
   senderId: string;
   message: string;
+  type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'MISSED_CALL' | 'SYSTEM';
+  attachmentUrl?: string;
+  mimeType?: string;
+  fileSize?: number;
+  duration?: number;
   timestamp: string; // Assuming ISO string date
   read?: boolean; // Optional, for read status
+}
+
+export interface UpdateUserProfileDto {
+  ageRange?: number;
+  skinType?: string;
+  skinToneLevel?: number;
+  melaninTone?: string;
+  primaryConcern?: string;
+  environment?: string;
+  avatarUrl?: string;
+  allergies?: string;
+  onboardingCompleted?: boolean;
+  knownSkinAllergies?: string[];
+  previousTreatments?: string[];
+  onboardingSkipped?: boolean;
+}
+
+export interface CreateUserProfileDto {
+  ageRange?: number;
+  skinType?: string;
+  skinToneLevel?: number;
+  melaninTone?: string;
+  primaryConcern?: string;
+  environment?: string;
+  avatarUrl?: string;
+  allergies?: string;
+  onboardingCompleted?: boolean;
+  knownSkinAllergies?: string[];
+  previousTreatments?: string[];
+  onboardingSkipped?: boolean;
 }
 
 /** 🛡️ RE-ENFORCED: Profile Update Type **/
@@ -68,8 +138,14 @@ export interface UpdateUserDto extends Partial<Omit<CreateUserDto, 'password'>> 
   nationality?: string;
   // Rule 6: These match the Profile model in Prisma linked via AnalyzerService
   ageRange?: number;
-  skinToneLevel?: string; // Synced with 'Fitzpatrick Level' in AnalyzerService
+  skinType?: string;
+  skinToneLevel?: number;
+  melaninTone?: string;
   primaryConcern?: string;
+  environment?: string;
+  avatarUrl?: string;
+  allergies?: string;
+  onboardingCompleted?: boolean;
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
 }
