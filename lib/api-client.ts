@@ -367,7 +367,7 @@ export const checkAppointmentEligibility = async () => {
 
 export const createAppointment = async (data: {
   subscriptionId?: string;
-  specialty: "DERMATOLOGIST" | "SKINCARE_CONSULTANT" | "REGISTERED_NURSE" | "MEDICAL_OFFICER";
+  specialty: "DERMATOLOGIST" | "CONSULTANT";
   scheduledAt: string;
   notes?: string;
 }) => {
@@ -391,3 +391,4 @@ export const getUserSubscriptions = async () => {
 };
 
 export default apiClient;
+
