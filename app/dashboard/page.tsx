@@ -39,9 +39,6 @@ export default function Dashboard() {
   const planName = user?.plan?.name?.toLowerCase() || ''
   const isRestrictedPlan = planName === 'free tier' || planName === 'plan' || planName === 'test plan'
 
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/login")
-  }, [user, authLoading, router])
 
   useEffect(() => {
     const fetchHistory = async () => {
