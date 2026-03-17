@@ -46,7 +46,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[100svh] bg-[#050505] flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
+    <div className="min-h-svh bg-[#050505] flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
       {/* --- CINEMATIC AMBIANCE --- */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#4DB6AC]/5 blur-[120px] md:blur-[250px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[#E1784F]/5 blur-[80px] md:blur-[180px] rounded-full pointer-events-none" />
@@ -80,13 +80,7 @@ export default function LoginPage() {
 
         {/* --- THE ENTRY PORTAL --- */}
         <div className="relative">
-          <button 
-            type="button"
-            onClick={handleCancel}
-            className="absolute -top-6 -right-2 md:-top-8 md:-right-8 p-3 md:p-4 text-white/20 hover:text-[#4DB6AC] hover:scale-110 transition-all z-[100]"
-          >
-            <X className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
+         
 
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-8">
             {error && (

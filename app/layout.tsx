@@ -68,10 +68,10 @@ export default function RootLayout({
       <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-[#050505] text-black dark:text-white selection:bg-[#E1784F]/30 min-h-[100svh] relative overflow-x-hidden transition-colors duration-500`}>
 
         {/* 🛡️ GLOBAL EDITORIAL TEXTURE */}
-        <div className="fixed inset-0 z-[0] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
         {/* --- LIGHTING ORBS --- */}
-        <div className="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#E1784F]/5 blur-[120px] rounded-full pointer-events-none z-[1]" />
+        <div className="fixed top-[-10%] right-[-10%] w-125 h-125 bg-[#E1784F]/5 blur-[120px] rounded-full pointer-events-none z-[1]" />
         <div className="fixed bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#4DB6AC]/5 blur-[100px] rounded-full pointer-events-none z-[1]" />
 
         {/* 🚀 THE FIX: ThemeProvider props removed to resolve ts(2322) */}
@@ -81,7 +81,7 @@ export default function RootLayout({
               <AnimatePresence mode="wait">
                 <motion.div
                   key={pathname}
-                  className="min-h-[100svh] w-full relative z-10 flex flex-col"
+                  className="min-h-svh w-full relative z-10 flex flex-col"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -102,11 +102,11 @@ export default function RootLayout({
 
               {/* 💬 PERSISTENT SUPPORT */}
               {shouldShowChatBot && (
-                <div className="fixed bottom-8 right-8 z-[100]">
+                <div className="fixed bottom-8 right-8 z-100">
                   <AIChatBot />
                 </div>
               )}
-              <div className="fixed bottom-8 left-8 z-[100]">
+              <div className="fixed bottom-8 left-8 z-100">
                 {/* <IngredientAnalyzer /> */}
               </div>
             </AuthGuard>
