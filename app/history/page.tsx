@@ -53,7 +53,7 @@ export default function HistoryPage() {
   }
 
   /**
-   * 🛡️ PREMIUM GATE: Fetch full report via GET /v1/{id}
+   * 🛡️ PREMIUM GATE: Fetch full report via GET /v2/{id}
    * This endpoint is subscription-restricted on the backend.
    */
   const handleOpenReport = async (record: any) => {

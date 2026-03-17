@@ -71,7 +71,7 @@ export default function Dashboard() {
   const initializePaystack = usePaystackPayment(config)
 
   /**
-   * 🛡️ PREMIUM GATE: Fetch full report via GET /v1/{id}
+   * 🛡️ PREMIUM GATE: Fetch full report via GET /v2/{id}
    * This endpoint is subscription-restricted on the backend.
    */
   const handleOpenReport = async (scan: any) => {
@@ -176,8 +176,8 @@ export default function Dashboard() {
           <section className="space-y-5 text-left pb-6">
             <div className="flex items-center justify-between px-3">
               <h4 className="text-[9px] font-black tracking-[0.4em] opacity-30">Clinical Diary</h4>
-              <button 
-                onClick={() => !isRestrictedPlan && router.push('/history')} 
+              <button
+                onClick={() => !isRestrictedPlan && router.push('/history')}
                 disabled={isRestrictedPlan}
                 className={`text-[8px] font-black tracking-widest ${isRestrictedPlan ? 'opacity-30 cursor-not-allowed' : 'text-[#4DB6AC] cursor-pointer'}`}
               >
@@ -215,11 +215,10 @@ export default function Dashboard() {
                           <p className="text-[8px] font-bold opacity-30 tracking-widest">{new Date(scan.createdAt).toLocaleDateString()}</p>
                         </div>
                       </div>
-                      <div className={`w-9 h-9 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center transition-all ${
-                        isRestrictedPlan 
-                          ? 'opacity-20' 
-                          : 'opacity-20 group-hover:opacity-100 group-hover:text-[#E1784F]'
-                      }`}>
+                      <div className={`w-9 h-9 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center transition-all ${isRestrictedPlan
+                        ? 'opacity-20'
+                        : 'opacity-20 group-hover:opacity-100 group-hover:text-[#E1784F]'
+                        }`}>
                         <ArrowRight size={14} />
                       </div>
                     </motion.div>
@@ -261,7 +260,7 @@ export default function Dashboard() {
               <div className="relative h-40 md:h-52 bg-gray-900">
                 {selectedRecord.imageUrl && (
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/${selectedRecord.imageUrl}`}
+                    src={`${process.env.NEXT_PUBLIC_API_URL || 'https://afridam-backend-prod-107032494605.us-central1.run.app'}/${selectedRecord.imageUrl}`}
                     alt="Clinical Scan"
                     className="w-full h-full object-cover opacity-60"
                   />
