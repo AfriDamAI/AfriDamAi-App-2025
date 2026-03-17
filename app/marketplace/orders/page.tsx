@@ -24,7 +24,6 @@ export default function OrderHistoryPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!authLoading && !user) router.push("/login")
     if (user) fetchOrders()
   }, [user, authLoading])
 
