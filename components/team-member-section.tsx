@@ -35,13 +35,13 @@ const teamMembers = [
     description: "Leads the Node.js/NestJS architecture and API integration.",
     image: tobImage,
   },
-  {
-    id: 4,
-    name: "Tochi Omeche",
-    title: "AI Coordinator",
-    description: "Manages the African datasets and model training for the scanner.",
-    image: anuImage,
-  },
+  // {
+  //   id: 4,
+  //   name: "Tochi Omeche",
+  //   title: "AI Coordinator",
+  //   description: "Manages the African datasets and model training for the scanner.",
+  //   image: anuImage,
+  // },
   
   {
     id: 5,
