@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { MessageSquare, Send, PlusCircle, Search, MoreVertical, Paperclip, Mic, Video, PanelLeftOpen, PanelLeftClose, ChevronLeft } from "lucide-react";
+import { MessageSquare, Send, PlusCircle, Search, MoreVertical, Paperclip, Mic, Video, PanelLeftOpen, PanelLeftClose, ChevronLeft, Phone } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
