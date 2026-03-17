@@ -42,9 +42,6 @@ export default function ProfilePage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(user?.profile?.avatarUrl || null)
 
-  useEffect(() => {
-    if (!user) router.push("/login")
-  }, [user, router])
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -61,6 +58,7 @@ export default function ProfilePage() {
 
       // 🛡️ RE-SYNC: Refreshing auth state to get the new avatarUrl from the backend
       await mutate()
+      window.location.reload()
     } catch (err) {
       console.error("Clinical Profile Sync Error:", err)
       // Fallback is handled by keeping the preview or showing error
