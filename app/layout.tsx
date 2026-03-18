@@ -42,7 +42,7 @@ export default function RootLayout({
    * Updated to remove '/auth' prefix per (auth) route group organization.
    * This ensures the AppWrapper (Sidebar/Nav) doesn't interfere with Auth pages.
    */
-  const publicRoutes = ["/", "/login", "/register", "/forgot-password"];
+  const publicRoutes = ["/", "/login", "/register", "/forgot-password", "/verify-email"];
   const isPublicPage = publicRoutes.includes(pathname);
 
   /**
