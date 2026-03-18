@@ -11,7 +11,8 @@ import {
   forgotPassword as forgotPasswordApi,
   createUserProfile,
   updateUserProfile as updateUserProfileApi,
-  skipOnboarding as skipOnboardingApi
+  skipOnboarding as skipOnboardingApi,
+  verifyRegister as apiVerifyRegister
 } from "@/lib/api-client"
 import { UserLoginDto, CreateUserDto, User, CreateUserProfileDto, UpdateUserProfileDto, UserProfile } from "@/lib/types"
 
@@ -37,6 +38,7 @@ interface AuthContextType {
   updateProfile: (profileData: UpdateUserProfileDto) => Promise<UserProfile | null>
   skipOnboarding: () => Promise<void>
   refreshUser: () => Promise<void>
+  verifyRegister: (email: string, code: string) => Promise<void>
   mutate: () => Promise<void>
 }
 
@@ -119,7 +121,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       await register(userData);
-      await signIn({ email: userData.email, password: userData.password });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const verifyRegister = async (email: string, code: string) => {
+    setIsLoading(true);
+    try {
+      const data: any = await apiVerifyRegister(email, code);
+      // 🚀 THE FIX: Catching token from various backend response styles
+      const accessToken = data?.accessToken || data?.access_token || data?.token;
+
+      if (!accessToken) throw new Error("Verification failed: Please check the code.");
+
+      localStorage.setItem("token", accessToken);
+      setAuthToken(accessToken);
+
+      // 🛡️ IMMEDIATE ACCESS: Set state before background fetching profile
+      setTokenLoaded(true);
+
+      const userData = extractUserData(data);
+      if (userData) setUser(userData);
+
+      // Background fetch for mobile speed
+      fetchUserData();
+
+    } catch (error) {
+      signOut();
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -203,6 +233,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     updateProfile,
     skipOnboarding,
     refreshUser,
+    verifyRegister,
     mutate: refreshUser
   }), [user, isLoading, tokenLoaded]);
 
