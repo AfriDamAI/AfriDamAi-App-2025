@@ -103,6 +103,11 @@ export const register = async (userData: CreateUserDto) => {
   return response.data;
 };
 
+export const verifyRegister = async (email: string, code: string) => {
+  const response = await apiClient.post("/auth/register/verify", { email, code });
+  return response.data;
+};
+
 export const forgotPassword = async (email: string) => {
   const response = await apiClient.post("/auth/forgot-password", { email });
   return response.data;

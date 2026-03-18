@@ -55,16 +55,18 @@ export default function RegisterPage() {
     setIsLoading(true)
     
     try {
-      /**
-       * 🚀 THE HANDSHAKE:
-       * signUp maps 'country' to 'nationality' via the api-client.
-       * This resolves the 404/Not Found error from the backend.
-       */
-      await signUp(formData)
-      router.replace("/dashboard")
+      if (step === 2) {
+        /**
+         * 🚀 THE HANDSHAKE (Step 2):
+         * signUp maps 'country' to 'nationality' via the api-client.
+         */
+        await signUp(formData)
+        console.log("Registration successful! Redirecting to verify...");
+        // Redirect to new verification page
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
+      }
     } catch (err: any) {
-      setError("We couldn't set up your account. Please check your details and try again.")
-      setStep(1) 
+      setError(err?.response?.data?.message || "We couldn't process your request. Please check your details and try again.")
     } finally {
       setIsLoading(false)
     }

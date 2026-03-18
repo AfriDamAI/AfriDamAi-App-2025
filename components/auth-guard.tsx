@@ -20,9 +20,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname()
 
   // 🚀 PATH SYNC: These are the exact paths allowed without a token.
-  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/login", "/register", "/forgot-password", "/reset-password", "/privacy-policy"]
+  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/login", "/register", "/forgot-password", "/reset-password", "/privacy-policy", "/verify-email"]
   const isPublicPath = publicPaths.includes(pathname)
-  
+
   // 🔐 AUTH PATHS: Pages that should be hidden from logged-in users.
   const isAuthPage = pathname === "/login" || pathname === "/register"
 
@@ -33,7 +33,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     if (isLoading) return
 
     // 🚩 THE FIX: Only redirect if we are CERTAIN.
-    
+
     // 1. GUEST GATE: If NOT signed in and trying to hit a PRIVATE page (like /dashboard)
     if (!isSignedIn && !isPublicPath) {
       console.log("🚫 Access Blocked: Redirecting to Landing");
@@ -47,7 +47,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
       router.replace("/dashboard")
       return
     }
-    
+
   }, [isSignedIn, isLoading, pathname, router, isPublicPath, isAuthPage])
 
   /**
