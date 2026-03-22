@@ -134,11 +134,25 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         onPeerReconnect: (userId) => {
             toast.success("Connection restored with peer", {
-                description: "The call connection has been successfully recovered.",
+                description: "Signaling connection has been recovered.",
                 duration: 3000
             });
         }
     });
+
+    const handleJoinMeet = async (chatId: string) => {
+        try {
+            const response = await apiClient.get(`/appointments/${chatId}/join`);
+            const meetLink = response.data?.meetLink || response.data;
+            if (meetLink) {
+                window.open(meetLink, '_blank');
+            } else {
+                toast.error("Google Meet link not available yet.");
+            }
+        } catch (err) {
+            toast.error("Failed to fetch Google Meet link.");
+        }
+    };
 
     useEffect(() => {
         if (remoteStream) {
@@ -179,23 +193,48 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const startCall = async (targetId: string, chatId: string, type: 'voice' | 'video') => {
+        // For Google Meet, we still emit 'call-offer' but we don't start local WebRTC
+        if (socket) {
+            socket.emit('call-offer', {
+                to: targetId,
+                from: user?.id,
+                offer: { type: 'google-meet' }, // Signaling we are using Meet
+                chatId: chatId,
+                type: type
+            });
+        }
+        
+        // Open the meet link immediately for the initiator
+        await handleJoinMeet(chatId);
+        
         setIsMuted(false);
         setIsVideoOff(false);
-        return baseStartCall(targetId, chatId, type);
+        // We set these to trigger the UI
+        // @ts-ignore - internal state of useCall isn't exported as setter, so we rely on context
+        return new MediaStream(); // Dummy stream to satisfy type
     };
 
     const acceptCall = async () => {
         if (!incomingCallData) throw new Error("No incoming call to accept");
-        setIsMuted(false);
-        setIsVideoOff(false);
-        const stream = await baseAcceptCall(
-            incomingCallData.from,
-            incomingCallData.chatId,
-            incomingCallData.type,
-            incomingCallData.offer
-        );
+        
+        // 1. Signal backend that call is accepted (clears timeout)
+        if (socket) {
+            socket.emit('call-answer', {
+                to: incomingCallData.from,
+                answer: { type: 'google-meet' },
+                chatId: incomingCallData.chatId
+            });
+        }
+
+        // 2. Open Google Meet link
+        await handleJoinMeet(incomingCallData.chatId);
+
         setIncomingCallData(null);
-        return stream;
+        if (ringtoneRef.current) {
+            ringtoneRef.current.pause();
+            ringtoneRef.current.currentTime = 0;
+        }
+        return new MediaStream(); // Dummy
     };
 
     const rejectCall = () => {
@@ -287,14 +326,20 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-8">
-                                <div className="w-40 h-40 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white text-5xl font-bold animate-pulse shadow-2xl shadow-[#4DB6AC]/20">
-                                    {remoteUserId?.[0].toUpperCase()}
-                                </div>
                                 <div className="text-center">
-                                    <h2 className="text-3xl font-bold text-white mb-2">{remoteUserId}</h2>
-                                    <div className="flex flex-col items-center gap-2">
-                                        <p className="text-[#4DB6AC] uppercase tracking-[0.4em] text-[12px] font-black">In Voice Call...</p>
-                                        <p className="text-white/60 font-mono text-sm">{callDuration}</p>
+                                    <h2 className="text-3xl font-bold text-white mb-2">Consultation Active</h2>
+                                    <div className="flex flex-col items-center gap-6">
+                                        <p className="text-[#4DB6AC] uppercase tracking-[0.4em] text-[12px] font-black italic">Meeting is live in Google Meet</p>
+                                        
+                                        <button 
+                                            onClick={() => currentChatId && handleJoinMeet(currentChatId)}
+                                            className="px-8 py-4 bg-[#4DB6AC] hover:bg-[#3d9189] text-white rounded-2xl font-bold shadow-xl transition-all transform hover:scale-105 flex items-center gap-3"
+                                        >
+                                            <PhoneOff className="rotate-[135deg] w-5 h-5" />
+                                            Re-join Google Meet
+                                        </button>
+                                        
+                                        <p className="text-white/40 font-mono text-sm">Session Duration: {callDuration}</p>
                                     </div>
                                 </div>
                             </div>
