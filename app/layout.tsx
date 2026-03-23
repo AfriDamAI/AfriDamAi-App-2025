@@ -64,7 +64,7 @@ export default function RootLayout({
         <meta name="description" content="Clinical-grade AI diagnostics and verified skincare regimens for the African family." />
         <meta name="theme-color" content="#050505" />
 
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo.png" />
       </head>
       <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-[#050505] text-black dark:text-white selection:bg-[#E1784F]/30 min-h-[100svh] relative overflow-x-hidden transition-colors duration-500`}>
 
