@@ -140,17 +140,29 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     });
 
-    const handleJoinMeet = async (chatId: string) => {
+    const handleJoinMeet = async (specialistId: string) => {
         try {
-            const response = await apiClient.get(`/appointments/${chatId}/join`);
-            const meetLink = response.data?.meetLink || response.data;
-            if (meetLink) {
-                window.open(meetLink, '_blank');
+            // Fetch the user's appointments and find the active one with this specialist
+            const { getMyAppointments, joinAppointmentSession } = await import('@/lib/api-client');
+            const appointments = await getMyAppointments();
+            const activeAppointment = appointments.find((apt: any) =>
+                apt.specialistId === specialistId &&
+                (apt.status === 'IN_PROGRESS' || apt.status === 'CONFIRMED')
+            );
+
+            if (!activeAppointment) {
+                toast.error('No active session found. Please wait for your specialist to start the session.');
+                return;
+            }
+
+            const result = await joinAppointmentSession(activeAppointment.id);
+            if (result?.meetLink) {
+                window.open(result.meetLink, '_blank', 'noopener,noreferrer');
             } else {
-                toast.error("Google Meet link not available yet.");
+                toast.error('Google Meet link not available yet. Please wait for specialist to start the session.');
             }
         } catch (err) {
-            toast.error("Failed to fetch Google Meet link.");
+            toast.error('Failed to fetch Google Meet link.');
         }
     };
 
@@ -204,8 +216,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
         }
         
-        // Open the meet link immediately for the initiator
-        await handleJoinMeet(chatId);
+        // Open the meet link for the initiator — look up appointment by specialist's userId
+        await handleJoinMeet(targetId);
         
         setIsMuted(false);
         setIsVideoOff(false);
@@ -226,8 +238,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
         }
 
-        // 2. Open Google Meet link
-        await handleJoinMeet(incomingCallData.chatId);
+        // 2. Open Google Meet link — look up appointment by specialist's userId
+        await handleJoinMeet(incomingCallData.from);
 
         setIncomingCallData(null);
         if (ringtoneRef.current) {
@@ -332,7 +344,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
                                         <p className="text-[#4DB6AC] uppercase tracking-[0.4em] text-[12px] font-black italic">Meeting is live in Google Meet</p>
                                         
                                         <button 
-                                            onClick={() => currentChatId && handleJoinMeet(currentChatId)}
+                                            onClick={() => remoteUserId && handleJoinMeet(remoteUserId)}
                                             className="px-8 py-4 bg-[#4DB6AC] hover:bg-[#3d9189] text-white rounded-2xl font-bold shadow-xl transition-all transform hover:scale-105 flex items-center gap-3"
                                         >
                                             <PhoneOff className="rotate-[135deg] w-5 h-5" />

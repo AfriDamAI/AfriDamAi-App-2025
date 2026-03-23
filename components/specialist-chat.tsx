@@ -13,6 +13,7 @@ import {
   uploadFile,
   getAllSpecialists,
   joinAppointmentSession,
+  getMyAppointments,
 } from "@/lib/api-client";
 import { Chat, Message } from "@/lib/types";
 import { useSocket } from "@/hooks/use-socket";
@@ -114,21 +115,41 @@ export const SpecialistChat = () => {
   };
 
   const handleJoinMeet = async () => {
-    const appointmentId = typeof window !== 'undefined' ? localStorage.getItem('activeAppointmentId') : null;
-    if (!appointmentId) {
-      toast.error('No active session found. Please wait for your specialist to start the session.');
+    if (!selectedChat) {
+      toast.error('Please select a conversation first.');
       return;
     }
     setIsJoiningMeet(true);
     try {
-      const result = await joinAppointmentSession(appointmentId);
+      if (!user?.id) {
+        toast.error('You must be logged in to join a session.');
+        return;
+      }
+      // Find the in-progress appointment for this conversation
+      const appointments = await getMyAppointments();
+      const otherUserId = selectedChat.participant1Id === user.id 
+        ? selectedChat.participant2Id 
+        : selectedChat.participant1Id;
+      
+      // Match by specialist and status
+      const activeAppointment = appointments.find((apt: any) => 
+        apt.specialistId === otherUserId && 
+        (apt.status === 'IN_PROGRESS' || apt.status === 'CONFIRMED')
+      );
+
+      if (!activeAppointment) {
+        toast.error('No active session found. Please wait for your specialist to start the session.');
+        return;
+      }
+
+      const result = await joinAppointmentSession(activeAppointment.id);
       if (result?.meetLink) {
         window.open(result.meetLink, '_blank', 'noopener,noreferrer');
       } else {
-        toast.error('Session not started yet. Please wait for your specialist.');
+        toast.error('Session not started yet. Please wait for your specialist to start the Google Meet.');
       }
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || 'Session not available';
+      const msg = err?.response?.data?.message || err?.message || 'Could not retrieve session link.';
       toast.error(msg);
     } finally {
       setIsJoiningMeet(false);
