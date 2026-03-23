@@ -385,6 +385,16 @@ export const getMyAppointments = async () => {
   return response.data;
 };
 
+export const getActiveAppointmentWith = async (otherUserId: string): Promise<any> => {
+  const response = await apiClient.get(`/appointments/active-with/${otherUserId}`);
+  return response.data;
+};
+
+export const createMeetForAppointment = async (otherUserId: string): Promise<{ meetLink: string; appointmentId: string }> => {
+  const response = await apiClient.post('/appointments/create-meet', { otherUserId });
+  return response.data;
+};
+
 export const getAppointmentPricing = async () => {
   const response = await apiClient.get("/appointments/pricing");
   return response.data;

@@ -12,8 +12,7 @@ import {
   markMessageAsRead,
   uploadFile,
   getAllSpecialists,
-  joinAppointmentSession,
-  getMyAppointments,
+  createMeetForAppointment,
 } from "@/lib/api-client";
 import { Chat, Message } from "@/lib/types";
 import { useSocket } from "@/hooks/use-socket";
@@ -37,6 +36,7 @@ export const SpecialistChat = () => {
   const [specialists, setSpecialists] = useState<any[]>([]);
   const [isListCollapsed, setIsListCollapsed] = useState(false);
   const [isJoiningMeet, setIsJoiningMeet] = useState(false);
+  const [currentMeetLink, setCurrentMeetLink] = useState<string | null>(null);
 
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -83,8 +83,19 @@ export const SpecialistChat = () => {
       };
 
       socket.on("newMessage", handleNewMessage);
+
+      // Listen for meetingLinkCreated — updates button on both sides in real time
+      const handleMeetingLinkCreated = (data: { meetLink: string }) => {
+        if (data?.meetLink) {
+          setCurrentMeetLink(data.meetLink);
+          toast.success('Google Meet is ready! Click "Join Meeting" to enter.');
+        }
+      };
+      socket.on('meetingLinkCreated', handleMeetingLinkCreated);
+
       return () => {
         socket.off("newMessage", handleNewMessage);
+        socket.off('meetingLinkCreated', handleMeetingLinkCreated);
       };
     }
   }, [socket, selectedChat]);
@@ -114,42 +125,33 @@ export const SpecialistChat = () => {
     }
   };
 
-  const handleJoinMeet = async () => {
+  const handleCreateOrJoinMeet = async () => {
     if (!selectedChat) {
       toast.error('Please select a conversation first.');
       return;
     }
+    if (!user?.id) {
+      toast.error('You must be logged in.');
+      return;
+    }
+
     setIsJoiningMeet(true);
     try {
-      if (!user?.id) {
-        toast.error('You must be logged in to join a session.');
-        return;
-      }
-      // Find the in-progress appointment for this conversation
-      const appointments = await getMyAppointments();
-      const otherUserId = selectedChat.participant1Id === user.id 
-        ? selectedChat.participant2Id 
+      // Determine the other participant (specialist)
+      const otherUserId = selectedChat.participant1Id === user.id
+        ? selectedChat.participant2Id
         : selectedChat.participant1Id;
-      
-      // Match by specialist and status
-      const activeAppointment = appointments.find((apt: any) => 
-        apt.specialistId === otherUserId && 
-        (apt.status === 'IN_PROGRESS' || apt.status === 'CONFIRMED')
-      );
 
-      if (!activeAppointment) {
-        toast.error('No active session found. Please wait for your specialist to start the session.');
-        return;
-      }
-
-      const result = await joinAppointmentSession(activeAppointment.id);
+      // createMeetForAppointment: finds the active appointment, re-uses or creates Meet link, broadcasts to both
+      const result = await createMeetForAppointment(otherUserId);
       if (result?.meetLink) {
+        setCurrentMeetLink(result.meetLink);
         window.open(result.meetLink, '_blank', 'noopener,noreferrer');
       } else {
-        toast.error('Session not started yet. Please wait for your specialist to start the Google Meet.');
+        toast.error('Could not create meeting link. Please ensure the appointment is CONFIRMED.');
       }
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || 'Could not retrieve session link.';
+      const msg = err?.response?.data?.message || err?.message || 'Error creating/joining the meeting.';
       toast.error(msg);
     } finally {
       setIsJoiningMeet(false);
@@ -417,13 +419,15 @@ export const SpecialistChat = () => {
               <div className="flex items-center gap-2">
                 {/* Google Meet Join Button — replaces old WebRTC call buttons */}
                 <button
-                  onClick={handleJoinMeet}
+                  onClick={handleCreateOrJoinMeet}
                   disabled={isJoiningMeet}
-                  title="Join on Google Meet"
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-60 shadow-sm"
+                  title={currentMeetLink ? 'Join Google Meet session' : 'Create a Google Meet for this session'}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-60 shadow-sm ${
+                    currentMeetLink ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
                 >
                   <Video size={16} />
-                  {isJoiningMeet ? 'Opening...' : 'Join Meet'}
+                  {isJoiningMeet ? 'Opening...' : currentMeetLink ? 'Join Meeting' : 'Create Meeting'}
                 </button>
                 <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
                   <MoreVertical size={20} />
