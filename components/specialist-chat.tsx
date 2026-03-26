@@ -13,6 +13,7 @@ import {
   uploadFile,
   getAllSpecialists,
   createMeetForAppointment,
+  getActiveAppointmentWith,
 } from "@/lib/api-client";
 import { Chat, Message } from "@/lib/types";
 import { useSocket } from "@/hooks/use-socket";
@@ -448,13 +449,13 @@ export const SpecialistChat = () => {
                 <button
                   onClick={handleCreateOrJoinMeet}
                   disabled={!canMeet || isJoiningMeet}
-                  title={!canMeet ? 'Session must be IN_PROGRESS' : currentMeetLink ? 'Join Google Meet session' : 'Create a Google Meet for this session'}
+                  title={!canMeet ? 'Session must be IN_PROGRESS' : (currentMeetLink || relatedAppointment?.meetingLink) ? 'Join Google Meet session' : 'Create a Google Meet for this session'}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:grayscale shadow-sm ${
-                    currentMeetLink ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
+                    (currentMeetLink || relatedAppointment?.meetingLink) ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
                   }`}
                 >
                   <Video size={16} />
-                  {isJoiningMeet ? 'Opening...' : currentMeetLink ? 'Join Meeting' : 'Create Meeting'}
+                  {isJoiningMeet ? 'Opening...' : (currentMeetLink || relatedAppointment?.meetingLink) ? 'Join Meeting' : 'Create Meeting'}
                 </button>
                 <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
                   <MoreVertical size={20} />
