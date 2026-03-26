@@ -165,26 +165,48 @@ export const SpecialistChat = () => {
     }
   }, [chats, selectedChat]);
 
+  const [relatedAppointment, setRelatedAppointment] = useState<any>(null);
+
+  const fetchRelatedAppointment = async (chat: Chat) => {
+    try {
+      const otherUserId = chat.participant1Id === CURRENT_USER_ID
+        ? chat.participant2Id
+        : chat.participant1Id;
+      const appointment = await getActiveAppointmentWith(otherUserId);
+      setRelatedAppointment(appointment);
+      if (appointment?.meetingLink) {
+        setCurrentMeetLink(appointment.meetingLink);
+      } else {
+        setCurrentMeetLink(null);
+      }
+    } catch (err) {
+      setRelatedAppointment(null);
+      setCurrentMeetLink(null);
+    }
+  };
+
   useEffect(() => {
     if (selectedChat) {
       fetchChatMessages(selectedChat.id);
+      fetchRelatedAppointment(selectedChat);
     } else {
       setMessages([]);
+      setRelatedAppointment(null);
+      setCurrentMeetLink(null);
     }
   }, [selectedChat]);
-
-  // 🛡️ DURABLE SIGNALING SCAN (Legacy watcher removed, integrated into fetch)
-  // This is now redundant but kept as a safety fallback with raw data access should be avoided
-  // Removed to avoid duplicate processing.
 
   // 🔄 SILENT POLLING FALLBACK (Cross-instance sync)
   useEffect(() => {
     const interval = setInterval(() => {
-      if (selectedChat) fetchChatMessages(selectedChat.id);
+      if (selectedChat) {
+        fetchChatMessages(selectedChat.id);
+        fetchRelatedAppointment(selectedChat);
+      }
       fetchUserChats();
-    }, 3000);
+    }, 5000); // Increased to 5s to reduce load
     return () => clearInterval(interval);
-  }, [selectedChat, fetchUserChats, fetchChatMessages]);
+  }, [selectedChat]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -216,8 +238,9 @@ export const SpecialistChat = () => {
       if (!messages.find(m => m.id === newMessage.id)) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       }
-    } catch (err) {
-      setError("Failed to send message.");
+    } catch (err: any) {
+      const errorMsg = err?.response?.data?.message || "Failed to send message.";
+      toast.error(errorMsg);
       if (type === 'TEXT') setInputMessage(msgText);
     }
   };
@@ -312,6 +335,8 @@ export const SpecialistChat = () => {
   };
 
   const toggleListCollapse = () => setIsListCollapsed(!isListCollapsed);
+
+  const canMeet = relatedAppointment?.status === 'IN_PROGRESS';
 
   return (
     <div className={`flex h-[calc(100vh-80px)] md:h-[calc(100vh-96px)] overflow-hidden ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
@@ -413,16 +438,18 @@ export const SpecialistChat = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-base">{getDisplayName(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id)}</h3>
-                  <p className="text-xs text-green-500 font-medium">Active now</p>
+                  <p className={`text-xs font-medium ${canMeet ? 'text-green-500' : 'text-gray-400'}`}>
+                    {canMeet ? 'Active now' : 'Session not active'}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* Google Meet Join Button — replaces old WebRTC call buttons */}
+                {/* Google Meet Join Button — active only if session is IN_PROGRESS */}
                 <button
                   onClick={handleCreateOrJoinMeet}
-                  disabled={isJoiningMeet}
-                  title={currentMeetLink ? 'Join Google Meet session' : 'Create a Google Meet for this session'}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-60 shadow-sm ${
+                  disabled={!canMeet || isJoiningMeet}
+                  title={!canMeet ? 'Session must be IN_PROGRESS' : currentMeetLink ? 'Join Google Meet session' : 'Create a Google Meet for this session'}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:grayscale shadow-sm ${
                     currentMeetLink ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
                   }`}
                 >
