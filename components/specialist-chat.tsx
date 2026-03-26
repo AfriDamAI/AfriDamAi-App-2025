@@ -142,13 +142,13 @@ export const SpecialistChat = () => {
         ? selectedChat.participant2Id
         : selectedChat.participant1Id;
 
-      // createMeetForAppointment: finds the active appointment, re-uses or creates Meet link, broadcasts to both
       const result = await createMeetForAppointment(otherUserId);
       if (result?.meetLink) {
         setCurrentMeetLink(result.meetLink);
+        toast.success('Google Meet link generated! Joining now...');
         window.open(result.meetLink, '_blank', 'noopener,noreferrer');
       } else {
-        toast.error('Could not create meeting link. Please ensure the appointment is CONFIRMED.');
+        toast.error('Could not create meeting link. Please check if the Google Meet API is enabled.');
       }
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Error creating/joining the meeting.';
