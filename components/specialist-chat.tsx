@@ -10,7 +10,6 @@ import {
   getChatMessages,
   sendUserChatMessage,
   markMessageAsRead,
-  uploadFile,
   getAllSpecialists,
   createMeetForAppointment,
   getActiveAppointmentWith,
@@ -38,6 +37,7 @@ export const SpecialistChat = () => {
   const [isListCollapsed, setIsListCollapsed] = useState(false);
   const [isJoiningMeet, setIsJoiningMeet] = useState(false);
   const [currentMeetLink, setCurrentMeetLink] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -215,51 +215,58 @@ export const SpecialistChat = () => {
     }
   }, [messages]);
 
-  const handleSendMessage = async (text?: string, type: string = 'TEXT', metadata: any = {}) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const cancelSelectedFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSendMessage = async (text?: string, file: File | null = null) => {
     const msgText = text || inputMessage;
-    if (!msgText.trim() && type === 'TEXT') return;
+    // Allow sending if there's text OR a file
+    if (!msgText.trim() && !file) return;
     if (!selectedChat) return;
 
     setInputMessage("");
+    setSelectedFile(null);
     setIsRecording(false);
 
+    let type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'FILE' = 'TEXT';
+
     try {
+      if (file) {
+        setIsUploading(true);
+        // type is handled by backend based on file mimeType, 
+        // but we can set it optimistically or just use 'TEXT' as default for multipart
+      }
+
       const newMessage = await sendUserChatMessage(
         selectedChat.id,
         CURRENT_USER_ID,
         msgText,
         type,
-        metadata.url,
-        metadata.mimeType,
-        metadata.size,
-        metadata.duration
+        '', 
+        '',
+        0,
+        0,
+        file || null
       );
-      // Socket will handle adding it to the UI via the 'newMessage' event if it's broad-casted
-      // But usually, we add it immediately for responsiveness
+
       if (!messages.find(m => m.id === newMessage.id)) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       }
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || "Failed to send message.";
       toast.error(errorMsg);
-      if (type === 'TEXT') setInputMessage(msgText);
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !selectedChat) return;
-
-    setIsUploading(true);
-    try {
-      const { url, mimeType, size } = await uploadFile(file);
-      let type: 'IMAGE' | 'VIDEO' | 'AUDIO' = 'IMAGE';
-      if (mimeType.startsWith('video/')) type = 'VIDEO';
-      if (mimeType.startsWith('audio/')) type = 'AUDIO';
-
-      await handleSendMessage("", type, { url, mimeType, size });
-    } catch (err) {
-      console.error("Upload failed:", err);
+      if (!file) setInputMessage(msgText);
     } finally {
       setIsUploading(false);
     }
@@ -267,16 +274,8 @@ export const SpecialistChat = () => {
 
   const handleVoiceNote = async (blob: Blob, duration: number) => {
     if (!selectedChat) return;
-    setIsUploading(true);
-    try {
-      const file = new File([blob], "voice-note.webm", { type: 'audio/webm' });
-      const { url, mimeType, size } = await uploadFile(file);
-      await handleSendMessage("", 'AUDIO', { url, mimeType, size, duration });
-    } catch (err) {
-      console.error("Voice note upload failed:", err);
-    } finally {
-      setIsUploading(false);
-    }
+    const file = new File([blob], "voice-note.webm", { type: 'audio/webm' });
+    await handleSendMessage("", file);
   };
 
   const formatMessageTime = (msg: any) => {
@@ -304,35 +303,49 @@ export const SpecialistChat = () => {
   // WebRTC calls replaced by Google Meet — handleInitiateCall removed
 
   const renderMessageContent = (msg: Message) => {
-    switch (msg.type) {
-      case 'IMAGE':
-        return (
-          <div className="rounded-lg overflow-hidden border border-white/10 mt-1 max-w-sm">
-            <img src={msg.attachmentUrl} alt="Sent image" className="w-full h-auto object-cover max-h-64" />
-          </div>
-        );
-      case 'VIDEO':
-        return (
-          <div className="rounded-lg overflow-hidden border border-white/10 mt-1 max-w-sm">
-            <video src={msg.attachmentUrl} controls className="w-full h-auto" />
-          </div>
-        );
-      case 'AUDIO':
-        return (
-          <div className="flex items-center gap-3 p-2 bg-black/10 rounded-xl min-w-[200px]">
-            <audio src={msg.attachmentUrl} controls className="h-8 w-full" />
-          </div>
-        );
-      case 'MISSED_CALL':
-        return (
+    const hasAttachment = !!msg.attachmentUrl;
+    
+    return (
+      <div className="flex flex-col gap-2">
+        {msg.type === 'MISSED_CALL' ? (
           <div className="flex items-center gap-2 text-red-500 italic text-xs font-bold py-1">
             <Phone size={14} className="rotate-[135deg]" />
             Missed {msg.message}
           </div>
-        );
-      default:
-        return <div>{msg.message}</div>;
-    }
+        ) : (
+          <>
+            {msg.message && (
+              <p className={msg.type === 'SYSTEM' ? 'italic text-gray-400 text-xs' : ''}>
+                {msg.message}
+              </p>
+            )}
+            
+            {hasAttachment && (
+              <div className="mt-1">
+                {msg.type === 'IMAGE' ? (
+                  <div className="rounded-lg overflow-hidden border border-white/10 max-w-sm">
+                    <img src={msg.attachmentUrl} alt="Sent image" className="w-full h-auto object-cover max-h-64 cursor-pointer hover:opacity-90" onClick={() => window.open(msg.attachmentUrl, '_blank')} />
+                  </div>
+                ) : msg.type === 'AUDIO' ? (
+                  <div className="flex items-center gap-3 p-2 bg-black/10 rounded-xl min-w-[200px]">
+                    <audio src={msg.attachmentUrl} controls className="h-8 w-full" />
+                  </div>
+                ) : msg.type === 'VIDEO' ? (
+                  <div className="rounded-lg overflow-hidden border border-white/10 max-w-sm">
+                    <video src={msg.attachmentUrl} controls className="w-full h-auto" />
+                  </div>
+                ) : (
+                  <a href={msg.attachmentUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg bg-black/10 hover:bg-black/20 transition-all text-xs border border-white/5">
+                    <Paperclip size={14} />
+                    <span className="truncate max-w-[120px]">View Attachment</span>
+                  </a>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
   };
 
   const toggleListCollapse = () => setIsListCollapsed(!isListCollapsed);
@@ -485,8 +498,34 @@ export const SpecialistChat = () => {
 
             {/* Message Input */}
             <div className={`p-4 border-t pb-24 md:pb-4 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
+              {/* File Preview */}
+              <AnimatePresence>
+                {selectedFile && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className={`mb-3 flex items-center gap-3 p-3 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-[#4DB6AC]/10 flex items-center justify-center text-[#4DB6AC]">
+                      <Paperclip size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{selectedFile.name}</p>
+                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <button
+                      onClick={cancelSelectedFile}
+                      className="p-1.5 rounded-full hover:bg-red-500/10 text-red-500 transition-all"
+                    >
+                      <PlusCircle size={18} className="rotate-45" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="flex items-end gap-3">
-                <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
 
                 {isRecording ? (
                   <VoiceRecorder onSend={handleVoiceNote} onCancel={() => setIsRecording(false)} />
@@ -495,7 +534,7 @@ export const SpecialistChat = () => {
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
-                      className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1"
+                      className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1 disabled:opacity-30"
                     >
                       <Paperclip size={20} />
                     </button>
@@ -504,7 +543,7 @@ export const SpecialistChat = () => {
                       <textarea
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(inputMessage, selectedFile); } }}
                         placeholder="Type message..."
                         rows={1}
                         className="w-full px-4 py-3 bg-transparent outline-none resize-none text-sm min-h-[44px]"
@@ -519,11 +558,15 @@ export const SpecialistChat = () => {
                     </button>
 
                     <button
-                      onClick={() => handleSendMessage()}
-                      disabled={!inputMessage.trim()}
-                      className="p-3 bg-[#4DB6AC] text-white rounded-2xl hover:bg-[#4DB6AC]/90 disabled:opacity-50 transition-all mb-1 shadow-lg shadow-[#4DB6AC]/20"
+                      onClick={() => handleSendMessage(inputMessage, selectedFile)}
+                      disabled={isUploading || (!inputMessage.trim() && !selectedFile)}
+                      className="p-3 bg-[#4DB6AC] text-white rounded-2xl hover:bg-[#4DB6AC]/90 disabled:opacity-50 transition-all mb-1 shadow-lg shadow-[#4DB6AC]/20 min-w-[3.5rem] flex items-center justify-center"
                     >
-                      <Send size={20} />
+                      {isUploading ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Send size={20} />
+                      )}
                     </button>
                   </>
                 )}
