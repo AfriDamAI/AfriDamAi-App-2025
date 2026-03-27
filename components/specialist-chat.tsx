@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { MessageSquare, Send, PlusCircle, Search, MoreVertical, Paperclip, Mic, Video, PanelLeftOpen, PanelLeftClose, ChevronLeft, Phone } from "lucide-react";
+import { MessageSquare, Send, PlusCircle, Search, MoreVertical, Paperclip, Mic, Video, PanelLeftOpen, PanelLeftClose, ChevronLeft, Phone, X } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
@@ -10,10 +10,10 @@ import {
   getChatMessages,
   sendUserChatMessage,
   markMessageAsRead,
-  uploadFile,
   getAllSpecialists,
   createMeetForAppointment,
   getActiveAppointmentWith,
+  getImageUrl,
 } from "@/lib/api-client";
 import { Chat, Message } from "@/lib/types";
 import { useSocket } from "@/hooks/use-socket";
@@ -38,6 +38,8 @@ export const SpecialistChat = () => {
   const [isListCollapsed, setIsListCollapsed] = useState(false);
   const [isJoiningMeet, setIsJoiningMeet] = useState(false);
   const [currentMeetLink, setCurrentMeetLink] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [modalImage, setModalImage] = useState<string | null>(null);
 
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -69,12 +71,40 @@ export const SpecialistChat = () => {
     return id === CURRENT_USER_ID ? "Me" : id;
   };
 
+  const transformMessage = (msg: any): Message => {
+    // 🛡️ Rule #6: Ultra-Robust Field Mapping (Full Schema Aggregation)
+    const attachmentUrl = 
+      msg.attachmentUrl || 
+      msg.attachment_url || 
+      msg.url || 
+      msg.fileUrl || 
+      msg.file_url ||
+      (typeof msg.attachment === 'string' ? msg.attachment : msg.attachment?.url) ||
+      (typeof msg.file === 'string' ? msg.file : msg.file?.url) ||
+      undefined;
+
+    return {
+      ...msg,
+      timestamp: msg.timestamp || msg.createdAt || msg.created_at || msg.createdAL || new Date().toISOString(),
+      read: msg.read ?? msg.isRead ?? msg.is_read ?? false,
+      message: msg.message || msg.text || msg.content || "",
+      attachmentUrl,
+      mimeType: msg.mimeType || msg.mime_type || msg.contentType || msg.content_type || undefined,
+      fileSize: msg.fileSize || msg.file_size || msg.size || undefined,
+    };
+  };
+
   useEffect(() => {
     if (socket) {
-      const handleNewMessage = (msg: Message) => {
-        if (msg.type === 'SYSTEM') return;
+      const handleNewMessage = (rawMsg: any) => {
+        if (rawMsg.type === 'SYSTEM') return;
+        const msg = transformMessage(rawMsg);
+        
         if (selectedChat && msg.chatId === selectedChat.id) {
-          setMessages(prev => [...prev, msg]);
+          setMessages(prev => {
+            if (prev.find(m => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
           markMessageAsRead(msg.id);
         }
         // Update chat list last message
@@ -118,8 +148,11 @@ export const SpecialistChat = () => {
     try {
       const chatMessages = await getChatMessages(chatId);
       // Filter out SYSTEM messages from the UI
-      const filteredMessages = chatMessages.filter((msg: any) => msg.type !== 'SYSTEM');
-      setMessages(filteredMessages);
+      const processedMessages = chatMessages
+        .filter((msg: any) => msg.type !== 'SYSTEM')
+        .map(msg => transformMessage(msg));
+      
+      setMessages(processedMessages);
       setError(null);
     } catch (err) {
       setError("Failed to fetch messages.");
@@ -215,51 +248,65 @@ export const SpecialistChat = () => {
     }
   }, [messages]);
 
-  const handleSendMessage = async (text?: string, type: string = 'TEXT', metadata: any = {}) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const cancelSelectedFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSendMessage = async (text?: string, file: File | null = null, duration: number = 0) => {
     const msgText = text || inputMessage;
-    if (!msgText.trim() && type === 'TEXT') return;
+    // Allow sending if there's text OR a file
+    if (!msgText.trim() && !file) return;
     if (!selectedChat) return;
 
     setInputMessage("");
+    setSelectedFile(null);
     setIsRecording(false);
 
+    let type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'FILE' = 'TEXT';
+    if (file) {
+      if (file.type.startsWith('image/')) type = 'IMAGE';
+      else if (file.type.startsWith('video/')) type = 'VIDEO';
+      else if (file.type.startsWith('audio/')) type = 'AUDIO';
+      else type = 'FILE';
+    }
+
     try {
-      const newMessage = await sendUserChatMessage(
+      if (file) {
+        setIsUploading(true);
+      }
+
+      const rawNewMessage = await sendUserChatMessage(
         selectedChat.id,
         CURRENT_USER_ID,
         msgText,
-        type,
-        metadata.url,
-        metadata.mimeType,
-        metadata.size,
-        metadata.duration
+        type, 
+        '', 
+        '',
+        0,
+        duration,
+        file || null
       );
-      // Socket will handle adding it to the UI via the 'newMessage' event if it's broad-casted
-      // But usually, we add it immediately for responsiveness
-      if (!messages.find(m => m.id === newMessage.id)) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+      if (rawNewMessage) {
+        const processedMsg = transformMessage(rawNewMessage);
+        if (!messages.find(m => m.id === processedMsg.id)) {
+          setMessages((prevMessages) => [...prevMessages, processedMsg]);
+        }
       }
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || "Failed to send message.";
       toast.error(errorMsg);
-      if (type === 'TEXT') setInputMessage(msgText);
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !selectedChat) return;
-
-    setIsUploading(true);
-    try {
-      const { url, mimeType, size } = await uploadFile(file);
-      let type: 'IMAGE' | 'VIDEO' | 'AUDIO' = 'IMAGE';
-      if (mimeType.startsWith('video/')) type = 'VIDEO';
-      if (mimeType.startsWith('audio/')) type = 'AUDIO';
-
-      await handleSendMessage("", type, { url, mimeType, size });
-    } catch (err) {
-      console.error("Upload failed:", err);
+      if (!file) setInputMessage(msgText);
     } finally {
       setIsUploading(false);
     }
@@ -267,16 +314,8 @@ export const SpecialistChat = () => {
 
   const handleVoiceNote = async (blob: Blob, duration: number) => {
     if (!selectedChat) return;
-    setIsUploading(true);
-    try {
-      const file = new File([blob], "voice-note.webm", { type: 'audio/webm' });
-      const { url, mimeType, size } = await uploadFile(file);
-      await handleSendMessage("", 'AUDIO', { url, mimeType, size, duration });
-    } catch (err) {
-      console.error("Voice note upload failed:", err);
-    } finally {
-      setIsUploading(false);
-    }
+    const file = new File([blob], "voice-note.webm", { type: 'audio/webm' });
+    await handleSendMessage("", file, duration);
   };
 
   const formatMessageTime = (msg: any) => {
@@ -304,36 +343,124 @@ export const SpecialistChat = () => {
   // WebRTC calls replaced by Google Meet — handleInitiateCall removed
 
   const renderMessageContent = (msg: Message) => {
-    switch (msg.type) {
-      case 'IMAGE':
-        return (
-          <div className="rounded-lg overflow-hidden border border-white/10 mt-1 max-w-sm">
-            <img src={msg.attachmentUrl} alt="Sent image" className="w-full h-auto object-cover max-h-64" />
-          </div>
-        );
-      case 'VIDEO':
-        return (
-          <div className="rounded-lg overflow-hidden border border-white/10 mt-1 max-w-sm">
-            <video src={msg.attachmentUrl} controls className="w-full h-auto" />
-          </div>
-        );
-      case 'AUDIO':
-        return (
-          <div className="flex items-center gap-3 p-2 bg-black/10 rounded-xl min-w-[200px]">
-            <audio src={msg.attachmentUrl} controls className="h-8 w-full" />
-          </div>
-        );
-      case 'MISSED_CALL':
-        return (
+    const isOwn = msg.senderId === CURRENT_USER_ID;
+    // Robust attachment check
+    const url = getImageUrl(msg.attachmentUrl);
+    const hasAttachment = !!url;
+    
+    // Fallback type detection if msg.type is generic or missing
+    let msgType = msg.type;
+    if (msg.mimeType) {
+      if (msg.mimeType.startsWith('image/')) msgType = 'IMAGE';
+      else if (msg.mimeType.startsWith('video/')) msgType = 'VIDEO';
+      else if (msg.mimeType.startsWith('audio/')) msgType = 'AUDIO';
+    }
+
+    return (
+      <div className="flex flex-col gap-2">
+        {msgType === 'MISSED_CALL' ? (
           <div className="flex items-center gap-2 text-red-500 italic text-xs font-bold py-1">
             <Phone size={14} className="rotate-[135deg]" />
             Missed {msg.message}
           </div>
-        );
-      default:
-        return <div>{msg.message}</div>;
-    }
+        ) : (
+          <>
+            {msg.message && (
+              <p className={msgType === 'SYSTEM' ? 'italic text-gray-400 text-xs' : ''}>
+                {msg.message}
+              </p>
+            )}
+            
+            {hasAttachment && (
+              <div className="mt-1">
+                {msgType === 'IMAGE' || (msg.attachmentUrl && /\.(jpg|jpeg|png|gif|webp|bmp|svg|heic)(\?.*)?$/i.test(msg.attachmentUrl)) ? (
+                  <div className="rounded-lg overflow-hidden border border-white/10 max-w-sm bg-black/5">
+                    <img 
+                      src={url} 
+                      alt="Sent attachment" 
+                      className="w-full h-auto object-cover max-h-64 cursor-pointer hover:scale-[1.02] transition-transform duration-300" 
+                      onClick={() => setModalImage(url)}
+                      onLoad={() => console.log("Image loaded successfully:", url)}
+                      onError={(e) => {
+                        console.error("Image failed to load:", url);
+                        // If it fails, maybe it's missing the base URL?
+                        // But getImageUrl adds it.
+                      }}
+                    />
+                  </div>
+                ) : msgType === 'AUDIO' ? (
+                  <div className="mt-1 min-w-[240px] bg-black/10 dark:bg-white/5 p-2 rounded-xl border border-white/10 flex flex-col gap-1">
+                    <audio 
+                      key={url}
+                      src={url} 
+                      controls 
+                      preload="metadata"
+                      className="h-10 w-full accent-[#4DB6AC]" 
+                    />
+                    <div className="flex justify-between items-center px-1">
+                      <span className="text-[10px] opacity-70 font-bold uppercase tracking-widest">Voice Note</span>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-white hover:underline font-bold uppercase tracking-widest"
+                        style={{ color: isOwn ? 'white' : '#4DB6AC' }}
+                      >
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                ) : msgType === 'VIDEO' ? (
+                  <div className="rounded-lg overflow-hidden border border-white/10 max-w-sm">
+                    <video src={url} controls className="w-full h-auto" />
+                  </div>
+                ) : (
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg bg-black/10 hover:bg-black/20 transition-all text-xs border border-white/5">
+                    <Paperclip size={14} />
+                    <span className="truncate max-w-[120px]">View Attachment</span>
+                  </a>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
   };
+
+  const ImageModal = ({ url, onClose }: { url: string; onClose: () => void }) => (
+    <AnimatePresence>
+      {url && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            className="relative max-w-full max-h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={onClose}
+              className="absolute -top-12 right-0 p-2 text-white/70 hover:text-white transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <img
+              src={url}
+              alt="Full view"
+              className="max-w-[95vw] max-h-[85vh] object-contain rounded-2xl shadow-2xl shadow-black/50 border border-white/10"
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   const toggleListCollapse = () => setIsListCollapsed(!isListCollapsed);
 
@@ -485,8 +612,34 @@ export const SpecialistChat = () => {
 
             {/* Message Input */}
             <div className={`p-4 border-t pb-24 md:pb-4 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
+              {/* File Preview */}
+              <AnimatePresence>
+                {selectedFile && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className={`mb-3 flex items-center gap-3 p-3 rounded-xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-[#4DB6AC]/10 flex items-center justify-center text-[#4DB6AC]">
+                      <Paperclip size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{selectedFile.name}</p>
+                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <button
+                      onClick={cancelSelectedFile}
+                      className="p-1.5 rounded-full hover:bg-red-500/10 text-red-500 transition-all"
+                    >
+                      <PlusCircle size={18} className="rotate-45" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="flex items-end gap-3">
-                <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
 
                 {isRecording ? (
                   <VoiceRecorder onSend={handleVoiceNote} onCancel={() => setIsRecording(false)} />
@@ -495,7 +648,7 @@ export const SpecialistChat = () => {
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
-                      className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1"
+                      className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1 disabled:opacity-30"
                     >
                       <Paperclip size={20} />
                     </button>
@@ -504,7 +657,7 @@ export const SpecialistChat = () => {
                       <textarea
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(inputMessage, selectedFile); } }}
                         placeholder="Type message..."
                         rows={1}
                         className="w-full px-4 py-3 bg-transparent outline-none resize-none text-sm min-h-[44px]"
@@ -519,11 +672,15 @@ export const SpecialistChat = () => {
                     </button>
 
                     <button
-                      onClick={() => handleSendMessage()}
-                      disabled={!inputMessage.trim()}
-                      className="p-3 bg-[#4DB6AC] text-white rounded-2xl hover:bg-[#4DB6AC]/90 disabled:opacity-50 transition-all mb-1 shadow-lg shadow-[#4DB6AC]/20"
+                      onClick={() => handleSendMessage(inputMessage, selectedFile)}
+                      disabled={isUploading || (!inputMessage.trim() && !selectedFile)}
+                      className="p-3 bg-[#4DB6AC] text-white rounded-2xl hover:bg-[#4DB6AC]/90 disabled:opacity-50 transition-all mb-1 shadow-lg shadow-[#4DB6AC]/20 min-w-[3.5rem] flex items-center justify-center"
                     >
-                      <Send size={20} />
+                      {isUploading ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Send size={20} />
+                      )}
                     </button>
                   </>
                 )}
@@ -540,6 +697,7 @@ export const SpecialistChat = () => {
           </div>
         )}
       </div>
+      {modalImage && <ImageModal url={modalImage} onClose={() => setModalImage(null)} />}
     </div>
   );
 };
