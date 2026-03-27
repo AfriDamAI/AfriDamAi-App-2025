@@ -262,7 +262,7 @@ export const SpecialistChat = () => {
     }
   };
 
-  const handleSendMessage = async (text?: string, file: File | null = null) => {
+  const handleSendMessage = async (text?: string, file: File | null = null, duration: number = 0) => {
     const msgText = text || inputMessage;
     // Allow sending if there's text OR a file
     if (!msgText.trim() && !file) return;
@@ -293,7 +293,7 @@ export const SpecialistChat = () => {
         '', 
         '',
         0,
-        0,
+        duration,
         file || null
       );
 
@@ -315,7 +315,7 @@ export const SpecialistChat = () => {
   const handleVoiceNote = async (blob: Blob, duration: number) => {
     if (!selectedChat) return;
     const file = new File([blob], "voice-note.webm", { type: 'audio/webm' });
-    await handleSendMessage("", file);
+    await handleSendMessage("", file, duration);
   };
 
   const formatMessageTime = (msg: any) => {
@@ -343,6 +343,7 @@ export const SpecialistChat = () => {
   // WebRTC calls replaced by Google Meet — handleInitiateCall removed
 
   const renderMessageContent = (msg: Message) => {
+    const isOwn = msg.senderId === CURRENT_USER_ID;
     // Robust attachment check
     const url = getImageUrl(msg.attachmentUrl);
     const hasAttachment = !!url;
@@ -388,8 +389,26 @@ export const SpecialistChat = () => {
                     />
                   </div>
                 ) : msgType === 'AUDIO' ? (
-                  <div className="flex items-center gap-3 p-2 bg-black/10 rounded-xl min-w-[200px]">
-                    <audio src={url} controls className="h-8 w-full" />
+                  <div className="mt-1 min-w-[240px] bg-black/10 dark:bg-white/5 p-2 rounded-xl border border-white/10 flex flex-col gap-1">
+                    <audio 
+                      key={url}
+                      src={url} 
+                      controls 
+                      preload="metadata"
+                      className="h-10 w-full accent-[#4DB6AC]" 
+                    />
+                    <div className="flex justify-between items-center px-1">
+                      <span className="text-[10px] opacity-70 font-bold uppercase tracking-widest">Voice Note</span>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-white hover:underline font-bold uppercase tracking-widest"
+                        style={{ color: isOwn ? 'white' : '#4DB6AC' }}
+                      >
+                        Download
+                      </a>
+                    </div>
                   </div>
                 ) : msgType === 'VIDEO' ? (
                   <div className="rounded-lg overflow-hidden border border-white/10 max-w-sm">
