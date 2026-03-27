@@ -292,7 +292,8 @@ export const getSpecialistById = async (id: string) => {
 // }
 
 export const analyzeIngredients = async (ingredients: string, more_info: any) => {
-  const response = await apiClient.post("/v2/ingredients-analysis", { query: ingredients, more_info });
+  const query = `Analyze these ingredients for melanin-rich skin safety and benefits. Provide a direct, concise response in a single paragraph. DO NOT use numbering, bullet points, or special symbols like ** or *. Just plain text: ${ingredients}`;
+  const response = await apiClient.post("/v2/chatbot", { query, more_info });
   return response.data;
 };
 
