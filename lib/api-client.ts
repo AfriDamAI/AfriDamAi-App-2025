@@ -194,8 +194,25 @@ export const sendUserChatMessage = async (
   attachmentUrl: string = "",
   mimeType: string = "",
   fileSize: number = 0,
-  duration: number = 0
+  duration: number = 0,
+  file: File | null = null // Add optional file parameter
 ): Promise<Message> => {
+  if (file) {
+    const formData = new FormData();
+    formData.append("chatId", chatId);
+    formData.append("senderId", senderId);
+    formData.append("message", message);
+    formData.append("type", type);
+    formData.append("file", file); // Backend expects "file"
+    
+    const response = await apiClient.post("/chats/messages", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  }
+
   const response = await apiClient.post("/chats/messages", {
     chatId,
     senderId,
