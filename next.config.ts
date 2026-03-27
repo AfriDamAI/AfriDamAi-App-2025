@@ -81,6 +81,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**', 
       },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+      },
     ],
   },
   

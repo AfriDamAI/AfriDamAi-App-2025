@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { MessageSquare, Send, PlusCircle, Search, MoreVertical, Paperclip, Mic, Video, PanelLeftOpen, PanelLeftClose, ChevronLeft, Phone } from "lucide-react";
+import { MessageSquare, Send, PlusCircle, Search, MoreVertical, Paperclip, Mic, Video, PanelLeftOpen, PanelLeftClose, ChevronLeft, Phone, X } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import {
   getAllSpecialists,
   createMeetForAppointment,
   getActiveAppointmentWith,
+  getImageUrl,
 } from "@/lib/api-client";
 import { Chat, Message } from "@/lib/types";
 import { useSocket } from "@/hooks/use-socket";
@@ -38,6 +39,7 @@ export const SpecialistChat = () => {
   const [isJoiningMeet, setIsJoiningMeet] = useState(false);
   const [currentMeetLink, setCurrentMeetLink] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [modalImage, setModalImage] = useState<string | null>(null);
 
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -69,12 +71,40 @@ export const SpecialistChat = () => {
     return id === CURRENT_USER_ID ? "Me" : id;
   };
 
+  const transformMessage = (msg: any): Message => {
+    // 🛡️ Rule #6: Ultra-Robust Field Mapping (Full Schema Aggregation)
+    const attachmentUrl = 
+      msg.attachmentUrl || 
+      msg.attachment_url || 
+      msg.url || 
+      msg.fileUrl || 
+      msg.file_url ||
+      (typeof msg.attachment === 'string' ? msg.attachment : msg.attachment?.url) ||
+      (typeof msg.file === 'string' ? msg.file : msg.file?.url) ||
+      undefined;
+
+    return {
+      ...msg,
+      timestamp: msg.timestamp || msg.createdAt || msg.created_at || msg.createdAL || new Date().toISOString(),
+      read: msg.read ?? msg.isRead ?? msg.is_read ?? false,
+      message: msg.message || msg.text || msg.content || "",
+      attachmentUrl,
+      mimeType: msg.mimeType || msg.mime_type || msg.contentType || msg.content_type || undefined,
+      fileSize: msg.fileSize || msg.file_size || msg.size || undefined,
+    };
+  };
+
   useEffect(() => {
     if (socket) {
-      const handleNewMessage = (msg: Message) => {
-        if (msg.type === 'SYSTEM') return;
+      const handleNewMessage = (rawMsg: any) => {
+        if (rawMsg.type === 'SYSTEM') return;
+        const msg = transformMessage(rawMsg);
+        
         if (selectedChat && msg.chatId === selectedChat.id) {
-          setMessages(prev => [...prev, msg]);
+          setMessages(prev => {
+            if (prev.find(m => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
           markMessageAsRead(msg.id);
         }
         // Update chat list last message
@@ -118,8 +148,11 @@ export const SpecialistChat = () => {
     try {
       const chatMessages = await getChatMessages(chatId);
       // Filter out SYSTEM messages from the UI
-      const filteredMessages = chatMessages.filter((msg: any) => msg.type !== 'SYSTEM');
-      setMessages(filteredMessages);
+      const processedMessages = chatMessages
+        .filter((msg: any) => msg.type !== 'SYSTEM')
+        .map(msg => transformMessage(msg));
+      
+      setMessages(processedMessages);
       setError(null);
     } catch (err) {
       setError("Failed to fetch messages.");
@@ -240,19 +273,23 @@ export const SpecialistChat = () => {
     setIsRecording(false);
 
     let type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'FILE' = 'TEXT';
+    if (file) {
+      if (file.type.startsWith('image/')) type = 'IMAGE';
+      else if (file.type.startsWith('video/')) type = 'VIDEO';
+      else if (file.type.startsWith('audio/')) type = 'AUDIO';
+      else type = 'FILE';
+    }
 
     try {
       if (file) {
         setIsUploading(true);
-        // type is handled by backend based on file mimeType, 
-        // but we can set it optimistically or just use 'TEXT' as default for multipart
       }
 
-      const newMessage = await sendUserChatMessage(
+      const rawNewMessage = await sendUserChatMessage(
         selectedChat.id,
         CURRENT_USER_ID,
         msgText,
-        type,
+        type, 
         '', 
         '',
         0,
@@ -260,8 +297,11 @@ export const SpecialistChat = () => {
         file || null
       );
 
-      if (!messages.find(m => m.id === newMessage.id)) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      if (rawNewMessage) {
+        const processedMsg = transformMessage(rawNewMessage);
+        if (!messages.find(m => m.id === processedMsg.id)) {
+          setMessages((prevMessages) => [...prevMessages, processedMsg]);
+        }
       }
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || "Failed to send message.";
@@ -303,11 +343,21 @@ export const SpecialistChat = () => {
   // WebRTC calls replaced by Google Meet — handleInitiateCall removed
 
   const renderMessageContent = (msg: Message) => {
-    const hasAttachment = !!msg.attachmentUrl;
+    // Robust attachment check
+    const url = getImageUrl(msg.attachmentUrl);
+    const hasAttachment = !!url;
     
+    // Fallback type detection if msg.type is generic or missing
+    let msgType = msg.type;
+    if (msg.mimeType) {
+      if (msg.mimeType.startsWith('image/')) msgType = 'IMAGE';
+      else if (msg.mimeType.startsWith('video/')) msgType = 'VIDEO';
+      else if (msg.mimeType.startsWith('audio/')) msgType = 'AUDIO';
+    }
+
     return (
       <div className="flex flex-col gap-2">
-        {msg.type === 'MISSED_CALL' ? (
+        {msgType === 'MISSED_CALL' ? (
           <div className="flex items-center gap-2 text-red-500 italic text-xs font-bold py-1">
             <Phone size={14} className="rotate-[135deg]" />
             Missed {msg.message}
@@ -315,27 +365,38 @@ export const SpecialistChat = () => {
         ) : (
           <>
             {msg.message && (
-              <p className={msg.type === 'SYSTEM' ? 'italic text-gray-400 text-xs' : ''}>
+              <p className={msgType === 'SYSTEM' ? 'italic text-gray-400 text-xs' : ''}>
                 {msg.message}
               </p>
             )}
             
             {hasAttachment && (
               <div className="mt-1">
-                {msg.type === 'IMAGE' ? (
-                  <div className="rounded-lg overflow-hidden border border-white/10 max-w-sm">
-                    <img src={msg.attachmentUrl} alt="Sent image" className="w-full h-auto object-cover max-h-64 cursor-pointer hover:opacity-90" onClick={() => window.open(msg.attachmentUrl, '_blank')} />
+                {msgType === 'IMAGE' || (msg.attachmentUrl && /\.(jpg|jpeg|png|gif|webp|bmp|svg|heic)(\?.*)?$/i.test(msg.attachmentUrl)) ? (
+                  <div className="rounded-lg overflow-hidden border border-white/10 max-w-sm bg-black/5">
+                    <img 
+                      src={url} 
+                      alt="Sent attachment" 
+                      className="w-full h-auto object-cover max-h-64 cursor-pointer hover:scale-[1.02] transition-transform duration-300" 
+                      onClick={() => setModalImage(url)}
+                      onLoad={() => console.log("Image loaded successfully:", url)}
+                      onError={(e) => {
+                        console.error("Image failed to load:", url);
+                        // If it fails, maybe it's missing the base URL?
+                        // But getImageUrl adds it.
+                      }}
+                    />
                   </div>
-                ) : msg.type === 'AUDIO' ? (
+                ) : msgType === 'AUDIO' ? (
                   <div className="flex items-center gap-3 p-2 bg-black/10 rounded-xl min-w-[200px]">
-                    <audio src={msg.attachmentUrl} controls className="h-8 w-full" />
+                    <audio src={url} controls className="h-8 w-full" />
                   </div>
-                ) : msg.type === 'VIDEO' ? (
+                ) : msgType === 'VIDEO' ? (
                   <div className="rounded-lg overflow-hidden border border-white/10 max-w-sm">
-                    <video src={msg.attachmentUrl} controls className="w-full h-auto" />
+                    <video src={url} controls className="w-full h-auto" />
                   </div>
                 ) : (
-                  <a href={msg.attachmentUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg bg-black/10 hover:bg-black/20 transition-all text-xs border border-white/5">
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg bg-black/10 hover:bg-black/20 transition-all text-xs border border-white/5">
                     <Paperclip size={14} />
                     <span className="truncate max-w-[120px]">View Attachment</span>
                   </a>
@@ -347,6 +408,40 @@ export const SpecialistChat = () => {
       </div>
     );
   };
+
+  const ImageModal = ({ url, onClose }: { url: string; onClose: () => void }) => (
+    <AnimatePresence>
+      {url && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            className="relative max-w-full max-h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={onClose}
+              className="absolute -top-12 right-0 p-2 text-white/70 hover:text-white transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <img
+              src={url}
+              alt="Full view"
+              className="max-w-[95vw] max-h-[85vh] object-contain rounded-2xl shadow-2xl shadow-black/50 border border-white/10"
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   const toggleListCollapse = () => setIsListCollapsed(!isListCollapsed);
 
@@ -583,6 +678,7 @@ export const SpecialistChat = () => {
           </div>
         )}
       </div>
+      {modalImage && <ImageModal url={modalImage} onClose={() => setModalImage(null)} />}
     </div>
   );
 };
