@@ -315,6 +315,40 @@ export const deleteScanResult = async (resultId: string) => {
     return response.data;
 };
 
+/** 🔬 PUBLIC AI SKIN DIAGNOSIS WITHOUT AUTHENTICATION **/
+export const analyzePublicSkin = async (imgSource: string) => {
+  const formData = new FormData();
+  
+  // Convert base64 to blob
+  const parts = imgSource.split(',');
+  const byteString = atob(parts[1]);
+  const mimeString = parts[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+  const blob = new Blob([ab], { type: mimeString });
+  
+  formData.append("file", blob, "scan_capture.jpg");
+  
+  const response = await fetch(`${baseURL}/v1/saas/scan`, {
+    method: 'POST',
+    headers: {
+      'X-API-KEY': 'org_live_fc8248b606dbcce1185d9d32812902a83496e30f0f24d6a1'
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Analysis failed. Please try again.');
+  }
+
+  // NestJS may wrap it in resultData, but Saas API might just return the object.
+  // Fetch doesn't auto-unwrap, so we return the unwrapped version if it exists.
+  const data = await response.json();
+  return data.resultData ? data.resultData : data;
+};
+
 /** 🔬 AI SKIN DIAGNOSIS WITH USER CONTEXT **/
 export const analyzeSkinWithUserData = async (imgSource: string, userContext: any) => {
   const formData = new FormData();

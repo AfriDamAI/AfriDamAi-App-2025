@@ -114,7 +114,7 @@ export default function LandingPage() {
               Localized protection. <br /> Safe care for the heritage.
             </p>
             <button 
-              onClick={() => handleFeatureAccess("/ai-scanner")} 
+              onClick={() => router.push("/public-scan")} 
               className="group h-20 px-12 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black capitalize text-[11px] tracking-widest shadow-xl flex items-center justify-center gap-6 active:scale-95 transition-all">
               Start Now <ArrowRight size={18} />
             </button>
@@ -126,17 +126,23 @@ export default function LandingPage() {
               <div className="absolute inset-0 pointer-events-none">
                 <motion.div animate={{ top: ["0%", "100%", "0%"] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_30px_5px_#E1784F] z-20" />
               </div>
-              <div className="absolute bottom-6 left-6 right-6 p-6 bg-black/80 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center gap-5">
+              <Link 
+                href="/public-scan" 
+                className="absolute bottom-6 left-6 right-6 p-6 bg-black/80 hover:bg-black/90 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center gap-5 cursor-pointer active:scale-95 transition-all outline-none"
+              >
                 <div className="w-12 h-12 bg-[#4DB6AC] rounded-2xl flex items-center justify-center text-white">
                   <Camera size={24} />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <p className="text-[10px] font-black capitalize tracking-widest text-white italic">Analysis Active</p>
+                  <div className="flex justify-between items-center">
+                    <p className="text-[10px] font-black capitalize tracking-widest text-white italic">Analysis Active</p>
+                    <p className="text-[9px] font-bold text-[#4DB6AC] uppercase tracking-widest flex items-center gap-1">Scan <ArrowRight size={10} /></p>
+                  </div>
                   <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
                     <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 6, repeat: Infinity }} className="h-full bg-[#E1784F]" />
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -202,10 +208,10 @@ export default function LandingPage() {
         <div className="max-w-screen-xl mx-auto space-y-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
-              { title: "Check Skin", icon: Camera, text: "A precision scan to verify your skin health.", path: "/ai-scanner", color: "#E1784F" },
+              { title: "Check Skin", icon: Camera, text: "A precision scan to verify your skin health.", path: "/public-scan", color: "#E1784F" },
               { title: "Safe Choice", icon: ShieldCheck, text: "Verify if your products are safe for melanin.", path: "/ingredient-analyzer", color: "#4DB6AC" }
             ].map((f, i) => (
-              <div key={i} onClick={() => handleFeatureAccess(f.path)} className="group p-12 md:p-16 bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[4rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm">
+              <div key={i} onClick={() => f.path === '/public-scan' ? router.push(f.path) : handleFeatureAccess(f.path)} className="group p-12 md:p-16 bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[4rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 text-white shadow-lg" style={{ backgroundColor: f.color }}>
                   <f.icon size={28} />
                 </div>

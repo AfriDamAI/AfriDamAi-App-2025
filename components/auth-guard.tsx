@@ -20,7 +20,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname()
 
   // 🚀 PATH SYNC: These are the exact paths allowed without a token.
-  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/login", "/register", "/forgot-password", "/reset-password", "/privacy-policy", "/verify-email"]
+  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/login", "/register", "/forgot-password", "/reset-password", "/privacy-policy", "/verify-email", "/public-scan"]
   const isPublicPath = publicPaths.includes(pathname)
 
   // 🔐 AUTH PATHS: Pages that should be hidden from logged-in users.
