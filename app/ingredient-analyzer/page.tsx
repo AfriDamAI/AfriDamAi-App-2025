@@ -84,11 +84,13 @@ export default function IngredientCheckerPage() {
 
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: "assistant", content: replyText }])
       setStatus("Ready")
-    } catch (err) {
+    } catch (err: any) {
+      console.error("AI Analysis Error:", err);
+      const backendMessage = err.response?.data?.message || err.message;
       setStatus("Error")
       setMessages(prev => [...prev, {
         id: "error", role: "assistant",
-        content: "I encountered an issue analyzing those ingredients. Please ensure the list is clear and try again."
+        content: backendMessage || "I encountered an issue analyzing those ingredients. Please ensure the list is clear and try again."
       }])
     } finally {
       setIsTyping(false)

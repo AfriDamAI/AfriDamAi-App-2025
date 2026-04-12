@@ -197,7 +197,9 @@ export default function UnifiedScanner() {
       setStatus("Analysis Complete")
     } catch (err: any) {
       console.error("AI Scan Error:", err);
-      setErrorDetails("The AI Brain is busy. Please check your internet and try again.");
+      // 🛡️ SYNC: Pull exact error message from backend (Rule 7 Precision)
+      const backendMessage = err.response?.data?.message || err.message;
+      setErrorDetails(backendMessage || "The AI Brain is busy. Please check your internet and try again.");
       setStatus("Try Again")
     } finally {
       setIsAnalyzing(false)
@@ -251,6 +253,8 @@ export default function UnifiedScanner() {
                   ) : imgSource ? (
                     <div className="relative w-full h-full">
                       <img src={imgSource} className={`w-full h-full object-cover ${isAnalyzing ? 'blur-md opacity-50 scale-105' : ''} transition-all duration-700`} alt="Skin Capture" />
+                      
+                      {/* 🔬 ANALYSIS OVERLAY */}
                       {isAnalyzing && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
                           <motion.div
@@ -272,6 +276,31 @@ export default function UnifiedScanner() {
                             </p>
                           </motion.div>
                         </div>
+                      )}
+
+                      {/* ⚠️ ERROR OVERLAY: Rule 7 Precision Sync */}
+                      {errorDetails && (
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="absolute inset-0 bg-black/80 backdrop-blur-lg z-50 flex flex-col items-center justify-center p-10 text-center"
+                        >
+                          <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center mb-6 border border-red-500/50">
+                            <Info size={40} className="text-red-500" />
+                          </div>
+                          <h3 className="text-white text-2xl font-black uppercase italic tracking-tighter mb-4 leading-tight">
+                            Scanning <span className="text-red-500">Halted</span>
+                          </h3>
+                          <p className="text-white/80 text-[13px] font-bold leading-relaxed mb-8 max-w-xs">
+                            {errorDetails}
+                          </p>
+                          <button 
+                            onClick={() => setErrorDetails(null)}
+                            className="px-10 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:scale-105 active:scale-95 transition-all"
+                          >
+                            Retry Lens Scan
+                          </button>
+                        </motion.div>
                       )}
                     </div>
                   ) : (
@@ -338,7 +367,6 @@ export default function UnifiedScanner() {
                     />
                   </div>
                 )}
-                {errorDetails && <p className="text-center text-red-500 text-[9px] font-black">{errorDetails}</p>}
               </div>
             </div>
           ) : (
