@@ -49,6 +49,7 @@ const AppointmentPage = () => {
     null
   );
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
     const checkEligibilityAndGetSubscription = async () => {
@@ -102,7 +103,7 @@ const AppointmentPage = () => {
       toast.success("Appointment booked successfully!", {
         description: "Our specialists have been notified."
       });
-      router.push("/dashboard");
+      setIsSuccess(true);
     } catch (error: any) {
       toast.error("Failed to book appointment", {
         description: error.response?.data?.message || error.message,
@@ -111,6 +112,31 @@ const AppointmentPage = () => {
       setLoading(false);
     }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <Card className="w-[450px] text-center p-6">
+          <CardHeader>
+            <div className="mx-auto bg-green-100 text-green-600 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <CardTitle className="text-2xl">Appointment Booked!</CardTitle>
+            <CardDescription className="text-base mt-2">
+              Your appointment has been successfully scheduled. Our specialists have been notified.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push("/dashboard")} className="w-full mt-4">
+              Return to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (loading && !eligibility) {
     return (
