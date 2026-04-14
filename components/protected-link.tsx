@@ -21,7 +21,7 @@ export function ProtectedLink({ href, children, className, onAuthRequired }: Pro
       "/ai-scanner",
       "/ingredient-analyzer",
       "/dashboard",
-      "/marketplace/cart",
+      "/cart",
       "/profile",
       "/appointments",
       "/history"

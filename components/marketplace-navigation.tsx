@@ -8,6 +8,7 @@ import { Menu, Moon, ShoppingBag, Sun, X, LogOut, LayoutDashboard } from 'lucide
 import { UserProfile } from './user-profile'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useCart } from '@/hooks/use-cart'
 
 /**
  * 🛡️ AFRIDAM CARE HUB: NAVIGATION (Rule 6 Synergy)
@@ -25,6 +26,7 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick, on
     const { theme, toggleTheme } = useTheme()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const { user, signOut, isLoading } = useAuth()
+    const { cart } = useCart()
     const router = useRouter()
     const isDark = theme === "dark"
 
@@ -82,13 +84,15 @@ export default function MarketplaceNavigation({ onSignInClick, onSignUpClick, on
                         </button>
 
                         <button
-                            onClick={() => router.push("/marketplace/cart")}
+                            onClick={() => router.push("/cart")}
                             className="relative p-3 rounded-2xl bg-[#E1784F]/10 border border-[#E1784F]/20 text-[#E1784F] hover:bg-[#E1784F] hover:text-white transition-all active:scale-90"
                         >
                             <ShoppingBag size={18} />
-                            <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E1784F] text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#050505]">
-                                0
-                            </span>
+                            {cart && cart.items.length > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E1784F] text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#050505]">
+                                    {cart.items.length}
+                                </span>
+                            )}
                         </button>
 
                         <div className="hidden md:block">
