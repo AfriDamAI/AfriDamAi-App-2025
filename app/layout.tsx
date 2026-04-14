@@ -89,7 +89,7 @@ export default function RootLayout({
                   transition={{ duration: 0.5, ease: "easeInOut" }}
                 >
                   {/* 🚀 RULE 6: High-speed route management */}
-                  {isPublicPage ? (
+                  {["/login", "/register", "/forgot-password", "/verify-email"].includes(pathname) ? (
                     <main className="w-full flex-1">
                       {children}
                     </main>
