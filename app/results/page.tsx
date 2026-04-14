@@ -177,7 +177,7 @@ function ResultsContent() {
 
 export default function ResultsPage() {
   return (
-    <main className="min-h-[100svh] bg-[#050505] text-white p-6 lg:p-16 relative overflow-x-hidden">
+    <div className="w-full text-white p-6 lg:p-16 relative">
       <div className="absolute top-0 right-0 w-full h-[800px] bg-[radial-gradient(circle_at_70%_0%,rgba(225,120,79,0.05),transparent_70%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] pointer-events-none" />
 
@@ -189,7 +189,7 @@ export default function ResultsPage() {
       }>
         <ResultsContent />
       </Suspense>
-    </main>
+    </div>
   )
 }
 

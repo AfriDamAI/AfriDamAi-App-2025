@@ -113,12 +113,12 @@ export const useCart = create<CartState>((set) => ({
 
       const payload = {
         cartId: cart.id,
-        userId: cart.userId, // Ensure userId is sent with cart update
-        items: updatedItems,
+        productId: productId,
+        quantity: quantity,
       };
 
-      // Use PUT to update the entire cart
-      await apiClient.put(`/Cart/${cart.id}`, payload);
+      // Use PUT to update the specific item quantity
+      await apiClient.put(`/Cart/${userId}`, payload);
       
     } catch (error: any) {
       console.error('🛒 UPDATE QUANTITY TOTAL FAILURE:', error.response?.data || error.message);

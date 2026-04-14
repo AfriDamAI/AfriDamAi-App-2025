@@ -32,11 +32,11 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   ];
 
   // 🚀 RULE 6: Toggle Nav/Footer visibility based on current clinical node
-  const showNav = !authRoutes.includes(pathname);
-  const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route));
+  const showNav = !authRoutes.includes(pathname) && !["/plans", "/transaction"].some(route => pathname.startsWith(route));
+  const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route)) && pathname !== "/plans" && pathname !== "/transaction";
 
   // 🧭 SIDEBAR SYNC: Show on all internal protected pages
-  const showSidebar = user && hideFooterRoutes.includes(pathname.split('/')[1] ? `/${pathname.split('/')[1]}` : pathname) && !authRoutes.includes(pathname);
+  const showSidebar = user && !authRoutes.includes(pathname);
 
   // 🛡️ OGA FIX: Show mobile nav only on internal dashboard-like pages, NOT on public auth pages
   const showMobileNav = !authRoutes.includes(pathname);
