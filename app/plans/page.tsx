@@ -121,7 +121,7 @@ export default function PlansPage() {
     }
 
     return (
-        <main className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white relative overflow-hidden">
+        <div className="w-full bg-white dark:bg-[#050505] text-black dark:text-white relative">
             <div className="fixed inset-0 z-[0] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
             <header className="relative z-10 px-8 pt-12 pb-6 flex items-center justify-between max-w-7xl mx-auto w-full">
@@ -257,7 +257,7 @@ export default function PlansPage() {
                     </div>
                 )}
             </div>
-        </main>
+        </div>
     )
 }
 

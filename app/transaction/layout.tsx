@@ -11,7 +11,7 @@ export default function TransactionLayout({
     const router = useRouter()
 
     return (
-        <main className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white relative overflow-hidden">
+        <div className="w-full bg-white dark:bg-[#050505] text-black dark:text-white relative overflow-hidden">
             <div className="fixed inset-0 z-[0] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
             {/* Header */}
@@ -29,6 +29,6 @@ export default function TransactionLayout({
             <div className="relative z-10 max-w-7xl mx-auto px-8 py-10 pb-32">
                 {children}
             </div>
-        </main>
+        </div>
     )
 }

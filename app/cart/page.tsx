@@ -49,7 +49,7 @@ export default function CartPage() {
   }
 
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
-    if (user && newQuantity >= 1) {
+    if (user && newQuantity >= 0) {
       updateQuantity(user.id, productId, newQuantity)
     }
   }
