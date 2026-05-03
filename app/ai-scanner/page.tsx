@@ -289,7 +289,7 @@ export default function UnifiedScanner() {
                             <Info size={40} className="text-red-500" />
                           </div>
                           <h3 className="text-white text-2xl font-black uppercase italic tracking-tighter mb-4 leading-tight">
-                            Scanning <span className="text-red-500">Halted</span>
+                            Image <span className="text-red-500">Not Recognized</span>
                           </h3>
                           <p className="text-white/80 text-[13px] font-bold leading-relaxed mb-8 max-w-xs">
                             {errorDetails}
@@ -298,7 +298,7 @@ export default function UnifiedScanner() {
                             onClick={() => setErrorDetails(null)}
                             className="px-10 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:scale-105 active:scale-95 transition-all"
                           >
-                            Retry Lens Scan
+                            Retry Scan With Real Human Image
                           </button>
                         </motion.div>
                       )}
