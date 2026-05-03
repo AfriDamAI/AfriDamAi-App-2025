@@ -298,7 +298,7 @@ export default function UnifiedScanner() {
                             onClick={() => setErrorDetails(null)}
                             className="px-10 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:scale-105 active:scale-95 transition-all"
                           >
-                            Retry Scan With Real Human Image
+                            Retry Scan With Good Lightening
                           </button>
                         </motion.div>
                       )}
