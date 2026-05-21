@@ -97,13 +97,13 @@ export default function Navigation({
             <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
             <img src="/logo.png" alt="AfriDam AI" className="h-9 md:h-11 w-auto object-contain" />
               <div className="hidden sm:flex flex-col border-l border-border/50 pl-3">
-                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Clinical</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#E1784F]">Clinical</span>
               </div>
             </Link>
 
             <div className="hidden lg:flex items-center gap-10">
               {navLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-[#E1784F] transition-all">
+                <Link key={link.href} href={link.href} className="text-xs lg:text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-[#E1784F] transition-all">
                   {link.label}
                 </Link>
               ))}
