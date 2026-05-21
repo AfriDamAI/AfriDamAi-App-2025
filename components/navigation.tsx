@@ -16,7 +16,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { useCart } from "@/hooks/use-cart";
 import NotificationDropdown from "./notification-dropdown";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation"; // 🚀 Added for Rule 6
+import { useRouter, usePathname } from "next/navigation";
 
 interface NavigationProps {
   onSignInClick: () => void;
@@ -33,8 +33,13 @@ export default function Navigation({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { cart, fetchCart } = useCart();
-  const router = useRouter(); // 🚀 Added
+  const router = useRouter();
+  const pathname = usePathname();
   const isDark = theme === "dark";
+
+  // 🌐 Public pages: hamburger is only needed here (dashboard has sidebar instead)
+  const publicPages = ["/", "/mission", "/contact", "/pricing", "/public-scan"];
+  const isPublicPage = publicPages.includes(pathname);
 
 
 
@@ -84,85 +89,120 @@ export default function Navigation({
   const cartItemCount = cart?.items.length || 0;
 
   return (
-    <nav className="sticky top-0 z-[100] bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
-        <div className="flex justify-between items-center h-20 md:h-24">
+    <>
+      <nav className="sticky top-0 z-[100] bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <div className="flex justify-between items-center h-20 md:h-24">
 
-          <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
-            <img src="/logo.png" alt="AfriDam AI" className="h-10 md:h-12 w-auto object-contain" />
-            <div className="hidden sm:flex flex-col border-l border-border/50 pl-3">
-              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Clinical</span>
-            </div>
-          </Link>
+            <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
+              <img src="/logo.png" alt="AfriDam AI" className="h-10 md:h-12 w-auto object-contain" />
+              <div className="hidden sm:flex flex-col border-l border-border/50 pl-3">
+                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Clinical</span>
+              </div>
+            </Link>
 
-          <div className="hidden lg:flex items-center gap-10">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-[#E1784F] transition-all">
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3 md:gap-4">
-            <button onClick={toggleTheme} className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all">
-              {isDark ? <Sun size={16} className="text-[#E1784F]" /> : <Moon size={16} />}
-            </button>
-
-            {user && (
-              <>
-                <NotificationDropdown />
-                <Link href="/cart" className="relative p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all">
-                  <ShoppingCart size={16} />
-                  {cartItemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {cartItemCount}
-                    </span>
-                  )}
+            <div className="hidden lg:flex items-center gap-10">
+              {navLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-[#E1784F] transition-all">
+                  {link.label}
                 </Link>
-              </>
-            )}
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3 md:gap-4">
+
+              {/* ☀️ Theme Toggle */}
+              <button onClick={toggleTheme} className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all">
+                {isDark ? <Sun size={16} className="text-[#E1784F]" /> : <Moon size={16} />}
+              </button>
 
 
-            <div className="hidden md:block">
-              <UserProfile
-                onSignInClick={handleSignIn} // 🚀 Rule 6 Updated
-                onSignUpClick={handleSignUp} // 🚀 Rule 6 Updated
-                onViewProfileClick={onViewProfileClick}
-              />
+              {/* 📱 MOBILE HAMBURGER TOGGLE — public pages only */}
+              {isPublicPage && (
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="lg:hidden p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all"
+                  aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                >
+                  {mobileMenuOpen ? <X size={16} className="text-[#E1784F]" /> : <Menu size={16} />}
+                </button>
+              )}
+
+
+
+              {user && (
+                <>
+                  <NotificationDropdown />
+                  <Link href="/cart" className="relative p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all">
+                    <ShoppingCart size={16} />
+                    {cartItemCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </Link>
+                </>
+              )}
+
+              <div className="hidden md:block">
+                <UserProfile
+                  onSignInClick={handleSignIn}
+                  onSignUpClick={handleSignUp}
+                  onViewProfileClick={onViewProfileClick}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </nav>
 
+      {/* 📱 MOBILE MENU — rendered outside <nav> to avoid transform containment issues */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
-            className="fixed inset-0 top-20 z-[90] bg-background flex flex-col p-8 lg:hidden overflow-y-auto no-scrollbar"
+            transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
+            className="fixed inset-0 z-[200] bg-background flex flex-col lg:hidden overflow-y-auto no-scrollbar"
           >
-            <div className="flex-grow space-y-4">
+            {/* Mobile Menu Header */}
+            <div className="flex justify-between items-center h-20 px-6 border-b border-border shrink-0">
+              <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+                <img src="/logo.png" alt="AfriDam AI" className="h-10 w-auto object-contain" />
+              </Link>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all"
+                aria-label="Close menu"
+              >
+                <X size={16} className="text-[#E1784F]" />
+              </button>
+            </div>
+
+            {/* Mobile Menu Links */}
+            <div className="flex-grow p-6 space-y-3">
               {navLinks.map((link) => (
-                <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between w-full p-6 rounded-[2rem] bg-card border border-border hover:border-[#E1784F]/30 transition-all">
-                  <span className="text-xl font-black italic uppercase tracking-tighter">{link.label}</span>
-                  <ArrowRight size={20} className="text-[#E1784F]" />
+                <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between w-full p-5 rounded-[1.5rem] bg-card border border-border hover:border-[#E1784F]/30 transition-all">
+                  <span className="text-lg font-black italic uppercase tracking-tighter">{link.label}</span>
+                  <ArrowRight size={18} className="text-[#E1784F]" />
                 </Link>
               ))}
             </div>
 
-            <div className="pt-8 border-t border-border space-y-4 pb-10">
+            {/* Mobile Menu Auth Actions */}
+            <div className="p-6 border-t border-border space-y-3 pb-10 shrink-0">
               {!user ? (
                 <div className="grid grid-cols-1 gap-3">
-                  <button onClick={handleSignUp} className="w-full py-6 bg-[#E1784F] text-white rounded-[2rem] font-black uppercase text-[11px] tracking-widest">
+                  <button onClick={handleSignUp} className="w-full py-5 bg-[#E1784F] text-white rounded-[1.5rem] font-black uppercase text-[11px] tracking-widest active:scale-[0.97] transition-transform">
                     Start Journey
                   </button>
-                  <button onClick={handleSignIn} className="w-full py-6 bg-muted text-foreground rounded-[2rem] font-black uppercase text-[11px] tracking-widest">
+                  <button onClick={handleSignIn} className="w-full py-5 bg-muted text-foreground rounded-[1.5rem] font-black uppercase text-[11px] tracking-widest active:scale-[0.97] transition-transform">
                     Login
                   </button>
                 </div>
               ) : (
-                <button onClick={() => { setMobileMenuOpen(false); signOut(); }} className="w-full py-6 bg-red-500/10 text-red-500 rounded-[2rem] font-black uppercase text-[11px] tracking-widest flex items-center justify-center gap-3">
+                <button onClick={() => { setMobileMenuOpen(false); signOut(); }} className="w-full py-5 bg-red-500/10 text-red-500 rounded-[1.5rem] font-black uppercase text-[11px] tracking-widest flex items-center justify-center gap-3 active:scale-[0.97] transition-transform">
                   <LogOut size={16} /> Sign Out
                 </button>
               )}
@@ -170,6 +210,6 @@ export default function Navigation({
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 }
