@@ -121,7 +121,7 @@ export default function VerifyEmailPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-[100svh] bg-[#050505] flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
+    <div className="min-h-[100svh] bg-background flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
       
       {/* --- CINEMATIC AMBIANCE --- */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#4DB6AC]/5 blur-[120px] md:blur-[250px] rounded-full pointer-events-none" />

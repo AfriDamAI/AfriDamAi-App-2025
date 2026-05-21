@@ -46,7 +46,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-svh bg-[#050505] flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
+    <div className="min-w-screen min-h-svh dark:bg-[#050505] bg-background flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
       {/* --- CINEMATIC AMBIANCE --- */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#4DB6AC]/5 blur-[120px] md:blur-[250px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[#E1784F]/5 blur-[80px] md:blur-[180px] rounded-full pointer-events-none" />
@@ -55,6 +55,7 @@ export default function LoginPage() {
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeInOut" }}
         className="w-full max-w-xl space-y-6 md:space-y-10 relative z-10"
       >
         {/* BRANDING HEADER */}
@@ -62,17 +63,17 @@ export default function LoginPage() {
           <motion.div 
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            className="w-16 h-16 md:w-20 md:h-20 bg-white text-black rounded-2xl md:rounded-3xl flex items-center justify-center shadow-[0_20px_40px_rgba(255,255,255,0.1)] mx-auto mb-4 relative group cursor-pointer"
+            className="w-16 h-16 md:w-20 md:h-20 bg-black dark:bg-white text-white dark:text-black rounded-2xl md:rounded-3xl flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(255,255,255,0.1)] mx-auto mb-4 relative group cursor-pointer"
           >
             <span className="font-black text-2xl md:text-3xl italic tracking-tighter">A</span>
-            <div className="absolute inset-0 rounded-2xl md:rounded-3xl border border-white/20 scale-110 opacity-50 group-hover:opacity-100 transition-all duration-500" />
+            <div className="absolute inset-0 rounded-2xl md:rounded-3xl border border-black/10 dark:border-white/20 scale-110 opacity-50 group-hover:opacity-100 transition-all duration-500" />
           </motion.div>
 
           <div className="space-y-3">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-[0.8] text-center">
+            <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter uppercase italic leading-[0.8] text-center">
               Welcome <br /> <span className="text-[#E1784F]">Back.</span>
             </h1>
-            <p className="text-white/20 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
+            <p className="text-foreground/20 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
               Sign in to your account
             </p>
           </div>
@@ -92,13 +93,13 @@ export default function LoginPage() {
             <div className="space-y-4 md:space-y-6">
               <div className="relative group/input">
                 <div className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
-                  <Mail className="w-4 h-4 text-white" />
+                  <Mail className="w-4 h-4 text-foreground" />
                 </div>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-white/10"
+                  className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
                   placeholder="Email Address"
                   required
                 />
@@ -106,20 +107,20 @@ export default function LoginPage() {
 
               <div className="relative group/input">
                 <div className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
-                  <Lock className="w-4 h-4 text-white" />
+                  <Lock className="w-4 h-4 text-foreground" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-12 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#E1784F] transition-all text-sm md:text-base placeholder:text-white/10"
+                  className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-12 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#E1784F] transition-all text-sm md:text-base placeholder:text-foreground/10"
                   placeholder="Password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-[#E1784F] transition-colors"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-foreground/40 hover:text-[#E1784F] transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -149,15 +150,15 @@ export default function LoginPage() {
               {/* Back Button */}
               <button
                 type="button"
-                onClick={() => window.history.back()}
-                className="w-full flex items-center justify-center gap-2 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] py-3 hover:text-white transition-all"
+                onClick={() => router.push("/")}
+                className="w-full flex items-center justify-center gap-2 text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] py-3 hover:text-foreground transition-all"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Go Back
               </button>
 
               <div className="text-center">
-                <Link href="/forgot-password" className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-[#E1784F] transition-colors">
+                <Link href="/forgot-password" className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/40 hover:text-[#E1784F] transition-colors">
                   Forgot your password?
                 </Link>
               </div>
@@ -170,8 +171,8 @@ export default function LoginPage() {
             <Fingerprint size={14} className="text-[#4DB6AC]" />
             <p className="text-[8px] font-black uppercase tracking-[0.4em]">Secure Login</p>
           </div>
-          <p className="text-center text-[9px] text-white/20 font-black uppercase tracking-[0.3em]">
-            Don't have an account? <Link href="/register" className="text-white hover:text-[#4DB6AC] transition-all ml-2 border-b border-white/20">Register</Link>
+          <p className="text-center text-[9px] text-foreground/20 font-black uppercase tracking-[0.3em]">
+            Don't have an account? <Link href="/register" className="text-foreground hover:text-[#4DB6AC] transition-all ml-2 border-b border-foreground/20">Register</Link>
           </p>
         </div>
       </motion.div>
