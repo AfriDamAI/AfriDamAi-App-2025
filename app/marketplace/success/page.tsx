@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { 
   CheckCircle2, ArrowRight, Package, 
@@ -15,7 +15,7 @@ import { motion } from "framer-motion"
  * Focus: Transaction Confirmation & Specialist Next-Steps.
  */
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const reference = searchParams.get('ref') || searchParams.get('reference')
@@ -104,5 +104,13 @@ export default function PaymentSuccessPage() {
         </div>
       </motion.div>
     </main>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }

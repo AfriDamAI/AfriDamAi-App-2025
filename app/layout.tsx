@@ -18,7 +18,6 @@ import { AIChatBot } from "@/components/ai/ai-chatbot"
 import { IngredientAnalyzer } from "@/components/ai/ingredient-analyzer"
 import { CallProvider } from "@/providers/call-provider"
 import { usePathname } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,18 +37,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
-  /** * 🛡️ RULE 6 Logic: 
-   * Updated to remove '/auth' prefix per (auth) route group organization.
-   * This ensures the AppWrapper (Sidebar/Nav) doesn't interfere with Auth pages.
-   */
-  const publicRoutes = ["/", "/login", "/register", "/forgot-password", "/verify-email", "/public-scan"];
-  const isPublicPage = publicRoutes.includes(pathname);
-
-  /**
-   * 🤖 AI ChatBot Visibility Logic
-   * Routes where the AIChatBot component should be hidden.
-   * These pages have their own specialized interfaces.
-   */
+  // Routes where the AIChatBot should be hidden (they have their own interfaces)
   const hideChatBotRoutes = ["/", "/ingredient-analyzer", "/specialist"];
   const shouldShowChatBot = !hideChatBotRoutes.includes(pathname);
 
@@ -65,8 +53,26 @@ export default function RootLayout({
         <meta name="theme-color" content="#050505" />
 
         <link rel="icon" href="/logo.png" />
+
+        {/* 🛡️ ANTI-FLICKER: Set theme class BEFORE first paint to prevent white/dark flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme') || 'dark';
+                  document.documentElement.classList.toggle('dark', theme === 'dark');
+                  document.documentElement.style.colorScheme = theme;
+                } catch(e) {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.style.colorScheme = 'dark';
+                }
+              })();
+            `,
+          }}
+        />
       </head>
-      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-[#050505] text-black dark:text-white selection:bg-[#E1784F]/30 min-h-[100svh] relative overflow-x-hidden transition-colors duration-500`}>
+      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-[#050505] text-black dark:text-white selection:bg-[#E1784F]/30 min-h-[100svh] relative overflow-x-hidden scroll-smooth`}>
 
         {/* 🛡️ GLOBAL EDITORIAL TEXTURE */}
         <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
@@ -79,27 +85,9 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <AuthGuard>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={pathname}
-                  className="min-h-svh w-full relative z-10 flex flex-col"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                >
-                  {/* 🚀 RULE 6: High-speed route management */}
-                  {["/login", "/register", "/forgot-password", "/verify-email"].includes(pathname) ? (
-                    <main className="w-full flex-1">
-                      {children}
-                    </main>
-                  ) : (
-                    <AppWrapper>
-                      {children}
-                    </AppWrapper>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+              <AppWrapper>
+                {children}
+              </AppWrapper>
 
               {/* 💬 PERSISTENT SUPPORT */}
               {shouldShowChatBot && (

@@ -51,13 +51,25 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }, [isSignedIn, isLoading, pathname, router, isPublicPath, isAuthPage])
 
   /**
-   * 🛡️ THE GHOST PREVENTER
-   * If it's a private page and we aren't signed in, show nothing while we redirect.
-   * If it's an auth page and we ARE signed in, show nothing while we redirect.
+   * 🛡️ RENDER GATE — ZERO FLASH STRATEGY
+   *
+   * Public paths (/, /mission, /contact, etc.) render IMMEDIATELY — no waiting.
+   * Auth pages (/login, /register) block ONLY when signed-in (we're about to redirect).
+   * Private pages block ONLY when definitely not signed in (we're about to redirect).
+   * 
+   * We NEVER return null while isLoading on public paths — that causes blank flash.
    */
-  if (isLoading) return null
 
+  // 1. Public page (not an auth page) → render immediately, no gate needed
+  if (isPublicPath && !isAuthPage) return <>{children}</>
+
+  // 2. Still checking auth for auth/private pages → pass through (redirect fires in useEffect)
+  if (isLoading) return <>{children}</>
+
+  // 3. Private page, definitely not signed in → blank while redirect fires
   if (!isSignedIn && !isPublicPath) return null
+
+  // 4. Auth page (/login, /register), definitely signed in → blank while redirect fires
   if (isSignedIn && isAuthPage) return null
 
   return <>{children}</>
