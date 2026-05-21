@@ -1,44 +1,30 @@
 /**
  * 🛡️ AFRIDAM WELLNESS HUB: ELEGANT UNIFIED EDITION (Rule 6 Synergy)
- * Version: 2026.6.2 (Route Group Sync & 404 Resolution)
+ * Version: 2026.6.3 (Navigation Cleanup & Responsive Polish)
  * Focus: Sophisticated Scaling, (auth) Group Alignment, Rule 6 Compliance.
  */
 
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React from "react"
 import {
-  Camera, ArrowRight, Sun, Moon, MapPin, Mail, Heart, Menu, X, ShieldCheck, Activity, Sparkles, Aperture
+  Camera, ArrowRight, MapPin, Mail, Heart, ShieldCheck, Activity, Sparkles, Aperture
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import { useTheme } from "@/providers/theme-provider"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import TeamMemberSection from "@/components/team-member-section"
-import Footer from "@/components/footer"
 
 export default function LandingPage() {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isDark = theme === "dark";
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   /**
    * 🛡️ RULE 6 SYNERGY: 
    * High-speed redirection to dedicated auth nodes.
-   * 🚀 FIX: Pointing to /login instead of /auth/login to match (auth) group.
    */
   const navigateToAuth = (type: "login" | "register") => {
-    setMobileMenuOpen(false);
     router.push(`/${type}`);
   };
 
@@ -47,93 +33,68 @@ export default function LandingPage() {
     else navigateToAuth("register");
   };
 
-  const NavLink = ({ href, label }: { href: string; label: string }) => (
-    <Link href={href} className="opacity-60 hover:opacity-100 hover:text-[#E1784F] transition-all font-bold tracking-widest capitalize text-[10px]">
-      {label}
-    </Link>
-  );
-
   return (
     <div className="min-h-svh bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 relative no-scrollbar">
 
-      {/* 🧭 1. NAVIGATION */}
-      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 px-6 py-4 md:px-12 ${scrolled ? 'bg-white/95 dark:bg-[#050505]/95 backdrop-blur-3xl py-4 shadow-sm border-b border-black/5 dark:border-white/5' : 'bg-transparent py-8'
-        }`}>
-        <div className="max-w-screen-xl mx-auto flex justify-between items-center">
-          <Link href="/" className="active:scale-95 transition-transform">
-            <img src="/logo.png" alt="AfriDam" className={`h-7 md:h-9 w-auto object-contain ${isDark ? '' : 'invert'}`} />
-          </Link>
-
-          <div className=" lg:flex items-center gap-8 text-[10px] font-black capitalize tracking-widest">
-            <NavLink href="/mission" label="Our Mission" />
-            <NavLink href="/marketplace" label="Market Place" />
-            <NavLink href="#contact" label="Contact" />
-
-            <button onClick={toggleTheme} className="p-2 opacity-40 hover:opacity-100 transition-all ml-4">
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-
-            {user ? (
-              <Link href="/dashboard" className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg capitalize tracking-widest font-black text-[9px]">
-                Portal
-              </Link>
-            ) : (
-              <div className="flex items-center gap-6">
-                <button 
-                onClick={() => navigateToAuth("login")} 
-                className="opacity-50 hover:opacity-100 transition-all cursor-pointer">
-                  Login
-                </button>
-                <button 
-                onClick={() => navigateToAuth("register")} 
-                className="px-8 py-3 bg-[#E1784F] text-white rounded-lg capitalize tracking-widest font-black text-[9px] shadow-xl active:scale-95 transition-all cursor-pointer">
-                  Get Started
-                </button>
-              </div>
-            )}
-          </div>
-
-          <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden hover:opacity-75 transition-opacity" aria-label="Open menu">
-            <Menu size={18} />
-          </button>
-        </div>
-      </nav>
+      {/* 🧭 Navigation handled by AppWrapper → Navigation component */}
 
       {/* 🌪️ 2. HERO */}
-      <section className="relative pt-32 md:pt-56 pb-20 px-6">
-        <div className="max-w-screen-xl mx-auto grid lg:grid-cols-12 items-center gap-12 md:gap-20">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="lg:col-span-7 space-y-8 md:space-y-12">
-            <div className="inline-flex items-center gap-2.5 bg-[#E1784F]/5 dark:bg-white/5 px-4 py-2 rounded-full border border-[#E1784F]/10">
-              <Sparkles className="text-[#E1784F]" size={12} />
-              <span className="text-[9px] font-black capitalize tracking-widest text-[#E1784F]">Clinical Excellence</span>
+      <section className="min-h-[calc(100svh-5rem)] relative px-6 flex items-center">
+        <div className="max-w-screen-xl mx-auto w-full grid lg:grid-cols-12 items-center gap-8 md:gap-20 py-12 md:py-16">
+
+          {/* Text + CTA — mobile: col 1-2 of 3; desktop: left 7 cols */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-none lg:col-span-7 lg:order-1 order-2 gap-6 items-end"
+          >
+            {/* Badge + Heading + Subtext */}
+            <div className="sm:col-span-2 space-y-4 md:space-y-6" style={{ margin: 0 }}>
+              <div className="inline-flex items-center gap-2.5 bg-[#E1784F]/5 dark:bg-white/5 px-4 py-2 rounded-full border border-[#E1784F]/10">
+                <Sparkles className="text-[#E1784F]" size={12} />
+                <span className="text-[9px] font-black capitalize tracking-widest text-[#E1784F]">Clinical Excellence</span>
+              </div>
+              <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-7xl font-black leading-[1.1] tracking-tight italic text-black dark:text-white">
+                Your <br /> Skin's <br /> <span className="text-[#E1784F]">Best Friend.</span>
+              </h1>
+              <p className="text-sm sm:text-lg md:text-2xl font-black max-w-lg opacity-25 tracking-tighter leading-tight italic">
+                Localized protection. <br /> Safe care for the heritage.
+              </p>
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-7xl font-black leading-[1.1] tracking-tight italic text-black dark:text-white">
-              Your <br /> Skin's <br /> <span className="text-[#E1784F]">Best Friend.</span>
-            </h1>
-            <p className="text-lg md:text-2xl font-black max-w-lg opacity-25 tracking-tighter leading-tight italic">
-              Localized protection. <br /> Safe care for the heritage.
-            </p>
-            <button 
-              onClick={() => router.push("/public-scan")} 
-              className="group h-20 px-12 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black capitalize text-[11px] tracking-widest shadow-xl flex items-center justify-center gap-6 active:scale-95 transition-all">
-              Start Now <ArrowRight size={18} />
+
+            {/* CTA Button — stacks beside text on mobile, full-width below on lg */}
+            <button
+              onClick={() => router.push("/public-scan")}
+              className="group sm:col-span-1 lg:col-span-full h-16 md:h-20 px-6 md:px-12 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black capitalize text-[10px] md:text-[11px] tracking-widest shadow-xl flex items-center justify-center gap-4 md:gap-6 active:scale-95 transition-all sm:justify-self-end lg:justify-self-start self-end w-full sm:w-auto lg:w-fit"
+            >
+              Start Now <ArrowRight size={16} />
             </button>
           </motion.div>
 
-          <div className="lg:col-span-5 relative">
-            <div className="aspect-4/5 rounded-[3.5rem] overflow-hidden border-10 border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
-              <img src="./molle.png" alt="AfriDam" className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0" />
+          {/* Image Card — full width on mobile (order-1), right 5 cols on desktop */}
+          <div className="lg:col-span-5 relative max-w-sm sm:max-w-md mx-auto w-full lg:order-2 order-1">
+            <div className="aspect-[4/5] rounded-[3.5rem] overflow-hidden border-[10px] border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
+              <img
+                src="./molle.png"
+                alt="AfriDam"
+                className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 group-hover:grayscale-0"
+              />
               <div className="absolute inset-0 pointer-events-none">
-                <motion.div animate={{ top: ["0%", "100%", "0%"] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_30px_5px_#E1784F] z-20" />
+                <motion.div
+                  animate={{ top: ["0%", "100%", "0%"] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute left-0 right-0 h-[2px] bg-[#E1784F] shadow-[0_0_30px_5px_#E1784F] z-20"
+                />
               </div>
-              <Link 
-                href="/public-scan" 
-                className="absolute bottom-6 left-6 right-6 p-6 bg-black/80 hover:bg-black/90 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center gap-5 cursor-pointer active:scale-95 transition-all outline-none"
+              <Link
+                href="/public-scan"
+                className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-4 sm:p-6 bg-black/80 hover:bg-black/90 backdrop-blur-2xl rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 flex items-center gap-4 sm:gap-5 cursor-pointer active:scale-95 transition-all outline-none"
               >
-                <div className="w-12 h-12 bg-[#4DB6AC] rounded-2xl flex items-center justify-center text-white">
-                  <Camera size={24} />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#4DB6AC] rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
+                  <Camera size={20} />
                 </div>
-                <div className="flex-1 space-y-2">
+                <div className="flex-1 space-y-2 min-w-0">
                   <div className="flex justify-between items-center">
                     <p className="text-[10px] font-black capitalize tracking-widest text-white italic">Analysis Active</p>
                     <p className="text-[9px] font-bold text-[#4DB6AC] uppercase tracking-widest flex items-center gap-1">Scan <ArrowRight size={10} /></p>
@@ -145,6 +106,7 @@ export default function LandingPage() {
               </Link>
             </div>
           </div>
+
         </div>
       </section>
 
@@ -211,7 +173,7 @@ export default function LandingPage() {
               { title: "Check Skin", icon: Camera, text: "A precision scan to verify your skin health.", path: "/public-scan", color: "#E1784F" },
               { title: "Safe Choice", icon: ShieldCheck, text: "Verify if your products are safe for melanin.", path: "/ingredient-analyzer", color: "#4DB6AC" }
             ].map((f, i) => (
-              <div key={i} onClick={() => f.path === '/public-scan' ? router.push(f.path) : handleFeatureAccess(f.path)} className="group p-12 md:p-16 bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[4rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm">
+              <div key={i} onClick={() => f.path === '/public-scan' ? router.push(f.path) : handleFeatureAccess(f.path)} className="group p-8 md:p-12 lg:p-16 bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[2.5rem] md:rounded-[4rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 text-white shadow-lg" style={{ backgroundColor: f.color }}>
                   <f.icon size={28} />
                 </div>
@@ -228,15 +190,15 @@ export default function LandingPage() {
       <TeamMemberSection />
 
       {/* 🏛️ 7. CONTACT & ACTION */}
-      <section id="contact" className="py-16 md:py-24 px-8 md:px-20">
-        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-24 md:gap-24 items-center">
+      <section id="contact" className="py-16 md:py-24 px-6 md:px-20">
+        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-12 md:gap-24 items-center">
           <div className="space-y-10">
-            <h2 className="text-6xl md:text-7xl font-black capitalize italic tracking-tighter leading-[0.85] text-black dark:text-white">Get <br /><span className="text-[#4DB6AC]">Started.</span></h2>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black capitalize italic tracking-tighter leading-[0.85] text-black dark:text-white">Get <br /><span className="text-[#4DB6AC]">Started.</span></h2>
             <p className="text-xl md:text-2xl font-black opacity-20 tracking-tighter italic">Join the movement for <br />Melanin-Rich Health.</p>
             <button onClick={() => navigateToAuth("register")} className="w-full md:w-auto h-20 px-16 bg-[#4DB6AC] text-black font-black capitalize text-[11px] tracking-widest rounded-2xl shadow-xl hover:scale-105 transition-all">Create Profile</button>
           </div>
           <div className="space-y-16">
-            <h2 className="text-5xl md:text-7xl font-black capitalize italic tracking-tighter text-[#E1784F]">Contact.</h2>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black capitalize italic tracking-tighter text-[#E1784F]">Contact.</h2>
             <div className="space-y-12">
               <div className="flex gap-8 items-center">
                 <MapPin className="text-[#E1784F]" size={32} />
@@ -257,76 +219,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 🏷️ 7. FOOTER */}
-      <Footer/>
-
-      {/* MOBILE MENU */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div initial={{ opacity: 0, scale: 1.1 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm p-6 flex flex-col">
-            {/* Close Button */}
-            <div className="flex justify-end mb-12">
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                aria-label="Close menu"
-              >
-                <X className="w-8 h-8" />
-              </button>
-            </div>
-
-            {/* Logo */}
-            <div className="px-6 mb-12">
-              <img src="/logo.png" className={`h-8 w-auto ${isDark ? '' : 'invert'}`} alt="Logo" />
-            </div>
-
-            {/* Navigation Items */}
-            <div className="flex-1 px-6 flex flex-col gap-5">
-              {['Mission', 'Care Hub', 'Contact', 'Login'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    if (item === 'Login') navigateToAuth('login');
-                    else if (item === 'Contact') document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-                    else handleFeatureAccess(item === 'Mission' ? '/mission' : '/marketplace');
-                  }}
-                  className="text-5xl font-bold italic text-white hover:text-[#E1784F] transition-colors text-left"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-
-            {/* Get Started Button */}
-            <div className="px-6 pb-12">
-              <button
-                onClick={() => navigateToAuth("register")}
-                className="w-full py-4 px-6 bg-[#E1784F] hover:bg-orange-500 text-white font-bold rounded-full transition-colors"
-              >
-                GET STARTED
-              </button>
-            </div>
-
-            {/* Bottom Chat Icon */}
-            {/* <div className="absolute bottom-12 right-6 w-12 h-12 bg-teal-400 rounded-2xl flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 8h10M7 12h4m1 8l-4-2H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 2z"
-                />
-              </svg>
-            </div> */}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* 🏷️ Footer rendered by app-wrapper.tsx */}
     </div>
   )
 }
