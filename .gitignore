@@ -40,3 +40,6 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 .env*.local
+
+# local history
+.history
