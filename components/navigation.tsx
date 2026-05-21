@@ -90,7 +90,7 @@ export default function Navigation({
 
   return (
     <>
-      <nav className="sticky top-0 z-[100] bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-300">
+      <nav className="sticky top-0 z-[100] bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="flex justify-between items-center h-16 md:h-20">
 
