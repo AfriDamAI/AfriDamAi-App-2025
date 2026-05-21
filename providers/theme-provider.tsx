@@ -61,9 +61,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   // 🛡️ NUCLEAR STABILIZER: Prevent Hydration Flicker
+  // Using visibility instead of opacity to avoid any painted frame of wrong-theme content.
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className={!mounted ? "opacity-0" : "opacity-100 contents transition-opacity duration-300"}>
+      <div style={{ visibility: mounted ? "visible" : "hidden" }} className="contents">
         {children}
       </div>
     </ThemeContext.Provider>
