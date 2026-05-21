@@ -73,7 +73,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-[100svh] bg-[#050505] flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
+    <div className="min-w-screen min-h-svh dark:bg-[#050505] bg-background flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
       
       {/* --- CINEMATIC AMBIANCE --- */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#4DB6AC]/5 blur-[120px] md:blur-[250px] rounded-full pointer-events-none" />
@@ -83,6 +83,7 @@ export default function RegisterPage() {
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeInOut" }}
         className="w-full max-w-xl space-y-6 md:space-y-10 relative z-10"
       >
         
@@ -91,22 +92,22 @@ export default function RegisterPage() {
           <motion.div 
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            className="w-16 h-16 md:w-20 md:h-20 bg-white text-black rounded-2xl md:rounded-3xl flex items-center justify-center shadow-[0_20px_40px_rgba(255,255,255,0.1)] mx-auto mb-4 relative group cursor-pointer"
+            className="w-16 h-16 md:w-20 md:h-20 bg-black dark:bg-white text-white dark:text-black rounded-2xl md:rounded-3xl flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(255,255,255,0.1)] mx-auto mb-4 relative group cursor-pointer"
           >
             <span className="font-black text-2xl md:text-3xl italic tracking-tighter">A</span>
-            <div className="absolute inset-0 rounded-2xl md:rounded-3xl border border-white/20 scale-110 opacity-50 group-hover:opacity-100 transition-all duration-500" />
+            <div className="absolute inset-0 rounded-2xl md:rounded-3xl border border-black/10 dark:border-white/20 scale-110 opacity-50 group-hover:opacity-100 transition-all duration-500" />
           </motion.div>
 
           <div className="space-y-3">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-[0.8] text-center">
+            <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter uppercase italic leading-[0.8] text-center">
               New <br /> <span className="text-[#4DB6AC]">Account</span>
             </h1>
             
             <div className="flex justify-center gap-3 pt-4">
-              <div className={`h-1 rounded-full transition-all duration-700 ${step === 1 ? 'w-16 bg-[#4DB6AC]' : 'w-3 bg-white/10'}`} />
-              <div className={`h-1 rounded-full transition-all duration-700 ${step === 2 ? 'w-16 bg-[#4DB6AC]' : 'w-3 bg-white/10'}`} />
+              <div className={`h-1 rounded-full transition-all duration-700 ${step === 1 ? 'w-16 bg-[#4DB6AC]' : 'w-3 bg-foreground/10'}`} />
+              <div className={`h-1 rounded-full transition-all duration-700 ${step === 2 ? 'w-16 bg-[#4DB6AC]' : 'w-3 bg-foreground/10'}`} />
             </div>
-            <p className="text-white/20 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
+            <p className="text-foreground/20 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
               Step {step} / Account Details
             </p>
           </div>
@@ -130,13 +131,14 @@ export default function RegisterPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5, ease: "easeIn" }}
                     className="space-y-4 md:space-y-6"
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         <div className="relative group/input">
                             <input
                                 type="text"
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-white/10"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
                                 placeholder="First Name"
                                 value={formData.firstName}
                                 onChange={(e) => setFormData({...formData, firstName: e.target.value})}
@@ -146,7 +148,7 @@ export default function RegisterPage() {
                         <div className="relative group/input">
                             <input
                                 type="text"
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-white/10"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
                                 placeholder="Last Name"
                                 value={formData.lastName}
                                 onChange={(e) => setFormData({...formData, lastName: e.target.value})}
@@ -158,38 +160,38 @@ export default function RegisterPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         <div className="relative">
                             <select
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#4DB6AC] appearance-none cursor-pointer text-sm md:text-base uppercase tracking-widest"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] appearance-none cursor-pointer text-sm md:text-base uppercase tracking-widest"
                                 onChange={(e) => setFormData({...formData, sex: e.target.value})}
                                 value={formData.sex}
                             >
-                                <option value="male" className="bg-[#0A0A0A]">Male</option>
-                                <option value="female" className="bg-[#0A0A0A]">Female</option>
+                                <option value="male" className="bg-background">Male</option>
+                                <option value="female" className="bg-background">Female</option>
                             </select>
-                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-white/20 text-xs">▼</div>
+                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-foreground/20 text-xs">▼</div>
                         </div>
 
                         <div className="relative">
                             <select
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#4DB6AC] appearance-none cursor-pointer text-sm md:text-base uppercase tracking-widest"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] appearance-none cursor-pointer text-sm md:text-base uppercase tracking-widest"
                                 onChange={(e) => setFormData({...formData, country: e.target.value})}
                                 value={formData.country}
                             >
-                                <option value="Nigeria" className="bg-[#0A0A0A]">Nigeria</option>
-                                <option value="Ghana" className="bg-[#0A0A0A]">Ghana</option>
-                                <option value="Kenya" className="bg-[#0A0A0A]">Kenya</option>
-                                <option value="USA" className="bg-[#0A0A0A]">USA</option>
+                                <option value="Nigeria" className="bg-background">Nigeria</option>
+                                <option value="Ghana" className="bg-background">Ghana</option>
+                                <option value="Kenya" className="bg-background">Kenya</option>
+                                <option value="USA" className="bg-background">USA</option>
                             </select>
-                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-white/20 text-xs">▼</div>
+                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-foreground/20 text-xs">▼</div>
                         </div>
                     </div>
 
                     <div className="relative group/input">
                         <div className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
-                            <Phone className="w-4 h-4 text-white" />
+                            <Phone className="w-4 h-4 text-foreground" />
                         </div>
                         <input
                             type="tel"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-white/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
                             placeholder="Phone Number"
                             value={formData.phoneNo}
                             onChange={(e) => setFormData({...formData, phoneNo: e.target.value})}
@@ -211,11 +213,11 @@ export default function RegisterPage() {
                     
                     <div className="relative group/input">
                         <div className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
-                            <Mail className="w-4 h-4 text-white" />
+                            <Mail className="w-4 h-4 text-foreground" />
                         </div>
                         <input
                             type="email"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-white/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
                             placeholder="Email Address"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -225,11 +227,11 @@ export default function RegisterPage() {
 
                     <div className="relative group/input">
                         <div className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 pointer-events-none opacity-20 group-focus-within/input:opacity-100 transition-all">
-                            <Lock className="w-4 h-4 text-white" />
+                            <Lock className="w-4 h-4 text-foreground" />
                         </div>
                         <input
                             type="password"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-white font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-white/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
                             placeholder="Create Password"
                             value={formData.password}
                             onChange={(e) => setFormData({...formData, password: e.target.value})}
@@ -237,25 +239,25 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    <div className="flex items-start gap-3 p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/5">
+                    <div className="flex items-start gap-3 p-4 bg-foreground/5 rounded-xl md:rounded-2xl border border-foreground/5">
                         <ShieldCheck className="text-[#4DB6AC] shrink-0" size={18} />
-                        <p className="text-[9px] text-white/20 font-black leading-relaxed uppercase tracking-[0.2em]">
+                        <p className="text-[9px] text-foreground/20 font-black leading-relaxed uppercase tracking-[0.2em]">
                             Your medical data is encrypted and protected.
                         </p>
                     </div>
 
                     {/* Privacy Policy Checkbox */}
-                    <div className="flex items-start gap-3 p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/5">
+                    <div className="flex items-start gap-3 p-4 bg-foreground/5 rounded-xl md:rounded-2xl border border-foreground/5">
                         <div className="shrink-0 pt-0.5">
                             <input
                                 type="checkbox"
                                 id="privacy-policy"
                                 checked={acceptPrivacy}
                                 onChange={(e) => setAcceptPrivacy(e.target.checked)}
-                                className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#4DB6AC] focus:ring-[#4DB6AC] focus:ring-offset-0 cursor-pointer"
+                                className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-[#4DB6AC] focus:ring-[#4DB6AC] focus:ring-offset-0 cursor-pointer"
                             />
                         </div>
-                        <label htmlFor="privacy-policy" className="text-[9px] text-white/40 font-medium leading-relaxed cursor-pointer">
+                        <label htmlFor="privacy-policy" className="text-[9px] text-foreground/40 font-medium leading-relaxed cursor-pointer">
                             I accept the <a href="/privacy-policy" className="text-[#4DB6AC] hover:underline underline-offset-2">Privacy Policy</a> and consent to the use of my data for AI training purposes as described therein.
                         </label>
                     </div>
@@ -282,8 +284,8 @@ export default function RegisterPage() {
                 {/* Back Button */}
                 <button
                     type="button"
-                    onClick={() => window.history.back()}
-                    className="w-full flex items-center justify-center gap-2 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] py-3 hover:text-white transition-all"
+                    onClick={() => router.push("/")}
+                    className="w-full flex items-center justify-center gap-2 text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] py-3 hover:text-foreground transition-all"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Go Back
@@ -297,8 +299,8 @@ export default function RegisterPage() {
                 <Fingerprint size={14} className="text-[#4DB6AC]" />
                 <p className="text-[8px] font-black uppercase tracking-[0.4em]">Secure Registration</p>
             </div>
-            <p className="text-center text-[9px] text-white/20 font-black uppercase tracking-[0.3em]">
-              Already have an account? <Link href="/login" className="text-white hover:text-[#4DB6AC] transition-all ml-2 border-b border-white/20">Login</Link>
+            <p className="text-center text-[9px] text-foreground/20 font-black uppercase tracking-[0.3em]">
+              Already have an account? <Link href="/login" className="text-foreground hover:text-[#4DB6AC] transition-all ml-2 border-b border-foreground/20">Login</Link>
             </p>
         </div>
       </motion.div>
