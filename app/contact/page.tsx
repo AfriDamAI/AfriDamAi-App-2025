@@ -76,7 +76,7 @@ export default function ContactPage() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[3rem] border border-black/5 dark:border-white/10 shadow-2xl relative"
+                        className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/10 shadow-2xl relative"
                     >
                         <div className="mb-10">
                             <h2 className="text-3xl font-black italic tracking-tighter mb-2">Send Message</h2>
@@ -124,7 +124,7 @@ export default function ContactPage() {
                         </div>
 
                         {/* WHY AFRIDAM CARD */}
-                        <div className="bg-gradient-to-br from-[#4DB6AC]/10 to-transparent rounded-[2.5rem] p-10 border border-[#4DB6AC]/20 relative overflow-hidden shadow-lg group">
+                        <div className="bg-gradient-to-br from-[#4DB6AC]/10 to-transparent rounded-[1.5rem] md:rounded-[2.5rem] p-10 border border-[#4DB6AC]/20 relative overflow-hidden shadow-lg group">
                             <Microscope className="absolute bottom-[-10px] right-[-10px] w-32 h-32 text-[#4DB6AC]/5 -rotate-12 group-hover:rotate-0 transition-transform duration-700" />
                             <div className="relative z-10 space-y-6">
                                 <h3 className="text-[#4DB6AC] text-xl font-black italic">The Mission</h3>
