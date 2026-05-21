@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import { Lock, ArrowRight, Loader2, X, AlertCircle, CheckCircle } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { resetPassword } from "@/lib/api-client" // Assuming this function exists or will be created
 
-export default function NewPasswordPage() {
+function NewPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [newPassword, setNewPassword] = useState("")
@@ -172,5 +172,13 @@ export default function NewPasswordPage() {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+export default function NewPasswordPage() {
+  return (
+    <Suspense>
+      <NewPasswordContent />
+    </Suspense>
   )
 }
