@@ -92,10 +92,10 @@ export default function Navigation({
     <>
       <nav className="sticky top-0 z-[100] bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="flex justify-between items-center h-20 md:h-24">
+          <div className="flex justify-between items-center h-16 md:h-20">
 
             <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
-              <img src="/logo.png" alt="AfriDam AI" className="h-10 md:h-12 w-auto object-contain" />
+            <img src="/logo.png" alt="AfriDam AI" className="h-9 md:h-11 w-auto object-contain" />
               <div className="hidden sm:flex flex-col border-l border-border/50 pl-3">
                 <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Clinical</span>
               </div>
