@@ -1,7 +1,7 @@
 "use client"
 
 import { getTreatmentRoutine } from "@/lib/treatment-data"
-import { Clock, Droplets, Sun, Moon } from 'lucide-react'
+import { Clock, Droplets, Sun, Moon, ArrowRight } from 'lucide-react'
 import { motion } from "framer-motion"
 
 export function TreatmentRoutine() {
@@ -18,7 +18,7 @@ export function TreatmentRoutine() {
         <div className="space-y-3">
           {routine.morning.map((step, idx) => (
             <div key={idx} className="flex gap-4 p-5 bg-card border border-border rounded-2xl hover:border-[#E1784F]/30 transition-all shadow-sm">
-              <div className="flex-shrink-0">
+              <div className="`flex-shrink-0`">
                 <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-[#E1784F]/10 border border-[#E1784F]/20">
                   <span className="text-sm font-black italic text-[#E1784F]">{idx + 1}</span>
                 </div>
@@ -45,7 +45,7 @@ export function TreatmentRoutine() {
         <div className="space-y-3">
           {routine.evening.map((step, idx) => (
             <div key={idx} className="flex gap-4 p-5 bg-card border border-border rounded-2xl hover:border-[#4DB6AC]/30 transition-all shadow-sm">
-              <div className="flex-shrink-0">
+              <div className="`flex-shrink-0`">
                 <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-[#4DB6AC]/10 border border-[#4DB6AC]/20">
                   <span className="text-sm font-black italic text-[#4DB6AC]">{idx + 1}</span>
                 </div>
