@@ -112,7 +112,7 @@ export default function Navigation({
             <div className="flex items-center gap-3 md:gap-4">
 
               {/* ☀️ Theme Toggle */}
-              <button onClick={toggleTheme} className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all">
+              <button onClick={toggleTheme} className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border">
                 {isDark ? <Sun size={16} className="text-[#E1784F]" /> : <Moon size={16} />}
               </button>
 
@@ -166,10 +166,10 @@ export default function Navigation({
             transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
             className="fixed inset-0 z-[200] bg-background flex flex-col lg:hidden overflow-y-auto no-scrollbar"
           >
-            {/* Mobile Menu Header */}
-            <div className="flex justify-between items-center h-20 px-6 border-b border-border shrink-0">
+          {/* Mobile Menu Header */}
+            <div className="flex justify-between items-center h-16 px-6 border-b border-border shrink-0">
               <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
-                <img src="/logo.png" alt="AfriDam AI" className="h-10 w-auto object-contain" />
+                <img src="/logo.png" alt="AfriDam AI" className="h-9 w-auto object-contain" />
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
