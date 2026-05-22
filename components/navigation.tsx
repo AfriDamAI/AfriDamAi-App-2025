@@ -90,20 +90,20 @@ export default function Navigation({
 
   return (
     <>
-      <nav className="sticky top-0 z-[100] bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-300">
+      <nav className="sticky top-0 z-[100] bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="flex justify-between items-center h-20 md:h-24">
+          <div className="flex justify-between items-center h-16 md:h-20">
 
             <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
-              <img src="/logo.png" alt="AfriDam AI" className="h-10 md:h-12 w-auto object-contain" />
+            <img src="/logo.png" alt="AfriDam AI" className="h-9 md:h-11 w-auto object-contain" />
               <div className="hidden sm:flex flex-col border-l border-border/50 pl-3">
-                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Clinical</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#E1784F]">Clinical</span>
               </div>
             </Link>
 
             <div className="hidden lg:flex items-center gap-10">
               {navLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-[#E1784F] transition-all">
+                <Link key={link.href} href={link.href} className="text-xs lg:text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-[#E1784F] transition-colors duration-200">
                   {link.label}
                 </Link>
               ))}
@@ -112,7 +112,7 @@ export default function Navigation({
             <div className="flex items-center gap-3 md:gap-4">
 
               {/* ☀️ Theme Toggle */}
-              <button onClick={toggleTheme} className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all">
+              <button onClick={toggleTheme} className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border">
                 {isDark ? <Sun size={16} className="text-[#E1784F]" /> : <Moon size={16} />}
               </button>
 
@@ -166,10 +166,10 @@ export default function Navigation({
             transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
             className="fixed inset-0 z-[200] bg-background flex flex-col lg:hidden overflow-y-auto no-scrollbar"
           >
-            {/* Mobile Menu Header */}
-            <div className="flex justify-between items-center h-20 px-6 border-b border-border shrink-0">
+          {/* Mobile Menu Header */}
+            <div className="flex justify-between items-center h-16 px-6 border-b border-border shrink-0">
               <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
-                <img src="/logo.png" alt="AfriDam AI" className="h-10 w-auto object-contain" />
+                <img src="/logo.png" alt="AfriDam AI" className="h-9 w-auto object-contain" />
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
