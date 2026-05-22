@@ -103,7 +103,7 @@ export default function Navigation({
 
             <div className="hidden lg:flex items-center gap-10">
               {navLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="text-xs lg:text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-[#E1784F] transition-all">
+                <Link key={link.href} href={link.href} className="text-xs lg:text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-[#E1784F] transition-colors duration-200">
                   {link.label}
                 </Link>
               ))}
@@ -173,7 +173,7 @@ export default function Navigation({
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border"
+                className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all"
                 aria-label="Close menu"
               >
                 <X size={16} className="text-[#E1784F]" />
