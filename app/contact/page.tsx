@@ -18,7 +18,7 @@ export default function ContactPage() {
         <main className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 overflow-x-hidden text-left">
 
             {/* 1. HERO SECTION - CINEMATIC GLOW */}
-            <section className="relative py-20 lg:py-32 overflow-hidden bg-[#1C1A19]">
+            <section className="relative py-20 lg:py-32 overflow-hidden bg-gray-100 dark:bg-[#1C1A19]">
                 <div className="absolute inset-0">
                     <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#E1784F]/20 blur-[120px] rounded-full" />
                     <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#4DB6AC]/10 blur-[120px] rounded-full" />
@@ -40,10 +40,10 @@ export default function ContactPage() {
                         >
                             <HeartPulse className="w-8 h-8" />
                         </motion.div>
-                        <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter leading-[0.9] text-white">
+                        <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter leading-[0.9] text-gray-900 dark:text-white">
                             Care <br /> <span className="text-[#E1784F]">Hub</span>
                         </h1>
-                        <p className="text-lg md:text-xl max-w-2xl font-bold tracking-tight text-gray-400">
+                        <p className="text-lg md:text-xl max-w-2xl font-bold tracking-tight text-gray-600 dark:text-gray-400">
                             Need help with a scan? We’re here to support you and your family.
                         </p>
                     </div>
@@ -51,7 +51,7 @@ export default function ContactPage() {
             </section>
 
             {/* 2. STATS BANNER - MOBILE GRID */}
-            <section className="bg-gray-50 dark:bg-white/5 border-y border-black/5 dark:border-white/10 py-10">
+            <section className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 py-10">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
                     {[
                         { label: "Available", val: "24/7" },
