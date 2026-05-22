@@ -16,14 +16,16 @@ export function MobileNav() {
         return pathname === path || (path !== '/dashboard' && pathname.startsWith(path))
     }
 
-    const NavItem = ({ icon: Icon, path, onClick }: { icon: any, path?: string, onClick?: () => void }) => {
+    const NavItem = ({ icon: Icon, label, path, onClick }: { icon: any, label: string, path?: string, onClick?: () => void }) => {
         const active = path ? isActive(path) : false
         return (
             <button
                 onClick={onClick || (() => path && router.push(path))}
-                className={`p-4 transition-all ${active ? 'text-[#E1784F] scale-110' : 'opacity-20 hover:opacity-50'}`}
+                className={`h-11 w-11 flex items-center justify-center rounded-2xl transition-all ${active ? 'text-[#E1784F] scale-105 bg-[#E1784F]/10' : 'opacity-35 hover:opacity-70'}`}
+                aria-label={label}
+                title={label}
             >
-                <Icon size={26} />
+                <Icon size={21} />
             </button>
         )
     }
@@ -38,13 +40,13 @@ export function MobileNav() {
 
     return (
         <>
-            <div className="fixed bottom-0 left-0 right-0 h-24 bg-white/80 dark:bg-black/80 backdrop-blur-3xl border-t border-gray-100 dark:border-white/5 flex justify-around items-center px-10 lg:hidden z-[9999] pb-6 pointer-events-auto">
-                <NavItem icon={Home} path="/dashboard" />
-                <NavItem icon={Scan} path="/ai-scanner" />
-                <NavItem icon={MessageSquare} path="/specialist" onClick={handleSpecialistClick} />
-                <NavItem icon={ShoppingBag} path="/marketplace" />
-                <NavItem icon={Zap} path="/history" />
-                <NavItem icon={UserIcon} path="/profile" />
+            <div className="fixed bottom-0 left-0 right-0 min-h-16 bg-white/85 dark:bg-black/85 backdrop-blur-3xl border-t border-gray-100 dark:border-white/5 flex justify-around items-center px-3 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden z-[9999] pointer-events-auto">
+                <NavItem icon={Home} label="Dashboard" path="/dashboard" />
+                <NavItem icon={Scan} label="AI Scanner" path="/ai-scanner" />
+                <NavItem icon={MessageSquare} label="Specialists" path="/specialist" onClick={handleSpecialistClick} />
+                <NavItem icon={ShoppingBag} label="Marketplace" path="/marketplace" />
+                <NavItem icon={Zap} label="History" path="/history" />
+                <NavItem icon={UserIcon} label="Profile" path="/profile" />
             </div>
 
             <SubscriptionModal
