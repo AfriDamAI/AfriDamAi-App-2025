@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation"
 import { Home, Scan, Zap, User as UserIcon, ShoppingBag, MessageSquare } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useSubscription } from "@/hooks/use-subscription"
 import { SubscriptionModal } from "@/components/subscription-modal"
 
@@ -11,16 +11,30 @@ export function MobileNav() {
     const pathname = usePathname()
     const { isFreeTier } = useSubscription()
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
+    const [navigatingTo, setNavigatingTo] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (navigatingTo && pathname === navigatingTo) {
+            setNavigatingTo(null)
+        }
+    }, [pathname, navigatingTo])
 
     const isActive = (path: string) => {
-        return pathname === path || (path !== '/dashboard' && pathname.startsWith(path))
+        const currentPath = navigatingTo || pathname
+        return currentPath === path || (path !== '/dashboard' && currentPath.startsWith(path))
+    }
+
+    const navigate = (path: string) => {
+        setNavigatingTo(path)
+        setShowSubscriptionModal(false)
+        router.push(path)
     }
 
     const NavItem = ({ icon: Icon, path, onClick }: { icon: any, path?: string, onClick?: () => void }) => {
         const active = path ? isActive(path) : false
         return (
             <button
-                onClick={onClick || (() => path && router.push(path))}
+                onClick={onClick || (() => path && navigate(path))}
                 className={`p-4 transition-all ${active ? 'text-[#E1784F] scale-110' : 'opacity-20 hover:opacity-50'}`}
             >
                 <Icon size={26} />
@@ -32,7 +46,7 @@ export function MobileNav() {
         if (isFreeTier()) {
             setShowSubscriptionModal(true)
         } else {
-            router.push('/specialist')
+            navigate('/specialist')
         }
     }
 
@@ -43,8 +57,8 @@ export function MobileNav() {
                 <NavItem icon={Scan} path="/ai-scanner" />
                 <NavItem icon={MessageSquare} path="/specialist" onClick={handleSpecialistClick} />
                 <NavItem icon={ShoppingBag} path="/marketplace" />
-                <NavItem icon={Zap} path="/history" />
-                <NavItem icon={UserIcon} path="/profile" />
+                {/* <NavItem icon={Zap} path="/history" /> */}
+                {/* <NavItem icon={UserIcon} path="/profile" /> */}
             </div>
 
             <SubscriptionModal
