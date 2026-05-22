@@ -13,8 +13,6 @@ import { useNotificationStore } from "@/stores/notification-store"; // Import th
  * Focus: Real-time Handshake & Mobile-First Alert Drawer.
  */
 
-// Removed NotificationType and Notification interface - now in store
-
 const NotificationDropdown = () => {
     const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
@@ -44,12 +42,14 @@ const NotificationDropdown = () => {
                 setIsOpen(false);
             }
         }
+
         if (isOpen) {
             document.addEventListener('mousedown', handleClickOutside);
             document.body.style.overflow = 'hidden'; // Lock background on mobile
             // Re-fetch when dropdown opens to get latest notifications
             fetchNotifications();
         }
+
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
             document.body.style.overflow = 'unset';
@@ -87,7 +87,6 @@ const NotificationDropdown = () => {
         }
     };
 
-
     return (
         <div className="relative" ref={dropdownRef}>
             <button
@@ -112,6 +111,7 @@ const NotificationDropdown = () => {
                             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
                             onClick={() => setIsOpen(false)}
                         />
+
                         <motion.div
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -134,7 +134,7 @@ const NotificationDropdown = () => {
 
                             {/* CONTENT AREA */}
                             <div className="max-h-[60vh] md:max-h-[420px] overflow-y-auto no-scrollbar">
-                                {loading ? ( // Use store's loading state
+                                {loading ? (
                                     <div className="py-20 flex flex-col items-center justify-center gap-4">
                                         <Loader2 className="animate-spin text-[#E1784F]" size={24} />
                                         <p className="text-[9px] font-black uppercase tracking-widest opacity-20">Syncing Alerts</p>
@@ -153,16 +153,18 @@ const NotificationDropdown = () => {
                                     </div>
                                 ) : (
                                     <div className="divide-y divide-black/5 dark:divide-white/5">
-                                        {notifications.map((n) => (
+                                        {notifications.map((n: any) => (
                                             <div
                                                 key={n.id}
                                                 className={`px-8 py-6 transition-all hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer ${!n.read ? 'bg-[#E1784F]/5' : 'bg-transparent'}`}
-                                                onClick={() => handleMarkAsRead(n.id)} // Use local wrapper
+                                                onClick={() => handleMarkAsRead(n.id)}
                                             >
                                                 <div className="flex gap-5">
-                                                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-center text-xl">
-                                                        {n.icon || <Zap size={18} className="text-[#E1784F]" />}
+                                                    <div className="`flex-shrink-0` w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-center text-xl">
+                                                        {/* FIX: safe fallback for missing icon property */}
+                                                        {n.icon ?? <Zap size={18} className="text-[#E1784F]" />}
                                                     </div>
+
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex justify-between items-start mb-2">
                                                             <p className={`text-[11px] font-black uppercase tracking-tight italic truncate ${!n.read ? 'text-[#E1784F]' : 'opacity-40'}`}>
@@ -170,14 +172,17 @@ const NotificationDropdown = () => {
                                                             </p>
                                                             {!n.read && <span className="w-2 h-2 bg-[#E1784F] rounded-full mt-1.5 animate-pulse" />}
                                                         </div>
+
                                                         <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed font-medium">
                                                             {n.message}
                                                         </p>
+
                                                         <div className="flex items-center justify-between mt-4">
                                                             <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                                                <Clock size={10} /> {/* n.time is not in store's Notification interface. Assuming createdAt is used */}
+                                                                <Clock size={10} />
                                                                 {n.createdAt ? new Date(n.createdAt).toLocaleString() : 'N/A'}
                                                             </span>
+
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
                                                                 className="p-1.5 opacity-20 hover:opacity-100 hover:text-red-500 transition-colors"
@@ -197,7 +202,7 @@ const NotificationDropdown = () => {
                             {notifications.length > 0 && (
                                 <div className="p-6 bg-gray-50 dark:bg-white/5 border-t border-black/5 dark:border-white/10">
                                     <button
-                                        onClick={handleMarkAllAsRead} // Use local wrapper
+                                        onClick={handleMarkAllAsRead}
                                         className="w-full py-4 bg-white dark:bg-black border border-black/5 dark:border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:text-[#E1784F] transition-all"
                                     >
                                         Dismiss All

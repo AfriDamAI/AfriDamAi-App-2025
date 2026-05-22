@@ -13,16 +13,14 @@ export interface CreateUserDto {
   firstName: string;
   lastName: string;
   email: string;
-  // 🛡️ Rule 6 Sync: Matches User model in schema.prisma
-  sex: string; 
+  sex: string;
   phoneNo: string;
   password: string;
   nationality?: string;
 }
 
 /**
- * 🚀 THE SYNERGY FIX: WRAPPED AUTH RESPONSE
- * Synced with the 2026 NestJS 'resultData' Envelope.
+ * 🚀 AUTH RESPONSE
  */
 export interface AuthResponse {
   message: string;
@@ -31,7 +29,7 @@ export interface AuthResponse {
     accessToken: string;
     refreshToken: string;
     isActive: boolean;
-    displayName:string;
+    displayName: string;
     role: string;
     user: {
       id: string;
@@ -46,37 +44,58 @@ export interface AuthResponse {
   };
 }
 
+/**
+ * 🧬 USER PROFILE
+ */
 export interface UserProfile {
   id?: string;
   userId?: string;
+
   ageRange?: number;
   skinType?: string;
-  skinToneLevel?: number; // Fitzpatrick scale (1-6)
+  skinToneLevel?: number;
   melaninTone?: string;
   primaryConcern?: string;
   environment?: string;
+
   avatarUrl?: string;
-  allergies?: string; // Textarea version for raw notes
+  allergies?: string;
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
-  
-  // 🛡️ AI CONTEXT FIELDS (Rule 6 Synergy)
+
   nationality?: string;
   sex?: string;
   age?: number;
   skinCondition?: string;
+
+  // skincare intelligence
   bodyLotion?: string;
   bodyLotionBrand?: string;
   lastSkinTreatment?: string;
   lastConsultation?: string;
 
+  country?: string;
+  region?: string;
+  appActiveness?: string;
+  subscriptionPlan?: string;
+
+  prefs?: {
+    clinical: boolean;
+    glowCheck: boolean;
+    careShop: boolean;
+    quietMode: boolean;
+  };
+
   onboardingSkipped?: boolean;
   onboardingCompleted?: boolean;
+
   createdAt?: string;
   updatedAt?: string;
 }
 
-//* nothing
+/**
+ * 👤 USER ENTITY
+ */
 export interface User {
   id: string;
   email: string;
@@ -84,37 +103,66 @@ export interface User {
   lastName: string;
   sex: string;
   phoneNo: string;
+
   isActive: boolean;
   isSuspended: boolean;
+
   lastLoginAt?: string;
   onboardingCompleted: boolean;
+
   profile: UserProfile | null;
+
+  nationality?: string;
 }
 
+/**
+ * 💬 CHAT
+ */
 export interface Chat {
   id: string;
   participant1Id: string;
   participant2Id: string;
-  // Add other chat properties as they become known from the backend
   createdAt?: string;
   updatedAt?: string;
-  lastMessage?: Message; // Optional, might be populated for chat list previews
+  lastMessage?: Message;
 }
 
+/**
+ * 💬 MESSAGE
+ */
 export interface Message {
   id: string;
   chatId: string;
   senderId: string;
   message: string;
+
   type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'MISSED_CALL' | 'SYSTEM';
+
   attachmentUrl?: string;
   mimeType?: string;
   fileSize?: number;
   duration?: number;
-  timestamp: string; // Assuming ISO string date
-  read?: boolean; // Optional, for read status
+
+  timestamp: string;
+  read?: boolean;
 }
 
+/**
+ * 🔔 NOTIFICATION
+ */
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  read?: boolean;
+
+  icon?: React.ReactNode;
+}
+
+/**
+ * 🧾 UPDATE PROFILE DTO
+ */
 export interface UpdateUserProfileDto {
   ageRange?: number;
   skinType?: string;
@@ -124,12 +172,21 @@ export interface UpdateUserProfileDto {
   environment?: string;
   avatarUrl?: string;
   allergies?: string;
+
   onboardingCompleted?: boolean;
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
   onboardingSkipped?: boolean;
+
+  bodyLotion?: string;
+  bodyLotionBrand?: string;
+  lastSkinTreatment?: string;
+  lastConsultation?: string;
 }
 
+/**
+ * 🧾 CREATE PROFILE DTO
+ */
 export interface CreateUserProfileDto {
   ageRange?: number;
   skinType?: string;
@@ -139,16 +196,24 @@ export interface CreateUserProfileDto {
   environment?: string;
   avatarUrl?: string;
   allergies?: string;
+
   onboardingCompleted?: boolean;
   knownSkinAllergies?: string[];
   previousTreatments?: string[];
   onboardingSkipped?: boolean;
+
+  bodyLotion?: string;
+  bodyLotionBrand?: string;
+  lastSkinTreatment?: string;
+  lastConsultation?: string;
 }
 
-/** 🛡️ RE-ENFORCED: Profile Update Type **/
-export interface UpdateUserDto extends Partial<Omit<CreateUserDto, 'password'>> {
+/**
+ * 🧾 UPDATE USER DTO
+ */
+export interface UpdateUserDto
+  extends Partial<Omit<CreateUserDto, 'password'>> {
   nationality?: string;
-  // Rule 6: These match the Profile model in Prisma linked via AnalyzerService
   ageRange?: number;
   skinType?: string;
   skinToneLevel?: number;
@@ -162,7 +227,9 @@ export interface UpdateUserDto extends Partial<Omit<CreateUserDto, 'password'>> 
   previousTreatments?: string[];
 }
 
-// 🛡️ CART & ORDER TYPES
+/**
+ * 🛒 CART
+ */
 export interface CartItem {
   id?: string;
   cartId?: string;
@@ -179,6 +246,9 @@ export interface Cart {
   items: CartItem[];
 }
 
+/**
+ * 📦 ORDER
+ */
 export interface OrderItem {
   productId: string;
   quantity: number;

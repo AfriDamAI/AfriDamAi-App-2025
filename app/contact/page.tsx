@@ -18,7 +18,7 @@ export default function ContactPage() {
         <main className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 selection:bg-[#E1784F]/30 overflow-x-hidden text-left">
 
             {/* 1. HERO SECTION - CINEMATIC GLOW */}
-            <section className="relative py-20 lg:py-32 overflow-hidden bg-[#1C1A19]">
+            <section className="relative py-20 lg:py-32 overflow-hidden bg-gray-100 dark:bg-[#1C1A19]">
                 <div className="absolute inset-0">
                     <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#E1784F]/20 blur-[120px] rounded-full" />
                     <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-[#4DB6AC]/10 blur-[120px] rounded-full" />
@@ -40,10 +40,10 @@ export default function ContactPage() {
                         >
                             <HeartPulse className="w-8 h-8" />
                         </motion.div>
-                        <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter leading-[0.9] text-white">
+                        <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter leading-[0.9] text-gray-900 dark:text-white">
                             Care <br /> <span className="text-[#E1784F]">Hub</span>
                         </h1>
-                        <p className="text-lg md:text-xl max-w-2xl font-bold tracking-tight text-gray-400">
+                        <p className="text-lg md:text-xl max-w-2xl font-bold tracking-tight text-gray-600 dark:text-gray-400">
                             Need help with a scan? We’re here to support you and your family.
                         </p>
                     </div>
@@ -51,7 +51,7 @@ export default function ContactPage() {
             </section>
 
             {/* 2. STATS BANNER - MOBILE GRID */}
-            <section className="bg-gray-50 dark:bg-white/5 border-y border-black/5 dark:border-white/10 py-10">
+            <section className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 py-10">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
                     {[
                         { label: "Available", val: "24/7" },
@@ -76,7 +76,7 @@ export default function ContactPage() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/10 shadow-2xl relative"
+                        className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-2rem md:rounded-[3rem] border border-black/5 dark:border-white/10 shadow-2xl relative"
                     >
                         <div className="mb-10">
                             <h2 className="text-3xl font-black italic tracking-tighter mb-2">Send Message</h2>
@@ -124,7 +124,7 @@ export default function ContactPage() {
                         </div>
 
                         {/* WHY AFRIDAM CARD */}
-                        <div className="bg-gradient-to-br from-[#4DB6AC]/10 to-transparent rounded-[1.5rem] md:rounded-[2.5rem] p-10 border border-[#4DB6AC]/20 relative overflow-hidden shadow-lg group">
+                        <div className="`bg-gradient-to-br` from-[#4DB6AC]/10 to-transparent rounded-1.5rem md:rounded-[2.5rem] p-10 border border-[#4DB6AC]/20 relative overflow-hidden shadow-lg group">
                             <Microscope className="absolute bottom-[-10px] right-[-10px] w-32 h-32 text-[#4DB6AC]/5 -rotate-12 group-hover:rotate-0 transition-transform duration-700" />
                             <div className="relative z-10 space-y-6">
                                 <h3 className="text-[#4DB6AC] text-xl font-black italic">The Mission</h3>
