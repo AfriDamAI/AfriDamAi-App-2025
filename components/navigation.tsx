@@ -173,7 +173,7 @@ export default function Navigation({
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border transition-all"
+                className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border"
                 aria-label="Close menu"
               >
                 <X size={16} className="text-[#E1784F]" />
