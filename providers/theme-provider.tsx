@@ -44,21 +44,45 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const toggleTheme = () => {
+    // ⚡ Create a style block to temporarily disable all animations during the repaint
+    const css = document.createElement('style')
+    css.type = 'text/css'
+    css.appendChild(
+      document.createTextNode(
+        `* {
+           -webkit-transition: none !important;
+           -moz-transition: none !important;
+           -o-transition: none !important;
+           -ms-transition: none !important;
+           transition: none !important;
+         }`
+      )
+    )
+    document.head.appendChild(css)
+
     setTheme((prev) => {
       const newTheme = prev === "light" ? "dark" : "light"
       localStorage.setItem("theme", newTheme)
       
-      if (newTheme === "dark") {
-        document.documentElement.classList.add("dark")
-        document.documentElement.style.colorScheme = "dark"
-      } else {
-        document.documentElement.classList.remove("dark")
-        document.documentElement.style.colorScheme = "light"
-      }
-      
-      return newTheme
-    })
-  }
+   if (newTheme === "dark") {
+      document.documentElement.classList.add("dark")
+      document.documentElement.style.colorScheme = "dark"
+    } else {
+      document.documentElement.classList.remove("dark")
+      document.documentElement.style.colorScheme = "light"
+    }
+    
+    return newTheme
+  })
+
+  // ⚡ Force a browser layout reflow computation
+  window.getComputedStyle(css).opacity
+
+  // ⚡ Clear out the style block on the next execution frame
+  setTimeout(() => {
+    document.head.removeChild(css)
+  }, 0)
+}
 
   // 🛡️ NUCLEAR STABILIZER: Prevent Hydration Flicker
   // Using visibility instead of opacity to avoid any painted frame of wrong-theme content.
