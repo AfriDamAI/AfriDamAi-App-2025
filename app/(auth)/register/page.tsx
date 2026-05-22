@@ -107,7 +107,7 @@ export default function RegisterPage() {
               <div className={`h-1 rounded-full transition-all duration-700 ${step === 1 ? 'w-16 bg-[#4DB6AC]' : 'w-3 bg-foreground/10'}`} />
               <div className={`h-1 rounded-full transition-all duration-700 ${step === 2 ? 'w-16 bg-[#4DB6AC]' : 'w-3 bg-foreground/10'}`} />
             </div>
-            <p className="text-foreground/20 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
+            <p className="text-neutral-600 dark:text-neutral-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
               Step {step} / Account Details
             </p>
           </div>
@@ -138,7 +138,7 @@ export default function RegisterPage() {
                         <div className="relative group/input">
                             <input
                                 type="text"
-                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                                 placeholder="First Name"
                                 value={formData.firstName}
                                 onChange={(e) => setFormData({...formData, firstName: e.target.value})}
@@ -148,7 +148,7 @@ export default function RegisterPage() {
                         <div className="relative group/input">
                             <input
                                 type="text"
-                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                                 placeholder="Last Name"
                                 value={formData.lastName}
                                 onChange={(e) => setFormData({...formData, lastName: e.target.value})}
@@ -191,7 +191,7 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="tel"
-                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                             placeholder="Phone Number"
                             value={formData.phoneNo}
                             onChange={(e) => setFormData({...formData, phoneNo: e.target.value})}
@@ -217,7 +217,7 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="email"
-                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                             placeholder="Email Address"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -231,7 +231,7 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="password"
-                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                             placeholder="Create Password"
                             value={formData.password}
                             onChange={(e) => setFormData({...formData, password: e.target.value})}
