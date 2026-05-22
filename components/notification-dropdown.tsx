@@ -160,7 +160,7 @@ const NotificationDropdown = () => {
                                                 onClick={() => handleMarkAsRead(n.id)}
                                             >
                                                 <div className="flex gap-5">
-                                                    <div className="`flex-shrink-0` w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-center text-xl">
+                                                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-center text-xl">
                                                         {/* FIX: safe fallback for missing icon property */}
                                                         {n.icon ?? <Zap size={18} className="text-[#E1784F]" />}
                                                     </div>

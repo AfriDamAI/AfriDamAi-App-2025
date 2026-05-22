@@ -70,12 +70,12 @@ export default function ProfilePage() {
   if (!user) return null
 
   return (
-    <main className="min-h-100svh bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 pb-12 text-left">
+    <main className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 pb-12 text-left">
       
       {/* --- SOFT AMBIANCE --- */}
       <div className="absolute top-0 left-0 w-full h-[400px] bg-[radial-gradient(circle_at_50%_0%,rgba(225,120,79,0.08),transparent_70%)] pointer-events-none" />
 
-      <div className="`max-w-screen-xl` mx-auto px-4 py-6 lg:py-10 relative z-10 space-y-8">
+      <div className="max-w-screen-xl mx-auto px-4 py-6 lg:py-10 relative z-10 space-y-8">
         
         {/* WORLD-CLASS HEADER */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
@@ -314,7 +314,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
           >
             <motion.div 
               initial={{ scale: 0.9, y: 20 }}
