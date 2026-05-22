@@ -39,7 +39,7 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
   }, [user, refreshUser, onComplete]);
 
   return (
-    <div className="fixed inset-0 `z-999` bg-[#050505] flex items-center justify-center">
+    <div className="fixed inset-0 z-[999] bg-[#050505] flex items-center justify-center">
        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
        
        <motion.div 

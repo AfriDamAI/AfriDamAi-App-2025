@@ -99,7 +99,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-black/0.03 dark:bg-white/0.03 border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
+                  className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                   placeholder="Email Address"
                   required
                 />
@@ -113,7 +113,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-black/0.03 dark:bg-white/0.03 border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-12 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#E1784F] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
+                  className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-12 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#E1784F] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                   placeholder="Password"
                   required
                 />
