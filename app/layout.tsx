@@ -4,20 +4,17 @@
  * Focus: High-End Ambiance, Zero-Flicker Redirection, Build Stability.
  */
 
-"use client"
-
 import type React from "react"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
+import type { Metadata, Viewport } from "next"
 import { ThemeProvider } from "@/providers/theme-provider"
 import { AuthProvider } from "@/providers/auth-provider"
-// 🚀 RULE 6 FIX: Corrected import path for AuthGuard
 import { AuthGuard } from "@/components/auth-guard"
 import { AppWrapper } from "@/components/app-wrapper"
-import { AIChatBot } from "@/components/ai/ai-chatbot"
-import { IngredientAnalyzer } from "@/components/ai/ingredient-analyzer"
+// import { IngredientAnalyzer } from "@/components/ai/ingredient-analyzer"
 import { CallProvider } from "@/providers/call-provider"
-import { usePathname } from "next/navigation"
+import { ChatBotWrapper } from "@/components/chat-bot-wrapper"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,30 +27,29 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
+// ✅ T1-02 FIX: Replaced inline <title>/<meta> with Next.js metadata export
+export const metadata: Metadata = {
+  title: "AFRIDAM AI | Premium Melanin-Rich Skin Intelligence",
+  description: "Clinical-grade AI diagnostics and verified skincare regimens for the African family.",
+  icons: {
+    icon: "/logo.png",
+  },
+}
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  maximumScale: 1,
+  themeColor: "#050505",
+}
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const pathname = usePathname();
-
-  // Routes where the AIChatBot should be hidden (they have their own interfaces)
-  const hideChatBotRoutes = ["/", "/ingredient-analyzer", "/specialist"];
-  const shouldShowChatBot = !hideChatBotRoutes.includes(pathname);
-
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <head>
-        {/* 📱 VIEWPORT OPTIMIZATION - Mobile First (Rule 3) */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
-
-        {/* 🛡️ CLINICAL BRANDING */}
-        <title>AFRIDAM AI | Premium Melanin-Rich Skin Intelligence</title>
-        <meta name="description" content="Clinical-grade AI diagnostics and verified skincare regimens for the African family." />
-        <meta name="theme-color" content="#050505" />
-
-        <link rel="icon" href="/logo.png" />
-
         {/* 🛡️ ANTI-FLICKER: Set theme class BEFORE first paint to prevent white/dark flash */}
         <script
           dangerouslySetInnerHTML={{
@@ -89,12 +85,9 @@ export default function RootLayout({
                 {children}
               </AppWrapper>
 
-              {/* 💬 PERSISTENT SUPPORT */}
-              {shouldShowChatBot && (
-                <div className="fixed bottom-8 right-8 z-100">
-                  <AIChatBot />
-                </div>
-              )}
+              {/* 💬 PERSISTENT SUPPORT — moved to client wrapper to allow server root layout */}
+              <ChatBotWrapper />
+
               <div className="fixed bottom-8 left-8 z-100">
                 {/* <IngredientAnalyzer /> */}
               </div>

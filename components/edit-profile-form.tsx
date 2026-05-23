@@ -1,3 +1,9 @@
+/**
+ * 🛡️ AFRIDAM PROFILE EDIT & SYNC FORM
+ * Version: 2026.5.22 (Synchronized Architecture Fields)
+ * Focus: Complete profile management, clearing string conflicts and finishing layout.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -12,7 +18,7 @@ import {
   CheckCircle2,
   ChevronDown,
   X,
-  History,
+  Heart,
   ShieldCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,15 +26,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const AFRICAN_COUNTRIES = [
   "Nigeria", "Ghana", "Kenya", "South Africa", "Ethiopia",
   "Rwanda", "Uganda", "Egypt", "Morocco", "Other"
-];
-
-const SKIN_TONES = [
-  { level: 1, label: "Type I", desc: "Always burns, never tans" },
-  { level: 2, label: "Type II", desc: "Burns easily, tans minimally" },
-  { level: 3, label: "Type III", desc: "Sometimes burns, tans uniformly" },
-  { level: 4, label: "Type IV", desc: "Burns minimally, tans easily" },
-  { level: 5, label: "Type V", desc: "Rarely burns, tans profusely" },
-  { level: 6, label: "Type VI", desc: "Never burns, deeply pigmented" }
 ];
 
 const TagInput = ({
@@ -67,7 +64,7 @@ const TagInput = ({
         <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">{label}</label>
       </div>
       <div className="flex flex-wrap gap-2 p-3 bg-muted/20 border border-border rounded-xl focus-within:border-[#E1784F] transition-all min-h-[50px]">
-        {value.map(tag => (
+        {(value || []).map(tag => (
           <span key={tag} className="flex items-center gap-2 px-3 py-1 bg-[#E1784F]/10 text-[#E1784F] border border-[#E1784F]/20 rounded-lg text-[10px] font-black uppercase italic">
             {tag}
             <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 transition-colors">
@@ -80,7 +77,7 @@ const TagInput = ({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={value.length === 0 ? placeholder : "Add more..."}
+          placeholder={(!value || value.length === 0) ? placeholder : "Add more..."}
           className="flex-1 min-w-[80px] bg-transparent outline-none text-xs font-bold py-1"
         />
       </div>
@@ -109,7 +106,7 @@ export const EditProfileForm = ({
     melaninTone: "",
     primaryConcern: "",
     environment: "",
-    allergies: "",
+    bodyLotion: "",
     knownSkinAllergies: [] as string[],
     previousTreatments: [] as string[],
   });
@@ -129,13 +126,13 @@ export const EditProfileForm = ({
         sex: user.sex || "",
         nationality: userNationality ? (isAfrican ? userNationality : "Other") : "Nigeria",
         otherCountry: isAfrican ? "" : userNationality,
-        ageRange: user.profile?.ageRange || 25,
+        ageRange: user.profile?.ageRange ? Number(user.profile?.ageRange) : 25,
         skinType: user.profile?.skinType || "",
         skinToneLevel: user.profile?.skinToneLevel || 4,
         melaninTone: user.profile?.melaninTone || "",
         primaryConcern: user.profile?.primaryConcern || "",
         environment: user.profile?.environment || "",
-        allergies: user.profile?.allergies || "",
+        bodyLotion: user.profile?.bodyLotion || "",
         knownSkinAllergies: user.profile?.knownSkinAllergies || [],
         previousTreatments: user.profile?.previousTreatments || [],
       });
@@ -143,7 +140,11 @@ export const EditProfileForm = ({
   }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ 
+      ...formData, 
+      [name]: name === "ageRange" || name === "skinToneLevel" ? (Number(value) || 0) : value 
+    });
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -153,8 +154,8 @@ export const EditProfileForm = ({
     try {
       if (!user) return;
       const finalNationality = formData.nationality === "Other" ? formData.otherCountry : formData.nationality;
-
-      // Update User Identity Fields
+  
+      // 1. Core user properties go here (NO bodyLotion)
       await updateUserProfile({
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -162,20 +163,21 @@ export const EditProfileForm = ({
         sex: formData.sex,
         nationality: finalNationality,
       });
-
-      // Update Clinical Profile Fields
+  
+      // 2. Custom profile schema attributes go here
       await updateProfile({
-        ageRange: Number(formData.ageRange),
+        ageRange: formData.ageRange,
         skinType: formData.skinType,
+        skinToneLevel: formData.skinToneLevel,
         melaninTone: formData.melaninTone,
         primaryConcern: formData.primaryConcern,
         environment: formData.environment,
-        allergies: formData.allergies,
+        bodyLotion: formData.bodyLotion, // 💡 Kept here safely inside the profile DTO
         knownSkinAllergies: formData.knownSkinAllergies,
         previousTreatments: formData.previousTreatments,
         onboardingSkipped: false
       });
-
+  
       setSuccess(true);
       if (onSuccess) onSuccess();
       setTimeout(() => setSuccess(false), 4000);
@@ -185,11 +187,11 @@ export const EditProfileForm = ({
       setLoading(false);
     }
   };
-
   return (
     <div className="bg-card border border-border rounded-[2.5rem] p-8 md:p-12 shadow-sm text-left relative max-h-[95vh] overflow-y-auto w-full max-w-5xl mx-auto">
       {onClose && (
         <button
+          type="button"
           onClick={onClose}
           className="absolute right-8 top-8 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-all z-50 text-muted-foreground hover:text-foreground"
         >
@@ -249,15 +251,22 @@ export const EditProfileForm = ({
               <div className="space-y-2">
                 <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Age Metric</label>
                 <div className="relative">
-                  <select name="ageRange" value={formData.ageRange} onChange={handleChange} className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] appearance-none cursor-pointer">
-                    <option value={18}>&lt; 25</option>
-                    <option value={25}>25 - 34</option>
-                    <option value={35}>35 - 49</option>
-                    <option value={50}>50+</option>
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
+                  <input 
+                    type="number" 
+                    name="ageRange" 
+                    value={formData.ageRange || ""} 
+                    onChange={handleChange} 
+                    placeholder="e.g. 25"
+                    className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" 
+                  />
+                  <Activity className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Contact Number</label>
+              <input type="text" name="phoneNo" value={formData.phoneNo} onChange={handleChange} placeholder="Phone number" className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" />
             </div>
 
             <div className="space-y-2">
@@ -270,17 +279,25 @@ export const EditProfileForm = ({
               </div>
               {formData.nationality === "Other" && (
                 <motion.input
-                  initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-                  name="otherCountry" value={formData.otherCountry} onChange={handleChange}
-                  placeholder="Specify country" className="w-full mt-2 h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]"
+                  initial={{ opacity: 0, y: -5 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  type="text"
+                  name="otherCountry"
+                  value={formData.otherCountry}
+                  onChange={handleChange}
+                  placeholder="Specify Country..."
+                  className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] mt-2"
                 />
               )}
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Primary Dermal Concern</label>
-              <input type="text" name="primaryConcern" value={formData.primaryConcern} onChange={handleChange} className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" placeholder="e.g. Hyperpigmentation, Acne Nodes" />
-            </div>
+            <TagInput
+              label="Known Skin Allergies"
+              placeholder="Add allergy and press Enter..."
+              value={formData.knownSkinAllergies}
+              onChange={(tags) => setFormData({ ...formData, knownSkinAllergies: tags })}
+              icon={AlertTriangle}
+            />
           </div>
 
           {/* 🧬 CLINICAL NODE */}
@@ -292,71 +309,69 @@ export const EditProfileForm = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Skin Category</label>
-                <div className="relative">
-                  <select name="skinType" value={formData.skinType} onChange={handleChange} className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] appearance-none cursor-pointer">
-                    <option value="">Select</option>
-                    <option value="Oily / Shine">Oily / Shine</option>
-                    <option value="Dry / Tight">Dry / Tight</option>
-                    <option value="Balanced">Balanced</option>
-                    <option value="Sensitive">Sensitive</option>
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
-                </div>
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Skin Type</label>
+                <input type="text" name="skinType" value={formData.skinType} onChange={handleChange} placeholder="e.g. Oily, Dry" className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" />
               </div>
               <div className="space-y-2">
-                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Melanin Tone</label>
-                <input type="text" name="melaninTone" value={formData.melaninTone} onChange={handleChange} className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" placeholder="e.g. Deep Melanin" />
+                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Fitzpatrick Level (1-6)</label>
+                <input type="number" name="skinToneLevel" min="1" max="6" value={formData.skinToneLevel || ""} onChange={handleChange} placeholder="4" className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Environment</label>
-                <input type="text" name="environment" value={formData.environment} onChange={handleChange} className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F]" placeholder="e.g. High Humidity" />
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Melanin Tone Description</label>
+              <input type="text" name="melaninTone" value={formData.melaninTone} onChange={handleChange} placeholder="e.g. Warm Amber, Rich Espresso" className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Primary Dermal Concern</label>
+              <input type="text" name="primaryConcern" value={formData.primaryConcern} onChange={handleChange} placeholder="e.g. Hyperpigmentation" className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Ambient Environment</label>
+              <input type="text" name="environment" value={formData.environment} onChange={handleChange} placeholder="e.g. Hot & Humid, Sub-Saharan" className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all" />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-2">Current Body Lotion</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="bodyLotion"
+                  value={formData.bodyLotion}
+                  onChange={handleChange}
+                  placeholder="e.g. Cetaphil Moisturizing Cream"
+                  className="w-full h-14 bg-muted/20 border border-border rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all"
+                />
+                <Heart className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
               </div>
             </div>
 
             <TagInput
-              label="Known Skin Allergies"
-              placeholder="Type & Press Enter..."
-              value={formData.knownSkinAllergies}
-              onChange={(tags) => setFormData({ ...formData, knownSkinAllergies: tags })}
-              icon={ShieldCheck}
-            />
-
-            <TagInput
-              label="Clinical History / Treatments"
-              placeholder="Type & Press Enter..."
+              label="Treatment & Clinical History"
+              placeholder="Add history (e.g. Chemical Peel) & Enter..."
               value={formData.previousTreatments}
               onChange={(tags) => setFormData({ ...formData, previousTreatments: tags })}
-              icon={History}
+              icon={ShieldCheck}
             />
           </div>
         </div>
 
-        {/* 📝 RAW NOTES BLOCK */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 ml-2">
-            <AlertTriangle className="text-red-500" size={12} strokeWidth={3} />
-            <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Extended Allergy Notes (Raw Storage)</label>
-          </div>
-          <textarea
-            name="allergies" value={formData.allergies} onChange={handleChange}
-            rows={2} className="w-full bg-muted/20 border border-border rounded-2xl p-6 text-xs font-bold outline-none focus:border-[#E1784F] transition-all resize-none h-28"
-            placeholder="Document detailed raw clinical observations here..."
-          />
-        </div>
-
-        <div className="pt-10 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-[9px] text-muted-foreground font-medium max-w-sm uppercase tracking-tighter">
-            Updating your clinical profile will recalibrate the AI diagnostic engine for your next scan.
+        {/* 🚀 SUBMIT NODE */}
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6 mt-12">
+          <p className="text-[9px] text-muted-foreground font-medium max-w-sm uppercase tracking-tight">
+            Data mutations synchronize instantly with cloud databases. Dermal logs are completely sandboxed.
           </p>
-          <button type="submit" disabled={loading} className="w-full md:w-auto px-16 h-16 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[11px] tracking-[0.4em] shadow-[0_15px_30px_rgba(225,120,79,0.25)] hover:bg-[#d06b45] active:scale-[0.98] transition-all flex items-center justify-center gap-4 disabled:opacity-50">
-            {loading ? <Loader2 className="animate-spin" size={18} /> : (
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full md:w-auto px-12 h-14 bg-foreground text-background rounded-xl font-black uppercase text-[10px] tracking-[0.3em] shadow-md hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="animate-spin" size={16} /> : (
               <>
-                <Save size={18} strokeWidth={3} />
-                Sync Profile
+                <Save size={16} strokeWidth={3} />
+                Sync Updates
               </>
             )}
           </button>

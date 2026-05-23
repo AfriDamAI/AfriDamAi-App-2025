@@ -2,10 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import {
-    Scan, MessageSquare, History,
-    Settings, Home, ShoppingBag, FlaskConical
-} from "lucide-react"
+import { Scan, MessageSquare, History, Settings, Home, ShoppingBag,} from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useSubscription } from "@/hooks/use-subscription"
 import { SubscriptionModal } from "@/components/subscription-modal"

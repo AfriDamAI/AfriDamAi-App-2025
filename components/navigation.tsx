@@ -74,9 +74,11 @@ export default function Navigation({
 
   const navLinks = user
     ? [
-      // { href: "/dashboard", label: "Dashboard" },
-      // { href: "/marketplace", label: "Care Hub" },
-      // { href: "/profile", label: "Profile" },
+      { href: "/dashboard", label: "Dashboard" },
+      { href: "/marketplace", label: "Care Hub" },
+      { href: "/ai-scanner", label: "AI Scanner" },
+      { href: "/history", label: "Clinical Diary" },
+      { href: "/profile", label: "Profile" },
       // { href: "/cart", label: "Cart" },
     ]
     : [

@@ -20,11 +20,11 @@ import { AnimatePresence } from "framer-motion"
 export function AppWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false)
 
   // 🛡️ Auth routes: clean UI — no nav, no footer, no sidebar
-  const authRoutes = ["/login", "/register", "/forgot-password", "/verify-email"];
+  const authRoutes = ["/login", "/register", "/forgot-password", "/verify-email", "/reset-password", "/reset-password/new-password", "/recover-access"];
 
   const hideFooterRoutes = [
     "/dashboard", "/profile", "/settings", "/ai-scanner", "/ingredient-analyzer", "/appointment",
@@ -51,6 +51,19 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     setProfileSidebarOpen(false);
     document.body.style.overflow = 'unset';
   }, [pathname]);
+
+  if (isLoading) {
+    return (
+      <div className="relative min-h-screen flex flex-col bg-background selection:bg-[#E1784F]/20 items-center justify-center">
+        <div className="flex flex-col gap-4 w-full max-w-sm px-6 animate-pulse">
+          <div className="h-8 bg-white/5 rounded-lg w-3/4" />
+          <div className="h-4 bg-white/5 rounded-lg w-full" />
+          <div className="h-4 bg-white/5 rounded-lg w-5/6" />
+          <div className="h-32 bg-white/5 rounded-lg w-full" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="relative min-h-screen flex flex-col bg-background selection:bg-[#E1784F]/20">
