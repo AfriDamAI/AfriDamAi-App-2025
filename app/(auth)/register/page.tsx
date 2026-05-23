@@ -6,7 +6,7 @@
 
 "use client"
 
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { Mail, Phone, Lock, ArrowRight, Loader2, X, ChevronLeft, ShieldCheck, Fingerprint, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion"
 export default function RegisterPage() {
   const { signUp } = useAuth()
   const router = useRouter()
+  const formTopRef = useRef<HTMLDivElement>(null)
   
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
@@ -41,7 +42,7 @@ export default function RegisterPage() {
     // Step 1 Transition
     if (step === 1) {
         setStep(2)
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
         return
     }
     
@@ -73,7 +74,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-w-screen min-h-svh dark:bg-[#050505] bg-background flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
+    <div className="min-w-screen min-h-svh dark:bg-[#050505] bg-background flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-y-auto overflow-x-hidden">
       
       {/* --- CINEMATIC AMBIANCE --- */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#4DB6AC]/5 blur-[120px] md:blur-[250px] rounded-full pointer-events-none" />
@@ -81,6 +82,7 @@ export default function RegisterPage() {
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
 
       <motion.div 
+        ref={formTopRef}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeInOut" }}
