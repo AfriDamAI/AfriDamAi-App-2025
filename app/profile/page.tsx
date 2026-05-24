@@ -42,7 +42,6 @@ export default function ProfilePage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(user?.profile?.avatarUrl || null)
 
-
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -61,7 +60,6 @@ export default function ProfilePage() {
       window.location.reload()
     } catch (err) {
       console.error("Clinical Profile Sync Error:", err)
-      // Fallback is handled by keeping the preview or showing error
     } finally {
       setUploadingAvatar(false)
     }
@@ -105,8 +103,8 @@ export default function ProfilePage() {
         </header>
 
         <section className="grid lg:grid-cols-3 gap-8 items-start">
-           {/* LEFT COLUMN: IDENTITY CARD */}
-           <div className="lg:col-span-1 space-y-6">
+            {/* LEFT COLUMN: IDENTITY CARD */}
+            <div className="lg:col-span-1 space-y-6">
               <div className="bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[2.5rem] p-8 space-y-8 shadow-sm">
                 <div className="flex flex-col items-center gap-6">
                   <div className="relative group">
@@ -182,10 +180,10 @@ export default function ProfilePage() {
                     <p className="text-[8px] font-bold opacity-40">Your data is encrypted and synced with our clinical engine.</p>
                  </div>
               </div>
-           </div>
+            </div>
 
-           {/* RIGHT COLUMN: CLINICAL DATA */}
-           <div className="lg:col-span-2 space-y-6">
+            {/* RIGHT COLUMN: CLINICAL DATA */}
+            <div className="lg:col-span-2 space-y-6">
               <div className="bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[2.5rem] p-8 md:p-10 space-y-10 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
                   <Fingerprint size={120} />
@@ -246,10 +244,10 @@ export default function ProfilePage() {
                         <div className="flex flex-col gap-1">
                           <span className="text-[10px] font-bold opacity-40 uppercase tracking-wider">Known Allergies</span>
                           <div className="flex flex-wrap gap-2 mt-1">
-                            {user.profile?.knownSkinAllergies?.length > 0 ? (
-                              user.profile.knownSkinAllergies.map((a: string) => (
-                                <span key={a} className="px-3 py-1 bg-red-500/10 text-red-500 text-[8px] font-black uppercase rounded-full">
-                                  {a}
+                            {user.profile?.knownSkinAllergies && user.profile.knownSkinAllergies.length > 0 ? (
+                              user.profile.knownSkinAllergies.map((allergy: string) => (
+                                <span key={allergy} className="text-xs font-black bg-red-500/10 text-red-500 px-2 py-1 rounded-md">
+                                  {allergy}
                                 </span>
                               ))
                             ) : (
@@ -282,7 +280,7 @@ export default function ProfilePage() {
                           </div>
                           <div className="space-y-1">
                              <p className="text-[8px] font-bold opacity-30 uppercase tracking-widest">Lotion</p>
-                             <p className="text-[10px] font-black">{user.profile?.knownBodyLotion || "Not Set"}</p>
+                             <p className="text-[10px] font-black">{user.profile?.bodyLotion || "Not Set"}</p>
                           </div>
                           <div className="space-y-1">
                              <p className="text-[8px] font-bold opacity-30 uppercase tracking-widest">Brand</p>
@@ -305,7 +303,7 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
-           </div>
+            </div>
         </section>
       </div>
 
@@ -316,13 +314,13 @@ export default function ProfilePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
           >
             <motion.div 
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-[#0A0A0A] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative scrollbar-hide"
+              className="bg-white dark:bg-[#0A0A0A] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
               <div className="p-6 md:p-10">
                 {activeModal === 'profile' ? (
@@ -341,16 +339,6 @@ export default function ProfilePage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </main>
   )
 }

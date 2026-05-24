@@ -73,7 +73,7 @@ export default function LoginPage() {
             <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter uppercase italic leading-[0.8] text-center">
               Welcome <br /> <span className="text-[#E1784F]">Back.</span>
             </h1>
-            <p className="text-foreground/20 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
+            <p className="text-neutral-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
               Sign in to your account
             </p>
           </div>
@@ -99,7 +99,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                  className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                   placeholder="Email Address"
                   required
                 />
@@ -113,7 +113,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-12 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#E1784F] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                  className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-12 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#E1784F] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                   placeholder="Password"
                   required
                 />

@@ -6,7 +6,7 @@
 
 "use client"
 
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { Mail, Phone, Lock, ArrowRight, Loader2, X, ChevronLeft, ShieldCheck, Fingerprint, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion"
 export default function RegisterPage() {
   const { signUp } = useAuth()
   const router = useRouter()
+  const formTopRef = useRef<HTMLDivElement>(null)
   
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
@@ -41,7 +42,7 @@ export default function RegisterPage() {
     // Step 1 Transition
     if (step === 1) {
         setStep(2)
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
         return
     }
     
@@ -73,7 +74,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-w-screen min-h-svh dark:bg-[#050505] bg-background flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-hidden">
+    <div className="min-w-screen min-h-svh dark:bg-[#050505] bg-background flex flex-col justify-center items-center p-6 md:p-12 selection:bg-[#4DB6AC]/30 relative overflow-y-auto overflow-x-hidden">
       
       {/* --- CINEMATIC AMBIANCE --- */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] md:w-[900px] h-[500px] md:h-[900px] bg-[#4DB6AC]/5 blur-[120px] md:blur-[250px] rounded-full pointer-events-none" />
@@ -81,6 +82,7 @@ export default function RegisterPage() {
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
 
       <motion.div 
+        ref={formTopRef}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeInOut" }}
@@ -107,7 +109,7 @@ export default function RegisterPage() {
               <div className={`h-1 rounded-full transition-all duration-700 ${step === 1 ? 'w-16 bg-[#4DB6AC]' : 'w-3 bg-foreground/10'}`} />
               <div className={`h-1 rounded-full transition-all duration-700 ${step === 2 ? 'w-16 bg-[#4DB6AC]' : 'w-3 bg-foreground/10'}`} />
             </div>
-            <p className="text-foreground/20 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
+            <p className="text-neutral-600 dark:text-neutral-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] pt-1">
               Step {step} / Account Details
             </p>
           </div>
@@ -138,7 +140,7 @@ export default function RegisterPage() {
                         <div className="relative group/input">
                             <input
                                 type="text"
-                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                                 placeholder="First Name"
                                 value={formData.firstName}
                                 onChange={(e) => setFormData({...formData, firstName: e.target.value})}
@@ -148,7 +150,7 @@ export default function RegisterPage() {
                         <div className="relative group/input">
                             <input
                                 type="text"
-                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl px-5 md:px-6 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                                 placeholder="Last Name"
                                 value={formData.lastName}
                                 onChange={(e) => setFormData({...formData, lastName: e.target.value})}
@@ -191,7 +193,7 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="tel"
-                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                             placeholder="Phone Number"
                             value={formData.phoneNo}
                             onChange={(e) => setFormData({...formData, phoneNo: e.target.value})}
@@ -217,7 +219,7 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="email"
-                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                             placeholder="Email Address"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -231,7 +233,7 @@ export default function RegisterPage() {
                         </div>
                         <input
                             type="password"
-                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-foreground/10"
+                            className="w-full bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-xl md:rounded-2xl pl-11 md:pl-12 pr-5 py-3.5 md:py-4 text-foreground font-medium focus:outline-none focus:border-[#4DB6AC] transition-all text-sm md:text-base placeholder:text-neutral-600 dark:placeholder:text-neutral-500"
                             placeholder="Create Password"
                             value={formData.password}
                             onChange={(e) => setFormData({...formData, password: e.target.value})}
