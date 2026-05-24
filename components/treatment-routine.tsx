@@ -1,7 +1,7 @@
 "use client"
 
 import { getTreatmentRoutine } from "@/lib/treatment-data"
-import { Clock, Droplets, Sun, Moon } from 'lucide-react'
+import { Clock, Droplets, Sun, Moon, ArrowRight } from 'lucide-react'
 import { motion } from "framer-motion"
 
 export function TreatmentRoutine() {

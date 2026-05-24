@@ -1,6 +1,6 @@
 /**
  * 🛡️ AFRIDAM PERSONAL DETAILS FORM (Rule 7 Sync)
- * Version: 2026.1.29 (Skin Health & Demographics)
+ * Version: 2026.5.22 (Skin Health & Demographics Unified)
  * Focus: Comprehensive dermal and personal data collection for AI model context.
  */
 
@@ -8,7 +8,6 @@
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { useAuth } from "@/providers/auth-provider";
-import { updateUserProfile as updateProfileAPI, createUserProfile as createProfileAPI } from "@/lib/api-client";
 import {
   Activity,
   Globe,
@@ -18,30 +17,12 @@ import {
   CheckCircle2,
   ChevronDown,
   Heart,
-  Pill,
   X,
   ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* -------------------- CONSTANTS -------------------- */
-
-const FITZPATRICK_SKIN_TYPES = [
-  { value: "I", label: "Type I (Pale white, always burns)" },
-  { value: "II", label: "Type II (Fair, usually burns)" },
-  { value: "III", label: "Type III (Fair to medium, sometimes burns)" },
-  { value: "IV", label: "Type IV (Medium to olive, rarely burns)" },
-  { value: "V", label: "Type V (Olive to brown, very rarely burns)" },
-  { value: "VI", label: "Type VI (Dark brown to black, never burns)" },
-];
-
-const AFRICAN_REGIONS = [
-  "West Africa",
-  "East Africa",
-  "Central Africa",
-  "Southern Africa",
-  "North Africa",
-];
 
 const AFRICAN_COUNTRIES = [
   "Nigeria",
@@ -60,30 +41,6 @@ const AFRICAN_COUNTRIES = [
   "Other",
 ];
 
-const SKIN_CONDITIONS = [
-  { id: "acne", label: "Acne", description: "Pimples, blackheads, whiteheads" },
-  { id: "eczema", label: "Eczema", description: "Dry, itchy, inflamed skin" },
-  { id: "psoriasis", label: "Psoriasis", description: "Red, scaly patches on skin" },
-  { id: "rosacea", label: "Rosacea", description: "Facial redness and visible blood vessels" },
-  { id: "vitiligo", label: "Vitiligo", description: "Loss of skin pigmentation in patches" },
-  { id: "hyperpigmentation", label: "Hyperpigmentation", description: "Dark patches or uneven skin tone" },
-  { id: "melasma", label: "Melasma", description: "Brown patches on face" },
-  { id: "keratosis_pilaris", label: "Keratosis Pilaris", description: "Small bumps on arms/thighs" },
-  { id: "none", label: "No Known Condition", description: "No diagnosed skin condition" },
-];
-
-const COMMON_ALLERGIES = [
-  { id: "fragrance", label: "Fragrance", description: "Perfumes & scents" },
-  { id: "vitamin_c", label: "Vitamin C", description: "May irritate sensitive skin" },
-  { id: "nuts", label: "Nut Oils", description: "Almond, coconut oils" },
-  { id: "sulfates", label: "Sulfates", description: "SLS/SLES cleansers" },
-  { id: "alcohol", label: "Alcohol", description: "Drying alcohols" },
-  { id: "benzoyl_peroxide", label: "Benzoyl Peroxide", description: "Acne treatment irritant" },
-  { id: "salicylic_acid", label: "Salicylic Acid", description: "Can cause dryness" },
-  { id: "nickel", label: "Nickel", description: "Metal sensitivity" },
-  { id: "sun", label: "Sun Sensitivity", description: "Burns easily" },
-];
-
 /* -------------------- TYPES -------------------- */
 
 interface PersonalDetailsData {
@@ -92,10 +49,11 @@ interface PersonalDetailsData {
   skinType: string;
   skinToneLevel: number;
   gender: string;
-  ageRange: string;
+  ageRange: number; // Unified as strict number
   melaninTone: string;
   primaryConcern: string;
   environment: string;
+  bodyLotion: string; // Synced field
   knownSkinAllergies: string[];
   previousTreatments: string[];
 }
@@ -174,10 +132,11 @@ export const PersonalDetailsForm = ({
     skinType: "",
     skinToneLevel: 4,
     gender: "",
-    ageRange: "25",
+    ageRange: 25,
     melaninTone: "",
     primaryConcern: "",
     environment: "",
+    bodyLotion: "",
     knownSkinAllergies: [],
     previousTreatments: [],
   });
@@ -194,10 +153,11 @@ export const PersonalDetailsForm = ({
         skinType: user.profile?.skinType || "",
         skinToneLevel: user.profile?.skinToneLevel || 4,
         gender: user.sex || "",
-        ageRange: user.profile?.ageRange ? String(user.profile?.ageRange) : "25",
+        ageRange: user.profile?.ageRange ? Number(user.profile?.ageRange) : 25,
         melaninTone: user.profile?.melaninTone || "",
         primaryConcern: user.profile?.primaryConcern || "",
         environment: user.profile?.environment || "",
+        bodyLotion: user.profile?.bodyLotion || "",
         knownSkinAllergies: user.profile?.knownSkinAllergies || [],
         previousTreatments: user.profile?.previousTreatments || [],
       });
@@ -205,7 +165,11 @@ export const PersonalDetailsForm = ({
   }, [user]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: name === "ageRange" || name === "skinToneLevel" ? Number(value) : value 
+    }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -218,12 +182,13 @@ export const PersonalDetailsForm = ({
 
     try {
       const profilePayload = {
-        ageRange: Number(formData.ageRange),
+        ageRange: formData.ageRange,
         skinType: formData.skinType,
         skinToneLevel: formData.skinToneLevel,
         melaninTone: formData.melaninTone,
         primaryConcern: formData.primaryConcern,
         environment: formData.environment,
+        bodyLotion: formData.bodyLotion,
         knownSkinAllergies: formData.knownSkinAllergies,
         previousTreatments: formData.previousTreatments,
         onboardingSkipped: false,
@@ -253,8 +218,6 @@ export const PersonalDetailsForm = ({
       setLoading(false);
     }
   };
-
-  /* -------------------- JSX -------------------- */
 
   return (
     <div className="space-y-10 relative">
@@ -293,7 +256,6 @@ export const PersonalDetailsForm = ({
       </AnimatePresence>
 
       <form onSubmit={handleSubmit} className="space-y-10">
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
           {/* 📍 GEOGRAPHIC & IDENTITY NODE */}
@@ -321,7 +283,7 @@ export const PersonalDetailsForm = ({
                   <input
                     type="number"
                     name="ageRange"
-                    value={formData.ageRange}
+                    value={formData.ageRange || ""}
                     onChange={handleChange}
                     placeholder="Enter Age (e.g. 25)"
                     className="w-full h-14 bg-muted/20 border-2 border-black/10 dark:border-white/10 rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all"
@@ -380,40 +342,40 @@ export const PersonalDetailsForm = ({
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC] ml-2">Skin Type / Dermal Context</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="skinType"
-                    value={formData.skinType}
-                    onChange={handleChange}
-                    placeholder="e.g. Oily, Dry, Type VI"
-                    className="w-full h-14 bg-muted/20 border-2 border-black/10 dark:border-white/10 rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all"
-                  />
-                  <Heart className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC] ml-2">Skin Type</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="skinType"
+                      value={formData.skinType}
+                      onChange={handleChange}
+                      placeholder="e.g. Oily, Dry"
+                      className="w-full h-14 bg-muted/20 border-2 border-black/10 dark:border-white/10 rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all"
+                    />
+                    <Heart className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC] ml-2">Skin Tone Level (1-6)</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="skinToneLevel"
+                      min="1"
+                      max="6"
+                      value={formData.skinToneLevel || ""}
+                      onChange={handleChange}
+                      placeholder="Level 1-6"
+                      className="w-full h-14 bg-muted/20 border-2 border-black/10 dark:border-white/10 rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all"
+                    />
+                    <ShieldCheck className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC] ml-2">Skin Tone Level (Fitzpatrick 1-6)</label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    name="skinToneLevel"
-                    min="1"
-                    max="6"
-                    value={formData.skinToneLevel}
-                    onChange={handleChange}
-                    placeholder="Level 1-6"
-                    className="w-full h-14 bg-muted/20 border-2 border-black/10 dark:border-white/10 rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all"
-                  />
-                  <ShieldCheck className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC] ml-2">Melanin Tone</label>
                 <div className="relative">
@@ -456,6 +418,22 @@ export const PersonalDetailsForm = ({
                     className="w-full h-14 bg-muted/20 border-2 border-black/10 dark:border-white/10 rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all"
                   />
                   <Globe className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
+                </div>
+              </div>
+
+              {/* Added bodyLotion control field */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC] ml-2">Current Body Lotion</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="bodyLotion"
+                    value={formData.bodyLotion}
+                    onChange={handleChange}
+                    placeholder="e.g. Cetaphil, Shea Butter"
+                    className="w-full h-14 bg-muted/20 border-2 border-black/10 dark:border-white/10 rounded-xl px-4 text-xs font-bold outline-none focus:border-[#E1784F] transition-all"
+                  />
+                  <Heart className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none" size={14} />
                 </div>
               </div>
             </div>
