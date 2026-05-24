@@ -16,8 +16,11 @@ export function SubscriptionModal({ isOpen, onClose }: SubscriptionModalProps) {
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 md:p-6 z-[200] overflow-y-auto">
+            <div 
+            onClick={onClose}
+            className="fixed inset-0 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 md:p-6 pb-32 md:pb-6 z-[200] overflow-y-auto">
                 <motion.div
+                    onClick={(event) => event.stopPropagation()}
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
@@ -91,4 +94,5 @@ export function SubscriptionModal({ isOpen, onClose }: SubscriptionModalProps) {
             </div>
         </AnimatePresence>
     )
+    
 }
