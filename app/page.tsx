@@ -40,7 +40,7 @@ export default function LandingPage() {
 
       {/* 🌪️ 2. HERO */}
       <section className="min-h-[calc(100svh-5rem)] relative px-6 flex items-center">
-        <div className="`max-w-screen-xl` mx-auto w-full grid lg:grid-cols-12 items-center gap-8 md:gap-20 py-12 md:py-16">
+        <div className="max-w-screen-xl mx-auto w-full grid lg:grid-cols-12 items-center gap-8 md:gap-20 py-12 md:py-16">
 
           {/* Text + CTA — mobile: col 1-2 of 3; desktop: left 7 cols */}
           <motion.div
@@ -74,7 +74,7 @@ export default function LandingPage() {
 
           {/* Image Card — full width on mobile (order-1), right 5 cols on desktop */}
           <div className="lg:col-span-5 relative max-w-sm sm:max-w-md mx-auto w-full lg:order-2 order-1">
-            <div className="aspect-4/5 rounded-[3.5rem] overflow-hidden border-10px border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
+            <div className="aspect-[4/5] rounded-[3.5rem] overflow-hidden border-[10px] border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
               <img
                 src="./molle.png"
                 alt="AfriDam"
@@ -89,9 +89,9 @@ export default function LandingPage() {
               </div>
               <Link
                 href="/public-scan"
-                className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-4 sm:p-6 bg-black/80 hover:bg-black/90 backdrop-blur-2xl `rounded-[2rem]` sm:rounded-[2.5rem] border border-white/10 flex items-center gap-4 sm:gap-5 cursor-pointer active:scale-95 transition-all outline-none"
+                className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-4 sm:p-6 bg-black/80 hover:bg-black/90 backdrop-blur-2xl rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 flex items-center gap-4 sm:gap-5 cursor-pointer active:scale-95 transition-all outline-none"
               >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#4DB6AC] rounded-xl sm:rounded-2xl flex items-center justify-center text-white `flex-shrink-0`">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#4DB6AC] rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
                   <Camera size={20} />
                 </div>
                 <div className="flex-1 space-y-2 min-w-0">
@@ -112,7 +112,7 @@ export default function LandingPage() {
 
       {/* 🎥 3. THE VISUAL FLOW */}
       <section className="py-20 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5 border-y border-black/5 dark:border-white/5">
-        <div className="`max-w-screen-xl` mx-auto space-y-20">
+        <div className="max-w-screen-xl mx-auto space-y-20">
           <div className="text-center space-y-4">
             <span className="text-[#E1784F] text-[10px] font-black capitalize tracking-widest opacity-40">Simple English Approach</span>
             <h2 className="text-4xl md:text-6xl font-black capitalize italic tracking-tighter leading-tight">Simple Path. <br />Pure Results.</h2>
@@ -156,7 +156,7 @@ export default function LandingPage() {
 
       {/* 📜 4. THE MANIFESTO */}
       <section className="py-24 md:py-40 px-6 text-center">
-        <div className="`max-w-screen-xl` mx-auto flex flex-col items-center">
+        <div className="max-w-screen-xl mx-auto flex flex-col items-center">
           <Heart className="text-[#E1784F] mb-12" size={40} fill="currentColor" />
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
             "Heritage is <br /> our <span className="text-[#4DB6AC]">Foundation</span>, <br /> Skin is our <span className="text-[#E1784F]">Legacy</span>."
@@ -167,7 +167,7 @@ export default function LandingPage() {
 
       {/* 🧪 5. CARE SOLUTIONS */}
       <section id="features" className="py-24 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5">
-        <div className="`max-w-screen-xl` mx-auto space-y-16">
+        <div className="max-w-screen-xl mx-auto space-y-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               { title: "Check Skin", icon: Camera, text: "A precision scan to verify your skin health.", path: "/public-scan", color: "#E1784F" },
@@ -191,7 +191,7 @@ export default function LandingPage() {
 
       {/* 🏛️ 7. CONTACT & ACTION */}
       <section id="contact" className="py-16 md:py-24 px-6 md:px-20">
-        <div className="`max-w-screen-xl` mx-auto grid md:grid-cols-2 gap-12 md:gap-24 items-center">
+        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-12 md:gap-24 items-center">
           <div className="space-y-10">
             <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black capitalize italic tracking-tighter leading-[0.85] text-black dark:text-white">Get <br /><span className="text-[#4DB6AC]">Started.</span></h2>
             <p className="text-xl md:text-2xl font-black opacity-20 tracking-tighter italic">Join the movement for <br />Melanin-Rich Health.</p>
