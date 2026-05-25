@@ -113,8 +113,8 @@ export default function Navigation({
 
             <div className="flex items-center gap-3 md:gap-4">
 
-              {/* ☀️ Theme Toggle */}
-              <button onClick={toggleTheme} className="p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border">
+              {/* ☀️ Theme Toggle — desktop only (mobile uses the bottom-sheet toggle) */}
+              <button onClick={toggleTheme} className="hidden lg:flex items-center justify-center p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border">
                 {isDark ? <Sun size={16} className="text-[#E1784F]" /> : <Moon size={16} />}
               </button>
 

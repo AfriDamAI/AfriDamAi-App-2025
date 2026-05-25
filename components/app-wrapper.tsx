@@ -13,6 +13,7 @@ import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 import { ProfileSidebar } from "@/components/profile-sidebar"
 import { MobileNav } from "@/components/mobile-nav"
+import { FloatingScrollNav } from "@/components/floating-scroll-nav"
 import type React from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { AnimatePresence } from "framer-motion"
@@ -42,6 +43,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
 
   // 🛡️ OGA FIX: Show mobile nav only on internal dashboard-like pages, NOT on public auth pages
   const showMobileNav = user && !isAuthRoute;
+  const showFloatingScrollNav = !isAuthRoute && !pathname.startsWith("/specialist");
 
   const handleSignIn = () => router.push("/login");
   const handleSignUp = () => router.push("/register");
@@ -49,8 +51,12 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setProfileSidebarOpen(false);
-    document.body.style.overflow = 'unset';
   }, [pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = profileSidebarOpen ? 'hidden' : 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [profileSidebarOpen]);
 
   if (isLoading) {
     return (
@@ -116,6 +122,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
 
       {/* 📱 5. BOTTOM MOBILE NAV */}
       {showMobileNav && <MobileNav />}
+      {showFloatingScrollNav && <FloatingScrollNav hasMobileNav={Boolean(showMobileNav)} />}
     </div >
   )
 }
