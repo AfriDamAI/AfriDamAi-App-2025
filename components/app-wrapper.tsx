@@ -33,16 +33,18 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   ];
 
   const isAuthRoute = authRoutes.includes(pathname);
+  const fullscreenRoutes = ["/plans", "/transaction"];
+  const isFullscreenRoute = fullscreenRoutes.some(route => pathname.startsWith(route));
 
   // 🚀 RULE 6: Toggle Nav/Footer visibility based on current clinical node
-  const showNav = !isAuthRoute && !["/plans", "/transaction"].some(route => pathname.startsWith(route));
-  const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route)) && pathname !== "/plans" && pathname !== "/transaction";
+  const showNav = !isAuthRoute && !isFullscreenRoute;
+  const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route)) && !isFullscreenRoute;
 
   // 🧭 SIDEBAR SYNC: Show on all internal protected pages
-  const showSidebar = user && !isAuthRoute;
+  const showSidebar = user && !isAuthRoute && !isFullscreenRoute;
 
   // 🛡️ OGA FIX: Show mobile nav only on internal dashboard-like pages, NOT on public auth pages
-  const showMobileNav = user && !isAuthRoute;
+  const showMobileNav = user && !isAuthRoute && !isFullscreenRoute;
   const showFloatingScrollNav = !isAuthRoute && !pathname.startsWith("/specialist");
 
   const handleSignIn = () => router.push("/login");
@@ -77,7 +79,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
           )}
 
           {/* 🚀 2. DYNAMIC CONTENT AREA */}
-          <main className={`flex-grow relative z-10 ${
+          <main className={`flex-grow relative z-10 ${showMobileNav ? 'pb-24 lg:pb-0' : ''} ${
             isAuthRoute
               ? 'flex items-center justify-center min-h-svh'
               : ''
