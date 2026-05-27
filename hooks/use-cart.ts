@@ -22,27 +22,17 @@ export const useCart = create<CartState>((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiClient.get<Cart>(`/cart/${userId}`);
-      
-      // ✨ RE-ENGAGED OPTIMIZED HANDSHAKE GATES:
-      if (response.data && response.data.items?.length === 0 && currentCart?.items?.length) {
-        // If the server clears the cart but the frontend payment was backed away from,
-        // preserve the local UI fields so things don't look broken to the user.
-        set({ loading: false });
-      } else if (response.data) {
-        // Safe update whenever the server successfully outputs a structural card update.
+      if (response.data) {
         set({ cart: response.data, loading: false });
       } else {
-        // Safe fallback constructor block
         const createResponse = await apiClient.post<Cart>('/cart', { userId });
         set({ cart: createResponse.data, loading: false });
       }
     } catch (error: any) {
       console.error("🛒 FETCH CART ERROR:", error);
       if (error.response?.status === 404) {
-        if (currentCart) {
-          set({ loading: false });
-          return;
-        }
+        // Cart was deleted on the backend — recreate unconditionally.
+        // A local cart with a stale ID would cause all writes to fail.
         try {
           const createResponse = await apiClient.post<Cart>('/cart', { userId });
           set({ cart: createResponse.data, loading: false });
@@ -50,11 +40,9 @@ export const useCart = create<CartState>((set) => ({
           set({ error: 'Failed to create cart', loading: false });
         }
       } else {
-        if (currentCart) {
-          set({ loading: false });
-        } else {
-          set({ error: 'Failed to fetch cart', loading: false });
-        }
+        // Transient network error — preserve an existing cart silently,
+        // show an error only if there's nothing to fall back to.
+        set({ error: currentCart ? null : 'Failed to fetch cart', loading: false });
       }
     }
   },
@@ -79,11 +67,12 @@ export const useCart = create<CartState>((set) => ({
         quantity: Math.max(1, Number(item.quantity || 1))
       };
       await apiClient.post(`/cart/addItem/${userId}`, payload);
-      
+
+      // Optimistic update so the UI reflects the change immediately.
       set((state) => {
         const cart = state.cart!;
         const existingItemIndex = cart.items.findIndex((i) => i.productId === item.productId);
-        
+
         let newItems;
         if (existingItemIndex > -1) {
           newItems = [...cart.items];
@@ -93,7 +82,7 @@ export const useCart = create<CartState>((set) => ({
             price: Number(newItems[existingItemIndex].price || item.price)
           };
         } else {
-          newItems = [...cart.items, { 
+          newItems = [...cart.items, {
             productId: item.productId,
             productName: item.productName || "Care Product",
             productImage: item.productImage || "",
@@ -106,6 +95,9 @@ export const useCart = create<CartState>((set) => ({
           cart: { ...cart, items: newItems }
         };
       });
+
+      // Sync server state to pick up the server-assigned item id.
+      await useCart.getState().fetchCart(userId);
     } catch (error) {
       console.error('Failed to add to cart', error);
     }
