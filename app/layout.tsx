@@ -15,8 +15,6 @@ import { AuthProvider } from "@/providers/auth-provider"
 import { AuthGuard } from "@/components/auth-guard"
 import { AppWrapper } from "@/components/app-wrapper"
 import { AIChatBot } from "@/components/ai/ai-chatbot"
-import { IngredientAnalyzer } from "@/components/ai/ingredient-analyzer"
-import { CallProvider } from "@/providers/call-provider"
 import { usePathname } from "next/navigation"
 
 const geistSans = Geist({
