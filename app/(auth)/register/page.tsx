@@ -6,35 +6,61 @@
 
 "use client"
 
-import React, { useRef, useState } from "react"
-import { Mail, Phone, Lock, ArrowRight, Loader2, X, ChevronLeft, ShieldCheck, Fingerprint, ArrowLeft } from "lucide-react"
+import React, { useEffect, useRef, useState } from "react"
+import { Mail, Phone, Lock, ArrowRight, Loader2, ChevronLeft, ShieldCheck, Fingerprint, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 
+const REGISTER_DRAFT_KEY = "afridam:register-draft"
+
+const initialFormData = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  sex: "male",
+  country: "Nigeria",
+  phoneNo: "",
+  password: ""
+}
+
 export default function RegisterPage() {
   const { signUp } = useAuth()
   const router = useRouter()
   const formTopRef = useRef<HTMLDivElement>(null)
+  const [hasLoadedDraft, setHasLoadedDraft] = useState(false)
   
   const [step, setStep] = useState(1)
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    sex: "male",
-    country: "Nigeria", // 🌍 This is remapped to 'nationality' in api-client.ts
-    phoneNo: "",
-    password: ""
-  })
+  const [formData, setFormData] = useState(initialFormData)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [acceptPrivacy, setAcceptPrivacy] = useState(false)
 
-  const handleCancel = () => {
-    router.push("/");
-  }
+  useEffect(() => {
+    try {
+      const draft = sessionStorage.getItem(REGISTER_DRAFT_KEY)
+      if (draft) {
+        const parsed = JSON.parse(draft)
+        setStep(parsed.step === 2 ? 2 : 1)
+        setFormData({ ...initialFormData, ...parsed.formData })
+        setAcceptPrivacy(Boolean(parsed.acceptPrivacy))
+      }
+    } catch {
+      sessionStorage.removeItem(REGISTER_DRAFT_KEY)
+    } finally {
+      setHasLoadedDraft(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!hasLoadedDraft) return
+
+    sessionStorage.setItem(
+      REGISTER_DRAFT_KEY,
+      JSON.stringify({ step, formData, acceptPrivacy })
+    )
+  }, [acceptPrivacy, formData, hasLoadedDraft, step])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,6 +88,7 @@ export default function RegisterPage() {
          * signUp maps 'country' to 'nationality' via the api-client.
          */
         await signUp(formData)
+        sessionStorage.removeItem(REGISTER_DRAFT_KEY)
         console.log("Registration successful! Redirecting to verify...");
         // Redirect to new verification page
         router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
@@ -286,7 +313,10 @@ export default function RegisterPage() {
                 {/* Back Button */}
                 <button
                     type="button"
-                    onClick={() => router.push("/")}
+                    onClick={() => {
+                        sessionStorage.removeItem(REGISTER_DRAFT_KEY)
+                        router.push("/")
+                    }}
                     className="w-full flex items-center justify-center gap-2 text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] py-3 hover:text-foreground transition-all"
                 >
                     <ArrowLeft className="w-4 h-4" />

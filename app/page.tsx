@@ -39,7 +39,7 @@ export default function LandingPage() {
       {/* 🧭 Navigation handled by AppWrapper → Navigation component */}
 
       {/* 🌪️ 2. HERO */}
-      <section className="min-h-[calc(100svh-5rem)] relative px-6 flex items-center">
+      <section className="min-h-[calc(100svh-5rem)] relative px-4 min-[360px]:px-5 sm:px-6 flex items-center">
         <div className="max-w-screen-xl mx-auto w-full grid lg:grid-cols-12 items-center gap-8 md:gap-20 py-12 md:py-16">
 
           {/* Text + CTA — mobile: col 1-2 of 3; desktop: left 7 cols */}
