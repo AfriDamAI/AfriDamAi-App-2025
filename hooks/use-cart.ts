@@ -18,28 +18,31 @@ export const useCart = create<CartState>((set) => ({
   loading: false,
   error: null,
   fetchCart: async (userId) => {
+    const currentCart = useCart.getState().cart;
     set({ loading: true, error: null });
     try {
-      // 🛡️ SYNERGY DIAGNOSTIC: Using capitalized "Cart" as per Swagger
-      const response = await apiClient.get<Cart>(`/Cart/${userId}`);
-      
+      const response = await apiClient.get<Cart>(`/cart/${userId}`);
       if (response.data) {
         set({ cart: response.data, loading: false });
       } else {
-        const createResponse = await apiClient.post<Cart>('/Cart', { userId });
+        const createResponse = await apiClient.post<Cart>('/cart', { userId });
         set({ cart: createResponse.data, loading: false });
       }
     } catch (error: any) {
       console.error("🛒 FETCH CART ERROR:", error);
       if (error.response?.status === 404) {
+        // Cart was deleted on the backend — recreate unconditionally.
+        // A local cart with a stale ID would cause all writes to fail.
         try {
-          const createResponse = await apiClient.post<Cart>('/Cart', { userId });
+          const createResponse = await apiClient.post<Cart>('/cart', { userId });
           set({ cart: createResponse.data, loading: false });
         } catch (createError) {
           set({ error: 'Failed to create cart', loading: false });
         }
       } else {
-        set({ error: 'Failed to fetch cart', loading: false });
+        // Transient network error — preserve an existing cart silently,
+        // show an error only if there's nothing to fall back to.
+        set({ error: currentCart ? null : 'Failed to fetch cart', loading: false });
       }
     }
   },
@@ -54,34 +57,47 @@ export const useCart = create<CartState>((set) => ({
 
       if (!currentCart) throw new Error("No cart available");
 
+      // FORCE strict formatting structures to satisfy the new backend guard requirements
       const payload = { 
-        ...item, 
+        productId: item.productId,
+        productName: item.productName || "Care Product",
+        productImage: item.productImage || "",
         cartId: currentCart.id,
-        // Ensure name and image are passed if they exist
-        productName: item.productName,
-        productImage: item.productImage
+        price: Number(item.price || 0),
+        quantity: Math.max(1, Number(item.quantity || 1))
       };
-      await apiClient.post(`/Cart/addItem/${userId}`, payload);
-      
+      await apiClient.post(`/cart/addItem/${userId}`, payload);
+
+      // Optimistic update so the UI reflects the change immediately.
       set((state) => {
         const cart = state.cart!;
         const existingItemIndex = cart.items.findIndex((i) => i.productId === item.productId);
-        
+
         let newItems;
         if (existingItemIndex > -1) {
           newItems = [...cart.items];
           newItems[existingItemIndex] = {
             ...newItems[existingItemIndex],
-            quantity: newItems[existingItemIndex].quantity + item.quantity
+            quantity: Number(newItems[existingItemIndex].quantity) + Number(item.quantity),
+            price: Number(newItems[existingItemIndex].price || item.price)
           };
         } else {
-          newItems = [...cart.items, { ...item, cartId: cart.id }];
+          newItems = [...cart.items, {
+            productId: item.productId,
+            productName: item.productName || "Care Product",
+            productImage: item.productImage || "",
+            cartId: cart.id,
+            price: Number(item.price || 0),
+            quantity: Number(item.quantity || 1)
+          }];
         }
-
         return {
           cart: { ...cart, items: newItems }
         };
       });
+
+      // Sync server state to pick up the server-assigned item id.
+      await useCart.getState().fetchCart(userId);
     } catch (error) {
       console.error('Failed to add to cart', error);
     }
@@ -97,55 +113,48 @@ export const useCart = create<CartState>((set) => ({
       const cart = state.cart;
       if (!cart) return;
 
-      // Optimistic update
       set((state) => {
         if (!state.cart) return state;
         const newItems = state.cart.items.map(item => 
-          item.productId === productId ? { ...item, quantity } : item
+          item.productId === productId ? { ...item, quantity: Number(quantity) } : item
         );
         return { cart: { ...state.cart, items: newItems } };
       });
 
-      // Construct the updated cart object
-      const updatedItems = cart.items.map(item => 
-        item.productId === productId ? { ...item, quantity } : item
-      );
-
       const payload = {
         cartId: cart.id,
         productId: productId,
-        quantity: quantity,
+        quantity: Number(quantity),
       };
 
-      // Use PUT to update the specific item quantity
-      await apiClient.put(`/Cart/${userId}`, payload);
+      await apiClient.put(`/cart/${userId}`, payload);
       
     } catch (error: any) {
       console.error('🛒 UPDATE QUANTITY TOTAL FAILURE:', error.response?.data || error.message);
-      // Re-fetch to sync with backend on failure
       await useCart.getState().fetchCart(userId);
     }
   },
   removeFromCart: async (userId, productId) => {
     try {
-      
       try {
-        await apiClient.delete(`/Cart/${userId}/items/${productId}`);
+        await apiClient.delete(`/cart/${userId}/items/${productId}`);
       } catch (delError) {
-        // Fallback to internal ID
         const cart = useCart.getState().cart;
         const item = cart?.items.find(i => i.productId === productId);
         if (item?.id) {
-          await apiClient.delete(`/Cart/${userId}/items/${item.id}`);
+          await apiClient.delete(`/cart/${userId}/items/${item.id}`);
         } else {
           throw delError;
         }
       }
       set((state) => {
-        if (state.cart) {
-          state.cart.items = state.cart.items.filter((i) => i.productId !== productId);
-        }
-        return { cart: state.cart };
+        if (!state.cart) return state;
+        return {
+          cart: {
+            ...state.cart,
+            items: state.cart.items.filter((i) => i.productId !== productId),
+          },
+        };
       });
     } catch (error) {
       console.error('Failed to remove from cart', error);
@@ -153,12 +162,15 @@ export const useCart = create<CartState>((set) => ({
   },
   clearCart: async (userId) => {
     try {
-      await apiClient.delete(`/Cart/${userId}/clear`);
+      await apiClient.delete(`/cart/${userId}/clear`);
       set((state) => {
-        if (state.cart) {
-          state.cart.items = [];
-        }
-        return { cart: state.cart };
+        if (!state.cart) return state;
+        return {
+          cart: {
+            ...state.cart,
+            items: [],
+          },
+        };
       });
     } catch (error) {
       console.error('Failed to clear cart', error);
