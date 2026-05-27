@@ -79,7 +79,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
           )}
 
           {/* 🚀 2. DYNAMIC CONTENT AREA */}
-          <main className={`flex-grow relative z-10 ${showMobileNav ? 'pb-24 lg:pb-0' : ''} ${
+          <main className={`flex-grow relative z-10 ${showMobileNav ? 'pb-16 lg:pb-0' : ''} ${
             isAuthRoute
               ? 'flex items-center justify-center min-h-svh'
               : ''
