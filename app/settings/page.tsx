@@ -1,7 +1,9 @@
 "use client"
 
 import React from "react"
+
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { 
   ChevronLeft, User, ShieldCheck, 
   Bell, Globe, LogOut, Moon, 
@@ -103,21 +105,22 @@ export default function SettingsPage() {
             icon={CreditCard} 
             title="Specialist Access" 
             subtitle="Manage consultations and payments" 
-            onClick={() => router.push('/settings/billing')}
+            onClick={() => router.push('/plans')}
           />
           <SettingTile 
             icon={Bell} 
             title="Notifications" 
             subtitle="Daily glow reminders and chat alerts" 
-            onClick={() => {}}
+            onClick={() => router.push ('/settings/notifications')}
             color="text-[#4DB6AC]"
           />
           <SettingTile 
             icon={Globe} 
             title="Language & Region" 
             subtitle="English • Nigeria" 
-            onClick={() => {}}
-          />
+            onClick={() => toast.info("Language settings coming soon!")} 
+/>  
+          
         </div>
 
         {/* DANGER ZONE */}
