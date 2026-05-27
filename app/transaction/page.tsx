@@ -28,6 +28,7 @@ function TransactionPage() {
     const [error, setError] = useState<string | null>(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [order, setOrder] = useState<Order | null>(null)
+    const [cachedAuthUrl, setCachedAuthUrl] = useState<string | null>(null)
 
     useEffect(() => {
         try {
@@ -38,9 +39,9 @@ function TransactionPage() {
             }
             const decodedToken: any = jwtDecode(token)
             setUser({
-                id: decodedToken.sub, // Assuming 'sub' is the userId claim in the token
-                name: decodedToken.name || 'User',   // Assuming 'name' is also in the token
-                email: decodedToken.email || 'user@example.com'  // Assuming 'email' is also in the token
+                id: decodedToken.sub,
+                name: decodedToken.name || 'User',
+                email: decodedToken.email || 'user@example.com'
             })
         } catch (err: any) {
             setError(err.message)
@@ -53,6 +54,10 @@ function TransactionPage() {
         }
 
         if (orderId) {
+            // Restore a previously obtained Paystack URL so a retry never re-calls the backend.
+            const stored = sessionStorage.getItem(`tx_auth_${orderId}`)
+            if (stored) setCachedAuthUrl(stored)
+
             apiClient.get<Order>(`/orders/${orderId}`).then(response => {
                 setOrder(response.data)
                 setAmount(String(response.data.totalAmount))
@@ -62,14 +67,22 @@ function TransactionPage() {
         }
     }, [price, orderId])
 
-    // page.tsx - Inside handlePayment
     const handlePayment = async () => {
         if (!user) {
             setError("User not found.")
             return;
         }
 
+        // Reuse a previously obtained Paystack URL rather than re-calling the backend.
+        // A second POST to /transactions/initiate with the same orderId hits a unique
+        // constraint on the backend and returns an error — avoid it entirely.
+        if (cachedAuthUrl) {
+            window.open(cachedAuthUrl, '_blank')
+            return
+        }
+
         setIsProcessing(true)
+        setError(null)
         try {
             const token = localStorage.getItem('token');
 
@@ -100,6 +113,9 @@ function TransactionPage() {
 
             const authUrl = result.authorizationUrl || (result.data && result.data.authorization_url);
             if (authUrl) {
+                // Cache the URL in state and sessionStorage so retries skip the API call.
+                setCachedAuthUrl(authUrl)
+                if (orderId) sessionStorage.setItem(`tx_auth_${orderId}`, authUrl)
                 window.open(authUrl, '_blank')
             } else {
                 throw new Error('No authorization URL received.')
