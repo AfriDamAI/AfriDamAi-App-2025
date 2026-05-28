@@ -85,7 +85,10 @@ export default function CartPage() {
       // console.log("🛒 ATTEMPTING ORDER CREATION (Simplified Path):", orderData);
 
       const newOrder = await apiClient.post<Order>('/orders', orderData)
-      // console.log("🛒 ORDER CREATED SUCCESS:", newOrder.data);
+      // Snapshot the cart before the backend clears it so the cart page stays
+      // populated until the user confirms payment on /payment-success.
+      sessionStorage.setItem('pending_order_id', newOrder.data.id)
+      sessionStorage.setItem('pending_cart_snapshot', JSON.stringify(enrichedItems))
       router.push(`/transaction?orderId=${newOrder.data.id}`)
     } catch (error: any) {
       console.error("🛒 ORDER CREATION FAILURE:", error.response?.data || error.message)

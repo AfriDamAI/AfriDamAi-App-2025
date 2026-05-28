@@ -51,6 +51,10 @@ function PaymentSuccessContent() {
                 const isSuccessful = data.status === 'SUCCESS' || data.status === 'COMPLETED';
 
                 if (response.ok && isSuccessful) {
+                    // Payment confirmed — clear the cart snapshot so the cart
+                    // shows empty on the next visit instead of the paid order.
+                    sessionStorage.removeItem('pending_order_id')
+                    sessionStorage.removeItem('pending_cart_snapshot')
                     setStatus('success')
                     setMessage("Your transaction was successful!")
                     setTransactionData(data)

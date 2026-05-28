@@ -2,6 +2,21 @@ import { create } from 'zustand';
 import { apiClient } from '@/lib/api-client';
 import { Cart, CartItem } from '@/lib/types';
 
+// Restores cart items from sessionStorage when the backend has cleared the cart
+// after order creation but before payment is confirmed.
+function withPendingSnapshot(cart: Cart): Cart {
+  if (typeof window === 'undefined' || cart.items?.length > 0) return cart;
+  const pendingOrderId = sessionStorage.getItem('pending_order_id');
+  if (!pendingOrderId) return cart;
+  try {
+    const raw = sessionStorage.getItem('pending_cart_snapshot');
+    if (!raw) return cart;
+    return { ...cart, items: JSON.parse(raw) };
+  } catch {
+    return cart;
+  }
+}
+
 interface CartState {
   cart: Cart | null;
   loading: boolean;
@@ -23,10 +38,10 @@ export const useCart = create<CartState>((set) => ({
     try {
       const response = await apiClient.get<Cart>(`/cart/${userId}`);
       if (response.data) {
-        set({ cart: response.data, loading: false });
+        set({ cart: withPendingSnapshot(response.data), loading: false });
       } else {
         const createResponse = await apiClient.post<Cart>('/cart', { userId });
-        set({ cart: createResponse.data, loading: false });
+        set({ cart: withPendingSnapshot(createResponse.data), loading: false });
       }
     } catch (error: any) {
       console.error("🛒 FETCH CART ERROR:", error);
@@ -35,7 +50,7 @@ export const useCart = create<CartState>((set) => ({
         // A local cart with a stale ID would cause all writes to fail.
         try {
           const createResponse = await apiClient.post<Cart>('/cart', { userId });
-          set({ cart: createResponse.data, loading: false });
+          set({ cart: withPendingSnapshot(createResponse.data), loading: false });
         } catch (createError) {
           set({ error: 'Failed to create cart', loading: false });
         }
