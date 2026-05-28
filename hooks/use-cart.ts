@@ -21,11 +21,11 @@ export const useCart = create<CartState>((set) => ({
     const currentCart = useCart.getState().cart;
     set({ loading: true, error: null });
     try {
-      const response = await apiClient.get<Cart>(`/cart/${userId}`);
+      const response = await apiClient.get<Cart>(`/Cart/${userId}`);
       if (response.data) {
         set({ cart: response.data, loading: false });
       } else {
-        const createResponse = await apiClient.post<Cart>('/cart', { userId });
+        const createResponse = await apiClient.post<Cart>('/Cart', { userId });
         set({ cart: createResponse.data, loading: false });
       }
     } catch (error: any) {
@@ -34,7 +34,7 @@ export const useCart = create<CartState>((set) => ({
         // Cart was deleted on the backend — recreate unconditionally.
         // A local cart with a stale ID would cause all writes to fail.
         try {
-          const createResponse = await apiClient.post<Cart>('/cart', { userId });
+          const createResponse = await apiClient.post<Cart>('/Cart', { userId });
           set({ cart: createResponse.data, loading: false });
         } catch (createError) {
           set({ error: 'Failed to create cart', loading: false });
@@ -66,7 +66,7 @@ export const useCart = create<CartState>((set) => ({
         price: Number(item.price || 0),
         quantity: Math.max(1, Number(item.quantity || 1))
       };
-      await apiClient.post(`/cart/addItem/${userId}`, payload);
+      await apiClient.post(`/Cart/addItem/${userId}`, payload);
 
       // Optimistic update so the UI reflects the change immediately.
       set((state) => {
@@ -127,7 +127,7 @@ export const useCart = create<CartState>((set) => ({
         quantity: Number(quantity),
       };
 
-      await apiClient.put(`/cart/${userId}`, payload);
+      await apiClient.put(`/Cart/${userId}`, payload);
       
     } catch (error: any) {
       console.error('🛒 UPDATE QUANTITY TOTAL FAILURE:', error.response?.data || error.message);
@@ -137,12 +137,12 @@ export const useCart = create<CartState>((set) => ({
   removeFromCart: async (userId, productId) => {
     try {
       try {
-        await apiClient.delete(`/cart/${userId}/items/${productId}`);
+        await apiClient.delete(`/Cart/${userId}/items/${productId}`);
       } catch (delError) {
         const cart = useCart.getState().cart;
         const item = cart?.items.find(i => i.productId === productId);
         if (item?.id) {
-          await apiClient.delete(`/cart/${userId}/items/${item.id}`);
+          await apiClient.delete(`/Cart/${userId}/items/${item.id}`);
         } else {
           throw delError;
         }
@@ -162,7 +162,7 @@ export const useCart = create<CartState>((set) => ({
   },
   clearCart: async (userId) => {
     try {
-      await apiClient.delete(`/cart/${userId}/clear`);
+      await apiClient.delete(`/Cart/${userId}/clear`);
       set((state) => {
         if (!state.cart) return state;
         return {
