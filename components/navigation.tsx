@@ -94,7 +94,7 @@ export default function Navigation({
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="flex justify-between items-center h-16 md:h-20">
 
-            <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-3 active:scale-95 transition-transform">
+            <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform">
             <img src="/logo.png" alt="AfriDam AI" className="h-9 md:h-11 w-auto object-contain" />
               <div className="hidden sm:flex flex-col border-l border-border/50 pl-3">
                 <span className="text-xs font-bold uppercase tracking-widest text-[#E1784F]">Clinical</span>
@@ -168,7 +168,7 @@ export default function Navigation({
           >
           {/* Mobile Menu Header */}
             <div className="flex justify-between items-center h-16 px-6 border-b border-border shrink-0">
-              <Link href={user ? "/dashboard" : "/"} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+              <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
                 <img src="/logo.png" alt="AfriDam AI" className="h-9 w-auto object-contain" />
               </Link>
               <button
