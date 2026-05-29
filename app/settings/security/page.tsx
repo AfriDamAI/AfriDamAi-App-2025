@@ -24,12 +24,17 @@ export default function SecurityPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
+  const [diagnosticSharingOverride, setDiagnosticSharingOverride] = useState<boolean | null>(null)
+  const [privacyLoading, setPrivacyLoading] = useState(false)
 
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
     confirm: ""
   })
+
+  const savedDiagnosticSharing = (user?.profile as any)?.diagnosticSharing
+  const diagnosticSharing = diagnosticSharingOverride ?? (typeof savedDiagnosticSharing === "boolean" ? savedDiagnosticSharing : true)
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,7 +51,7 @@ export default function SecurityPage() {
        * 🚀 THE SECURITY HANDSHAKE
        * Syncing with NestJS Auth/User password update logic.
        */
-      await apiClient.patch(`/user/update-password`, {
+      await apiClient.patch(`/v1/user/settings`, {
         currentPassword: passwords.current,
         newPassword: passwords.new
       })
@@ -58,6 +63,22 @@ export default function SecurityPage() {
       setError("Could not update. Please check your current password.")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleToggleDiagnosticSharing = async () => {
+    const nextValue = !diagnosticSharing
+    setDiagnosticSharingOverride(nextValue)
+    setPrivacyLoading(true)
+
+    try {
+      await apiClient.patch(`/v1/user/settings`, {
+        diagnosticSharing: nextValue
+      })
+    } catch (err: any) {
+      console.warn("Privacy setting sync failed.", err)
+    } finally {
+      setPrivacyLoading(false)
     }
   }
 
@@ -167,9 +188,20 @@ export default function SecurityPage() {
                    <p className="text-[10px] font-black uppercase tracking-tight">Diagnostic Sharing</p>
                    <p className="text-[8px] font-bold uppercase opacity-30 tracking-tighter">Anonymously help our AI improve for African skin</p>
                 </div>
-                <div className="w-12 h-6 bg-[#4DB6AC] rounded-full relative cursor-pointer">
-                   <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full" />
-                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleDiagnosticSharing}
+                  disabled={privacyLoading}
+                  aria-pressed={diagnosticSharing}
+                  aria-label="Toggle diagnostic sharing"
+                  className={`w-12 h-6 rounded-full relative transition-all disabled:opacity-60 disabled:cursor-wait ${
+                    diagnosticSharing ? "bg-[#4DB6AC]" : "bg-gray-200 dark:bg-white/10"
+                  }`}
+                >
+                   <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                    diagnosticSharing ? "right-1" : "left-1"
+                   }`} />
+                </button>
              </div>
           </div>
         </section>
