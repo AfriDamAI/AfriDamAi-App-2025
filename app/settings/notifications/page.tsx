@@ -12,6 +12,13 @@ import {
 import { useAuth } from "@/providers/auth-provider"
 import { apiClient } from "@/lib/api-client"
 
+const defaultPrefs = {
+  clinical: true,
+  glowCheck: true,
+  careShop: false,
+  quietMode: false
+}
+
 /**
  * 🛡️ AFRIDAM NOTIFICATION SETTINGS (Rule 6 Synergy)
  * Version: 2026.1.25
@@ -24,16 +31,15 @@ export default function NotificationSettingsPage() {
   
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const [prefs, setPrefs] = useState({
-    clinical: user?.profile?.prefs?.clinical ?? true,
-    glowCheck: user?.profile?.prefs?.glowCheck ?? true,
-    careShop: user?.profile?.prefs?.careShop ?? false,
-    quietMode: user?.profile?.prefs?.quietMode ?? false
-  })
+  const [prefsOverride, setPrefsOverride] = useState<typeof defaultPrefs | null>(null)
+  const prefs = prefsOverride ?? {
+    ...defaultPrefs,
+    ...user?.profile?.prefs
+  }
 
   const handleToggle = async (key: keyof typeof prefs) => {
     const updatedPrefs = { ...prefs, [key]: !prefs[key] }
-    setPrefs(updatedPrefs)
+    setPrefsOverride(updatedPrefs)
     setIsLoading(true)
     setIsSuccess(false)
 
@@ -42,7 +48,7 @@ export default function NotificationSettingsPage() {
        * 🚀 THE PREFERENCE HANDSHAKE
        * Updating the User Profile preferences in the Render backend.
        */
-      await apiClient.patch(`/user/${user?.id}/preferences`, {
+      await apiClient.patch(`/v1/user/settings`, {
         notificationPrefs: updatedPrefs
       })
       setIsSuccess(true)
