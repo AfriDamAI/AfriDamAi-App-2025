@@ -2,11 +2,15 @@
 
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  ChevronLeft, MessageSquare,
-  Sparkles, ShoppingBag, Fingerprint
+// 🛡️ THE FIX: Explicit import to resolve ts(2304) and ts(2552)
+import { motion, AnimatePresence } from "framer-motion"
+import { 
+  ChevronLeft, MessageSquare, 
+  Sparkles, ShoppingBag, Loader2, 
+  CheckCircle2, Fingerprint
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
+import { apiClient } from "@/lib/api-client"
 
 const defaultPrefs = {
   clinical: true,
@@ -25,14 +29,35 @@ export default function NotificationSettingsPage() {
   const router = useRouter()
   const { user } = useAuth()
   
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const [prefsOverride, setPrefsOverride] = useState<typeof defaultPrefs | null>(null)
   const prefs = prefsOverride ?? {
     ...defaultPrefs,
     ...user?.profile?.prefs
   }
 
-  const handleToggle = (key: keyof typeof prefs) => {
-    setPrefsOverride({ ...prefs, [key]: !prefs[key] })
+  const handleToggle = async (key: keyof typeof prefs) => {
+    const updatedPrefs = { ...prefs, [key]: !prefs[key] }
+    setPrefsOverride(updatedPrefs)
+    setIsLoading(true)
+    setIsSuccess(false)
+
+    try {
+      /**
+       * 🚀 THE PREFERENCE HANDSHAKE
+       * Updating the User Profile preferences in the Render backend.
+       */
+      await apiClient.put(`/users/${user?.id}`, {
+        profile: { prefs: updatedPrefs }
+      })
+      setIsSuccess(true)
+      setTimeout(() => setIsSuccess(false), 2000)
+    } catch (err) {
+      console.log("Preference sync pending...")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const ToggleRow = ({ icon: Icon, title, subtitle, active, onToggle, color = "text-[#E1784F]" }: any) => (
@@ -74,6 +99,22 @@ export default function NotificationSettingsPage() {
             <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-30">Manage your glow notifications</p>
           </div>
         </header>
+
+        <AnimatePresence>
+          {(isLoading || isSuccess) && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center gap-3 px-6 py-4 bg-[#4DB6AC]/10 border border-[#4DB6AC]/20 rounded-2xl text-[#4DB6AC]"
+            >
+              {isLoading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+              <span className="text-[8px] font-black uppercase tracking-widest">
+                {isLoading ? "Syncing..." : "Saved"}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <section className="space-y-4">
           <ToggleRow 
