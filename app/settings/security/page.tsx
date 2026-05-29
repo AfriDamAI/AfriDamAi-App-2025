@@ -2,9 +2,9 @@
 
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  ChevronLeft, ShieldCheck,
-  Loader2, Key,
+import { 
+  ChevronLeft, Lock, ShieldCheck, 
+  Eye, EyeOff, Loader2, Key,
   Fingerprint, CheckCircle2, AlertCircle
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
@@ -23,9 +23,12 @@ export default function SecurityPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
   const [diagnosticSharingOverride, setDiagnosticSharingOverride] = useState<boolean | null>(null)
+  const [privacyLoading, setPrivacyLoading] = useState(false)
 
   const [passwords, setPasswords] = useState({
+    current: "",
     new: "",
     confirm: ""
   })
@@ -42,23 +45,50 @@ export default function SecurityPage() {
       return
     }
 
+    if (!user?.id || !user?.email) return
+
     setIsLoading(true)
     try {
-      await apiClient.put(`/users/${user?.id}`, {
+      // Step 1: verify current password by re-authenticating
+      await apiClient.post(`/auth/user/login`, {
+        email: user.email,
+        password: passwords.current
+      })
+
+      // Step 2: update the password
+      await apiClient.put(`/users/${user.id}`, {
         password: passwords.new
       })
+
       setIsSuccess(true)
-      setPasswords({ new: "", confirm: "" })
+      setPasswords({ current: "", new: "", confirm: "" })
       setTimeout(() => setIsSuccess(false), 3000)
     } catch (err: any) {
-      setError("Could not update password. Please try again.")
+      const status = err?.response?.status
+      if (status === 401 || status === 403) {
+        setError("Current password is incorrect.")
+      } else {
+        setError("Could not update password. Please try again.")
+      }
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleToggleDiagnosticSharing = () => {
-    setDiagnosticSharingOverride(!diagnosticSharing)
+  const handleToggleDiagnosticSharing = async () => {
+    const nextValue = !diagnosticSharing
+    setDiagnosticSharingOverride(nextValue)
+    setPrivacyLoading(true)
+
+    try {
+      await apiClient.put(`/users/${user?.id}`, {
+        profile: { diagnosticSharing: nextValue }
+      })
+    } catch (err: any) {
+      console.warn("Privacy setting sync failed.", err)
+    } finally {
+      setPrivacyLoading(false)
+    }
   }
 
   return (
@@ -104,7 +134,25 @@ export default function SecurityPage() {
               )}
 
               <div className="space-y-4">
-                 <input
+                 <div className="relative">
+                    <input 
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Current Password"
+                      value={passwords.current}
+                      onChange={(e) => setPasswords({...passwords, current: e.target.value})}
+                      className="w-full bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl py-6 px-8 text-[11px] font-bold outline-none focus:border-[#4DB6AC] transition-all"
+                      required
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-6 top-1/2 -translate-y-1/2 opacity-20 hover:opacity-100"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                 </div>
+
+                 <input 
                     type="password"
                     placeholder="New Password"
                     value={passwords.new}
@@ -152,9 +200,10 @@ export default function SecurityPage() {
                 <button
                   type="button"
                   onClick={handleToggleDiagnosticSharing}
+                  disabled={privacyLoading}
                   aria-pressed={diagnosticSharing}
                   aria-label="Toggle diagnostic sharing"
-                  className={`w-12 h-6 rounded-full relative transition-all ${
+                  className={`w-12 h-6 rounded-full relative transition-all disabled:opacity-60 disabled:cursor-wait ${
                     diagnosticSharing ? "bg-[#4DB6AC]" : "bg-gray-200 dark:bg-white/10"
                   }`}
                 >
