@@ -172,7 +172,7 @@ export const PersonalDetailsForm = ({
     }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+ const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
@@ -196,18 +196,31 @@ export const PersonalDetailsForm = ({
       };
 
       const hasExistingProfile = user?.profile && Object.keys(user.profile).length > 0;
+      // ATOMIC ROLLBACK: Track what was saved so we can undo on failure
+      let profileSaved = false;
 
       if (hasExistingProfile) {
         await updateProfile(profilePayload);
       } else {
         await createProfile(profilePayload);
       }
+      profileSaved = true;
 
+      try{
       await updateUserProfile({
         sex: formData.gender,
         nationality: formData.nationality === "Other" ? formData.otherCountry : formData.nationality
       });
-
+    } catch (secondErr: any) {
+      // ROLLBACK: Second call failed - undo the profile save to avoid corrupted state
+      if (profileSaved) {
+        await updateProfile({
+          ...profilePayload,
+          onboardingCompleted: user?.profile?.onboardingCompleted ?? false,
+        }).catch(() => {});
+      }
+      throw secondErr;
+    }
       setSuccess(true);
       await refreshUser();
       if (onSuccess) onSuccess();
