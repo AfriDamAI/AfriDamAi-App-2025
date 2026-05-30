@@ -49,13 +49,18 @@ export default function SecurityPage() {
 
     setIsLoading(true)
     try {
-      // Step 1: verify current password by re-authenticating
-      await apiClient.post(`/auth/user/login`, {
-        email: user.email,
-        password: passwords.current
-      })
+      // Step 1: verify current password — backend returns 404 for any auth failure
+      try {
+        await apiClient.post(`/auth/user/login`, {
+          email: user.email,
+          password: passwords.current
+        })
+      } catch {
+        setError("Current password is incorrect.")
+        return
+      }
 
-      // Step 2: update the password
+      // Step 2: update the password via the user update endpoint
       await apiClient.put(`/users/${user.id}`, {
         password: passwords.new
       })
@@ -64,12 +69,7 @@ export default function SecurityPage() {
       setPasswords({ current: "", new: "", confirm: "" })
       setTimeout(() => setIsSuccess(false), 3000)
     } catch (err: any) {
-      const status = err?.response?.status
-      if (status === 401 || status === 403) {
-        setError("Current password is incorrect.")
-      } else {
-        setError("Could not update password. Please try again.")
-      }
+      setError("Could not update password. Please try again.")
     } finally {
       setIsLoading(false)
     }
