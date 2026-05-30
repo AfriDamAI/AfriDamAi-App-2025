@@ -24,12 +24,17 @@ export default function SecurityPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
+  const [diagnosticSharingOverride, setDiagnosticSharingOverride] = useState<boolean | null>(null)
+  const [privacyLoading, setPrivacyLoading] = useState(false)
 
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
     confirm: ""
   })
+
+  const savedDiagnosticSharing = (user?.profile as any)?.diagnosticSharing
+  const diagnosticSharing = diagnosticSharingOverride ?? (typeof savedDiagnosticSharing === "boolean" ? savedDiagnosticSharing : true)
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,24 +45,49 @@ export default function SecurityPage() {
       return
     }
 
+    if (!user?.id || !user?.email) return
+
     setIsLoading(true)
     try {
-      /**
-       * 🚀 THE SECURITY HANDSHAKE
-       * Syncing with NestJS Auth/User password update logic.
-       */
-      await apiClient.patch(`/user/update-password`, {
-        currentPassword: passwords.current,
-        newPassword: passwords.new
+      // Step 1: verify current password — backend returns 404 for any auth failure
+      try {
+        await apiClient.post(`/auth/user/login`, {
+          email: user.email,
+          password: passwords.current
+        })
+      } catch {
+        setError("Current password is incorrect.")
+        return
+      }
+
+      // Step 2: update the password via the user update endpoint
+      await apiClient.put(`/users/${user.id}`, {
+        password: passwords.new
       })
-      
+
       setIsSuccess(true)
       setPasswords({ current: "", new: "", confirm: "" })
       setTimeout(() => setIsSuccess(false), 3000)
     } catch (err: any) {
-      setError("Could not update. Please check your current password.")
+      setError("Could not update password. Please try again.")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleToggleDiagnosticSharing = async () => {
+    const nextValue = !diagnosticSharing
+    setDiagnosticSharingOverride(nextValue)
+    setPrivacyLoading(true)
+
+    try {
+      await apiClient.put(`/users/${user?.id}`, {
+        profile: { diagnosticSharing: nextValue }
+      })
+    } catch (err: any) {
+      console.warn("Privacy setting sync failed.", err)
+    } finally {
+      setPrivacyLoading(false)
     }
   }
 
@@ -167,9 +197,20 @@ export default function SecurityPage() {
                    <p className="text-[10px] font-black uppercase tracking-tight">Diagnostic Sharing</p>
                    <p className="text-[8px] font-bold uppercase opacity-30 tracking-tighter">Anonymously help our AI improve for African skin</p>
                 </div>
-                <div className="w-12 h-6 bg-[#4DB6AC] rounded-full relative cursor-pointer">
-                   <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full" />
-                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleDiagnosticSharing}
+                  disabled={privacyLoading}
+                  aria-pressed={diagnosticSharing}
+                  aria-label="Toggle diagnostic sharing"
+                  className={`w-12 h-6 rounded-full relative transition-all disabled:opacity-60 disabled:cursor-wait ${
+                    diagnosticSharing ? "bg-[#4DB6AC]" : "bg-gray-200 dark:bg-white/10"
+                  }`}
+                >
+                   <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                    diagnosticSharing ? "right-1" : "left-1"
+                   }`} />
+                </button>
              </div>
           </div>
         </section>
