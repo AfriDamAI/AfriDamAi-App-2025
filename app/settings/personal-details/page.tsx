@@ -26,21 +26,19 @@ export default function PersonalDetailsPage() {
         <header className="space-y-6">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-sm opacity-80 hover:opacity-100 transition"
+            className="flex items-center gap-2 text-[#4DB6AC] text-[10px] font-black uppercase tracking-[0.3em]"
           >
-            <ChevronLeft className="h-4 w-4" />
-            Back
+            <ChevronLeft size={16} /> Back to Settings
           </button>
-
-          <h1 className="text-2xl font-semibold">
-            Personal Details
+        <div className="space-y-2">
+          <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none">
+            Personal <br /> <span className="text-[#E1784F]">Details</span>
           </h1>
-
-          <p className="text-sm opacity-70">
+          <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-30">
             Please provide accurate personal and skin health information.
           </p>
+          </div>
         </header>
-
         {/* FORM */}
         <section>
           <PersonalDetailsForm />
