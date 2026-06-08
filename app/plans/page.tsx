@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Check, X, ArrowLeft, Star, Zap, Crown, Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import environment from "@/lib/environment" // Import environment
-import { jwtDecode } from 'jwt-decode' // Import jwtDecode
+import environment from "@/lib/environment"
+import { jwtDecode } from 'jwt-decode'
 
 interface PricingPlan {
     id: string
@@ -84,7 +84,7 @@ export default function PlansPage() {
             }
 
             const decodedToken: any = jwtDecode(token)
-            const userId = decodedToken.sub // Assuming 'sub' is the userId claim in the token
+            const userId = decodedToken.sub
 
             const startDate = new Date()
             const endDate = new Date()
@@ -97,7 +97,7 @@ export default function PlansPage() {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    userId: userId, // Include userId
+                    userId: userId,
                     planId: plan.id,
                     startDate: startDate.toISOString(),
                     endDate: endDate.toISOString(),
@@ -106,11 +106,11 @@ export default function PlansPage() {
 
             const result = await response.json()
 
-            if (!response.ok || !result.id) { // Check for result.id as per Postman example
+            if (!response.ok || !result.id) {
                 throw new Error(result.message || "Failed to create subscription.")
             }
 
-            const subscriptionId = result.id // Get ID directly from result as per Postman example
+            const subscriptionId = result.id
             router.push(`/transaction?subscriptionId=${subscriptionId}&price=${plan.price}&name=${encodeURIComponent(plan.name)}`)
 
         } catch (err: any) {
@@ -124,7 +124,7 @@ export default function PlansPage() {
         <div className="w-full bg-white dark:bg-[#050505] text-black dark:text-white relative">
             <div className="fixed inset-0 z-[0] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-            <header className="relative z-10 px-8 pt-12 pb-6 flex items-center justify-between max-w-7xl mx-auto w-full">
+            <header className="relative z-10 px-4 sm:px-8 pt-12 pb-6 flex items-center justify-between max-w-7xl mx-auto w-full">
                 <button
                     onClick={() => router.back()}
                     className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center hover:bg-[#E1784F] hover:text-white transition-all"
@@ -135,7 +135,7 @@ export default function PlansPage() {
                 <div className="w-12" />
             </header>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-8 py-10 pb-32">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 py-10 pb-32">
                 <div className="text-center mb-16 space-y-4">
                     <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter leading-none">
                         Choose Your <br /><span className="text-[#E1784F]">Wellness Journey</span>
@@ -175,8 +175,8 @@ export default function PlansPage() {
                     </div>
                 ) : (
                     <div className="relative">
-                        <div className="overflow-x-auto overflow-y-visible pb-8 -mx-8 px-8 scrollbar-hide">
-                            <div className="flex gap-8 min-w-max md:min-w-0 md:grid md:grid-cols-3 md:gap-8">
+                        <div className="overflow-x-auto overflow-y-visible pb-8 scrollbar-hide">
+                            <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto sm:max-w-none sm:mx-0 sm:flex sm:flex-row sm:gap-6 sm:min-w-max md:min-w-0 md:grid md:grid-cols-3 md:gap-8">
                                 {plans.map((plan, idx) => (
                                     <motion.div
                                         key={plan.id}
@@ -184,11 +184,14 @@ export default function PlansPage() {
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
                                         transition={{ delay: idx * 0.1 }}
-                                        className={`relative p-8 md:p-10 rounded-[3rem] ${plan.color} ${plan.textColor} shadow-2xl flex flex-col h-full min-w-[320px] md:min-w-0`}
+                                        className={`relative p-8 md:p-10 rounded-[2.5rem] sm:rounded-[3rem] ${plan.color} ${plan.textColor} shadow-2xl flex flex-col w-full sm:min-w-[300px] md:min-w-0`}
                                     >
+                                        {/* FIXED: badge is now inline inside the card, no longer absolute/overflow */}
                                         {plan.popular && (
-                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg whitespace-nowrap">
-                                                Most Popular
+                                            <div className="flex justify-center mb-5">
+                                                <span className="bg-black text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg whitespace-nowrap">
+                                                    Most Popular
+                                                </span>
                                             </div>
                                         )}
 
@@ -198,7 +201,7 @@ export default function PlansPage() {
                                             </div>
                                             <h3 className="text-2xl font-black italic uppercase tracking-tighter">{plan.name}</h3>
                                             <div className="mt-4 flex items-baseline">
-                                                <span className="text-5xl font-black tracking-tighter">₦{plan.price}</span>
+                                                <span className="text-5xl font-black tracking-tighter">₦{plan.price.toLocaleString()}</span>
                                                 <span className="ml-2 text-[10px] font-bold uppercase tracking-widest opacity-60">{plan.period}</span>
                                             </div>
                                             <div className="mt-4 space-y-1">
@@ -260,4 +263,3 @@ export default function PlansPage() {
         </div>
     )
 }
-
