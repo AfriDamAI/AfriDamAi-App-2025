@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import {
   ShoppingBag, Search, ShieldCheck, ChevronLeft, ChevronUp, ChevronDown,
-  Sparkles, Heart, PackageOpen, SlidersHorizontal, X, AlertCircle
+  Sparkles, Heart, PackageOpen, SlidersHorizontal, X, AlertCircle, Plus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
@@ -114,18 +114,14 @@ export default function MarketplacePage() {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-
     const term = searchQuery.trim();
     latestTermRef.current = term;
 
     const execute = async () => {
       if (latestTermRef.current !== term) return;
-
       setIsSearchEmpty(false);
-
       try {
         let base: Product[];
-
         if (term.length >= 2) {
           setIsSearching(true);
           const data = await searchProducts(term);
@@ -138,12 +134,9 @@ export default function MarketplacePage() {
         } else {
           base = allProducts;
         }
-
         const filtered = applyClientFilters(base);
         setDisplayedProducts(filtered);
-        setIsSearchEmpty(
-          filtered.length === 0 && (term.length >= 2 || !!selectedCategory)
-        );
+        setIsSearchEmpty(filtered.length === 0 && (term.length >= 2 || !!selectedCategory));
       } catch {
         setIsSearching(false);
         setDisplayedProducts([]);
@@ -195,28 +188,21 @@ export default function MarketplacePage() {
   };
 
   const hasActiveFilters =
-    !!selectedCategory ||
-    minPrice !== "" ||
-    maxPrice !== "" ||
-    searchQuery.trim().length > 0;
+    !!selectedCategory || minPrice !== "" || maxPrice !== "" || searchQuery.trim().length > 0;
 
-  const activeFilterCount = [
-    !!selectedCategory,
-    minPrice !== "",
-    maxPrice !== "",
-  ].filter(Boolean).length;
+  const activeFilterCount = [!!selectedCategory, minPrice !== "", maxPrice !== ""].filter(Boolean).length;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#050505] flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-white dark:bg-[#050505] flex flex-col items-center justify-center space-y-5">
         <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="w-12 h-12 bg-[#E1784F] rounded-xl flex items-center justify-center font-black text-2xl text-white shadow-lg"
+          animate={{ scale: [1, 1.12, 1], opacity: [0.6, 1, 0.6] }}
+          transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+          className="w-14 h-14 bg-[#E1784F] rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-2xl shadow-[#E1784F]/30"
         >
           A
         </motion.div>
-        <p className="text-black/20 dark:text-white/20 text-[8px] font-black tracking-[0.4em]">
+        <p className="text-black/20 dark:text-white/20 text-[8px] font-black tracking-[0.5em] uppercase">
           Opening the Care Shop
         </p>
       </div>
@@ -224,33 +210,39 @@ export default function MarketplacePage() {
   }
 
   return (
-    <main className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 pb-12 selection:bg-[#E1784F]/30 text-left">
-      <div className="absolute top-0 left-0 w-full h-[400px] bg-[radial-gradient(circle_at_50%_0%,rgba(225,120,79,0.08),transparent_70%)] pointer-events-none" />
+    <main className="min-h-[100svh] bg-white dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 pb-16 selection:bg-[#E1784F]/30 text-left">
 
-      <div className="max-w-screen-xl mx-auto px-4 py-6 lg:py-10 relative z-10 space-y-8">
+      {/* Ambient background glow */}
+      <div className="fixed top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_at_50%_-10%,rgba(225,120,79,0.10),transparent_65%)] pointer-events-none z-0" />
+      <div className="fixed bottom-0 right-0 w-[400px] h-[400px] bg-[radial-gradient(circle_at_100%_100%,rgba(77,182,172,0.05),transparent_60%)] pointer-events-none z-0" />
 
-        <header className="space-y-6">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10 py-6 lg:py-10 relative z-10 space-y-10">
+
+        {/* ── HEADER ── */}
+        <header className="space-y-8">
+
+          {/* Top bar */}
           <div className="flex justify-between items-center">
             <button
               onClick={() => router.push("/dashboard")}
-              className="group flex items-center gap-2 text-[9px] font-black tracking-[0.2em] text-[#E1784F]"
+              className="group flex items-center gap-2 text-[9px] font-black tracking-[0.2em] text-[#E1784F] hover:gap-3 transition-all"
             >
               <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
               <span>Back home</span>
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-full">
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[#4DB6AC]/8 border border-[#4DB6AC]/20 rounded-full">
                 <ShieldCheck size={10} className="text-[#4DB6AC]" />
-                <span className="text-[7px] font-black tracking-widest opacity-60">Hand-Picked</span>
+                <span className="text-[7px] font-black tracking-widest text-[#4DB6AC]/70">Hand-Picked</span>
               </div>
               <Button
                 onClick={() => router.push("/cart")}
-                className="relative h-10 px-4 bg-black dark:bg-white text-white dark:text-black rounded-xl shadow-lg transition-all active:scale-95"
+                className="relative h-10 w-10 p-0 bg-black dark:bg-white text-white dark:text-black rounded-xl shadow-lg shadow-black/20 dark:shadow-white/10 transition-all active:scale-95 hover:bg-[#E1784F] hover:shadow-[#E1784F]/30"
               >
-                <ShoppingBag size={16} />
+                <ShoppingBag size={15} />
                 {cart && cart.items.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E1784F] text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#050505]">
+                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E1784F] text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#050505] shadow-sm">
                     {cart.items.length}
                   </span>
                 )}
@@ -258,264 +250,336 @@ export default function MarketplacePage() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-[0.8] text-black dark:text-white">
-              Care <br /> <span className="text-[#E1784F]">Market</span>
-            </h1>
-            <p className="text-[9px] font-black tracking-[0.3em] opacity-40 max-w-lg leading-relaxed">
+          {/* Hero title */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-10 bg-[#E1784F] rounded-full" />
+              <div>
+                <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter leading-[0.85] text-black dark:text-white">
+                  Care <span className="text-[#E1784F]">Market</span>
+                </h1>
+              </div>
+            </div>
+            <p className="text-[9px] font-black tracking-[0.35em] opacity-35 max-w-sm leading-relaxed uppercase pl-4">
               Supporting your skin journey with products that feel like home.
             </p>
           </div>
 
-          {/* Search bar + filter toggle */}
-          <div className="flex gap-2 w-full max-w-lg">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-20 w-4 h-4" />
-              {isSearching && (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-[#E1784F] border-t-transparent rounded-full"
+          {/* ── SEARCH + FILTER ── */}
+          <div className="space-y-4">
+            <div className="flex gap-3 w-full max-w-xl">
+              {/* Search input */}
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-25 w-4 h-4" />
+                {isSearching && (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 0.7, ease: "linear" }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-[#E1784F] border-t-transparent rounded-full"
+                  />
+                )}
+                <input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full bg-gray-50/80 dark:bg-white/[0.04] border border-gray-200/80 dark:border-white/[0.07] rounded-2xl py-4 pl-11 pr-11 text-[11px] font-bold tracking-wider focus:border-[#E1784F] focus:bg-white dark:focus:bg-white/[0.06] focus:shadow-[0_0_0_4px_rgba(225,120,79,0.08)] outline-none transition-all placeholder:opacity-30"
                 />
-              )}
-              <input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl py-4 pl-10 pr-10 text-[10px] font-bold tracking-widest focus:border-[#E1784F] outline-none transition-all"
-              />
-            </div>
-            <button
-              onClick={() => setShowFilters((v) => !v)}
-              className={`relative h-[52px] w-[52px] flex items-center justify-center rounded-xl border transition-all ${
-                showFilters || activeFilterCount > 0
-                  ? "bg-[#E1784F] border-[#E1784F] text-white"
-                  : "bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-black/40 dark:text-white/40"
-              }`}
-            >
-              <SlidersHorizontal size={14} />
-              {showFilters ? <ChevronUp size={10} className="ml-0.5" /> : <ChevronDown size={10} className="ml-0.5" />}
-              {activeFilterCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-black dark:bg-white text-white dark:text-black text-[7px] font-black rounded-full flex items-center justify-center">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-          </div>
+              </div>
 
-          {/* Filter panel */}
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
+              {/* Filter toggle */}
+              <button
+                onClick={() => setShowFilters((v) => !v)}
+                className={`relative h-[54px] px-4 flex items-center gap-1.5 rounded-2xl border font-black text-[9px] tracking-widest transition-all ${
+                  showFilters || activeFilterCount > 0
+                    ? "bg-[#E1784F] border-[#E1784F] text-white shadow-lg shadow-[#E1784F]/25"
+                    : "bg-gray-50/80 dark:bg-white/[0.04] border-gray-200/80 dark:border-white/[0.07] text-black/40 dark:text-white/40 hover:border-[#E1784F]/40"
+                }`}
               >
-                <div className="space-y-5 pt-2 pb-5 border-b border-gray-100 dark:border-white/10">
+                <SlidersHorizontal size={13} />
+                <span className="hidden sm:inline">Filters</span>
+                {showFilters ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+                {activeFilterCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 w-[18px] h-[18px] bg-black dark:bg-white text-white dark:text-black text-[7px] font-black rounded-full flex items-center justify-center">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </button>
+            </div>
 
-                  {categories.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-[8px] font-black tracking-[0.3em] opacity-40">CATEGORY</p>
-                      <div className="flex flex-wrap gap-2">
-                        {categories.map((cat) => (
-                          <button
-                            key={cat.id}
-                            onClick={() =>
-                              setSelectedCategory(
-                                selectedCategory?.id === cat.id ? null : cat
-                              )
-                            }
-                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black tracking-wider transition-all ${
-                              selectedCategory?.id === cat.id
-                                ? "bg-[#E1784F] text-white"
-                                : "bg-gray-100 dark:bg-white/10 text-black/60 dark:text-white/60 hover:bg-gray-200 dark:hover:bg-white/20"
-                            }`}
-                          >
-                            {cat.name}
-                          </button>
-                        ))}
+            {/* Filter panel */}
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, y: -8 }}
+                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -8 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-5 rounded-2xl bg-gray-50/60 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] space-y-5">
+                    {categories.length > 0 && (
+                      <div className="space-y-2.5">
+                        <p className="text-[8px] font-black tracking-[0.35em] opacity-35 uppercase">Category</p>
+                        <div className="flex flex-wrap gap-2">
+                          {categories.map((cat) => (
+                            <button
+                              key={cat.id}
+                              onClick={() => setSelectedCategory(selectedCategory?.id === cat.id ? null : cat)}
+                              className={`px-3.5 py-1.5 rounded-xl text-[9px] font-black tracking-wider transition-all ${
+                                selectedCategory?.id === cat.id
+                                  ? "bg-[#E1784F] text-white shadow-sm shadow-[#E1784F]/20"
+                                  : "bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 text-black/50 dark:text-white/50 hover:border-[#E1784F]/40 hover:text-[#E1784F]"
+                              }`}
+                            >
+                              {cat.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="space-y-2.5">
+                      <p className="text-[8px] font-black tracking-[0.35em] opacity-35 uppercase">Price Range (₦)</p>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="number"
+                          value={minPrice}
+                          onChange={(e) => setMinPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                          placeholder="Min"
+                          min={0}
+                          className="bg-white dark:bg-white/[0.05] border border-gray-200 dark:border-white/10 rounded-xl py-2.5 px-4 text-[10px] font-bold tracking-wider focus:border-[#E1784F] outline-none transition-all w-28 placeholder:opacity-30"
+                        />
+                        <div className="w-4 h-px bg-gray-300 dark:bg-white/20" />
+                        <input
+                          type="number"
+                          value={maxPrice}
+                          onChange={(e) => setMaxPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                          placeholder="Max"
+                          min={0}
+                          className="bg-white dark:bg-white/[0.05] border border-gray-200 dark:border-white/10 rounded-xl py-2.5 px-4 text-[10px] font-bold tracking-wider focus:border-[#E1784F] outline-none transition-all w-28 placeholder:opacity-30"
+                        />
                       </div>
                     </div>
-                  )}
 
-                  <div className="space-y-2">
-                    <p className="text-[8px] font-black tracking-[0.3em] opacity-40">PRICE RANGE (₦)</p>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={minPrice}
-                        onChange={(e) =>
-                          setMinPrice(e.target.value === "" ? "" : Number(e.target.value))
-                        }
-                        placeholder="Min"
-                        min={0}
-                        className="bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl py-2 px-4 text-[10px] font-bold tracking-widest focus:border-[#E1784F] outline-none transition-all w-28"
-                      />
-                      <span className="text-[9px] font-black opacity-30">—</span>
-                      <input
-                        type="number"
-                        value={maxPrice}
-                        onChange={(e) =>
-                          setMaxPrice(e.target.value === "" ? "" : Number(e.target.value))
-                        }
-                        placeholder="Max"
-                        min={0}
-                        className="bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl py-2 px-4 text-[10px] font-bold tracking-widest focus:border-[#E1784F] outline-none transition-all w-28"
-                      />
-                    </div>
+                    {hasActiveFilters && (
+                      <button
+                        onClick={clearFilters}
+                        className="flex items-center gap-1.5 text-[9px] font-black tracking-wider text-[#E1784F] hover:opacity-70 transition-opacity"
+                      >
+                        <X size={10} />
+                        Clear all filters
+                      </button>
+                    )}
                   </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-                  {hasActiveFilters && (
-                    <button
-                      onClick={clearFilters}
-                      className="flex items-center gap-1.5 text-[9px] font-black tracking-wider text-[#E1784F]"
-                    >
-                      <X size={10} />
-                      Clear all filters
+            {/* Active filter badges */}
+            {!showFilters && (selectedCategory || minPrice !== "" || maxPrice !== "") && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-wrap gap-2"
+              >
+                {selectedCategory && (
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E1784F]/10 text-[#E1784F] border border-[#E1784F]/20 rounded-xl text-[8px] font-black tracking-wider">
+                    {selectedCategory.name}
+                    <button onClick={() => setSelectedCategory(null)} className="hover:opacity-60 transition-opacity">
+                      <X size={8} />
                     </button>
-                  )}
-                </div>
+                  </span>
+                )}
+                {minPrice !== "" && (
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E1784F]/10 text-[#E1784F] border border-[#E1784F]/20 rounded-xl text-[8px] font-black tracking-wider">
+                    From ₦{Number(minPrice).toLocaleString()}
+                    <button onClick={() => setMinPrice("")} className="hover:opacity-60 transition-opacity">
+                      <X size={8} />
+                    </button>
+                  </span>
+                )}
+                {maxPrice !== "" && (
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E1784F]/10 text-[#E1784F] border border-[#E1784F]/20 rounded-xl text-[8px] font-black tracking-wider">
+                    Under ₦{Number(maxPrice).toLocaleString()}
+                    <button onClick={() => setMaxPrice("")} className="hover:opacity-60 transition-opacity">
+                      <X size={8} />
+                    </button>
+                  </span>
+                )}
               </motion.div>
             )}
-          </AnimatePresence>
-
-          {/* Active filter badges (collapsed state) */}
-          {!showFilters && (selectedCategory || minPrice !== "" || maxPrice !== "") && (
-            <div className="flex flex-wrap gap-2">
-              {selectedCategory && (
-                <span className="flex items-center gap-1 px-2.5 py-1 bg-[#E1784F]/10 text-[#E1784F] rounded-lg text-[8px] font-black tracking-wider">
-                  {selectedCategory.name}
-                  <button onClick={() => setSelectedCategory(null)} className="ml-0.5">
-                    <X size={8} />
-                  </button>
-                </span>
-              )}
-              {minPrice !== "" && (
-                <span className="flex items-center gap-1 px-2.5 py-1 bg-[#E1784F]/10 text-[#E1784F] rounded-lg text-[8px] font-black tracking-wider">
-                  From ₦{Number(minPrice).toLocaleString()}
-                  <button onClick={() => setMinPrice("")} className="ml-0.5">
-                    <X size={8} />
-                  </button>
-                </span>
-              )}
-              {maxPrice !== "" && (
-                <span className="flex items-center gap-1 px-2.5 py-1 bg-[#E1784F]/10 text-[#E1784F] rounded-lg text-[8px] font-black tracking-wider">
-                  Under ₦{Number(maxPrice).toLocaleString()}
-                  <button onClick={() => setMaxPrice("")} className="ml-0.5">
-                    <X size={8} />
-                  </button>
-                </span>
-              )}
-            </div>
-          )}
+          </div>
         </header>
 
-        {/* Product grid / empty states */}
+        {/* ── PRODUCT GRID / STATES ── */}
         {isError ? (
-          <div className="py-16 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-red-100 dark:border-red-900/20 rounded-xl">
-            <AlertCircle size={24} className="text-red-400 opacity-60" />
-            <div className="space-y-0.5">
-              <h3 className="text-lg font-black italic tracking-tighter leading-none">Shop Unavailable</h3>
-              <p className="text-[7px] font-black tracking-widest opacity-20">
-                Could not load products. Please try again.
-              </p>
+          <div className="py-20 flex flex-col items-center justify-center text-center space-y-5 border border-dashed border-red-200 dark:border-red-900/20 rounded-3xl bg-red-50/30 dark:bg-red-900/5">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+              <AlertCircle size={20} className="text-red-400" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-black italic tracking-tighter">Shop Unavailable</h3>
+              <p className="text-[8px] font-black tracking-widest opacity-25">Could not load products. Please try again.</p>
             </div>
             <button
               onClick={() => window.location.reload()}
-              className="text-[8px] font-black tracking-widest text-[#E1784F] mt-1"
+              className="px-5 py-2.5 rounded-xl bg-[#E1784F] text-white text-[9px] font-black tracking-widest"
             >
               Retry
             </button>
           </div>
+
         ) : displayedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {displayedProducts.map((product, i) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <div className="group flex flex-col h-full text-left">
-                  <div className="aspect-[1/1.2] relative overflow-hidden rounded-xl bg-gray-100 dark:bg-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.10)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-shadow duration-300 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.65)]">
+          <>
+            {/* Product count */}
+            <div className="flex items-center justify-between">
+              <p className="text-[8px] font-black tracking-[0.3em] opacity-30 uppercase">
+                {displayedProducts.length} product{displayedProducts.length !== 1 ? "s" : ""}
+              </p>
+              {hasActiveFilters && (
+                <button onClick={clearFilters} className="text-[8px] font-black tracking-wider text-[#E1784F] flex items-center gap-1">
+                  <X size={8} /> Clear filters
+                </button>
+              )}
+            </div>
+
+            {/* Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full">
+              {displayedProducts.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04, ease: "easeOut" }}
+                  className="group flex flex-col h-full text-left"
+                >
+                  {/* Image container */}
+                  <div className="relative overflow-hidden rounded-2xl bg-gray-100 dark:bg-white/[0.04] aspect-[3/4]">
                     <img
                       src={product.thumbnail}
                       alt={product.name}
-                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 "
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                     />
-                    <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-[10px] font-black tracking-tight">
+
+                    {/* Gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                    {/* Price tag — top right */}
+                    <div className="absolute top-3 right-3 bg-black/75 dark:bg-black/85 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-[10px] font-black tracking-tight shadow-lg">
                       ₦{product.price.toLocaleString()}
+                    </div>
+
+                    {/* Out of stock overlay */}
+                    {!product.inStock && (
+                      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center rounded-2xl">
+                        <span className="bg-white/10 border border-white/20 text-white text-[8px] font-black tracking-widest px-3 py-1.5 rounded-full">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Quick-add button — slides up on hover */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                      <button
+                        onClick={() => addToCart(product)}
+                        disabled={isAddingToCart === product.id || !product.inStock}
+                        className="w-full bg-white text-black rounded-xl py-2.5 text-[9px] font-black tracking-widest flex items-center justify-center gap-2 shadow-xl active:scale-95 transition-all disabled:opacity-50 hover:bg-[#E1784F] hover:text-white"
+                      >
+                        {isAddingToCart === product.id ? (
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 0.6, ease: "linear" }}
+                            className="w-3 h-3 border-2 border-current border-t-transparent rounded-full"
+                          />
+                        ) : (
+                          <>
+                            <Plus size={10} strokeWidth={3} />
+                            Add to Cart
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
 
-                  <div className="py-4 space-y-3">
-                    <div className="space-y-0.5">
-                      <p className="text-[7px] font-black tracking-widest text-[#E1784F]">
-                        {product.vendorName}
-                      </p>
-                      <h3 className="text-base font-black italic tracking-tighter leading-tight">
-                        {product.name}
-                      </h3>
-                    </div>
-                    <Button
+                  {/* Product info below image */}
+                  <div className="pt-3.5 pb-1 px-0.5 space-y-1.5 flex-1 flex flex-col">
+                    <p className="text-[7px] font-black tracking-[0.25em] text-[#E1784F] uppercase leading-none">
+                      {product.vendorName}
+                    </p>
+                    <h3 className="text-[13px] font-black italic tracking-tight leading-snug line-clamp-2 text-black dark:text-white flex-1">
+                      {product.name}
+                    </h3>
+
+                    {/* Mobile-only add button (visible when hover isn't possible) */}
+                    <button
                       onClick={() => addToCart(product)}
-                      disabled={isAddingToCart === product.id}
-                      className="w-full bg-black dark:bg-white text-white dark:text-black rounded-lg h-10 font-black tracking-widest text-[8px] shadow-md active:scale-95 transition-all"
+                      disabled={isAddingToCart === product.id || !product.inStock}
+                      className="sm:hidden w-full mt-2 bg-black dark:bg-white text-white dark:text-black rounded-xl py-3 text-[9px] font-black tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50"
                     >
-                      {isAddingToCart === product.id ? "Adding..." : "Add To Cart"}
-                    </Button>
+                      {isAddingToCart === product.id ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 0.6, ease: "linear" }}
+                          className="w-3 h-3 border-2 border-current border-t-transparent rounded-full"
+                        />
+                      ) : (
+                        <>
+                          <Plus size={10} strokeWidth={3} />
+                          Add to Cart
+                        </>
+                      )}
+                    </button>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          </>
+
         ) : isSearchEmpty ? (
-          <div className="py-16 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-gray-100 dark:border-white/5 rounded-xl">
-            <Search size={24} className="opacity-10" />
-            <div className="space-y-0.5">
-              <h3 className="text-lg font-black italic tracking-tighter leading-none">No matches found</h3>
-              <p className="text-[7px] font-black tracking-widest opacity-20">
-                Try different keywords or adjust your filters.
-              </p>
+          <div className="py-20 flex flex-col items-center justify-center text-center space-y-5 border border-dashed border-gray-200 dark:border-white/[0.06] rounded-3xl">
+            <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+              <Search size={18} className="opacity-30" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-black italic tracking-tighter">No matches found</h3>
+              <p className="text-[8px] font-black tracking-widest opacity-25">Try different keywords or adjust your filters.</p>
             </div>
             {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="text-[8px] font-black tracking-widest text-[#E1784F]"
-              >
+              <button onClick={clearFilters} className="text-[9px] font-black tracking-widest text-[#E1784F] px-4 py-2 rounded-xl bg-[#E1784F]/10 hover:bg-[#E1784F]/20 transition-colors">
                 Clear filters
               </button>
             )}
           </div>
+
         ) : (
-          <div className="py-16 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-gray-100 dark:border-white/5 rounded-xl">
-            <PackageOpen size={24} className="opacity-10" />
-            <div className="space-y-0.5">
-              <h3 className="text-lg font-black italic tracking-tighter leading-none">Restocking...</h3>
-              <p className="text-[7px] font-black tracking-widest opacity-20">New solutions coming soon.</p>
+          <div className="py-20 flex flex-col items-center justify-center text-center space-y-5 border border-dashed border-gray-200 dark:border-white/[0.06] rounded-3xl">
+            <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+              <PackageOpen size={18} className="opacity-30" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-black italic tracking-tighter">Restocking...</h3>
+              <p className="text-[8px] font-black tracking-widest opacity-25">New solutions coming soon.</p>
             </div>
           </div>
         )}
 
-        <footer className="pt-10 border-t border-gray-100 dark:border-white/10 flex flex-col items-center gap-5">
-          <div className="flex flex-wrap justify-center gap-6 items-center opacity-30">
+        {/* ── FOOTER ── */}
+        <footer className="pt-12 border-t border-gray-100 dark:border-white/[0.06] flex flex-col items-center gap-5">
+          <div className="flex flex-wrap justify-center gap-8 items-center">
             {[
               { label: "Proven Care", icon: ShieldCheck },
               { label: "African Glow", icon: Sparkles },
               { label: "Family Safe", icon: Heart },
             ].map((trust, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 text-black dark:text-white font-black text-[7px] tracking-[0.2em]"
-              >
-                <trust.icon size={12} className="text-[#E1784F]" />
+              <div key={i} className="flex items-center gap-2 font-black text-[7px] tracking-[0.25em] opacity-20 uppercase">
+                <trust.icon size={11} className="text-[#E1784F]" />
                 <span>{trust.label}</span>
               </div>
             ))}
           </div>
-          <p className="text-[7px] font-black tracking-[0.4em] opacity-20 italic">© 2026 AfriDam AI</p>
+          <p className="text-[7px] font-black tracking-[0.5em] opacity-15 italic">© 2026 AfriDam AI</p>
         </footer>
+
       </div>
     </main>
   );
