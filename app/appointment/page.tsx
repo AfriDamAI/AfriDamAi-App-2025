@@ -247,7 +247,7 @@ const AppointmentPage = () => {
                     mode="single"
                     selected={scheduledAt}
                     onSelect={setScheduledAt}
-                    initialFocus
+                    autoFocus
                   />
                   <div className="p-3 border-t border-border">
                     <Input
