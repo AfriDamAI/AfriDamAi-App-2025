@@ -80,7 +80,7 @@ export default function Dashboard() {
       await initializePayment({ plan: "INSTANT_CONSULTATION", amount: 15 })
       initializePaystack({
         onSuccess: (reference: any) => {
-          router.push(`/specialist/chat?ref=${reference.reference}`)
+          router.push(`//chat?ref=${reference.reference}`)
         },
         onClose: () => console.log("Handshake Interrupted")
       })
