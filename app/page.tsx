@@ -4,6 +4,7 @@
  * Focus: Sophisticated Scaling, (auth) Group Alignment, Rule 6 Compliance.
  */
 
+
 "use client"
 
 import React from "react"
@@ -53,13 +54,13 @@ export default function LandingPage() {
             <div className="sm:col-span-2 space-y-4 md:space-y-6" style={{ margin: 0 }}>
               <div className="inline-flex items-center gap-2.5 bg-[#E1784F]/5 dark:bg-white/5 px-4 py-2 rounded-full border border-[#E1784F]/10">
                 <Sparkles className="text-[#E1784F]" size={12} />
-                <span className="text-[9px] font-black capitalize tracking-widest text-[#E1784F]">Cosmetic Excellence</span>
+                <span className="text-[9px] font-black capitalize tracking-widest text-[#E1784F]">Clinical Excellence</span>
               </div>
               <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-7xl font-black leading-[1.1] tracking-tight italic text-black dark:text-white">
                 Your <br /> Skin's <br /> <span className="text-[#E1784F]">Best Friend.</span>
               </h1>
               <p className="text-sm sm:text-lg md:text-2xl font-black max-w-lg opacity-25 tracking-tighter leading-tight italic">
-                Melanin Aware. <br /> Safe care for skin of color.
+                Localized protection. <br /> Safe care for the heritage.
               </p>
             </div>
 
@@ -132,7 +133,7 @@ export default function LandingPage() {
             <div className="p-10 bg-[#E1784F] text-white rounded-[3rem] space-y-8 shadow-2xl relative overflow-hidden group">
               <div className="w-14 h-14 rounded-2xl bg-white text-[#E1784F] flex items-center justify-center font-black text-xl italic">02</div>
               <h3 className="text-2xl font-black capitalize italic leading-none text-white">Instant <br />Check</h3>
-              <p className="text-[11px] font-bold opacity-80 leading-relaxed tracking-tight">We check your scan against cosmetic health standards for melanin.</p>
+              <p className="text-[11px] font-bold opacity-80 leading-relaxed tracking-tight">We check your scan against clinical health standards for melanin.</p>
               <div className="aspect-square bg-black/10 rounded-[2.5rem] flex items-center justify-center">
                 <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="w-24 h-24 border-2 border-dashed border-white/30 rounded-full flex items-center justify-center">
                   <Activity size={32} />
