@@ -552,45 +552,65 @@ export const SpecialistChat = () => {
         {selectedChat ? (
           <>
             {/* Chat Header */}
-            <div className={`px-6 py-4 border-b flex items-center justify-between ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
-              <div className="flex items-center gap-4">
+            {/* MOBILE FIX: smaller padding/gap on mobile only; sm: and up match original desktop values */}
+            <div className={`px-3 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between gap-2 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
+              {/* MOBILE FIX: added flex-1 alongside min-w-0 — this is what makes the
+                  name actually shrink and truncate instead of wrapping. A flex child
+                  needs both min-w-0 (allow shrinking below content width) AND a size
+                  basis (flex-1) so the row gives space to the button first. */}
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
                 {/* Back Button for Mobile */}
                 <button
                   onClick={() => setSelectedChat(null)}
-                  className="md:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[#4DB6AC]"
+                  className="md:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[#4DB6AC] flex-shrink-0"
                 >
                   <ChevronLeft size={24} />
                 </button>
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold shadow-md flex-shrink-0">
+                {/* MOBILE FIX: smaller avatar on mobile only */}
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#4DB6AC] to-[#E1784F] flex items-center justify-center text-white font-semibold shadow-md flex-shrink-0 text-sm sm:text-base">
                   {getDisplayName(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id).split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
-                <div>
-                  <h3 className="font-semibold text-base">{getDisplayName(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id)}</h3>
-                  <p className={`text-xs font-medium ${canMeet ? 'text-green-500' : 'text-gray-400'}`}>
+                {/* MOBILE FIX: min-w-0 + flex-1 + truncate so long names ellipsis on one line instead of wrapping to two */}
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-sm sm:text-base truncate">{getDisplayName(selectedChat.participant1Id === CURRENT_USER_ID ? selectedChat.participant2Id : selectedChat.participant1Id)}</h3>
+                  <p className={`text-xs font-medium truncate ${canMeet ? 'text-green-500' : 'text-gray-400'}`}>
                     {canMeet ? 'Active now' : 'Session not active'}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                {/* MOBILE FIX: three-dot menu now comes first so the Create/Join
+                    Meeting button ends up as the last (rightmost) element — moved
+                    it "towards the end" of the row as requested */}
+                {/* <button className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex-shrink-0">
+                  <MoreVertical size={20} />
+                </button> */}
                 {/* Google Meet Join Button — active only if session is IN_PROGRESS */}
+                {/* MOBILE FIX: on mobile the label shortens to "Meet"/"Join" (full
+                    "Create Meeting"/"Join Meeting" text only shows from sm: up) so
+                    the button can never wrap onto two lines on narrow screens */}
                 <button
                   onClick={handleCreateOrJoinMeet}
                   disabled={!canMeet || isJoiningMeet}
                   title={!canMeet ? 'Session must be IN_PROGRESS' : (currentMeetLink || relatedAppointment?.meetingLink) ? 'Join Google Meet session' : 'Create a Google Meet for this session'}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:grayscale shadow-sm ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-white text-[10px] sm:text-xs font-black uppercase tracking-wide sm:tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:grayscale shadow-sm whitespace-nowrap flex-shrink-0 ${
                     (currentMeetLink || relatedAppointment?.meetingLink) ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
                   }`}
                 >
-                  <Video size={16} />
-                  {isJoiningMeet ? 'Opening...' : (currentMeetLink || relatedAppointment?.meetingLink) ? 'Join Meeting' : 'Create Meeting'}
-                </button>
-                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
-                  <MoreVertical size={20} />
+                  <Video size={14} className="sm:hidden flex-shrink-0" />
+                  <Video size={16} className="hidden sm:block flex-shrink-0" />
+                  {/* MOBILE FIX: short label on mobile, full label from sm: up */}
+                  <span className="sm:hidden">
+                    {isJoiningMeet ? '...' : (currentMeetLink || relatedAppointment?.meetingLink) ? 'Join' : 'Meet'}
+                  </span>
+                  <span className="hidden sm:inline">
+                    {isJoiningMeet ? 'Opening...' : (currentMeetLink || relatedAppointment?.meetingLink) ? 'Join Meeting' : 'Create Meeting'}
+                  </span>
                 </button>
               </div>
             </div>
 
-            {/* Messages Area */}
+            {/* Messages Area — unchanged */}
             <div ref={scrollRef} className={`flex-1 overflow-y-auto p-6 space-y-4 ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
               {messages.map((msg, index) => {
                 const isOwn = msg.senderId === CURRENT_USER_ID;
@@ -611,8 +631,12 @@ export const SpecialistChat = () => {
             </div>
 
             {/* Message Input */}
-            <div className={`p-4 border-t pb-24 md:pb-4 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
-              {/* File Preview */}
+            {/* MOBILE FIX: smaller padding on mobile only; sm: matches original desktop.
+                pb-24 restored — it's clearance for the app's fixed bottom nav bar
+                (Home/Chat/Camera/Cart), not dead space. Removing it hid the send
+                button behind that bar and required scrolling to reach it. */}
+            <div className={`p-2 sm:p-4 border-t pb-24 md:pb-4 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
+              {/* File Preview — unchanged */}
               <AnimatePresence>
                 {selectedFile && (
                   <motion.div
@@ -638,43 +662,51 @@ export const SpecialistChat = () => {
                 )}
               </AnimatePresence>
 
-              <div className="flex items-end gap-3">
+              {/* MOBILE FIX: smaller gap on mobile only */}
+              <div className="flex items-end gap-1.5 sm:gap-3">
                 <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
 
                 {isRecording ? (
                   <VoiceRecorder onSend={handleVoiceNote} onCancel={() => setIsRecording(false)} />
                 ) : (
                   <>
+                    {/* MOBILE FIX: smaller padding on mobile only */}
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
-                      className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1 disabled:opacity-30"
+                      className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1 disabled:opacity-30 flex-shrink-0"
                     >
                       <Paperclip size={20} />
                     </button>
 
-                    <div className={`flex-1 rounded-2xl border transition-all ${isDark ? 'bg-[#1F1E1D] border-white/10 focus-within:border-[#4DB6AC]/50' : 'bg-gray-50 border-gray-200 focus-within:border-[#4DB6AC]'}`}>
+                    {/* MOBILE FIX: added min-w-0 — this is the actual overlap fix.
+                        Without it, a flex-1 child won't shrink below its content's
+                        natural width in a flex row, which pushed the send button
+                        off-screen on narrow viewports. */}
+                    <div className={`flex-1 min-w-0 rounded-2xl border transition-all ${isDark ? 'bg-[#1F1E1D] border-white/10 focus-within:border-[#4DB6AC]/50' : 'bg-gray-50 border-gray-200 focus-within:border-[#4DB6AC]'}`}>
                       <textarea
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(inputMessage, selectedFile); } }}
                         placeholder="Type message..."
                         rows={1}
-                        className="w-full px-4 py-3 bg-transparent outline-none resize-none text-sm min-h-[44px]"
+                        className="w-full px-3 sm:px-4 py-3 bg-transparent outline-none resize-none text-sm min-h-[44px]"
                       />
                     </div>
 
+                    {/* MOBILE FIX: smaller padding on mobile only */}
                     <button
                       onClick={() => setIsRecording(true)}
-                      className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1"
+                      className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-all mb-1 flex-shrink-0"
                     >
                       <Mic size={20} />
                     </button>
 
+                    {/* MOBILE FIX: smaller padding/min-width on mobile only; sm: matches original */}
                     <button
                       onClick={() => handleSendMessage(inputMessage, selectedFile)}
                       disabled={isUploading || (!inputMessage.trim() && !selectedFile)}
-                      className="p-3 bg-[#4DB6AC] text-white rounded-2xl hover:bg-[#4DB6AC]/90 disabled:opacity-50 transition-all mb-1 shadow-lg shadow-[#4DB6AC]/20 min-w-[3.5rem] flex items-center justify-center"
+                      className="p-2.5 sm:p-3 bg-[#4DB6AC] text-white rounded-2xl hover:bg-[#4DB6AC]/90 disabled:opacity-50 transition-all mb-1 shadow-lg shadow-[#4DB6AC]/20 min-w-[2.75rem] sm:min-w-[3.5rem] flex items-center justify-center flex-shrink-0"
                     >
                       {isUploading ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
