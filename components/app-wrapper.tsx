@@ -47,6 +47,12 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const showMobileNav = user && !isAuthRoute && !isFullscreenRoute;
   const showFloatingScrollNav = !isAuthRoute && !pathname.startsWith("/specialist");
 
+  // 🩹 /specialist sizes itself to the exact remaining viewport (h-[calc(100vh-Npx)])
+  // and already reserves its own clearance for the fixed MobileNav internally.
+  // Adding main's usual pb-16 on top pushes total page height past 100vh, making the
+  // whole page scroll and exposing a blank gap above the nav bar.
+  const isFullHeightRoute = pathname.startsWith("/specialist");
+
   const handleSignIn = () => router.push("/login");
   const handleSignUp = () => router.push("/register");
   const handleViewProfile = () => setProfileSidebarOpen(true);
@@ -60,9 +66,18 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     return () => { document.body.style.overflow = 'unset'; };
   }, [profileSidebarOpen]);
 
+  // 🩹 min-h-screen (100vh) is the mobile browser's LARGE viewport (chrome hidden) —
+  // taller than what's visible when the address bar is showing, which creates phantom
+  // scroll room even when content fits. Fine for normal scrolling pages, but /specialist
+  // wants zero page-level scroll, so it additionally needs the dynamic viewport unit.
+  // Keep min-h-screen too (not a replacement) — if a WebView doesn't understand the
+  // dvh unit it drops that whole declaration, and without this fallback the page would
+  // collapse to content height instead of filling the screen.
+  const screenHeightClass = isFullHeightRoute ? 'min-h-screen min-h-dvh' : 'min-h-screen';
+
   return (
-    <div className="relative min-h-screen flex flex-col bg-background selection:bg-[#E1784F]/20">
-      <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className={`relative ${screenHeightClass} flex flex-col bg-background selection:bg-[#E1784F]/20`}>
+      <div className={`flex flex-col lg:flex-row ${screenHeightClass}`}>
         {/* 🖥️ PC SIDEBAR LAYER */}
         {showSidebar && <Sidebar />}
 
@@ -79,7 +94,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
           )}
 
           {/* 🚀 2. DYNAMIC CONTENT AREA */}
-          <main className={`flex-grow relative z-10 ${showMobileNav ? 'pb-16 lg:pb-0' : ''} ${
+          <main className={`flex-grow relative z-10 ${isFullHeightRoute ? 'min-h-0 overflow-hidden' : ''} ${showMobileNav && !isFullHeightRoute ? 'pb-16 lg:pb-0' : ''} ${
             isAuthRoute
               ? 'flex items-center justify-center min-h-svh'
               : ''

@@ -43,3 +43,7 @@ yarn-error.log*
 
 # local history
 .historyProjects/specialist/
+
+.history
+.claudeignore
+.docs/cart-flow-explained.md
