@@ -36,6 +36,9 @@ export const SpecialistChat = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [specialists, setSpecialists] = useState<any[]>([]);
   const [isListCollapsed, setIsListCollapsed] = useState(false);
+  // Below md, the chat list opens as a half-width overlay above the chat interface
+  // (which stays visible underneath) instead of replacing it full-screen.
+  const [isMobileListOpen, setIsMobileListOpen] = useState(true);
   const [isJoiningMeet, setIsJoiningMeet] = useState(false);
   const [currentMeetLink, setCurrentMeetLink] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -47,6 +50,10 @@ export const SpecialistChat = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
+  const inputBarRef = useRef<HTMLDivElement>(null);
+  const [inputBarHeight, setInputBarHeight] = useState(88);
+  const headerBarRef = useRef<HTMLDivElement>(null);
+  const [headerBarHeight, setHeaderBarHeight] = useState(64);
 
   const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "https://afridam-backend-prod-107032494605.us-central1.run.app";
   const { socket, listen, emit } = useSocket(socketUrl);
@@ -247,6 +254,34 @@ export const SpecialistChat = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Input bar is fixed above the bottom nav on mobile/tablet, so it's out of
+  // normal flex flow — track its real (variable, e.g. file preview) height to
+  // reserve matching scroll space at the end of the messages list.
+  useEffect(() => {
+    const el = inputBarRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const height = entries[0]?.contentRect.height;
+      if (height) setInputBarHeight(height);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [selectedChat]);
+
+  // Chat header is fixed above the messages list on mobile/tablet, so it's out
+  // of normal flex flow — track its real height to reserve matching space at
+  // the top of the scrollable messages list.
+  useEffect(() => {
+    const el = headerBarRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const height = entries[0]?.contentRect.height;
+      if (height) setHeaderBarHeight(height);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [selectedChat]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -467,13 +502,37 @@ export const SpecialistChat = () => {
   const canMeet = relatedAppointment?.status === 'IN_PROGRESS';
 
   return (
-    <div className={`flex h-[calc(100vh-80px)] md:h-[calc(100vh-96px)] overflow-hidden ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
+    <div className={`flex h-full overflow-hidden relative ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
 
-      {/* Left Sidebar: Chat List */}
+      {/* Backdrop — sits above the fixed chat header/input (z-30) so tapping anywhere
+          on the chat behind the overlay, header/input included, dismisses it. */}
+      <AnimatePresence>
+        {isMobileListOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden fixed inset-0 z-30 bg-black/30"
+            onClick={() => setIsMobileListOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Left Sidebar: Chat List — half-width overlay above the chat interface on
+          mobile (chat stays visible in the uncovered half); normal static side-by-side
+          panel from md up. z-40 keeps it above the fixed chat header/input (z-30).
+          Stays mounted at all times (never display:none below md) and slides via
+          transform instead, since display changes can't be animated; md:translate-x-0
+          pins it in place for the static desktop layout regardless of open/closed state. */}
       <div className={`
-        ${selectedChat ? 'hidden md:flex' : 'flex'} 
-        ${isListCollapsed ? 'w-24' : 'w-80'} 
-        flex-col transition-all duration-300 relative
+        flex absolute z-40 shadow-2xl
+        ${isMobileListOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'}
+        transition-all duration-300 ease-in-out
+        md:static md:translate-x-0 md:pointer-events-auto md:shadow-none md:z-auto
+        inset-y-0 left-0
+        ${isListCollapsed ? 'md:w-24' : 'md:w-80'}
+        h-full flex-col
         ${isDark ? 'bg-[#151312] border-r border-white/5' : 'bg-white border-r border-gray-200'}
       `}>
         <div className="p-4 border-b border-gray-200 dark:border-white/5">
@@ -507,7 +566,7 @@ export const SpecialistChat = () => {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {isLoading ? (
             <p className="p-6 text-center text-gray-500">Loading chats...</p>
           ) : chats.length === 0 ? (
@@ -522,7 +581,7 @@ export const SpecialistChat = () => {
               return (
                 <button
                   key={chat.id}
-                  onClick={() => setSelectedChat(chat)}
+                  onClick={() => { setSelectedChat(chat); setIsMobileListOpen(false); }}
                   title={isListCollapsed ? getDisplayName(otherUserId) : undefined}
                   className={`flex items-center gap-3 p-4 w-full text-left transition-all ${isActive ? 'bg-[#4DB6AC]/10 border-l-4 border-[#4DB6AC]' : 'hover:bg-gray-50 dark:hover:bg-white/5 border-l-4 border-transparent'
                     } ${isListCollapsed ? 'justify-center' : ''}`}
@@ -547,13 +606,19 @@ export const SpecialistChat = () => {
         </div>
       </div>
 
-      {/* Main Chat Area */}
-      <div className={`flex-1 flex flex-col relative ${!selectedChat ? 'hidden md:flex' : 'flex'}`}>
+      {/* Main Chat Area — always visible so it stays in view behind the mobile list overlay */}
+      <div className="flex-1 flex flex-col min-h-0 relative">
         {selectedChat ? (
           <>
-            {/* Chat Header */}
-            {/* MOBILE FIX: smaller padding/gap on mobile only; sm: and up match original desktop values */}
-            <div className={`px-3 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between gap-2 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
+            {/* Chat Header — fixed just below the global top nav (top-16/top-20 match
+                that nav's own h-16/md:h-20 real height) on mobile/tablet where the
+                page can't rely on normal flow to keep it in place; back to normal
+                static flow on lg+. left offset matches the chat-list sidebar's width
+                in the md-lg range where both panes render side by side. */}
+            <div
+              ref={headerBarRef}
+              className={`px-3 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between gap-2 fixed top-16 md:top-20 inset-x-0 z-30 ${isListCollapsed ? 'md:left-24' : 'md:left-80'} lg:static lg:top-auto lg:inset-x-auto lg:left-auto lg:z-auto ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}
+            >
               {/* MOBILE FIX: added flex-1 alongside min-w-0 — this is what makes the
                   name actually shrink and truncate instead of wrapping. A flex child
                   needs both min-w-0 (allow shrinking below content width) AND a size
@@ -561,7 +626,7 @@ export const SpecialistChat = () => {
               <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
                 {/* Back Button for Mobile */}
                 <button
-                  onClick={() => setSelectedChat(null)}
+                  onClick={() => setIsMobileListOpen(true)}
                   className="md:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[#4DB6AC] flex-shrink-0"
                 >
                   <ChevronLeft size={24} />
@@ -611,7 +676,10 @@ export const SpecialistChat = () => {
             </div>
 
             {/* Messages Area — unchanged */}
-            <div ref={scrollRef} className={`flex-1 overflow-y-auto p-6 space-y-4 ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
+            <div ref={scrollRef} className={`flex-1 min-h-0 overflow-y-auto p-6 space-y-4 ${isDark ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
+              {/* Reserves scroll space so the oldest message isn't hidden under the
+                  fixed chat header below lg (where the header is pulled out of flow). */}
+              <div className="lg:hidden shrink-0" style={{ height: headerBarHeight }} />
               {messages.map((msg, index) => {
                 const isOwn = msg.senderId === CURRENT_USER_ID;
                 return (
@@ -628,14 +696,24 @@ export const SpecialistChat = () => {
                   </div>
                 );
               })}
+              {/* Reserves scroll space so the last message clears the fixed input
+                  bar below lg (where the input is pulled out of normal flow) — the
+                  input floats bottom-[4rem+safe-area] above the viewport bottom, so
+                  that gap must be reserved in addition to the input bar's own height. */}
+              <div
+                className="lg:hidden shrink-0"
+                style={{ height: `calc(${inputBarHeight}px + 4rem + env(safe-area-inset-bottom))` }}
+              />
             </div>
 
-            {/* Message Input */}
-            {/* MOBILE FIX: smaller padding on mobile only; sm: matches original desktop.
-                pb-24 restored — it's clearance for the app's fixed bottom nav bar
-                (Home/Chat/Camera/Cart), not dead space. Removing it hid the send
-                button behind that bar and required scrolling to reach it. */}
-            <div className={`p-2 sm:p-4 border-t pb-24 md:pb-4 ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}>
+            {/* Message Input — fixed above the bottom mobile nav (< lg, where that nav
+                shows); back to normal static flow on lg+ where there's no bottom nav.
+                left offset matches the chat-list sidebar's own width in the md-lg
+                range where both panes render side by side. */}
+            <div
+              ref={inputBarRef}
+              className={`p-2 sm:p-4 border-t fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 ${isListCollapsed ? 'md:left-24' : 'md:left-80'} lg:static lg:inset-x-auto lg:left-auto lg:bottom-auto lg:z-auto ${isDark ? 'bg-[#151312] border-white/5' : 'bg-white border-gray-200'}`}
+            >
               {/* File Preview — unchanged */}
               <AnimatePresence>
                 {selectedFile && (
@@ -720,11 +798,22 @@ export const SpecialistChat = () => {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center opacity-30">
+          <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <MessageSquare size={80} className="mx-auto mb-4 text-[#4DB6AC]" />
-              <h3 className="text-xl font-bold uppercase tracking-widest italic">Select Consultation</h3>
-              <p className="text-sm mt-2 font-medium">Choose a chat to start messaging</p>
+              <div className="opacity-30">
+                <MessageSquare size={80} className="mx-auto mb-4 text-[#4DB6AC]" />
+                <h3 className="text-xl font-bold uppercase tracking-widest italic">Select Consultation</h3>
+                <p className="text-sm mt-2 font-medium">Choose a chat to start messaging</p>
+              </div>
+              {/* Reopens the list overlay on mobile if it was dismissed without picking a chat */}
+              {!isMobileListOpen && (
+                <button
+                  onClick={() => setIsMobileListOpen(true)}
+                  className="md:hidden mt-4 px-4 py-2 rounded-xl bg-[#4DB6AC] text-white text-xs font-bold uppercase tracking-widest"
+                >
+                  View Conversations
+                </button>
+              )}
             </div>
           </div>
         )}
