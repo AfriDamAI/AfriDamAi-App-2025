@@ -8,9 +8,9 @@ import type { NextConfig } from "next";
 const nextConfig = {
   // 🚀 OGA FIX: Moving these into the main object and 
   // casting at the end to bypass version-specific type blocks.
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // eslint: {
+  //   ignoreDuringBuilds: true,
+  // },
   typescript: {
     ignoreBuildErrors: true, 
   },
