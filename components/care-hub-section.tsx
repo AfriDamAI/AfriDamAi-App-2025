@@ -7,21 +7,21 @@ import { motion } from "framer-motion"
 const careHubItems = [
   {
     title: "AI Scanner",
-    description: "Instant skin texture and health analysis",
+    description: "Instant skin texture and health analysis from the comfort of your home.",
     icon: Camera,
     accent: "#E1784F",
     tile: "bg-[#3A2A24]",
   },
   {
     title: "Ingredient Analyzer",
-    description: "Analyze cosmetic ingredients",
+    description: "Instantly identify child-safe products and decode complex chemical ingredients.",
     icon: ShieldCheck,
     accent: "#4DB6AC",
     tile: "bg-[#22342F]",
   },
   {
     title: "Marketplace",
-    description: "Shop trusted skincare products",
+    description: "Shop verified skincare from our network of pre-vetted, authentic vendors.",
     icon: ShoppingBag,
     accent: "#E1784F",
     tile: "bg-[#3A2A24]",
@@ -116,14 +116,14 @@ export default function CareHubSection() {
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
               <Link
-                href="/specialist"
-                className="inline-flex h-16 min-w-64 items-center justify-center rounded-full bg-white px-8 text-[12px] font-black text-[#E1784F] transition-all duration-300 hover:-translate-y-1 hover:bg-white/95 hover:shadow-2xl active:scale-95"
+                href="#"
+                className="inline-flex h-16 min-w-64 items-center justify-center rounded-full bg-white px-8 text-[16px] font-black text-[#E1784F] transition-all duration-300 hover:-translate-y-1 hover:bg-white/95 hover:shadow-2xl active:scale-95"
               >
                 Join as Specialist
               </Link>
               <Link
-                href="/marketplace"
-                className="inline-flex h-16 min-w-64 items-center justify-center rounded-full bg-[#151312] px-8 text-[12px] font-black text-white transition-all duration-300 hover:-translate-y-1 hover:bg-black hover:shadow-2xl active:scale-95"
+                href="https://vendor.afridamai.com"
+                className="inline-flex h-16 min-w-64 items-center justify-center rounded-full bg-[#151312] px-8 text-[16px] font-black text-white transition-all duration-300 hover:-translate-y-1 hover:bg-black hover:shadow-2xl active:scale-95"
               >
                 Join as Vendor
               </Link>
