@@ -82,7 +82,7 @@ export default function Navigation({
     : [
       { href: "/", label: "Home" },
       { href: "/mission", label: "Our Story" },
-      { href: "/marketplace", label: "Care Hub" },
+      { href: "/#care-hub", label: "Care Hub" },
       { href: "/contact", label: "Support" },
     ];
 

@@ -9,13 +9,14 @@
 
 import React from "react"
 import {
-  Camera, ArrowRight, MapPin, Mail, Heart, ShieldCheck, Activity, Sparkles, Aperture
+  Camera, ArrowRight, Heart, ShieldCheck, Activity, Sparkles, Aperture, UsersRound, MessageCircle
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import TeamMemberSection from "@/components/team-member-section"
+import CareHubSection from "@/components/care-hub-section"
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -57,7 +58,7 @@ export default function LandingPage() {
                 <span className="text-[9px] font-black capitalize tracking-widest text-[#E1784F]">Clinical Excellence</span>
               </div>
               <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-7xl font-black leading-[1.1] tracking-tight italic text-black dark:text-white">
-                Your <br /> Skin's <br /> <span className="text-[#E1784F]">Best Friend.</span>
+                Your <br /> Skin&apos;s <br /> <span className="text-[#E1784F]">Best Friend.</span>
               </h1>
               <p className="text-sm sm:text-lg md:text-2xl font-black max-w-lg opacity-25 tracking-tighter leading-tight italic">
                 Localized protection. <br /> Safe care for the heritage.
@@ -118,7 +119,7 @@ export default function LandingPage() {
             <span className="text-[#E1784F] text-[10px] font-black capitalize tracking-widest opacity-40">Simple English Approach</span>
             <h2 className="text-4xl md:text-6xl font-black capitalize italic tracking-tighter leading-tight">Simple Path. <br />Pure Results.</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
             <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm">
               <div className="w-14 h-14 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-black text-xl italic">01</div>
               <h3 className="text-2xl font-black italic leading-none">Snap a <br />Photo</h3>
@@ -151,6 +152,39 @@ export default function LandingPage() {
                 <motion.div initial={{ width: 0 }} whileInView={{ width: "60%" }} transition={{ delay: 0.4 }} className="h-2.5 bg-[#4DB6AC] rounded-full opacity-10" />
               </div>
             </div>
+
+            <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm overflow-hidden relative group">
+              <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#E1784F]/40 to-transparent" />
+              <div className="w-14 h-14 rounded-2xl bg-[#E1784F] text-white flex items-center justify-center font-black text-xl italic">04</div>
+              <h3 className="text-2xl font-black italic leading-none">Meet the <br />Consultants</h3>
+              <p className="text-[11px] font-bold opacity-30 leading-relaxed tracking-tight">Connect your results to real specialist insight and next-step care.</p>
+              <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2.5rem] relative border border-black/5 dark:border-white/5 overflow-hidden">
+                <motion.div
+                  animate={{ y: [0, -8, 0], scale: [1, 1.04, 1] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute left-1/2 top-1/2 w-24 h-24 -translate-x-1/2 -translate-y-1/2 rounded-[2rem] bg-[#E1784F]/10 border border-[#E1784F]/20 flex items-center justify-center"
+                >
+                  <UsersRound size={36} className="text-[#E1784F]" />
+                </motion.div>
+                <motion.div
+                  animate={{ x: [0, 10, 0], opacity: [0.35, 1, 0.35] }}
+                  transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute right-8 top-10 h-12 w-12 rounded-2xl bg-[#4DB6AC]/15 border border-[#4DB6AC]/20 flex items-center justify-center"
+                >
+                  <MessageCircle size={20} className="text-[#4DB6AC]" />
+                </motion.div>
+                <motion.div
+                  animate={{ width: ["30%", "68%", "42%"] }}
+                  transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute left-8 bottom-14 h-2 rounded-full bg-[#E1784F]/35"
+                />
+                <motion.div
+                  animate={{ width: ["52%", "28%", "62%"] }}
+                  transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute left-8 bottom-9 h-2 rounded-full bg-[#4DB6AC]/25"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -160,67 +194,42 @@ export default function LandingPage() {
         <div className="max-w-screen-xl mx-auto flex flex-col items-center">
           <Heart className="text-[#E1784F] mb-12" size={40} fill="currentColor" />
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
-            "Heritage is <br /> our <span className="text-[#4DB6AC]">Foundation</span>, <br /> Skin is our <span className="text-[#E1784F]">Legacy</span>."
+            &quot;Heritage is <br /> our <span className="text-[#4DB6AC]">Foundation</span>, <br /> Skin is our <span className="text-[#E1784F]">Legacy</span>.&quot;
           </h2>
-          <p className="text-[10px] font-black tracking-[0.5em] opacity-20 mt-16 italic">A Founder's Promise</p>
+          <p className="text-[10px] font-black tracking-[0.5em] opacity-20 mt-16 italic">A Founder&apos;s Promise</p>
         </div>
       </section>
 
-      {/* 🧪 5. CARE SOLUTIONS */}
+      {/* 5. CARE SOLUTIONS */}
       <section id="features" className="py-24 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5">
         <div className="max-w-screen-xl mx-auto space-y-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               { title: "Check Skin", icon: Camera, text: "A precision scan to verify your skin health.", path: "/public-scan", color: "#E1784F" },
               { title: "Safe Choice", icon: ShieldCheck, text: "Verify if your products are safe for melanin.", path: "/ingredient-analyzer", color: "#4DB6AC" }
-            ].map((f, i) => (
-              <div key={i} onClick={() => f.path === '/public-scan' ? router.push(f.path) : handleFeatureAccess(f.path)} className="group p-8 md:p-12 lg:p-16 bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[2.5rem] md:rounded-[4rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 text-white shadow-lg" style={{ backgroundColor: f.color }}>
+            ].map((f) => (
+              <div key={f.title} onClick={() => f.path === "/public-scan" ? router.push(f.path) : handleFeatureAccess(f.path)} className="group p-8 md:p-12 lg:p-16 bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[2.5rem] md:rounded-[4rem] hover:border-[#E1784F] transition-all cursor-pointer shadow-sm">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 text-white shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3" style={{ backgroundColor: f.color }}>
                   <f.icon size={28} />
                 </div>
                 <h3 className="text-4xl font-black italic capitalize tracking-tighter mb-4 leading-none">{f.title}</h3>
                 <p className="text-[12px] font-bold capitalize tracking-widest opacity-30 leading-relaxed mb-10 max-w-xs">{f.text}</p>
-                <div className="flex items-center gap-4 text-[10px] font-black capitalize tracking-widest" style={{ color: f.color }}>Start Now <ArrowRight size={16} /></div>
+                <div className="flex items-center gap-4 text-[10px] font-black capitalize tracking-widest" style={{ color: f.color }}>
+                  Start Now <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 👥 6. TEAM MEMBERS */}
+      {/* 6. CARE HUB + BRAND CTA */}
+      <CareHubSection />
+
+      {/* 7. TEAM MEMBERS */}
       <TeamMemberSection />
 
-      {/* 🏛️ 7. CONTACT & ACTION */}
-      <section id="contact" className="py-16 md:py-24 px-6 md:px-20">
-        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-12 md:gap-24 items-center">
-          <div className="space-y-10">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black capitalize italic tracking-tighter leading-[0.85] text-black dark:text-white">Get <br /><span className="text-[#4DB6AC]">Started.</span></h2>
-            <p className="text-xl md:text-2xl font-black opacity-20 tracking-tighter italic">Join the movement for <br />Melanin-Rich Health.</p>
-            <button onClick={() => navigateToAuth("register")} className="w-full md:w-auto h-20 px-16 bg-[#4DB6AC] text-black font-black capitalize text-[11px] tracking-widest rounded-2xl shadow-xl hover:scale-105 transition-all">Create Profile</button>
-          </div>
-          <div className="space-y-16">
-            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black capitalize italic tracking-tighter text-[#E1784F]">Contact.</h2>
-            <div className="space-y-12">
-              <div className="flex gap-8 items-center">
-                <MapPin className="text-[#E1784F]" size={32} />
-                <div>
-                  <p className="font-black text-[9px] tracking-[0.5em] opacity-20">Lagos HQ</p>
-                  <p className="text-2xl font-black italic capitalize tracking-tighter text-black dark:text-white">Nigeria</p>
-                </div>
-              </div>
-              <div className="flex gap-8 items-center">
-                <Mail className="text-[#E1784F]" size={32} />
-                <div>
-                  <p className="font-black capitalize text-[9px] tracking-[0.5em] opacity-20">Direct</p>
-                  <p className="text-2xl font-black italic tracking-tighter text-black dark:text-white">hello@afridamai.com</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 🏷️ Footer rendered by app-wrapper.tsx */}
+      {/* 8. Footer rendered by app-wrapper.tsx */}
     </div>
   )
 }
