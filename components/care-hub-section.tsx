@@ -6,21 +6,21 @@ import { motion } from "framer-motion"
 
 const careHubItems = [
   {
-    title: "AI Scanner",
-    description: "Instant skin texture and health analysis from the comfort of your home.",
+    title: "AI Skin Scan",
+    description: "Instant clinical-grade scanning designed to analyze skin health and texture.",
     icon: Camera,
     accent: "#E1784F",
     tile: "bg-[#3A2A24]",
   },
   {
     title: "Ingredient Analyzer",
-    description: "Instantly identify child-safe products and decode complex chemical ingredients.",
+    description: "Decodes product formulas instantly to check if they are safe for your skin.",
     icon: ShieldCheck,
     accent: "#4DB6AC",
     tile: "bg-[#22342F]",
   },
   {
-    title: "Marketplace",
+    title: "Verified Marketplace",
     description: "Shop verified skincare from our network of pre-vetted, authentic vendors.",
     icon: ShoppingBag,
     accent: "#E1784F",
