@@ -175,81 +175,294 @@ export default function LandingPage() {
       </section>
 
       {/* 🎥 3. THE VISUAL FLOW */}
-      <section className="py-20 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5 border-y border-black/5 dark:border-white/5">
-        <div className="max-w-screen-xl mx-auto space-y-20">
-          <div className="text-center space-y-4">
-            <span className="text-[#E1784F] text-[10px] font-black capitalize tracking-widest opacity-40">Simple English Approach</span>
-            <h2 className="text-4xl md:text-6xl font-black capitalize italic tracking-tighter leading-tight">Simple Path. <br />Pure Results.</h2>
+<section className="py-20 md:py-36 px-6 bg-gray-100/70 dark:bg-white/[0.02] border-y border-black/5 dark:border-white/5 relative overflow-hidden">
+  <div className="max-w-screen-xl mx-auto space-y-16 md:space-y-20">
+
+    {/* Section Header */}
+    <div className="text-center space-y-4 max-w-2xl mx-auto">
+      <span className="text-[#E1784F] text-xs font-black uppercase tracking-[0.2em] opacity-90">
+        Simple English Approach
+      </span>
+      <h2 className="text-4xl sm:text-5xl md:text-6xl font-black capitalize italic tracking-tighter leading-tight text-black dark:text-white">
+        Simple Path. <br className="hidden md:block" />
+        <span className="text-[#E1784F]">Pure Results.</span>
+      </h2>
+    </div>
+
+    {/* Steps Grid: 2 White Cards & 2 Brand Orange Cards */}
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 md:gap-8">
+
+      {/* STEP 01 - WHITE CARD */}
+      <motion.div
+        whileHover={{ y: -6 }}
+        transition={{ duration: 0.3 }}
+        className="p-8 md:p-10 bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 space-y-8 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+      >
+        <div className="space-y-6">
+          <div className="w-14 h-14 rounded-2xl bg-[#E1784F]/10 text-[#E1784F] flex items-center justify-center font-black text-xl italic border border-[#E1784F]/20">
+            01
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-            <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm">
-              <div className="w-14 h-14 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-black text-xl italic">01</div>
-              <h3 className="text-2xl font-black italic leading-none">Snap a <br />Photo</h3>
-              <p className="text-[11px] font-bold opacity-30 leading-relaxed tracking-tight">Capture your skin concern clearly under soft, natural light.</p>
-              <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2.5rem] relative border border-black/5 dark:border-white/5 flex items-center justify-center">
-                <div className="p-8 bg-white/10 backdrop-blur-3xl rounded-full border border-white/20 shadow-xl">
-                  <Aperture size={40} className="text-[#E1784F]" />
-                </div>
-              </div>
-            </div>
-
-            <div className="p-10 bg-[#E1784F] text-white rounded-[3rem] space-y-8 shadow-2xl relative overflow-hidden group">
-              <div className="w-14 h-14 rounded-2xl bg-white text-[#E1784F] flex items-center justify-center font-black text-xl italic">02</div>
-              <h3 className="text-2xl font-black capitalize italic leading-none text-white">Instant <br />Check</h3>
-              <p className="text-[11px] font-bold opacity-80 leading-relaxed tracking-tight">We check your scan against clinical health standards for melanin.</p>
-              <div className="aspect-square bg-black/10 rounded-[2.5rem] flex items-center justify-center">
-                <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="w-24 h-24 border-2 border-dashed border-white/30 rounded-full flex items-center justify-center">
-                  <Activity size={32} />
-                </motion.div>
-              </div>
-            </div>
-
-            <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm">
-              <div className="w-14 h-14 rounded-2xl bg-[#4DB6AC] text-white flex items-center justify-center font-black text-xl italic">03</div>
-              <h3 className="text-2xl font-black italic leading-none">Get the <br />Answer</h3>
-              <p className="text-[11px] font-bold opacity-30 leading-relaxed tracking-tight">Receive immediate results and guidance for your skin journey.</p>
-              <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2.5rem] p-10 flex flex-col justify-center space-y-4">
-                <motion.div initial={{ width: 0 }} whileInView={{ width: "80%" }} className="h-2.5 bg-[#4DB6AC] rounded-full opacity-40" />
-                <motion.div initial={{ width: 0 }} whileInView={{ width: "100%" }} transition={{ delay: 0.2 }} className="h-2.5 bg-[#4DB6AC] rounded-full opacity-20" />
-                <motion.div initial={{ width: 0 }} whileInView={{ width: "60%" }} transition={{ delay: 0.4 }} className="h-2.5 bg-[#4DB6AC] rounded-full opacity-10" />
-              </div>
-            </div>
-
-            <div className="p-10 bg-white dark:bg-black rounded-[3rem] border border-black/5 dark:border-white/5 space-y-8 shadow-sm overflow-hidden relative group">
-              <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#E1784F]/40 to-transparent" />
-              <div className="w-14 h-14 rounded-2xl bg-[#E1784F] text-white flex items-center justify-center font-black text-xl italic">04</div>
-              <h3 className="text-2xl font-black italic leading-none">Meet the <br />Consultants</h3>
-              <p className="text-[11px] font-bold opacity-30 leading-relaxed tracking-tight">Connect your results to real specialist insight and next-step care.</p>
-              <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2.5rem] relative border border-black/5 dark:border-white/5 overflow-hidden">
-                <motion.div
-                  animate={{ y: [0, -8, 0], scale: [1, 1.04, 1] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute left-1/2 top-1/2 w-24 h-24 -translate-x-1/2 -translate-y-1/2 rounded-[2rem] bg-[#E1784F]/10 border border-[#E1784F]/20 flex items-center justify-center"
-                >
-                  <UsersRound size={36} className="text-[#E1784F]" />
-                </motion.div>
-                <motion.div
-                  animate={{ x: [0, 10, 0], opacity: [0.35, 1, 0.35] }}
-                  transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute right-8 top-10 h-12 w-12 rounded-2xl bg-[#4DB6AC]/15 border border-[#4DB6AC]/20 flex items-center justify-center"
-                >
-                  <MessageCircle size={20} className="text-[#4DB6AC]" />
-                </motion.div>
-                <motion.div
-                  animate={{ width: ["30%", "68%", "42%"] }}
-                  transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute left-8 bottom-14 h-2 rounded-full bg-[#E1784F]/35"
-                />
-                <motion.div
-                  animate={{ width: ["52%", "28%", "62%"] }}
-                  transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute left-8 bottom-9 h-2 rounded-full bg-[#4DB6AC]/25"
-                />
-              </div>
-            </div>
+          <div className="space-y-3">
+            <h3 className="text-2xl sm:text-3xl font-black italic leading-tight text-black dark:text-white">
+              Snap a <br />Photo
+            </h3>
+            <p className="text-sm sm:text-base font-semibold text-black/70 dark:text-white/70 leading-relaxed tracking-tight">
+              Capture your skin concern clearly under soft, natural light.
+            </p>
           </div>
         </div>
-      </section>
+
+        <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2rem] relative border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden group">
+          <div className="p-6 bg-white dark:bg-white/10 backdrop-blur-xl rounded-full border border-black/5 dark:border-white/20 shadow-md group-hover:scale-110 transition-transform duration-300">
+            <Aperture size={40} className="text-[#E1784F]" />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* STEP 02 - BRAND ORANGE CARD */}
+      <motion.div
+        whileHover={{ y: -6 }}
+        transition={{ duration: 0.3 }}
+        className="p-8 md:p-10 bg-[#E1784F] text-white rounded-[2.5rem] space-y-8 shadow-xl shadow-[#E1784F]/25 relative overflow-hidden flex flex-col justify-between"
+      >
+        <div className="space-y-6 relative z-10">
+          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center font-black text-xl italic border border-white/30">
+            02
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-2xl sm:text-3xl font-black capitalize italic leading-tight text-white">
+              Instant <br />Check
+            </h3>
+            <p className="text-sm sm:text-base font-semibold text-white/95 leading-relaxed tracking-tight">
+              We check your scan against clinical health standards for melanin.
+            </p>
+          </div>
+        </div>
+
+        <div className="aspect-square bg-black/10 rounded-[2rem] flex items-center justify-center relative overflow-hidden border border-white/20 z-10">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            className="w-24 h-24 border-2 border-dashed border-white/60 rounded-full flex items-center justify-center"
+          >
+            <Activity size={38} className="text-white" />
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* STEP 03 - WHITE CARD */}
+      <motion.div
+        whileHover={{ y: -6 }}
+        transition={{ duration: 0.3 }}
+        className="p-8 md:p-10 bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 space-y-8 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+      >
+        <div className="space-y-6">
+          <div className="w-14 h-14 rounded-2xl bg-[#4DB6AC]/10 text-[#4DB6AC] flex items-center justify-center font-black text-xl italic border border-[#4DB6AC]/20">
+            03
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-2xl sm:text-3xl font-black italic leading-tight text-black dark:text-white">
+              Get the <br />Answer
+            </h3>
+            <p className="text-sm sm:text-base font-semibold text-black/70 dark:text-white/70 leading-relaxed tracking-tight">
+              Receive immediate results and guidance for your skin journey.
+            </p>
+          </div>
+        </div>
+
+        <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2rem] p-8 flex flex-col justify-center space-y-3.5 border border-black/5 dark:border-white/5">
+          <motion.div initial={{ width: "20%" }} whileInView={{ width: "85%" }} transition={{ duration: 0.8 }} className="h-3 bg-[#4DB6AC] rounded-full opacity-90" />
+          <motion.div initial={{ width: "20%" }} whileInView={{ width: "100%" }} transition={{ duration: 0.8, delay: 0.2 }} className="h-3 bg-[#4DB6AC] rounded-full opacity-50" />
+          <motion.div initial={{ width: "20%" }} whileInView={{ width: "65%" }} transition={{ duration: 0.8, delay: 0.4 }} className="h-3 bg-[#4DB6AC] rounded-full opacity-30" />
+        </div>
+      </motion.div>
+
+      {/* STEP 04 - BRAND ORANGE CARD */}
+      <motion.div
+        whileHover={{ y: -6 }}
+        transition={{ duration: 0.3 }}
+        className="p-8 md:p-10 bg-[#E1784F] text-white rounded-[2.5rem] space-y-8 shadow-xl shadow-[#E1784F]/25 relative overflow-hidden flex flex-col justify-between"
+      >
+        <div className="space-y-6 relative z-10">
+          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center font-black text-xl italic border border-white/30">
+            04
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-2xl sm:text-3xl font-black italic leading-tight text-white">
+              Meet the <br />Consultants
+            </h3>
+            <p className="text-sm sm:text-base font-semibold text-white/95 leading-relaxed tracking-tight">
+              Connect your results to real specialist insight and next-step care.
+            </p>
+          </div>
+        </div>
+
+        <div className="aspect-square bg-black/10 rounded-[2rem] relative border border-white/20 overflow-hidden z-10">
+          <motion.div
+            animate={{ y: [0, -6, 0], scale: [1, 1.03, 1] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-1/2 top-1/2 w-20 h-20 -translate-x-1/2 -translate-y-1/2 rounded-[1.75rem] bg-white/20 border border-white/40 flex items-center justify-center shadow-lg backdrop-blur-sm"
+          >
+            <UsersRound size={36} className="text-white" />
+          </motion.div>
+          <motion.div
+            animate={{ x: [0, 8, 0], opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute right-6 top-8 h-10 w-10 rounded-xl bg-white/25 border border-white/30 flex items-center justify-center"
+          >
+            <MessageCircle size={20} className="text-white" />
+          </motion.div>
+          <motion.div
+            animate={{ width: ["30%", "65%", "40%"] }}
+            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-6 bottom-10 h-2 rounded-full bg-white/40"
+          />
+          <motion.div
+            animate={{ width: ["50%", "25%", "60%"] }}
+            transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-6 bottom-6 h-2 rounded-full bg-white/25"
+          />
+        </div>
+      </motion.div>
+
+    </div>
+  </div>
+</section>
+
+{/* 🛒 5.5 MARKETPLACE PREVIEW */}
+<section id="marketplace-preview" className="py-24 md:py-40 px-6">
+  <div className="max-w-screen-xl mx-auto space-y-16">
+
+    {/* Section header */}
+    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+      <div className="space-y-4">
+        <span className="text-[#E1784F] text-[10px] font-black capitalize tracking-widest opacity-40">Verified Products</span>
+        <h2 className="text-4xl md:text-6xl font-black capitalize italic tracking-tighter leading-tight">
+          Shop the <br className="hidden md:block" /><span className="text-[#4DB6AC]">Marketplace.</span>
+        </h2>
+      </div>
+      <Link
+        href="/marketplace"
+        className="group inline-flex items-center gap-3 self-start md:self-auto h-14 px-8 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black capitalize text-[10px] tracking-widest shadow-xl active:scale-95 transition-all"
+      >
+        View All Products
+        <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+      </Link>
+    </div>
+
+    {/* Product grid */}
+    {productsLoading ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+        {Array.from({ length: MAX_PREVIEW_ITEMS }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-[2.5rem] overflow-hidden border border-black/5 dark:border-white/5"
+          >
+            <div className="aspect-[4/5] bg-gray-100 dark:bg-white/5 animate-pulse" />
+            <div className="p-6 space-y-3">
+              <div className="h-2.5 w-20 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+              <div className="h-4 w-full bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : products.length === 0 ? (
+      <div className="py-20 text-center">
+        <p className="text-[10px] font-black uppercase tracking-widest opacity-30">
+          No products available right now
+        </p>
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+        {products.map((product, i) => (
+          <motion.div
+            key={product.id}
+            initial="initial"
+            whileInView="animate"
+            whileHover="hover"
+            viewport={{ once: true }}
+            variants={{
+              initial: { opacity: 0, y: 24 },
+              animate: { opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.08 } },
+            }}
+            className="relative bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#E1784F]/40 transition-shadow duration-300 flex flex-col justify-between"
+          >
+            {/* Image + Overlay Container */}
+            <div className="relative aspect-[4/5] bg-gray-50 dark:bg-white/5 overflow-hidden">
+              <Link href={`/marketplace/${product.id}`} className="block w-full h-full">
+                <motion.img
+                  src={getImageUrl(product.imageUrl)}
+                  alt={product.name}
+                  variants={{
+                    initial: { scale: 1 },
+                    hover: { scale: 1.08 }
+                  }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+
+              {/* Price badge */}
+              <div className="absolute top-4 right-4 px-3 py-1.5 bg-black/85 backdrop-blur-xl rounded-full z-10 pointer-events-none">
+                <span className="text-[10px] font-black text-white tracking-wide">
+                  {formatNaira(product.basePrice)}
+                </span>
+              </div>
+
+              {/* Desktop Add to Cart (Slides up on hover only) */}
+              <motion.button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleAddToCart(product);
+                }}
+                variants={{
+                  initial: { y: 60, opacity: 0 },
+                  hover: { y: 0, opacity: 1 }
+                }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="hidden md:flex absolute bottom-4 left-4 right-4 h-12 bg-[#E1784F] hover:bg-[#d0673e] text-white rounded-2xl font-black text-[10px] capitalize tracking-widest items-center justify-center gap-2 shadow-lg active:scale-95 z-20 cursor-pointer"
+              >
+                <ShoppingCart size={14} />
+                Add to Cart
+              </motion.button>
+            </div>
+
+            {/* Details + Mobile Permanent Button */}
+            <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+              <Link href={`/marketplace/${product.id}`} className="block space-y-2">
+                {product.verifiedShop && (
+                  <div className="flex items-center gap-1.5">
+                    <BadgeCheck size={12} className="text-[#4DB6AC]" />
+                    <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">Verified Shop</span>
+                  </div>
+                )}
+                <h3 className="text-sm font-black italic leading-snug line-clamp-2 hover:text-[#E1784F] transition-colors">
+                  {product.name}
+                </h3>
+              </Link>
+
+              {/* Mobile Add to Cart (Always visible on small screens) */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleAddToCart(product);
+                }}
+                className="md:hidden w-full h-12 bg-[#E1784F] active:bg-[#d0673e] text-white rounded-2xl font-black text-[10px] capitalize tracking-widest flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform"
+              >
+                <ShoppingCart size={14} />
+                Add to Cart
+              </button>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
 
       {/* 📜 4. THE MANIFESTO */}
       <section className="py-24 md:py-40 px-6 text-center">
@@ -262,7 +475,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. CARE SOLUTIONS */}
+      {/* 5. CARE SOLUTIONS
       <section id="features" className="py-24 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5">
         <div className="max-w-screen-xl mx-auto space-y-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -283,109 +496,9 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* 🛒 5.5 MARKETPLACE PREVIEW */}
-      <section id="marketplace-preview" className="py-24 md:py-40 px-6">
-        <div className="max-w-screen-xl mx-auto space-y-16">
-
-          {/* Section header */}
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-            <div className="space-y-4">
-              <span className="text-[#E1784F] text-[10px] font-black capitalize tracking-widest opacity-40">Verified Products</span>
-              <h2 className="text-4xl md:text-6xl font-black capitalize italic tracking-tighter leading-tight">
-                Shop the <br className="hidden md:block" /><span className="text-[#4DB6AC]">Marketplace.</span>
-              </h2>
-            </div>
-            <Link
-              href="/marketplace"
-              className="group inline-flex items-center gap-3 self-start md:self-auto h-14 px-8 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black capitalize text-[10px] tracking-widest shadow-xl active:scale-95 transition-all"
-            >
-              View All Products
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
-
-          {/* Product grid */}
-          {productsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
-              {Array.from({ length: MAX_PREVIEW_ITEMS }).map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-[2.5rem] overflow-hidden border border-black/5 dark:border-white/5"
-                >
-                  <div className="aspect-[4/5] bg-gray-100 dark:bg-white/5 animate-pulse" />
-                  <div className="p-6 space-y-3">
-                    <div className="h-2.5 w-20 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
-                    <div className="h-4 w-full bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : products.length === 0 ? (
-            <div className="py-20 text-center">
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-30">
-                No products available right now
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
-              {products.map((product, i) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: i * 0.08 }}
-                  className="group relative bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl hover:border-[#E1784F]/30 transition-all"
-                >
-                  {/* Image + overlay */}
-                  <Link href={`/marketplace/${product.id}`} className="relative aspect-[4/5] bg-gray-50 dark:bg-white/5 overflow-hidden block">
-                    <img
-                      src={getImageUrl(product.imageUrl)}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-
-                    {/* Price badge */}
-                    <div className="absolute top-4 right-4 px-3 py-1.5 bg-black/85 backdrop-blur-xl rounded-full">
-                      <span className="text-[10px] font-black text-white tracking-wide">
-                        {formatNaira(product.basePrice)}
-                      </span>
-                    </div>
-
-                    {/* Add to cart — slides up on hover (desktop), always visible on touch */}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddToCart(product);
-                      }}
-                      className="absolute bottom-4 left-4 right-4 h-12 bg-[#E1784F] text-white rounded-2xl font-black text-[10px] capitalize tracking-widest flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all translate-y-16 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 md:translate-y-16 md:opacity-0 touch:translate-y-0 touch:opacity-100"
-                    >
-                      <ShoppingCart size={14} />
-                      Add to Cart
-                    </button>
-                  </Link>
-
-                  {/* Details */}
-                  <div className="p-6 space-y-2">
-                    {product.verifiedShop && (
-                      <div className="flex items-center gap-1.5">
-                        <BadgeCheck size={12} className="text-[#4DB6AC]" />
-                        <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">Verified Shop</span>
-                      </div>
-                    )}
-                    <h3 className="text-sm font-black italic leading-snug line-clamp-2">
-                      {product.name}
-                    </h3>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
+      
       {/* 6. CARE HUB + BRAND CTA */}
       <CareHubSection />
 
