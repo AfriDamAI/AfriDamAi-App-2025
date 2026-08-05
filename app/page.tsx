@@ -1,15 +1,15 @@
 /**
  * 🛡️ AFRIDAM WELLNESS HUB: ELEGANT UNIFIED EDITION (Rule 6 Synergy)
- * Version: 2026.6.3 (Navigation Cleanup & Responsive Polish)
+ * Version: 2026.6.4 (Marketplace Preview Section Added)
  * Focus: Sophisticated Scaling, (auth) Group Alignment, Rule 6 Compliance.
  */
 
-
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import {
-  Camera, ArrowRight, Heart, ShieldCheck, Activity, Sparkles, Aperture, UsersRound, MessageCircle
+  Camera, ArrowRight, Heart, ShieldCheck, Activity, Sparkles, Aperture, UsersRound, MessageCircle,
+  ShoppingCart, BadgeCheck
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
 import Link from "next/link"
@@ -17,10 +17,34 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import TeamMemberSection from "@/components/team-member-section"
 import CareHubSection from "@/components/care-hub-section"
+import { getProducts, getImageUrl } from "@/lib/api-client"
+import { useCart } from "@/hooks/use-cart"
+
+// -----------------------------------------------------------------------
+// 🛒 MARKETPLACE PREVIEW
+// Field names confirmed against your cart page (app/cart/page.tsx):
+//   product.id, product.name, product.imageUrl, product.basePrice
+// `verifiedShop` is NOT confirmed on the product object — treated as
+// optional so the badge only renders if your API actually sends it.
+// -----------------------------------------------------------------------
+type MarketplaceProduct = {
+  id: string
+  name: string
+  basePrice: number
+  imageUrl?: string
+  verifiedShop?: boolean
+}
+
+const MAX_PREVIEW_ITEMS = 4
+
+function formatNaira(amount: number) {
+  return `₦${amount.toLocaleString("en-NG")}`
+}
 
 export default function LandingPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { addToCart } = useCart();
 
   /**
    * 🛡️ RULE 6 SYNERGY: 
@@ -33,6 +57,44 @@ export default function LandingPage() {
   const handleFeatureAccess = (path: string) => {
     if (user) router.push(path);
     else navigateToAuth("register");
+  };
+
+  // 🛒 MARKETPLACE PREVIEW: live product fetch
+  const [products, setProducts] = useState<MarketplaceProduct[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await getProducts();
+        const list = Array.isArray(data) ? data : [];
+        setProducts(list.slice(0, MAX_PREVIEW_ITEMS));
+      } catch (err) {
+        console.error("Failed to load marketplace preview products", err);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
+
+  const handleAddToCart = async (product: MarketplaceProduct) => {
+    if (!user) {
+      navigateToAuth("register");
+      return;
+    }
+    try {
+      // Matches the real CartItem shape from use-cart.ts's addToCart(userId, item).
+      await addToCart(user.id, {
+        productId: product.id,
+        productName: product.name,
+        productImage: getImageUrl(product.imageUrl),
+        price: product.basePrice,
+        quantity: 1,
+      });
+    } catch (err) {
+      console.error("Failed to add product to cart", err);
+    }
   };
 
   return (
@@ -220,6 +282,107 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 🛒 5.5 MARKETPLACE PREVIEW */}
+      <section id="marketplace-preview" className="py-24 md:py-40 px-6">
+        <div className="max-w-screen-xl mx-auto space-y-16">
+
+          {/* Section header */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+            <div className="space-y-4">
+              <span className="text-[#E1784F] text-[10px] font-black capitalize tracking-widest opacity-40">Verified Products</span>
+              <h2 className="text-4xl md:text-6xl font-black capitalize italic tracking-tighter leading-tight">
+                Shop the <br className="hidden md:block" /><span className="text-[#4DB6AC]">Marketplace.</span>
+              </h2>
+            </div>
+            <Link
+              href="/marketplace"
+              className="group inline-flex items-center gap-3 self-start md:self-auto h-14 px-8 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black capitalize text-[10px] tracking-widest shadow-xl active:scale-95 transition-all"
+            >
+              View All Products
+              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+
+          {/* Product grid */}
+          {productsLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+              {Array.from({ length: MAX_PREVIEW_ITEMS }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-[2.5rem] overflow-hidden border border-black/5 dark:border-white/5"
+                >
+                  <div className="aspect-[4/5] bg-gray-100 dark:bg-white/5 animate-pulse" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-2.5 w-20 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+                    <div className="h-4 w-full bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="py-20 text-center">
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-30">
+                No products available right now
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+              {products.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.08 }}
+                  className="group relative bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl hover:border-[#E1784F]/30 transition-all"
+                >
+                  {/* Image + overlay */}
+                  <Link href={`/marketplace/${product.id}`} className="relative aspect-[4/5] bg-gray-50 dark:bg-white/5 overflow-hidden block">
+                    <img
+                      src={getImageUrl(product.imageUrl)}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+
+                    {/* Price badge */}
+                    <div className="absolute top-4 right-4 px-3 py-1.5 bg-black/85 backdrop-blur-xl rounded-full">
+                      <span className="text-[10px] font-black text-white tracking-wide">
+                        {formatNaira(product.basePrice)}
+                      </span>
+                    </div>
+
+                    {/* Add to cart — slides up on hover (desktop), always visible on touch */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddToCart(product);
+                      }}
+                      className="absolute bottom-4 left-4 right-4 h-12 bg-[#E1784F] text-white rounded-2xl font-black text-[10px] capitalize tracking-widest flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all translate-y-16 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 md:translate-y-16 md:opacity-0 touch:translate-y-0 touch:opacity-100"
+                    >
+                      <ShoppingCart size={14} />
+                      Add to Cart
+                    </button>
+                  </Link>
+
+                  {/* Details */}
+                  <div className="p-6 space-y-2">
+                    {product.verifiedShop && (
+                      <div className="flex items-center gap-1.5">
+                        <BadgeCheck size={12} className="text-[#4DB6AC]" />
+                        <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">Verified Shop</span>
+                      </div>
+                    )}
+                    <h3 className="text-sm font-black italic leading-snug line-clamp-2">
+                      {product.name}
+                    </h3>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
