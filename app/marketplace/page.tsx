@@ -171,8 +171,10 @@ export default function MarketplacePage() {
         price: product.price,
       };
       await addItemToCart(user.id, cartItem);
+      await fetchCart(user.id);
       toast.success(`${product.name} added to cart!`);
-    } catch {
+    } catch (error) {
+      console.error("Marketplace add-to-cart failed:", error);
       toast.error("Failed to add item to cart");
     } finally {
       setIsAddingToCart(null);
@@ -451,18 +453,18 @@ export default function MarketplacePage() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.04, ease: "easeOut" }}
-                  className="group flex flex-col h-full text-left"
+                  className="group flex flex-col h-full text-left transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_24px_80px_rgba(0,0,0,0.08)]"
                 >
                   {/* Image container */}
                   <div className="relative overflow-hidden rounded-2xl bg-gray-100 dark:bg-white/[0.04] aspect-[3/4]">
                     <img
                       src={product.thumbnail}
                       alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                      className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:blur-sm"
                     />
 
                     {/* Gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
 
                     {/* Price tag — top right */}
                     <div className="absolute top-3 right-3 bg-black/75 dark:bg-black/85 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-[10px] font-black tracking-tight shadow-lg">
@@ -478,12 +480,15 @@ export default function MarketplacePage() {
                       </div>
                     )}
 
-                    {/* Quick-add button — slides up on hover */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
-                      <button
+                    {/* Quick-add button — always visible on desktop, slides up on hover on mobile-like devices */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 md:translate-y-0 transition-transform duration-300 ease-out">
+                      <motion.button
+                        type="button"
                         onClick={() => addToCart(product)}
                         disabled={isAddingToCart === product.id || !product.inStock}
-                        className="w-full bg-white text-black rounded-xl py-2.5 text-[9px] font-black tracking-widest flex items-center justify-center gap-2 shadow-xl active:scale-95 transition-all disabled:opacity-50 hover:bg-[#E1784F] hover:text-white"
+                        whileHover={{ y: -2, scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full bg-[#E1784F] text-white rounded-xl py-3 text-[9px] font-black tracking-widest flex items-center justify-center gap-2 shadow-[0_18px_35px_rgba(225,120,79,0.18)] transition-all duration-300 ease-out hover:shadow-[0_24px_60px_rgba(225,120,79,0.28)] hover:-translate-y-0.5 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E1784F]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isAddingToCart === product.id ? (
                           <motion.div
@@ -497,7 +502,7 @@ export default function MarketplacePage() {
                             Add to Cart
                           </>
                         )}
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
 
@@ -514,7 +519,7 @@ export default function MarketplacePage() {
                     <button
                       onClick={() => addToCart(product)}
                       disabled={isAddingToCart === product.id || !product.inStock}
-                      className="sm:hidden w-full mt-2 bg-black dark:bg-white text-white dark:text-black rounded-xl py-3 text-[9px] font-black tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50"
+                      className="sm:hidden w-full mt-2 bg-[#E1784F] text-white rounded-xl py-3 text-[9px] font-black tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all hover:bg-[#ff985c] disabled:opacity-50"
                     >
                       {isAddingToCart === product.id ? (
                         <motion.div
