@@ -19,6 +19,7 @@ import TeamMemberSection from "@/components/team-member-section"
 import CareHubSection from "@/components/care-hub-section"
 import { getProducts, getImageUrl } from "@/lib/api-client"
 import { useCart } from "@/hooks/use-cart"
+import Image from "next/image";
 
 // -----------------------------------------------------------------------
 // 🛒 MARKETPLACE PREVIEW
@@ -467,7 +468,11 @@ export default function LandingPage() {
       {/* 📜 4. THE MANIFESTO */}
       <section className="py-24 md:py-40 px-6 text-center">
         <div className="max-w-screen-xl mx-auto flex flex-col items-center">
-          <Heart className="text-[#E1784F] mb-12" size={40} fill="currentColor" />
+          
+          <Image
+          src="/logo.png" alt="AfridmaAI Logo" width={210} height={210}
+          className="mb-12 mx-auto object-contain"
+            />
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
             &quot;Heritage is <br /> our <span className="text-[#4DB6AC]">Foundation</span>, <br /> Skin is our <span className="text-[#E1784F]">Legacy</span>.&quot;
           </h2>
