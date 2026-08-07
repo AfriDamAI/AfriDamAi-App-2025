@@ -36,11 +36,11 @@ export default function Footer() {
     <footer className="bg-background border-t border-border mt-24 transition-colors duration-500 relative overflow-hidden">
       <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-[#E1784F]/5 to-transparent pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-20">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 mb-16">
 
           {/* 🌍 1. BRAND COLUMN */}
-          <div className="md:col-span-5 space-y-10">
+          <div className="sm:col-span-2 lg:col-span-4 space-y-8 md:space-y-10">
             <Link href="/" className="inline-block active:scale-95 transition-transform">
               <img src="/logo.png" alt="AfriDam AI" className="h-14 w-auto object-contain" />
             </Link>
@@ -62,8 +62,8 @@ export default function Footer() {
           </div>
 
           {/* 🧬 2. CLINICAL NODE */}
-          <div className="md:col-span-2">
-            <h3 className="text-[11px] font-black tracking-[0.5em] text-[#E1784F] mb-8">Clinical</h3>
+          <div className="sm:col-span-1 lg:col-span-2">
+            <h3 className="text-[11px] font-black tracking-[0.5em] text-[#E1784F] mb-6">Clinical</h3>
             <ul className="space-y-5">
               {[
                 // 🛡️ OGA FIX: Updated to match your actual folder structure
@@ -85,8 +85,8 @@ export default function Footer() {
           </div>
 
           {/* 🏥 3. RESOURCES */}
-          <div className="md:col-span-2">
-            <h3 className="text-[11px] font-black tracking-[0.5em] text-[#4DB6AC] mb-8">Resources</h3>
+          <div className="sm:col-span-1 lg:col-span-2">
+            <h3 className="text-[11px] font-black tracking-[0.5em] text-[#4DB6AC] mb-6">Resources</h3>
             <ul className="space-y-5">
               {[
                 { label: "Our Mission", href: "/mission" },
@@ -103,20 +103,20 @@ export default function Footer() {
           </div>
 
           {/* ⚖️ 4. LEGAL PROTOCOL */}
-          <div className="md:col-span-3">
-            <h3 className="text-[11px] font-black tracking-[0.5em] text-muted-foreground mb-8">Protocol</h3>
-            <ul className="space-y-5">
+          <div className="sm:col-span-2 lg:col-span-4">
+            <h3 className="text-[11px] font-black tracking-[0.5em] mb-6">Protocol</h3>
+            <ul className="space-y-4">
               <li>
-                <Link href="/privacy" className="text-[10px] font-black tracking-widest text-muted-foreground hover:text-[#E1784F] transition-all">
+                <Link href="/privacy-policy" className="text-[10px] font-black tracking-widest hover:text-[#E1784F] transition-all">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-[10px] font-black tracking-widest text-muted-foreground hover:text-[#E1784F] transition-all">
-                  Clinical Terms
+                <Link href="/terms" className="text-[10px] font-black tracking-widest hover:text-[#E1784F] transition-all">
+                  Terms & Conditions
                 </Link>
               </li>
-              <li className="pt-6 flex gap-6">
+              <li className="pt-4 flex gap-5">
                 <Instagram size={18} className="text-muted-foreground hover:text-[#E1784F] cursor-pointer transition-colors" />
                 <Twitter size={18} className="text-muted-foreground hover:text-[#E1784F] cursor-pointer transition-colors" />
                 <Linkedin size={18} className="text-muted-foreground hover:text-[#E1784F] cursor-pointer transition-colors" />
@@ -126,19 +126,19 @@ export default function Footer() {
         </div>
 
         {/* 🛡️ BOTTOM BAR */}
-        <div className="border-t border-border pt-12">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <p className="text-[8px] font-black tracking-[0.5em] text-muted-foreground opacity-60">
+        <div className="border-t border-border pt-10">
+          <div className="flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-center text-center lg:text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-center gap-4 lg:gap-6">
+              <p className="text-[9px] font-black tracking-[0.4em] text-muted-foreground opacity-70">
                 © {currentYear} AfriDam AI • Clinical Systems
               </p>
-              <div className="hidden md:block w-1.5 h-1.5 bg-muted rounded-full" />
-              <p className="text-[8px] font-black tracking-[0.5em] text-muted-foreground opacity-60">
+              <div className="hidden sm:block w-1.5 h-1.5 bg-muted rounded-full" />
+              <p className="text-[9px] font-black tracking-[0.4em] text-muted-foreground opacity-70">
                 AES-256 Cloud Encryption
               </p>
             </div>
 
-            <div className="flex items-center gap-3 px-8 py-3 bg-[#4DB6AC]/5 border border-[#4DB6AC]/20 rounded-[1.5rem] shadow-sm">
+            <div className="flex items-center justify-center gap-3 px-5 py-3 bg-[#4DB6AC]/5 border border-[#4DB6AC]/20 rounded-[1.5rem] shadow-sm">
               <ShieldCheck size={14} className="text-[#4DB6AC]" />
               <span className="text-[9px] font-black tracking-[0.3em] text-[#4DB6AC]">
                 Built for Africa
