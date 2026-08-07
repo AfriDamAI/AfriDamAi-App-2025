@@ -90,8 +90,8 @@ export default function Footer() {
             <ul className="space-y-5">
               {[
                 { label: "Our Mission", href: "/mission" },
-                { label: "Care Support", href: "/contact" },
-                { label: "Expert Hub", href: "/pricing" }
+                { label: "Care Support", href: "/contact" }
+                // 🗑️ REMOVED: "Expert Hub" (was linked to /pricing) — removed per task request
               ].map((link) => (
                 <li key={link.label}>
                   <Link href={link.href} className="text-[10px] font-black tracking-widest text-foreground hover:text-[#4DB6AC] transition-all">
