@@ -20,6 +20,7 @@ import CareHubSection from "@/components/care-hub-section"
 import { getProducts, getImageUrl } from "@/lib/api-client"
 import { useCart } from "@/hooks/use-cart"
 import Image from "next/image";
+import FaqChatbot from "@/components/FaqChatbot"
 
 // -----------------------------------------------------------------------
 // 🛒 MARKETPLACE PREVIEW
@@ -507,10 +508,13 @@ export default function LandingPage() {
       {/* 6. CARE HUB + BRAND CTA */}
       <CareHubSection />
 
-      {/* 7. TEAM MEMBERS */}
+      {/* 7. FAQ SECTION */}
+      <FaqChatbot />
+
+      {/* 8. TEAM MEMBERS */}
       <TeamMemberSection />
 
-      {/* 8. Footer rendered by app-wrapper.tsx */}
+      {/* 9. Footer rendered by app-wrapper.tsx */}
     </div>
   )
 }
