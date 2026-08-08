@@ -152,7 +152,7 @@ export default function PrivacyPolicyPage() {
               <ul className="text-white/70 text-sm md:text-base leading-relaxed pl-9 space-y-3">
                 <li>• <strong className="text-white font-semibold">Account Retention:</strong> Account data and scan logs are retained for as long as your account remains active. Images used for model training are permanently anonymized.</li>
                 <li>• <strong className="text-white font-semibold">Deletion Rights:</strong> You have the right to access, export, or request permanent deletion of your account, facial images, and scan records at any time.</li>
-                <li>• <strong className="text-white font-semibold">How to Request Deletion:</strong> Submit a request in your account settings or email <span className="text-[#E1784F] font-bold">privacy@afridamai.com</span>. All personal data will be purged within 30 days of confirmation.</li>
+                <li>• <strong className="text-white font-semibold">How to Request Deletion:</strong> Submit a request in your account settings or email <span className="text-[#E1784F] font-bold">hello@afridamai.com</span>. All personal data will be purged within 30 days of confirmation.</li>
               </ul>
             </div>
 
@@ -191,7 +191,7 @@ export default function PrivacyPolicyPage() {
                 </h2>
               </div>
               <p className="text-white/70 text-sm md:text-base leading-relaxed pl-9">
-                For questions regarding this policy or to exercise your privacy rights, contact us at: <span className="text-[#E1784F] font-bold">privacy@afridamai.com</span> or <span className="text-[#4DB6AC] font-bold">support@afridam.ai</span>.
+                For questions regarding this policy or to exercise your privacy rights, contact us at: <span className="text-[#4DB6AC] font-bold">hello@afridamai.com</span>.
               </p>
             </div>
 
