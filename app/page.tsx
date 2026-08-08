@@ -22,6 +22,7 @@ import { getProducts, getImageUrl } from "@/lib/api-client"
 import { useCart } from "@/hooks/use-cart"
 import Image from "next/image";
 import FaqChatbot from "@/components/FaqChatbot"
+import PartnersSection from "@/components/PartnersSection"
 
 // -----------------------------------------------------------------------
 // 🛒 MARKETPLACE PREVIEW
@@ -510,6 +511,8 @@ export default function LandingPage() {
 
       {/* 6. CARE HUB + BRAND CTA */}
       <CareHubSection />
+
+      <PartnersSection />
 
       {/* 7. FAQ SECTION */}
       <FaqChatbot />
