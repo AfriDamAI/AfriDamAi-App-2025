@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import TeamMemberSection from "@/components/team-member-section"
 import CareHubSection from "@/components/care-hub-section"
+import PedigreeSection from "@/components/pedigree-section"
 import { getProducts, getImageUrl } from "@/lib/api-client"
 import { useCart } from "@/hooks/use-cart"
 import Image from "next/image";
@@ -503,7 +504,9 @@ export default function LandingPage() {
         </div>
       </section> */}
 
-      
+      {/* 5. PEDIGREE */}
+      <PedigreeSection />
+
       {/* 6. CARE HUB + BRAND CTA */}
       <CareHubSection />
 

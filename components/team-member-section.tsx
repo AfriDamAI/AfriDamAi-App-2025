@@ -7,6 +7,9 @@ import { useState, useEffect, useRef } from "react"
 
 import ogImage from "@/public/pics/og.png"
 import anaduImage from "@/public/pics/anadu.png"
+import dawiitImage from "@/public/pics/Dawiit.png"
+import rasheedahImage from "@/public/pics/Rasheedah.png"
+
 import tobImage from "@/public/pics/tob.png"
 import anuImage from "@/public/pics/anu.png"
 import natImage from "@/public/pics/nat.png"
@@ -19,6 +22,7 @@ const teamMembers = [
     title: "Founder & CEO",
     description: "Registered Nurse & Venture Builder. Bridges clinical gaps with tech systems.",
     image: ogImage,
+    imagePosition: "center", // 🎯 adjust per-photo if a face sits off-center, e.g. "center 20%"
   },
   {
     id: 2,
@@ -26,14 +30,31 @@ const teamMembers = [
     title: "CMO",
     description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
     image: anaduImage,
+    imagePosition: "center", // 🎯 this photo is wide/off-center in the source — tweak here if needed
   },
   {
     id: 3,
-    name: "Oluwatobi Adejoro",
-    title: "Technical Lead",
-    description: "Leads the Node.js/NestJS architecture and API integration.",
-    image: tobImage,
+    name: "Dr. Dawitt",
+    title: "CMO",
+    description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
+    image: dawiitImage,
+    imagePosition: "center",
   },
+  {
+    id: 4,
+    name: "Dr. Rasheeda",
+    title: "CMO",
+    description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
+    image: rasheedahImage,
+    imagePosition: "center",
+  },
+  // {
+  //   id: 3,
+  //   name: "Oluwatobi Adejoro",
+  //   title: "Technical Lead",
+  //   description: "Leads the Node.js/NestJS architecture and API integration.",
+  //   image: tobImage,
+  // },
   // {
   //   id: 4,
   //   name: "Tochi Omeche",
@@ -41,20 +62,20 @@ const teamMembers = [
   //   description: "Manages the African datasets and model training for the scanner.",
   //   image: anuImage,
   // },
-  {
-    id: 5,
-    name: "Nathan Isong",
-    title: "Head of AI",
-    description: "Lead the model architecture",
-    image: natImage,
-  },
-  {
-    id: 6,
-    name: "Mistura Agbabiaka",
-    title: "Workflow Coordinator",
-    description: "Ensures the seamless handoff between AI detection and specialist consultation.",
-    image: matImage,
-  },
+  // {
+  //   id: 5,
+  //   name: "Nathan Isong",
+  //   title: "Head of AI",
+  //   description: "Lead the model architecture",
+  //   image: natImage,
+  // },
+  // {
+  //   id: 6,
+  //   name: "Mistura Agbabiaka",
+  //   title: "Workflow Coordinator",
+  //   description: "Ensures the seamless handoff between AI detection and specialist consultation.",
+  //   image: matImage,
+  // },
 ]
 
 export default function TeamMemberSection() {
@@ -151,15 +172,16 @@ export default function TeamMemberSection() {
                     className="shrink-0 px-3"
                     style={{ width: `${itemWidthPct}%` }}
                   >
-                    <div className="bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 p-6 shadow-sm flex flex-col items-center text-center h-full">
+                    <div className="bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 p-6 shadow-sm flex flex-col items-center justify-center text-center h-full w-full">
 
-                      {/* Image */}
-                      <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full overflow-hidden mb-5 border-4 border-gray-100 dark:border-white/10 shrink-0">
+                      {/* Image — border frame explicitly centered; per-member imagePosition fine-tunes the photo inside it */}
+                      <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full overflow-hidden mb-5 border-4 border-gray-100 dark:border-white/10 shrink-0 mx-auto self-center">
                         <Image
                           src={member.image}
                           alt={member.name}
                           fill
-                          className="object-cover"
+                          className="object-cover object-center"
+                          style={{ objectPosition: member.imagePosition ?? "center" }}
                           sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
                         />
                       </div>
@@ -217,8 +239,11 @@ export default function TeamMemberSection() {
           </div>
         </div>
 
-        {/* Desktop Grid */}
-        <div className="hidden lg:grid grid-cols-3 xl:grid-cols-5 gap-6 md:gap-8">
+        {/* Desktop Grid — fixed 4 columns (matches current 4 team members exactly,
+            so there's no leftover empty slot pulling the row off-center).
+            Sits inside the max-w-screen-xl mx-auto container above, so left/right
+            margins stay equal. */}
+        <div className="hidden lg:grid grid-cols-4 gap-6 md:gap-8">
           {teamMembers.map((member, index) => (
             <motion.div
               key={member.id}
@@ -228,10 +253,10 @@ export default function TeamMemberSection() {
               viewport={{ once: true }}
               className="group"
             >
-              <div className="bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 p-6 md:p-8 shadow-sm hover:shadow-2xl transition-all duration-500 hover:border-[#E1784F]/30 h-full flex flex-col items-center text-center">
+              <div className="bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 p-6 md:p-8 shadow-sm hover:shadow-2xl transition-all duration-500 hover:border-[#E1784F]/30 h-full w-full flex flex-col items-center justify-center text-center">
 
-                {/* Image */}
-                <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden mb-6 border-4 border-gray-100 dark:border-white/10 group-hover:border-[#E1784F]/30 transition-all duration-500">
+                {/* Image — border frame explicitly centered; per-member imagePosition fine-tunes the photo inside it */}
+                <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden mb-6 border-4 border-gray-100 dark:border-white/10 group-hover:border-[#E1784F]/30 transition-all duration-500 mx-auto self-center">
                   <motion.div
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.3 }}
@@ -241,7 +266,8 @@ export default function TeamMemberSection() {
                       src={member.image}
                       alt={member.name}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center"
+                      style={{ objectPosition: member.imagePosition ?? "center" }}
                       sizes="(max-width: 768px) 144px, 176px"
                     />
                   </motion.div>
