@@ -269,33 +269,40 @@ export default function FaqChatbot() {
   ]
 
   return (
-    <section className="w-full py-8 sm:py-12 md:py-16 bg-[#050505] text-white flex flex-col justify-center items-center px-3 sm:px-6 md:px-8 selection:bg-[#E1784F]/30">
-      
+    <section 
+      id="faq" 
+      className="w-full py-10 sm:py-16 md:py-20 bg-gradient-to-br from-[#0D0914] via-[#170E20] to-[#0A1624] text-white flex flex-col justify-center items-center px-3 sm:px-6 md:px-8 relative overflow-hidden selection:bg-[#E1784F]/30"
+    >
+      {/* BRAND COLOR GLOW ACCENTS IN BACKGROUND */}
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[#E1784F]/20 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[#4DB6AC]/20 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#E1784F]/10 rounded-full blur-[160px] pointer-events-none" />
+
       {/* HEADER SECTION */}
-      <div className="max-w-3xl text-center space-y-2.5 mb-6 md:mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[#E1784F] text-[11px] sm:text-xs font-bold uppercase tracking-widest backdrop-blur-md">
-          <Sparkles size={13} className="text-[#4DB6AC]" />
+      <div className="max-w-3xl text-center space-y-3 mb-8 md:mb-12 relative z-10">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/15 text-[#E1784F] text-xs sm:text-sm font-bold uppercase tracking-widest backdrop-blur-md shadow-inner">
+          <Sparkles size={15} className="text-[#4DB6AC]" />
           <span>Interactive Knowledge Assistant</span>
         </div>
         
-        <h2 className="text-xl sm:text-3xl md:text-5xl font-black tracking-tight uppercase italic leading-tight text-center">
-          GOT QUESTIONS? <span className="text-[#E1784F] whitespace-nowrap">ASK AFRIDAM AI</span>
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase italic leading-tight text-center">
+          GOT QUESTIONS? <span className="bg-gradient-to-r from-[#E1784F] via-[#F2936E] to-[#4DB6AC] bg-clip-text text-transparent whitespace-nowrap">ASK AFRIDAM AI</span>
         </h2>
 
-        <p className="text-white/60 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl mx-auto px-2">
-          Explore our Marketplace, diagnostic scanner, vendor onboarding, or contact support directly at <strong className="text-white">hello@afridamai.com</strong>.
+        <p className="text-white/80 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mx-auto px-2 font-normal">
+          Explore our Marketplace, diagnostic scanner, vendor onboarding, or contact support directly at <strong className="text-white font-semibold underline decoration-[#4DB6AC]">hello@afridamai.com</strong>.
         </p>
       </div>
 
-      {/* CHATBOX CONTAINER - Mobile Responsive Height & Flex Layout */}
-      <div className="w-full max-w-5xl bg-white/[0.02] border border-white/10 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col md:flex-row h-[720px] md:h-[580px] relative">
+      {/* CHATBOX CONTAINER - Enhanced Dimensions & Vibrancy */}
+      <div className="w-full max-w-5xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/15 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.7)] flex flex-col md:flex-row h-[780px] md:h-[620px] relative z-10">
         
         {/* LEFT SIDEBAR: TOPICS & KNOWLEDGE BANK */}
-        <div className="w-full md:w-5/12 bg-black/60 border-b md:border-b-0 md:border-r border-white/10 p-3 sm:p-4 flex flex-col justify-between h-[230px] md:h-full shrink-0">
-          <div className="space-y-2.5 flex-1 flex flex-col overflow-hidden">
+        <div className="w-full md:w-5/12 bg-gradient-to-b from-[#E1784F]/10 via-black/50 to-[#4DB6AC]/10 border-b md:border-b-0 md:border-r border-white/15 p-3.5 sm:p-5 flex flex-col justify-between h-[280px] md:h-full shrink-0">
+          <div className="space-y-3 flex-1 flex flex-col overflow-hidden">
             
             <div className="flex items-center justify-between">
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-white/50">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-white/70">
                 Knowledge Bank
               </span>
               <button 
@@ -305,36 +312,36 @@ export default function FaqChatbot() {
                   text: "Chat cleared! How else can I assist you with AfriDam AI?",
                   time: formatTime(new Date())
                 }])}
-                className="text-[10px] sm:text-[11px] text-white/40 hover:text-[#E1784F] transition-colors flex items-center gap-1 font-semibold"
+                className="text-xs sm:text-sm text-white/50 hover:text-[#E1784F] transition-colors flex items-center gap-1 font-semibold"
                 title="Clear Chat"
               >
-                <RefreshCw size={12} /> Clear
+                <RefreshCw size={13} /> Clear
               </button>
             </div>
 
             {/* Category Badges (Horizontal Scroll with Hidden Scrollbars) */}
-            <div className="flex gap-1.5 overflow-x-auto pb-1 shrink-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex gap-2 overflow-x-auto pb-1.5 shrink-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {categories.map((cat) => {
                 const IconComponent = cat.icon
                 return (
                   <button
                     key={cat.label}
                     onClick={() => setActiveCategory(cat.label)}
-                    className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                       activeCategory === cat.label
-                        ? "bg-[#E1784F] text-white shadow-md shadow-[#E1784F]/20"
-                        : "bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white"
+                        ? "bg-gradient-to-r from-[#E1784F] to-[#d8683e] text-white shadow-lg shadow-[#E1784F]/30"
+                        : "bg-white/[0.07] text-white/70 hover:bg-white/15 hover:text-white border border-white/5"
                     }`}
                   >
-                    <IconComponent size={12} />
+                    <IconComponent size={14} />
                     <span>{cat.label}</span>
                   </button>
                 )
               })}
             </div>
 
-            {/* Questions List (Vertical Scroll with Custom Dark Scrollbars) */}
-            <div className="overflow-y-auto space-y-1.5 pr-1 flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.1)_transparent]">
+            {/* Questions List - Enlarged font & spacious padding */}
+            <div className="overflow-y-auto space-y-2 pr-1 flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.15)_transparent]">
               {filteredQuestions.map((item) => (
                 <button
                   key={item.id}
@@ -345,51 +352,51 @@ export default function FaqChatbot() {
                     item.category === "Support"
                   )}
                   disabled={isTyping}
-                  className="w-full text-left p-2.5 sm:p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-[#4DB6AC]/40 transition-all duration-200 group flex items-start justify-between gap-2 text-[11px] sm:text-xs font-medium text-white/80 hover:text-white disabled:opacity-50"
+                  className="w-full text-left p-3 sm:p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/10 hover:border-[#4DB6AC]/50 hover:shadow-[0_0_15px_rgba(77,182,172,0.15)] transition-all duration-200 group flex items-start justify-between gap-2.5 text-xs sm:text-sm md:text-base font-medium text-white/90 hover:text-white disabled:opacity-50"
                 >
                   <span className="line-clamp-2 leading-snug">{item.question}</span>
-                  <ChevronRight size={13} className="text-white/30 group-hover:text-[#4DB6AC] shrink-0 mt-0.5 group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight size={16} className="text-white/40 group-hover:text-[#4DB6AC] shrink-0 mt-0.5 group-hover:translate-x-1 transition-transform" />
                 </button>
               ))}
             </div>
           </div>
 
           {/* Sidebar Footer Stats */}
-          <div className="pt-2 mt-1 border-t border-white/5 flex items-center justify-between text-[10px] sm:text-[11px] text-white/40 font-medium shrink-0">
-            <span className="flex items-center gap-1">
-              <ShieldCheck size={13} className="text-[#4DB6AC]" /> Verified Vendors & Products
+          <div className="pt-2.5 mt-2 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm text-white/50 font-medium shrink-0">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck size={15} className="text-[#4DB6AC]" /> Verified Vendors & Products
             </span>
-            <span>40k+ Scans</span>
+            <span className="text-white/70 font-semibold">40k+ Scans</span>
           </div>
         </div>
 
         {/* RIGHT PANEL: LIVE CHAT WINDOW */}
-        <div className="w-full md:w-7/12 flex-1 flex flex-col justify-between bg-black/70 relative overflow-hidden">
+        <div className="w-full md:w-7/12 flex-1 flex flex-col justify-between bg-gradient-to-br from-black/60 via-[#120B18]/70 to-[#0A1624]/70 relative overflow-hidden">
           
           {/* Chat Header */}
-          <div className="p-3 border-b border-white/10 bg-white/[0.02] flex items-center justify-between backdrop-blur-md shrink-0">
-            <div className="flex items-center gap-2.5">
+          <div className="p-3.5 sm:p-4 border-b border-white/10 bg-white/[0.03] flex items-center justify-between backdrop-blur-md shrink-0">
+            <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-[#E1784F] to-[#4DB6AC] flex items-center justify-center text-white shadow-md">
-                  <Bot size={18} />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-[#E1784F] to-[#4DB6AC] flex items-center justify-center text-white shadow-md">
+                  <Bot size={20} />
                 </div>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 border-2 border-black absolute bottom-0 right-0 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-black absolute bottom-0 right-0 animate-pulse" />
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-bold text-white">
+                <h3 className="text-sm sm:text-base font-bold text-white">
                   AfriDam AI Assistant
                 </h3>
-                <p className="text-[9px] sm:text-[10px] text-[#4DB6AC] font-semibold uppercase tracking-wider">
+                <p className="text-xs text-[#4DB6AC] font-semibold uppercase tracking-wider">
                   Always Online • Clinical, Marketplace & Support
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Messages Container (Strict Internal Scroll to prevent page jump) */}
+          {/* Messages Container - Increased text sizes & dynamic bubbles */}
           <div 
             ref={messagesContainerRef}
-            className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.1)_transparent]"
+            className="flex-1 p-3.5 sm:p-5 overflow-y-auto space-y-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.15)_transparent]"
           >
             <AnimatePresence initial={false}>
               {messages.map((msg) => (
@@ -398,62 +405,62 @@ export default function FaqChatbot() {
                   initial={{ opacity: 0, y: 10, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.2 }}
-                  className={`flex items-end gap-2 ${
+                  className={`flex items-end gap-2.5 ${
                     msg.sender === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   {msg.sender === "bot" && (
-                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#E1784F]/20 border border-[#E1784F]/40 flex items-center justify-center text-[#E1784F] shrink-0 mb-0.5">
-                      <Bot size={13} />
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#E1784F]/20 border border-[#E1784F]/50 flex items-center justify-center text-[#E1784F] shrink-0 mb-0.5">
+                      <Bot size={15} />
                     </div>
                   )}
 
                   <div
-                    className={`max-w-[88%] sm:max-w-[85%] p-3 rounded-2xl text-xs sm:text-sm leading-relaxed shadow-lg ${
+                    className={`max-w-[88%] sm:max-w-[85%] p-3.5 sm:p-4 rounded-2xl text-sm sm:text-base leading-relaxed shadow-xl ${
                       msg.sender === "user"
-                        ? "bg-[#E1784F] text-white rounded-br-none font-medium"
-                        : "bg-white/[0.06] border border-white/10 text-white/90 rounded-bl-none backdrop-blur-md"
+                        ? "bg-gradient-to-r from-[#E1784F] to-[#d8683e] text-white rounded-br-none font-medium"
+                        : "bg-white/[0.08] border border-white/15 text-white/95 rounded-bl-none backdrop-blur-md"
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{msg.text}</p>
 
                     {/* Interactive Vendor CTA Card */}
                     {msg.showVendorCTA && (
-                      <div className="mt-2.5 p-2.5 rounded-xl bg-gradient-to-r from-[#E1784F]/20 to-[#4DB6AC]/20 border border-[#E1784F]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="mt-3 p-3 rounded-xl bg-gradient-to-r from-[#E1784F]/30 to-[#4DB6AC]/30 border border-[#E1784F]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <div>
-                          <p className="text-xs font-bold text-white">Join as an Approved Vendor</p>
-                          <p className="text-[10px] text-white/70">Fill out our Vendor Registration Form on the Homepage.</p>
+                          <p className="text-sm font-bold text-white">Join as an Approved Vendor</p>
+                          <p className="text-xs text-white/80">Fill out our Vendor Registration Form on the Homepage.</p>
                         </div>
                         <a
                           href="/#join-as-vendor"
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#E1784F] hover:text-white bg-white/10 hover:bg-[#E1784F] px-2.5 py-1.5 rounded-lg transition-all shrink-0"
+                          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white bg-[#E1784F] hover:bg-[#c9623b] px-3 py-1.5 rounded-lg transition-all shrink-0 shadow-md"
                         >
                           <span>Go to Homepage</span>
-                          <ArrowRight size={12} />
+                          <ArrowRight size={14} />
                         </a>
                       </div>
                     )}
 
                     {/* Interactive Support Email CTA Card */}
                     {msg.showSupportCTA && (
-                      <div className="mt-2.5 p-2.5 rounded-xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="mt-3 p-3 rounded-xl bg-white/10 border border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <div>
-                          <p className="text-xs font-bold text-white">Direct Email Support</p>
-                          <p className="text-[10px] text-white/70">hello@afridamai.com</p>
+                          <p className="text-sm font-bold text-white">Direct Email Support</p>
+                          <p className="text-xs text-[#4DB6AC] font-semibold">hello@afridamai.com</p>
                         </div>
                         <a
                           href="mailto:hello@afridamai.com"
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#4DB6AC] hover:text-white bg-white/10 hover:bg-[#4DB6AC] px-2.5 py-1.5 rounded-lg transition-all shrink-0"
+                          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white bg-[#4DB6AC] hover:bg-[#3ca399] px-3 py-1.5 rounded-lg transition-all shrink-0 shadow-md"
                         >
                           <span>Send Email</span>
-                          <ArrowRight size={12} />
+                          <ArrowRight size={14} />
                         </a>
                       </div>
                     )}
 
                     <span
-                      className={`block text-[9px] mt-1 text-right ${
-                        msg.sender === "user" ? "text-white/70" : "text-white/40"
+                      className={`block text-xs mt-1.5 text-right ${
+                        msg.sender === "user" ? "text-white/80" : "text-white/50"
                       }`}
                     >
                       {msg.time}
@@ -461,8 +468,8 @@ export default function FaqChatbot() {
                   </div>
 
                   {msg.sender === "user" && (
-                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 mb-0.5">
-                      <User size={13} />
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/15 border border-white/25 flex items-center justify-center text-white shrink-0 mb-0.5">
+                      <User size={15} />
                     </div>
                   )}
                 </motion.div>
@@ -474,13 +481,13 @@ export default function FaqChatbot() {
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 text-white/40 text-xs pl-1 pt-1"
+                className="flex items-center gap-2.5 text-white/50 text-xs sm:text-sm pl-1 pt-1"
               >
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#E1784F]/20 border border-[#E1784F]/40 flex items-center justify-center text-[#E1784F] shrink-0">
-                  <Bot size={13} />
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#E1784F]/20 border border-[#E1784F]/50 flex items-center justify-center text-[#E1784F] shrink-0">
+                  <Bot size={15} />
                 </div>
-                <div className="flex items-center gap-1.5 bg-white/[0.05] px-3 py-1.5 rounded-xl border border-white/10">
-                  <span className="text-white/60 font-medium text-[10px] sm:text-[11px]">AfriDam AI is typing</span>
+                <div className="flex items-center gap-2 bg-white/[0.08] px-3.5 py-2 rounded-xl border border-white/15">
+                  <span className="text-white/70 font-medium text-xs sm:text-sm">AfriDam AI is typing</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E1784F] animate-bounce" style={{ animationDelay: "0ms" }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-[#4DB6AC] animate-bounce" style={{ animationDelay: "150ms" }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -492,7 +499,7 @@ export default function FaqChatbot() {
           {/* Form Input Bar */}
           <form
             onSubmit={handleSubmitInput}
-            className="p-2.5 sm:p-3 border-t border-white/10 bg-black/90 flex items-center gap-2 shrink-0"
+            className="p-3 sm:p-4 border-t border-white/15 bg-black/60 backdrop-blur-md flex items-center gap-2.5 shrink-0"
           >
             <input
               type="text"
@@ -500,15 +507,15 @@ export default function FaqChatbot() {
               onChange={(e) => setInputQuery(e.target.value)}
               placeholder="Ask about skin scans, marketplace, vendors, or email support..."
               disabled={isTyping}
-              className="flex-1 bg-white/[0.05] border border-white/10 focus:border-[#E1784F] rounded-xl px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none transition-colors disabled:opacity-50"
+              className="flex-1 bg-white/[0.07] border border-white/15 focus:border-[#E1784F] rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-white/50 focus:outline-none transition-colors disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={!inputQuery.trim() || isTyping}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#E1784F] hover:bg-[#d0673e] text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0 shadow-lg shadow-[#E1784F]/20"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-r from-[#E1784F] to-[#d8683e] hover:from-[#d8683e] hover:to-[#c4572f] text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0 shadow-lg shadow-[#E1784F]/30"
               aria-label="Send Message"
             >
-              <Send size={15} />
+              <Send size={18} />
             </button>
           </form>
 
