@@ -36,8 +36,10 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const fullscreenRoutes = ["/plans", "/transaction"];
   const isFullscreenRoute = fullscreenRoutes.some(route => pathname.startsWith(route));
 
-  // 🚀 RULE 6: Toggle Nav/Footer visibility based on current clinical node
-  const showNav = !isAuthRoute && !isFullscreenRoute;
+  // Keep the shared public navigation available on the primary auth entry pages.
+  const showNav =
+    !isFullscreenRoute &&
+    (!isAuthRoute || pathname === "/login" || pathname === "/register");
   const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route)) && !isFullscreenRoute;
 
   // 🧭 SIDEBAR SYNC: Show on all internal protected pages

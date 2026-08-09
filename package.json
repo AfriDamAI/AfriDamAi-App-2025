@@ -2,6 +2,10 @@
   "name": "afridam-frontend",
   "version": "0.1.0",
   "private": true,
+  "author": "Iyere Godspower <hello@geypeywebstudio.com.ng>",
+  "contributors": [
+    "Geypey Web Studio <https://geypeywebstudio.com.ng>"
+  ],                      
   "scripts": {
     "dev": "next dev",
     "build": "next build",
