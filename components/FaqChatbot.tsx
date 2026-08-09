@@ -174,8 +174,9 @@ export default function FaqChatbot() {
     {
       id: "welcome-1",
       sender: "bot",
-      text: "Hello! 👋 I am the AfriDam AI Virtual Assistant. Ask me anything about our dark skin scanner, Marketplace, tele-dermatologists, or how to join as an approved vendor!",
-      time: formatTime(new Date())
+      text: "Hello! 👋 I am Godspower, the AfriDam AI Virtual Assistant. Ask me anything about our dark skin scanner, Marketplace, tele-dermatologists, or how to join as an approved vendor!",
+      // This message renders on both server and client, which can use different time zones.
+      time: "Now"
     }
   ])
   const [isTyping, setIsTyping] = useState(false)
