@@ -20,31 +20,31 @@ const teamMembers = [
     id: 1,
     name: "Ogirima Obey",
     title: "Founder & CEO",
-    description: "Registered Nurse & Venture Builder. Bridges clinical gaps with tech systems.",
+    description: "Registered Nurse and Venture Builder leading the development of our skin technology.",
     image: ogImage,
     imagePosition: "center", // 🎯 adjust per-photo if a face sits off-center, e.g. "center 20%"
   },
   {
     id: 2,
     name: "Dr. Anand Urheka",
-    title: "CMO",
-    description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
+    title: "Chief Medical Officer (CMO)",
+    description: "Leading clinical strategy and doctor network operations. Ensures the AI scanner meets medical standards.",
     image: anaduImage,
     imagePosition: "center", // 🎯 this photo is wide/off-center in the source — tweak here if needed
   },
   {
     id: 3,
-    name: "Dr. Dawitt",
-    title: "CMO",
-    description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
+    name: "Dr. Dawitt Feleke Zewde",
+    title: "Medical Advisory Board Member ",
+    description: "Consultant supporting our medical review processes. Ensures the AI scanner aligns with clinical best practices.",
     image: dawiitImage,
     imagePosition: "center",
   },
   {
     id: 4,
-    name: "Dr. Rasheeda",
-    title: "CMO",
-    description: "Chief Medical Officer. Provides the clinical oversight for the AI diagnostics.",
+    name: "Dr. Rasheedah Adesokan ",
+    title: "Founding Dermatologist ",
+    description: "Consultant supporting our medical review processes.",
     image: rasheedahImage,
     imagePosition: "center",
   },
@@ -149,9 +149,9 @@ export default function TeamMemberSection() {
             </span>
           </div>
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-tight text-black dark:text-white">
-            Meet The <span className="text-[#4DB6AC]">Minds</span>
+            Expertise Behind<span className="text-[#4DB6AC]">The Brand</span>
           </h2>
-          <p className="text-[11px] font-bold opacity-30 tracking-widest max-w-lg mx-auto leading-relaxed">
+          <p className="text-[15px] font-bold opacity-30 tracking-widest max-w-lg mx-auto leading-relaxed">
             Passionate experts dedicated to revolutionizing skin care for melanin-rich communities.
           </p>
         </div>
