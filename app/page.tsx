@@ -638,13 +638,14 @@ export default function LandingPage() {
       {/* 6. CARE HUB + BRAND CTA */}
       <CareHubSection />
 
-      <PartnersSection />
-
       {/* 7. FAQ SECTION */}
       <FaqChatbot />
 
       {/* 8. TEAM MEMBERS */}
       <TeamMemberSection />
+      
+      {/* 9. PARTNERS SECTION */}
+      <PartnersSection />
 
       {/* 9. Footer rendered by app-wrapper.tsx */}
     </div>
