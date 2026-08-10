@@ -33,7 +33,16 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-background border-t border-border mt-24 transition-colors duration-500 relative overflow-hidden">
+    <footer className="bg-white dark:bg-[#1c1a19] border-t border-border mt-24 transition-colors duration-500 relative isolate overflow-hidden">
+      {/* Theme-aware brand watermark, kept behind all footer controls and links. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <img
+          src="/logo.png"
+          alt=""
+          className="absolute -right-20 top-1/2 h-[30rem] w-[30rem] -translate-y-1/2 object-contain opacity-[0.045] mix-blend-multiply dark:opacity-[0.14] dark:brightness-125 dark:mix-blend-screen md:right-8 md:h-[38rem] md:w-[38rem]"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_50%,transparent_8%,rgba(255,255,255,0.6)_72%)] dark:bg-[radial-gradient(circle_at_80%_50%,transparent_8%,rgba(28,26,25,0.45)_72%)]" />
+      </div>
       <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-[#E1784F]/5 to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 relative z-10">
