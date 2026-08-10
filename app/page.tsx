@@ -37,9 +37,38 @@ type MarketplaceProduct = {
   basePrice: number
   imageUrl?: string
   verifiedShop?: boolean
+  createdAt?: string
+  restockedAt?: string
+  inStock?: boolean
 }
 
 const MAX_PREVIEW_ITEMS = 4
+// Products created (or restocked) within this window are labeled on the marketplace preview.
+// No existing definition of "new"/"recently restocked" was found in the codebase — 14 days
+// is a starting default; adjust here if the team wants a different window.
+const NEW_ARRIVAL_WINDOW_DAYS = 14
+
+function isRecent(dateString: string | undefined, withinDays: number) {
+  if (!dateString) return false
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return false
+  const diffMs = Date.now() - date.getTime()
+  return diffMs >= 0 && diffMs <= withinDays * 24 * 60 * 60 * 1000
+}
+
+function getInventoryBadge(product: MarketplaceProduct): "new" | "restocked" | null {
+  const restockedIsNewer =
+    !!product.restockedAt &&
+    (!product.createdAt || new Date(product.restockedAt) > new Date(product.createdAt))
+
+  if (restockedIsNewer && isRecent(product.restockedAt, NEW_ARRIVAL_WINDOW_DAYS)) {
+    return "restocked"
+  }
+  if (isRecent(product.createdAt, NEW_ARRIVAL_WINDOW_DAYS)) {
+    return "new"
+  }
+  return null
+}
 
 function formatNaira(amount: number) {
   return `₦${amount.toLocaleString("en-NG")}`
@@ -70,9 +99,12 @@ export default function LandingPage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const data = await getProducts();
+        const data = await getProducts({ sort: "recent", limit: MAX_PREVIEW_ITEMS });
         const list = Array.isArray(data) ? data : [];
-        setProducts(list.slice(0, MAX_PREVIEW_ITEMS));
+        // Defensive client-side backstop — only drops items explicitly marked
+        // unavailable, so nothing breaks if a product is missing `inStock`.
+        const available = list.filter((p: MarketplaceProduct) => p.inStock !== false);
+        setProducts(available.slice(0, MAX_PREVIEW_ITEMS));
       } catch (err) {
         console.error("Failed to load marketplace preview products", err);
       } finally {
@@ -435,18 +467,37 @@ export default function LandingPage() {
 
             {/* Details + Mobile Permanent Button */}
             <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
-              <Link href={`/marketplace/${product.id}`} className="block space-y-2">
+             <Link href={`/marketplace/${product.id}`} className="block space-y-2">
                 {product.verifiedShop && (
                   <div className="flex items-center gap-1.5">
                     <BadgeCheck size={12} className="text-[#4DB6AC]" />
                     <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">Verified Shop</span>
                   </div>
                 )}
+                {(() => {
+                  const badge = getInventoryBadge(product)
+                  if (badge === "restocked") {
+                    return (
+                      <div className="flex items-center gap-1.5">
+                        <ShieldCheck size={12} className="text-[#E1784F]" />
+                        <span className="text-[9px] font-black capitalize tracking-widest text-[#E1784F]">Back in Stock</span>
+                      </div>
+                    )
+                  }
+                  if (badge === "new") {
+                    return (
+                      <div className="flex items-center gap-1.5">
+                        <Sparkles size={12} className="text-[#4DB6AC]" />
+                        <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">New</span>
+                      </div>
+                    )
+                  }
+                  return null
+                })()}
                 <h3 className="text-sm font-black italic leading-snug line-clamp-2 hover:text-[#E1784F] transition-colors">
                   {product.name}
                 </h3>
               </Link>
-
               {/* Mobile Add to Cart (Always visible on small screens) */}
               <button
                 type="button"
