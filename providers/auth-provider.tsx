@@ -15,6 +15,7 @@ import {
   verifyRegister as apiVerifyRegister
 } from "@/lib/api-client"
 import { UserLoginDto, CreateUserDto, User, CreateUserProfileDto, UpdateUserProfileDto, UserProfile } from "@/lib/types"
+import { useCart } from "@/hooks/use-cart"
 
 /**
  * 🛡️ AFRIDAM AUTH PROVIDER (Rule 7 Precision Sync)
@@ -109,6 +110,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // We don't 'await' this so the user enters the dashboard instantly
       fetchUserData();
 
+      // After sign-in, attempt to process any pending cart add saved before auth.
+      try {
+        const pendingKey = "afridam:pendingCartAdd";
+        const pendingJson = typeof window !== "undefined" ? localStorage.getItem(pendingKey) : null;
+        if (pendingJson) {
+          const pending = JSON.parse(pendingJson as string);
+          if (pending && userData?.id) {
+            const processingKey = "afridam:pendingCartAddProcessing";
+            const processingId = localStorage.getItem(processingKey);
+            if (processingId !== pending.id) {
+              localStorage.setItem(processingKey, pending.id);
+              try {
+                await useCart.getState().addToCart(userData.id, {
+                  productId: pending.productId,
+                  productName: pending.productName,
+                  productImage: pending.productImage,
+                  price: pending.price,
+                  quantity: pending.quantity || 1,
+                });
+                localStorage.removeItem(pendingKey);
+                localStorage.removeItem(processingKey);
+                console.debug("auth: processed pending cart after signIn", pending.productId);
+              } catch (cartErr) {
+                console.error("auth: failed to process pending cart after signIn", cartErr);
+                localStorage.removeItem(processingKey);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("auth: pending cart processing error", e);
+      }
+
     } catch (error) {
       signOut();
       throw error;
@@ -146,6 +180,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Background fetch for mobile speed
       fetchUserData();
+
+      // After verification/login, attempt to process any pending cart add.
+      try {
+        const pendingKey = "afridam:pendingCartAdd";
+        const pendingJson = typeof window !== "undefined" ? localStorage.getItem(pendingKey) : null;
+        if (pendingJson) {
+          const pending = JSON.parse(pendingJson as string);
+          if (pending && userData?.id) {
+            const processingKey = "afridam:pendingCartAddProcessing";
+            const processingId = localStorage.getItem(processingKey);
+            if (processingId !== pending.id) {
+              localStorage.setItem(processingKey, pending.id);
+              try {
+                await useCart.getState().addToCart(userData.id, {
+                  productId: pending.productId,
+                  productName: pending.productName,
+                  productImage: pending.productImage,
+                  price: pending.price,
+                  quantity: pending.quantity || 1,
+                });
+                localStorage.removeItem(pendingKey);
+                localStorage.removeItem(processingKey);
+                console.debug("auth: processed pending cart after verifyRegister", pending.productId);
+              } catch (cartErr) {
+                console.error("auth: failed to process pending cart after verifyRegister", cartErr);
+                localStorage.removeItem(processingKey);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("auth: pending cart processing error", e);
+      }
 
     } catch (error) {
       signOut();
