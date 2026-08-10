@@ -595,13 +595,31 @@ export default function LandingPage() {
 </section>
 
       {/* 📜 4. THE MANIFESTO */}
-      <section className="py-24 md:py-40 px-6 text-center">
-        <div className="max-w-screen-xl mx-auto flex flex-col items-center">
-          
-          <Image
-          src="/logo.png" alt="AfridmaAI Logo" width={210} height={210}
-          className="mb-12 mx-auto object-contain"
+      <section className="relative isolate overflow-hidden py-24 md:py-40 px-6 text-center bg-gradient-to-br from-[#fffaf7] via-white to-[#f6fffd] dark:from-[#130d0a] dark:via-[#1c1a19] dark:to-[#071513] transition-colors duration-500">
+        {/* A restrained brand watermark keeps the message legible in either theme. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute inset-0 bg-white/70 dark:bg-[#1c1a19]/45" />
+          <div className="absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 md:h-[42rem] md:w-[42rem]">
+            <Image
+              src="/logo.png"
+              alt=""
+              fill
+              sizes="672px"
+              className="object-contain opacity-[0.08] mix-blend-multiply dark:opacity-[0.2] dark:brightness-125 dark:mix-blend-screen"
             />
+          </div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_16%,rgba(255,255,255,0.55)_78%)] dark:bg-[radial-gradient(circle_at_center,transparent_12%,rgba(28,26,25,0.35)_78%)]" />
+        </div>
+
+        <div className="relative z-10 max-w-screen-xl mx-auto flex flex-col items-center">
+          <Image
+            src="/logo.png"
+            alt="AfriDam AI"
+            width={210}
+            height={210}
+            className="mb-10 h-auto w-32 object-contain sm:w-40 md:w-48"
+          />
+          <div className="mb-10 h-px w-16 bg-gradient-to-r from-[#E1784F] to-[#4DB6AC]" />
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
             &quot;Heritage is <br /> our <span className="text-[#4DB6AC]">Foundation</span>, <br /> Skin is our <span className="text-[#E1784F]">Legacy</span>.&quot;
           </h2>

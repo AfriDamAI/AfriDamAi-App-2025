@@ -137,8 +137,23 @@ export default function TeamMemberSection() {
   }
 
   return (
-    <section className="py-24 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5 border-y border-black/5 dark:border-white/5">
-      <div className="max-w-screen-xl mx-auto space-y-16">
+    <section className="relative isolate overflow-hidden py-24 md:py-40 px-6 bg-gradient-to-br from-[#fffaf7] via-white to-[#f6fffd] dark:from-[#130d0a] dark:via-[#1c1a19] dark:to-[#071513] border-y border-black/5 dark:border-white/5 transition-colors duration-500">
+      {/* Brand watermark: low contrast in light mode, gently luminous in dark mode. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-white/75 dark:bg-[#1c1a19]/55" />
+        <div className="absolute -right-24 top-1/2 h-[42rem] w-[42rem] -translate-y-1/2 sm:right-0 md:right-[8%]">
+          <Image
+            src="/logo.png"
+            alt=""
+            fill
+            sizes="672px"
+            className="object-contain opacity-[0.07] mix-blend-multiply dark:opacity-[0.18] dark:brightness-125 dark:mix-blend-screen"
+          />
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(255,255,255,0.55)_78%)] dark:bg-[radial-gradient(circle_at_center,transparent_15%,rgba(28,26,25,0.4)_78%)]" />
+      </div>
+
+      <div className="relative z-10 max-w-screen-xl mx-auto space-y-16">
 
         {/* Section Header */}
         <div className="text-center space-y-6">
