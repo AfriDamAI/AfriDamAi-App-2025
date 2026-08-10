@@ -40,6 +40,7 @@ type MarketplaceProduct = {
   createdAt?: string
   restockedAt?: string
   inStock?: boolean
+  stock?: number
 }
 
 const MAX_PREVIEW_ITEMS = 4
@@ -48,7 +49,7 @@ const MAX_PREVIEW_ITEMS = 4
 // is a starting default; adjust here if the team wants a different window.
 const NEW_ARRIVAL_WINDOW_DAYS = 14
 
-function isRecent(dateString: string | undefined, withinDays: number) {
+function isRecentDate(dateString: string | undefined, withinDays: number) {
   if (!dateString) return false
   const date = new Date(dateString)
   if (isNaN(date.getTime())) return false
@@ -61,10 +62,10 @@ function getInventoryBadge(product: MarketplaceProduct): "new" | "restocked" | n
     !!product.restockedAt &&
     (!product.createdAt || new Date(product.restockedAt) > new Date(product.createdAt))
 
-  if (restockedIsNewer && isRecent(product.restockedAt, NEW_ARRIVAL_WINDOW_DAYS)) {
+  if (restockedIsNewer && isRecentDate(product.restockedAt, NEW_ARRIVAL_WINDOW_DAYS)) {
     return "restocked"
   }
-  if (isRecent(product.createdAt, NEW_ARRIVAL_WINDOW_DAYS)) {
+  if (isRecentDate(product.createdAt, NEW_ARRIVAL_WINDOW_DAYS)) {
     return "new"
   }
   return null
@@ -72,6 +73,46 @@ function getInventoryBadge(product: MarketplaceProduct): "new" | "restocked" | n
 
 function formatNaira(amount: number) {
   return `₦${amount.toLocaleString("en-NG")}`
+}
+
+function isInStock(product: MarketplaceProduct) {
+  if (product.inStock === false) return false
+  return typeof product.stock === "number" ? product.stock > 0 : true
+}
+
+function getHomepagePreviewProducts(products: MarketplaceProduct[]) {
+  const available = products.filter(isInStock)
+
+  if (available.length === 0) return []
+
+  const ranked = available
+    .map((product) => {
+      const createdAt = product.createdAt ? new Date(product.createdAt).getTime() : 0
+      const restockedAt = product.restockedAt ? new Date(product.restockedAt).getTime() : 0
+      const latestActivity = Math.max(createdAt, restockedAt)
+      const isRecent = Boolean(
+        (product.createdAt && isRecentDate(product.createdAt, NEW_ARRIVAL_WINDOW_DAYS)) ||
+        (product.restockedAt && isRecentDate(product.restockedAt, NEW_ARRIVAL_WINDOW_DAYS))
+      )
+
+      return {
+        product,
+        isRecent,
+        latestActivity,
+        badge: getInventoryBadge(product),
+      }
+    })
+    .sort((a, b) => {
+      if (a.isRecent !== b.isRecent) return a.isRecent ? -1 : 1
+      if (a.badge === "restocked" && b.badge !== "restocked") return -1
+      if (a.badge === "new" && b.badge === null) return -1
+      return b.latestActivity - a.latestActivity
+    })
+
+  const prioritized = ranked.filter((entry) => entry.isRecent)
+  const fallback = prioritized.length > 0 ? prioritized : ranked
+
+  return fallback.slice(0, MAX_PREVIEW_ITEMS).map((entry) => entry.product)
 }
 
 export default function LandingPage() {
@@ -99,12 +140,31 @@ export default function LandingPage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const data = await getProducts({ sort: "recent", limit: MAX_PREVIEW_ITEMS });
+        const windowStart = new Date(Date.now() - NEW_ARRIVAL_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
+        const data = await getProducts({
+          sort: "recent",
+          limit: MAX_PREVIEW_ITEMS * 4,
+          restockedSince: windowStart,
+          createdSince: windowStart,
+        });
         const list = Array.isArray(data) ? data : [];
-        // Defensive client-side backstop — only drops items explicitly marked
-        // unavailable, so nothing breaks if a product is missing `inStock`.
-        const available = list.filter((p: MarketplaceProduct) => p.inStock !== false);
-        setProducts(available.slice(0, MAX_PREVIEW_ITEMS));
+        let previewProducts = getHomepagePreviewProducts(list)
+        console.debug("homepage: fetched recent products", { requested: list.length, preview: previewProducts.length })
+
+        // If the recent/restocked window returned nothing, fall back to a
+        // broader query (all products) so the homepage never appears empty.
+        if (!previewProducts || previewProducts.length === 0) {
+          try {
+            const allData = await getProducts();
+            const allList = Array.isArray(allData) ? allData : [];
+            previewProducts = getHomepagePreviewProducts(allList);
+            console.debug("homepage: fallback fetched all products", { total: allList.length, preview: previewProducts.length })
+          } catch (fallbackErr) {
+            console.error("Fallback product fetch failed", fallbackErr);
+          }
+        }
+
+        setProducts(previewProducts);
       } catch (err) {
         console.error("Failed to load marketplace preview products", err);
       } finally {
@@ -116,6 +176,21 @@ export default function LandingPage() {
 
   const handleAddToCart = async (product: MarketplaceProduct) => {
     if (!user) {
+      try {
+        const pending = {
+          id: product.id,
+          productId: product.id,
+          productName: product.name,
+          productImage: product.imageUrl || "",
+          price: product.basePrice,
+          quantity: 1,
+          createdAt: new Date().toISOString(),
+        } as any
+        localStorage.setItem("afridam:pendingCartAdd", JSON.stringify(pending));
+        console.debug("homepage: saved pending cart item", pending);
+      } catch (e) {
+        console.error("Failed to save pending cart item", e);
+      }
       navigateToAuth("register");
       return;
     }
