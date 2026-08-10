@@ -317,6 +317,7 @@ export interface GetProductsParams {
   sort?: "recent";
   limit?: number;
   restockedSince?: string;
+  createdSince?: string;
 }
 
 export const getProducts = async (params?: GetProductsParams) => {
