@@ -21,6 +21,8 @@ import PedigreeSection from "@/components/pedigree-section"
 import { getProducts, getImageUrl } from "@/lib/api-client"
 import { useCart } from "@/hooks/use-cart"
 import Image from "next/image";
+import FaqChatbot from "@/components/FaqChatbot"
+import PartnersSection from "@/components/PartnersSection"
 
 // -----------------------------------------------------------------------
 // 🛒 MARKETPLACE PREVIEW
@@ -35,12 +37,82 @@ type MarketplaceProduct = {
   basePrice: number
   imageUrl?: string
   verifiedShop?: boolean
+  createdAt?: string
+  restockedAt?: string
+  inStock?: boolean
+  stock?: number
 }
 
 const MAX_PREVIEW_ITEMS = 4
+// Products created (or restocked) within this window are labeled on the marketplace preview.
+// No existing definition of "new"/"recently restocked" was found in the codebase — 14 days
+// is a starting default; adjust here if the team wants a different window.
+const NEW_ARRIVAL_WINDOW_DAYS = 14
+
+function isRecentDate(dateString: string | undefined, withinDays: number) {
+  if (!dateString) return false
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return false
+  const diffMs = Date.now() - date.getTime()
+  return diffMs >= 0 && diffMs <= withinDays * 24 * 60 * 60 * 1000
+}
+
+function getInventoryBadge(product: MarketplaceProduct): "new" | "restocked" | null {
+  const restockedIsNewer =
+    !!product.restockedAt &&
+    (!product.createdAt || new Date(product.restockedAt) > new Date(product.createdAt))
+
+  if (restockedIsNewer && isRecentDate(product.restockedAt, NEW_ARRIVAL_WINDOW_DAYS)) {
+    return "restocked"
+  }
+  if (isRecentDate(product.createdAt, NEW_ARRIVAL_WINDOW_DAYS)) {
+    return "new"
+  }
+  return null
+}
 
 function formatNaira(amount: number) {
   return `₦${amount.toLocaleString("en-NG")}`
+}
+
+function isInStock(product: MarketplaceProduct) {
+  if (product.inStock === false) return false
+  return typeof product.stock === "number" ? product.stock > 0 : true
+}
+
+function getHomepagePreviewProducts(products: MarketplaceProduct[]) {
+  const available = products.filter(isInStock)
+
+  if (available.length === 0) return []
+
+  const ranked = available
+    .map((product) => {
+      const createdAt = product.createdAt ? new Date(product.createdAt).getTime() : 0
+      const restockedAt = product.restockedAt ? new Date(product.restockedAt).getTime() : 0
+      const latestActivity = Math.max(createdAt, restockedAt)
+      const isRecent = Boolean(
+        (product.createdAt && isRecentDate(product.createdAt, NEW_ARRIVAL_WINDOW_DAYS)) ||
+        (product.restockedAt && isRecentDate(product.restockedAt, NEW_ARRIVAL_WINDOW_DAYS))
+      )
+
+      return {
+        product,
+        isRecent,
+        latestActivity,
+        badge: getInventoryBadge(product),
+      }
+    })
+    .sort((a, b) => {
+      if (a.isRecent !== b.isRecent) return a.isRecent ? -1 : 1
+      if (a.badge === "restocked" && b.badge !== "restocked") return -1
+      if (a.badge === "new" && b.badge === null) return -1
+      return b.latestActivity - a.latestActivity
+    })
+
+  const prioritized = ranked.filter((entry) => entry.isRecent)
+  const fallback = prioritized.length > 0 ? prioritized : ranked
+
+  return fallback.slice(0, MAX_PREVIEW_ITEMS).map((entry) => entry.product)
 }
 
 export default function LandingPage() {
@@ -68,9 +140,31 @@ export default function LandingPage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const data = await getProducts();
+        const windowStart = new Date(Date.now() - NEW_ARRIVAL_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
+        const data = await getProducts({
+          sort: "recent",
+          limit: MAX_PREVIEW_ITEMS * 4,
+          restockedSince: windowStart,
+          createdSince: windowStart,
+        });
         const list = Array.isArray(data) ? data : [];
-        setProducts(list.slice(0, MAX_PREVIEW_ITEMS));
+        let previewProducts = getHomepagePreviewProducts(list)
+        console.debug("homepage: fetched recent products", { requested: list.length, preview: previewProducts.length })
+
+        // If the recent/restocked window returned nothing, fall back to a
+        // broader query (all products) so the homepage never appears empty.
+        if (!previewProducts || previewProducts.length === 0) {
+          try {
+            const allData = await getProducts();
+            const allList = Array.isArray(allData) ? allData : [];
+            previewProducts = getHomepagePreviewProducts(allList);
+            console.debug("homepage: fallback fetched all products", { total: allList.length, preview: previewProducts.length })
+          } catch (fallbackErr) {
+            console.error("Fallback product fetch failed", fallbackErr);
+          }
+        }
+
+        setProducts(previewProducts);
       } catch (err) {
         console.error("Failed to load marketplace preview products", err);
       } finally {
@@ -82,6 +176,21 @@ export default function LandingPage() {
 
   const handleAddToCart = async (product: MarketplaceProduct) => {
     if (!user) {
+      try {
+        const pending = {
+          id: product.id,
+          productId: product.id,
+          productName: product.name,
+          productImage: product.imageUrl || "",
+          price: product.basePrice,
+          quantity: 1,
+          createdAt: new Date().toISOString(),
+        } as any
+        localStorage.setItem("afridam:pendingCartAdd", JSON.stringify(pending));
+        console.debug("homepage: saved pending cart item", pending);
+      } catch (e) {
+        console.error("Failed to save pending cart item", e);
+      }
       navigateToAuth("register");
       return;
     }
@@ -433,18 +542,37 @@ export default function LandingPage() {
 
             {/* Details + Mobile Permanent Button */}
             <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
-              <Link href={`/marketplace/${product.id}`} className="block space-y-2">
+             <Link href={`/marketplace/${product.id}`} className="block space-y-2">
                 {product.verifiedShop && (
                   <div className="flex items-center gap-1.5">
                     <BadgeCheck size={12} className="text-[#4DB6AC]" />
                     <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">Verified Shop</span>
                   </div>
                 )}
+                {(() => {
+                  const badge = getInventoryBadge(product)
+                  if (badge === "restocked") {
+                    return (
+                      <div className="flex items-center gap-1.5">
+                        <ShieldCheck size={12} className="text-[#E1784F]" />
+                        <span className="text-[9px] font-black capitalize tracking-widest text-[#E1784F]">Back in Stock</span>
+                      </div>
+                    )
+                  }
+                  if (badge === "new") {
+                    return (
+                      <div className="flex items-center gap-1.5">
+                        <Sparkles size={12} className="text-[#4DB6AC]" />
+                        <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">New</span>
+                      </div>
+                    )
+                  }
+                  return null
+                })()}
                 <h3 className="text-sm font-black italic leading-snug line-clamp-2 hover:text-[#E1784F] transition-colors">
                   {product.name}
                 </h3>
               </Link>
-
               {/* Mobile Add to Cart (Always visible on small screens) */}
               <button
                 type="button"
@@ -467,13 +595,31 @@ export default function LandingPage() {
 </section>
 
       {/* 📜 4. THE MANIFESTO */}
-      <section className="py-24 md:py-40 px-6 text-center">
-        <div className="max-w-screen-xl mx-auto flex flex-col items-center">
-          
-          <Image
-          src="/logo.png" alt="AfridmaAI Logo" width={210} height={210}
-          className="mb-12 mx-auto object-contain"
+      <section className="relative isolate overflow-hidden py-24 md:py-40 px-6 text-center bg-gradient-to-br from-[#fffaf7] via-white to-[#f6fffd] dark:from-[#130d0a] dark:via-[#1c1a19] dark:to-[#071513] transition-colors duration-500">
+        {/* A restrained brand watermark keeps the message legible in either theme. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute inset-0 bg-white/70 dark:bg-[#1c1a19]/45" />
+          <div className="absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 md:h-[42rem] md:w-[42rem]">
+            <Image
+              src="/logo.png"
+              alt=""
+              fill
+              sizes="672px"
+              className="object-contain opacity-[0.08] mix-blend-multiply dark:opacity-[0.2] dark:brightness-125 dark:mix-blend-screen"
             />
+          </div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_16%,rgba(255,255,255,0.55)_78%)] dark:bg-[radial-gradient(circle_at_center,transparent_12%,rgba(28,26,25,0.35)_78%)]" />
+        </div>
+
+        <div className="relative z-10 max-w-screen-xl mx-auto flex flex-col items-center">
+          <Image
+            src="/logo.png"
+            alt="AfriDam AI"
+            width={210}
+            height={210}
+            className="mb-10 h-auto w-32 object-contain sm:w-40 md:w-48"
+          />
+          <div className="mb-10 h-px w-16 bg-gradient-to-r from-[#E1784F] to-[#4DB6AC]" />
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
             &quot;Heritage is <br /> our <span className="text-[#4DB6AC]">Foundation</span>, <br /> Skin is our <span className="text-[#E1784F]">Legacy</span>.&quot;
           </h2>
@@ -510,10 +656,16 @@ export default function LandingPage() {
       {/* 6. CARE HUB + BRAND CTA */}
       <CareHubSection />
 
-      {/* 7. TEAM MEMBERS */}
-      <TeamMemberSection />
+      {/* 7. FAQ SECTION */}
+      <FaqChatbot />
 
-      {/* 8. Footer rendered by app-wrapper.tsx */}
+      {/* 8. TEAM MEMBERS */}
+      <TeamMemberSection />
+      
+      {/* 9. PARTNERS SECTION */}
+      <PartnersSection />
+
+      {/* 9. Footer rendered by app-wrapper.tsx */}
     </div>
   )
 }

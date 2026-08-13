@@ -19,9 +19,13 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // 🚀 PATH SYNC: These are the exact paths allowed without a token.
-  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/login", "/register", "/forgot-password", "/reset-password", "/privacy-policy", "/verify-email", "/public-scan"]
-  const isPublicPath = publicPaths.includes(pathname)
+  // 🚀 PATH SYNC: These are the base paths allowed without a token.
+  // Use startsWith for non-root paths to tolerate trailing slashes and nested routes.
+  const publicPaths = ["/", "/pricing", "/contact", "/mission", "/login", "/register", "/forgot-password", "/reset-password", "/privacy-policy", "/terms", "/verify-email", "/public-scan"]
+  const isPublicPath = publicPaths.some((p) => {
+    if (p === "/") return pathname === "/"
+    return pathname.startsWith(p)
+  })
 
   // 🔐 AUTH PATHS: Pages that should be hidden from logged-in users.
   const isAuthPage = pathname === "/login" || pathname === "/register"
