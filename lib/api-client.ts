@@ -313,8 +313,15 @@ export const verifyPayment = async (transactionId: string) => {
   return response.data;
 };
 
-export const getProducts = async () => {
-  const response = await apiClient.get("/products");
+export interface GetProductsParams {
+  sort?: "recent";
+  limit?: number;
+  restockedSince?: string;
+  createdSince?: string;
+}
+
+export const getProducts = async (params?: GetProductsParams) => {
+  const response = await apiClient.get("/products", { params });
   return response.data;
 };
 
