@@ -8,9 +8,18 @@
 
 import type React from "react"
 import Link from "next/link"
-import { ShieldCheck, Instagram, Twitter, Linkedin, Globe, MapPin } from "lucide-react"
+import { ShieldCheck, Instagram, Twitter, Linkedin, Facebook, Globe, MapPin } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
+
+// 🔗 SOCIAL LINKS
+// Update here if any handle/URL changes — every icon below pulls from this list.
+const socialLinks = [
+  { label: "X (Twitter)", href: "https://x.com/Afridam_AI", icon: Twitter },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/afridamai/", icon: Linkedin },
+  { label: "Instagram", href: "https://www.instagram.com/afridam_ai", icon: Instagram },
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61577358013953", icon: Facebook },
+]
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -116,10 +125,20 @@ export default function Footer() {
                   Clinical Terms
                 </Link>
               </li>
+              {/* 🔗 SOCIAL ICONS — now linked to live URLs, open in a new tab */}
               <li className="pt-6 flex gap-6">
-                <Instagram size={18} className="text-muted-foreground hover:text-[#E1784F] cursor-pointer transition-colors" />
-                <Twitter size={18} className="text-muted-foreground hover:text-[#E1784F] cursor-pointer transition-colors" />
-                <Linkedin size={18} className="text-muted-foreground hover:text-[#E1784F] cursor-pointer transition-colors" />
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    className="text-muted-foreground hover:text-[#E1784F] cursor-pointer transition-colors"
+                  >
+                    <social.icon size={18} />
+                  </a>
+                ))}
               </li>
             </ul>
           </div>
