@@ -23,6 +23,8 @@ import { useCart } from "@/hooks/use-cart"
 import Image from "next/image";
 import FaqChatbot from "@/components/FaqChatbot"
 import PartnersSection from "@/components/PartnersSection"
+import HeroVideo from "@/components/HeroVideo"; 
+
 
 // -----------------------------------------------------------------------
 // 🛒 MARKETPLACE PREVIEW
@@ -213,6 +215,9 @@ export default function LandingPage() {
 
       {/* 🧭 Navigation handled by AppWrapper → Navigation component */}
 
+      {/* 🎬 1. BRAND HERO VIDEO (now first thing seen on the page) */}
+      <HeroVideo />
+
       {/* 🌪️ 2. HERO */}
       <section className="min-h-[calc(100svh-5rem)] relative px-4 min-[360px]:px-5 sm:px-6 flex items-center">
         <div className="max-w-screen-xl mx-auto w-full grid lg:grid-cols-12 items-center gap-8 md:gap-20 py-12 md:py-16">
@@ -222,7 +227,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-none lg:col-span-7 lg:order-1 order-2 gap-6 items-end"
+            className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-none lg:col-span-12 lg:order-1 order-2 gap-6 items-end"
           >
             {/* Badge + Heading + Subtext */}
             <div className="sm:col-span-2 space-y-4 md:space-y-6" style={{ margin: 0 }}>
@@ -247,7 +252,7 @@ export default function LandingPage() {
             </button>
           </motion.div>
 
-          {/* Image Card — full width on mobile (order-1), right 5 cols on desktop */}
+          {/* Image Card — commented out 
           <div className="lg:col-span-5 relative max-w-sm sm:max-w-md mx-auto w-full lg:order-2 order-1">
             <div className="aspect-[4/5] rounded-[3.5rem] overflow-hidden border-[10px] border-white dark:border-[#121212] shadow-2xl bg-muted/20 relative group">
               <img
@@ -281,6 +286,7 @@ export default function LandingPage() {
               </Link>
             </div>
           </div>
+          */}
 
         </div>
       </section>
