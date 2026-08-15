@@ -18,10 +18,6 @@ import { useRef, useSyncExternalStore } from "react";
 
 export default function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const revealTransition = {
-    duration: 0.9,
-    ease: [0.22, 1, 0.36, 1] as const,
-  };
   const reducedMotion = useSyncExternalStore(
     (callback) => {
       const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -31,6 +27,25 @@ export default function HeroVideo() {
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     () => false
   );
+
+  // The mask reveal *is* the motion here, so reduced motion snaps it to the
+  // final frame rather than just shortening it.
+  const revealTransition = reducedMotion
+    ? { duration: 0 }
+    : { duration: 0.9, ease: [0.22, 1, 0.36, 1] as const };
+  const stagger = (index: number) => ({
+    ...revealTransition,
+    delay: reducedMotion ? 0 : index * 0.12,
+  });
+
+  // overflow-hidden is what masks the slide-up, but it was also clipping the
+  // italic overhang on the last glyph (the "I" of AI lost its right edge) and
+  // the cap-height that leading-[0.9] pushes above the line box. Padding opens
+  // the mask on those two edges; the matching negative margin keeps layout
+  // byte-identical. Deliberately no padding-bottom — that edge has to stay
+  // tight or the text peeks out before it animates in.
+  const maskClass =
+    "inline-block overflow-hidden align-bottom pt-[0.12em] -mt-[0.12em] pr-[0.18em] -mr-[0.18em]";
 
   return (
     <section className="relative h-screen min-h-[640px] w-full overflow-hidden bg-[#141812]">
@@ -73,24 +88,24 @@ export default function HeroVideo() {
       />
 
       {/* Copy block */}
-      <div className="relative z-10 mx-auto flex h-full max-w-[1280px] items-end px-[6vw] pb-[10vh]">
+      <div className="relative z-10 mx-auto flex h-full max-w-[1280px] items-end px-[6vw] pb-[20vh]">
         <div className="max-w-5xl">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black italic uppercase tracking-tighter leading-[0.9] text-white text-balance">
-            <span className="inline-block overflow-hidden align-bottom">
+            <span className={maskClass}>
               <motion.span
                 initial={{ y: "110%" }}
                 animate={{ y: 0 }}
-                transition={revealTransition}
+                transition={stagger(0)}
                 className="inline-block"
               >
                 AfriDam
               </motion.span>
             </span>{" "}
-            <span className="inline-block overflow-hidden align-bottom">
+            <span className={maskClass}>
               <motion.span
                 initial={{ y: "110%" }}
                 animate={{ y: 0 }}
-                transition={{ ...revealTransition, delay: 0.12 }}
+                transition={stagger(1)}
                 className="inline-block text-[#E1784F]"
               >
                 AI
@@ -98,13 +113,25 @@ export default function HeroVideo() {
             </span>
           </h1>
 
-          <p className="mt-6 max-w-xl text-sm md:text-lg font-medium leading-relaxed tracking-tight uppercase text-white/70">
+          {/* Subtitle and CTA join the same stagger — previously only the
+              heading animated, so the rest of the block popped in flat. */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={stagger(2)}
+            className="mt-6 max-w-xl text-sm md:text-lg font-medium leading-relaxed tracking-tight uppercase text-white/70"
+          >
             Melanin-rich skin intelligence for clinical scans, verified care, and safer skincare choices.
-          </p>
+          </motion.p>
 
-          <div className="mt-11 flex items-center gap-7">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={stagger(3)}
+            className="mt-11 flex items-center gap-7"
+          >
             <a
-              href="/collection"
+              href="/public-scan"
               className="group inline-flex items-center gap-2.5 border-b border-[#E1784F] pb-2 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white transition-all duration-300 hover:border-[#4DB6AC] hover:text-[#4DB6AC]"
             >
               Start Skin Scan
@@ -118,7 +145,7 @@ export default function HeroVideo() {
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </a>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
