@@ -9,6 +9,9 @@ type Entry = {
   label: string;
   caption: string;
   alt: string;
+  /** Optional. Fine-tune crop if a face still looks off-center after the
+   *  default top-anchored crop, e.g. "50% 25%" or "50% 10%". */
+  focus?: string;
 };
 
 const entries: Entry[] = [
@@ -74,6 +77,31 @@ export default function CommunityCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const pauseAutoplay = () => {
+    if (resumeTimerRef.current) {
+      clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
+    }
+    setIsPaused(true);
+  };
+
+  // Resumes autoplay a few seconds after touch ends, instead of instantly —
+  // so lifting a finger to read a caption doesn't yank the carousel forward.
+  const scheduleResume = (delayMs = 3000) => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+      resumeTimerRef.current = null;
+    }, delayMs);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    };
+  }, []);
 
   const scrollToIndex = (index: number) => {
     const track = trackRef.current;
@@ -86,15 +114,19 @@ export default function CommunityCarousel() {
   };
 
   const handlePrev = () => {
+    pauseAutoplay();
     const previous = activeIndex <= 0 ? entries.length - 1 : activeIndex - 1;
     setActiveIndex(previous);
     scrollToIndex(previous);
+    scheduleResume();
   };
 
   const handleNext = () => {
+    pauseAutoplay();
     const next = activeIndex + 1 >= entries.length ? 0 : activeIndex + 1;
     setActiveIndex(next);
     scrollToIndex(next);
+    scheduleResume();
   };
 
   useEffect(() => {
@@ -168,7 +200,7 @@ export default function CommunityCarousel() {
               Every Tone, One Standard
             </div>
             <h2 className="max-w-[15ch] text-4xl font-black italic leading-tight tracking-tight text-black dark:text-white md:text-6xl">
-              Formulated for every <span className="text-[#E1784F]">shade</span> of skin.
+              Every complexion <span className="text-[#E1784F]">deserves</span> to be understood.
             </h2>
           </div>
 
@@ -194,25 +226,37 @@ export default function CommunityCarousel() {
 
         <div
           ref={trackRef}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => setIsPaused(false)}
+          onMouseEnter={pauseAutoplay}
+          onMouseLeave={() => scheduleResume(500)}
+          onTouchStart={pauseAutoplay}
+          onTouchEnd={() => scheduleResume(3000)}
           className="no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2"
           style={{ scrollbarWidth: "none" }}
         >
           {entries.map((entry) => (
             <figure
               key={entry.src}
-              className="group relative w-[78vw] shrink-0 snap-start overflow-hidden rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/[0.03] sm:w-[46vw] md:w-[30vw] lg:w-[23vw]"
+              className="group relative w-[65vw] shrink-0 snap-start overflow-hidden rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/[0.03] sm:w-[40vw] md:w-[26vw] lg:w-[20vw]"
             >
-              <div className="relative aspect-[4/5] overflow-hidden bg-black/5 dark:bg-white/5">
+              <div className="relative aspect-[4/4.4] overflow-hidden bg-black/5 dark:bg-white/5">
+                {/* Blurred backdrop — same photo, scaled and blurred, fills
+                    any space the full uncropped photo doesn't reach so
+                    there's never a bare black gap. */}
+                <Image
+                  src={entry.src}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(max-width: 640px) 65vw, (max-width: 768px) 40vw, (max-width: 1024px) 26vw, 20vw"
+                  className="scale-125 object-cover opacity-60 blur-2xl"
+                />
+                {/* Full, uncropped photo on top — nothing hidden */}
                 <Image
                   src={entry.src}
                   alt={entry.alt}
                   fill
-                  sizes="(max-width: 640px) 78vw, (max-width: 768px) 46vw, (max-width: 1024px) 30vw, 23vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 640px) 65vw, (max-width: 768px) 40vw, (max-width: 1024px) 26vw, 20vw"
+                  className="object-contain transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
@@ -231,8 +275,10 @@ export default function CommunityCarousel() {
               type="button"
               aria-label={`Go to slide ${i + 1}`}
               onClick={() => {
+                pauseAutoplay();
                 setActiveIndex(i);
                 scrollToIndex(i);
+                scheduleResume();
               }}
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === activeIndex ? "w-8 bg-[#E1784F]" : "w-1.5 bg-black/25 dark:bg-white/25"
