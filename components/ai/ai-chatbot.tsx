@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageSquare, X, Send, User, Bot, Zap, Info, Loader2 } from "lucide-react"
+import { X, Send, User, Bot, Zap, Info, Loader2, ChevronUp } from "lucide-react"
 import { useTheme } from "@/providers/theme-provider"
 import { useAuth } from "@/providers/auth-provider" // 🚀 SYNC: Import useAuth to get user context
 // 🚀 SYNC: Using the verified chatbot endpoint from api-client
@@ -20,6 +20,14 @@ export function AIChatBot() {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
+  // 👋 GREETING BUBBLE: pops up on load, fades on its own after a few seconds.
+  // 📌 DOCKED: at the same moment the greeting fades, the icon itself slides
+  // fully off the right edge of the screen, leaving only a tiny tab visible.
+  // Tapping the tab brings the icon back — it does NOT open the chat panel
+  // by itself; the user still taps the icon to open it, same as always.
+  const [showGreeting, setShowGreeting] = useState(false);
+  const [isDocked, setIsDocked] = useState(false);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -30,6 +38,34 @@ export function AIChatBot() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const isDark = theme === "dark";
+
+  // 👋 GREETING BUBBLE + DOCKING TIMER — both happen together (timing tightened)
+  useEffect(() => {
+    const showTimer = setTimeout(() => setShowGreeting(true), 300);
+    const hideTimer = setTimeout(() => {
+      setShowGreeting(false);
+      setIsDocked(true);
+    }, 3000);
+
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+    };
+  }, []);
+
+  // 🚪 OPEN / CLOSE HELPERS
+  // Opening always undocks (icon + panel both visible). Closing always
+  // re-docks — the icon never lingers on screen after the user is done;
+  // it goes straight back to hiding, same as the initial auto-hide.
+  const openChat = () => {
+    setIsDocked(false);
+    setIsOpen(true);
+  };
+
+  const closeChat = () => {
+    setIsOpen(false);
+    setIsDocked(true);
+  };
 
   // 🛡️ VIEWPORT SYNC: Auto-scroll to latest insight for mobile users
   useEffect(() => {
@@ -106,23 +142,69 @@ export function AIChatBot() {
 
   return (
     <>
-      {/* 🚀 TOGGLE HUB (Mobile Optimized Position) */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-28 right-6 md:bottom-10 md:right-10 z-[999] w-16 h-16 bg-[#4DB6AC] text-white rounded-[1.5rem] shadow-[0_20px_40px_rgba(77,182,172,0.4)] flex items-center justify-center active:scale-90 transition-all group border-2 border-white/10"
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div key="close" initial={{ rotate: -90 }} animate={{ rotate: 0 }} exit={{ rotate: 90 }}>
-              <X size={28} />
-            </motion.div>
-          ) : (
-            <motion.div key="chat" initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}>
-              <MessageSquare size={28} className="group-hover:rotate-12 transition-transform" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </button>
+      {/* 👋 GREETING BUBBLE — pops up next to the icon, fades on its own.
+          Does not open the chat panel; purely signals "I'm here". */}
+      <AnimatePresence>
+        {showGreeting && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+            className={`fixed bottom-48 right-6 md:bottom-28 md:right-10 z-[999] px-5 py-3 rounded-[1.2rem] rounded-br-sm shadow-xl border text-[12px] font-black italic ${isDark ? 'bg-[#0A0A0A] border-white/10 text-white' : 'bg-white border-black/5 text-black'
+              }`}
+          >
+            Hello 👋
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 📌 DOCKED TAB — the tiny sliver left behind once the icon slides
+          up and off-screen. Sits flush against the bottom edge, where the
+          icon "took off" from. Tapping it undocks (slides the full icon
+          back down into view); it does not open the panel. */}
+      <AnimatePresence>
+        {isDocked && !isOpen && (
+          <motion.button
+            key="docked-tab"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            onClick={openChat}
+            aria-label="Show chat"
+            className="fixed bottom-0 right-6 md:right-10 z-[999] w-14 h-7 bg-[#4DB6AC] rounded-t-[1rem] shadow-[0_-10px_25px_rgba(77,182,172,0.4)] flex items-center justify-center active:scale-95 transition-transform border-t border-x border-white/10"
+          >
+            <ChevronUp size={16} className="text-white" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* 🚀 TOGGLE HUB (Mobile Optimized Position) — slides fully off-screen
+          upward when docked; the tab above takes over as the only visible trace */}
+      <AnimatePresence>
+        {!isDocked && (
+          <motion.button
+            key="toggle-hub"
+            initial={false}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -160, opacity: 0 }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            onClick={() => (isOpen ? closeChat() : openChat())}
+            className="fixed bottom-28 right-6 md:bottom-10 md:right-10 z-[999] w-16 h-16 bg-[#4DB6AC] text-white rounded-[1.5rem] shadow-[0_20px_40px_rgba(77,182,172,0.4)] flex items-center justify-center active:scale-90 transition-all group border-2 border-white/10"
+          >
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.div key="close" initial={{ rotate: -90 }} animate={{ rotate: 0 }} exit={{ rotate: 90 }}>
+                  <X size={28} />
+                </motion.div>
+              ) : (
+                <motion.div key="chat" initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}>
+                  <Bot size={28} className="group-hover:rotate-12 transition-transform" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* 🏛️ CHAT CONSOLE */}
       <AnimatePresence>
@@ -150,7 +232,7 @@ export function AIChatBot() {
                   </div>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="opacity-20 hover:opacity-100 transition-all">
+              <button onClick={closeChat} className="opacity-20 hover:opacity-100 transition-all">
                 <X size={20} />
               </button>
             </div>
