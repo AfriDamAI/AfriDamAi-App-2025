@@ -77,6 +77,10 @@ export default function CommunityCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  // How many slide positions the track can actually stop at. Lower than
+  // entries.length, because the last screenful of cards is already visible
+  // once the track hits max scroll — see lastReachableIndex below.
+  const [reachableCount, setReachableCount] = useState(entries.length);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pauseAutoplay = () => {
@@ -113,9 +117,41 @@ export default function CommunityCarousel() {
     track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: "smooth" });
   };
 
+  // Now that a whole number of cards fills the viewport, the track runs out of
+  // scroll before the final card reaches the left edge. Advancing past that
+  // point scrolls nowhere while the scroll handler snaps activeIndex back,
+  // which reads as the carousel stalling. Cap the index at the last position
+  // the track can genuinely stop on.
+  const lastReachableIndex = () => {
+    const track = trackRef.current;
+    if (!track) return entries.length - 1;
+
+    const children = Array.from(track.children) as HTMLElement[];
+    const maxScroll = track.scrollWidth - track.clientWidth;
+
+    for (let i = 0; i < children.length; i++) {
+      if (children[i].offsetLeft - track.offsetLeft >= maxScroll - 1) return i;
+    }
+    return children.length - 1;
+  };
+
+  // Card count per view is breakpoint-driven, so remeasure on resize.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const recount = () => setReachableCount(lastReachableIndex() + 1);
+    recount();
+
+    const observer = new ResizeObserver(recount);
+    observer.observe(track);
+
+    return () => observer.disconnect();
+  }, []);
+
   const handlePrev = () => {
     pauseAutoplay();
-    const previous = activeIndex <= 0 ? entries.length - 1 : activeIndex - 1;
+    const previous = activeIndex <= 0 ? reachableCount - 1 : activeIndex - 1;
     setActiveIndex(previous);
     scrollToIndex(previous);
     scheduleResume();
@@ -123,7 +159,7 @@ export default function CommunityCarousel() {
 
   const handleNext = () => {
     pauseAutoplay();
-    const next = activeIndex + 1 >= entries.length ? 0 : activeIndex + 1;
+    const next = activeIndex + 1 >= reachableCount ? 0 : activeIndex + 1;
     setActiveIndex(next);
     scrollToIndex(next);
     scheduleResume();
@@ -135,14 +171,14 @@ export default function CommunityCarousel() {
 
     const timer = setInterval(() => {
       setActiveIndex((current) => {
-        const next = current + 1 >= entries.length ? 0 : current + 1;
+        const next = current + 1 >= reachableCount ? 0 : current + 1;
         scrollToIndex(next);
         return next;
       });
     }, AUTOPLAY_INTERVAL);
 
     return () => clearInterval(timer);
-  }, [isPaused]);
+  }, [isPaused, reachableCount]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -236,27 +272,19 @@ export default function CommunityCarousel() {
           {entries.map((entry) => (
             <figure
               key={entry.src}
-              className="group relative w-[65vw] shrink-0 snap-start overflow-hidden rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/[0.03] sm:w-[40vw] md:w-[26vw] lg:w-[20vw]"
+              className="group relative shrink-0 snap-start overflow-hidden rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/[0.03] basis-full sm:basis-[calc((100%-1.5rem)/2)] lg:basis-[calc((100%-3rem)/3)] xl:basis-[calc((100%-4.5rem)/4)]"
             >
               <div className="relative aspect-[4/4.4] overflow-hidden bg-black/5 dark:bg-white/5">
-                {/* Blurred backdrop — same photo, scaled and blurred, fills
-                    any space the full uncropped photo doesn't reach so
-                    there's never a bare black gap. */}
-                <Image
-                  src={entry.src}
-                  alt=""
-                  aria-hidden="true"
-                  fill
-                  sizes="(max-width: 640px) 65vw, (max-width: 768px) 40vw, (max-width: 1024px) 26vw, 20vw"
-                  className="scale-125 object-cover opacity-60 blur-2xl"
-                />
-                {/* Full, uncropped photo on top — nothing hidden */}
+                {/* One photo, filling the card edge to edge. Anchored high so
+                    what the crop takes is the bottom of the frame, never the
+                    face. Per-entry `focus` overrides it when a shot sits low. */}
                 <Image
                   src={entry.src}
                   alt={entry.alt}
                   fill
-                  sizes="(max-width: 640px) 65vw, (max-width: 768px) 40vw, (max-width: 1024px) 26vw, 20vw"
-                  className="object-contain transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
+                  style={{ objectPosition: entry.focus ?? "50% 20%" }}
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
@@ -268,8 +296,10 @@ export default function CommunityCarousel() {
           ))}
         </div>
 
+        {/* One dot per position the track can actually stop at, not one per
+            card — trailing dots for cards already on screen were unclickable. */}
         <div className="mt-10 flex items-center gap-2">
-          {entries.map((_, i) => (
+          {entries.slice(0, reachableCount).map((_, i) => (
             <button
               key={i}
               type="button"
