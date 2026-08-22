@@ -14,7 +14,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  distDir: '.next-buildcheck',
 
   async headers() {
     return [
