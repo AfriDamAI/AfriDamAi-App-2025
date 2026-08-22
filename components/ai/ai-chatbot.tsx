@@ -41,12 +41,17 @@ export function AIChatBot() {
   const isDark = theme === "dark";
 
   // 👋 GREETING BUBBLE + DOCKING TIMER — both happen together (timing tightened)
+  // Kept in a ref so opening the chat can cancel them. Without that the
+  // auto-dock still fires up to 3s in and pulls the toggle out mid-conversation.
+  const greetingTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
   useEffect(() => {
     const showTimer = setTimeout(() => setShowGreeting(true), 300);
     const hideTimer = setTimeout(() => {
       setShowGreeting(false);
       setIsDocked(true);
     }, 3000);
+    greetingTimersRef.current = [showTimer, hideTimer];
 
     return () => {
       clearTimeout(showTimer);
@@ -59,6 +64,11 @@ export function AIChatBot() {
   // re-docks — the icon never lingers on screen after the user is done;
   // it goes straight back to hiding, same as the initial auto-hide.
   const openChat = () => {
+    // Cancel the pending auto-dock. It sits above the panel at z-[999], so
+    // letting it fire here would slide the toggle — and the X inside it —
+    // off screen while the user is mid-conversation.
+    greetingTimersRef.current.forEach(clearTimeout);
+    setShowGreeting(false);
     setIsDocked(false);
     setIsOpen(true);
   };
