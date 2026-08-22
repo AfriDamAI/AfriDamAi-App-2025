@@ -329,122 +329,116 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2rem] relative border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden group">
-          <div className="p-6 bg-white dark:bg-white/10 backdrop-blur-xl rounded-full border border-black/5 dark:border-white/20 shadow-md group-hover:scale-110 transition-transform duration-300">
-            <Aperture size={40} className="text-[#E1784F]" />
-          </div>
-        </div>
+      <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2rem] relative border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden group">
+  <video
+    src="/videos/step one.mp4"
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="w-full h-full object-cover rounded-[2rem]"
+  />
+</div>
       </motion.div>
 
       {/* STEP 02 - BRAND ORANGE CARD */}
-      <motion.div
-        whileHover={{ y: -6 }}
-        transition={{ duration: 0.3 }}
-        className="p-8 md:p-10 bg-[#E1784F] text-white rounded-[2.5rem] space-y-8 shadow-xl shadow-[#E1784F]/25 relative overflow-hidden flex flex-col justify-between"
-      >
-        <div className="space-y-6 relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center font-black text-xl italic border border-white/30">
-            02
-          </div>
-          <div className="space-y-3">
-            <h3 className="text-2xl sm:text-3xl font-black capitalize italic leading-tight text-white">
-              Instant <br />Check
-            </h3>
-            <p className="text-sm sm:text-base font-semibold text-white/95 leading-relaxed tracking-tight">
-              We check your scan against clinical health standards for melanin.
-            </p>
-          </div>
-        </div>
-
-        <div className="aspect-square bg-black/10 rounded-[2rem] flex items-center justify-center relative overflow-hidden border border-white/20 z-10">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-            className="w-24 h-24 border-2 border-dashed border-white/60 rounded-full flex items-center justify-center"
-          >
-            <Activity size={38} className="text-white" />
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* STEP 03 - WHITE CARD */}
-      <motion.div
-        whileHover={{ y: -6 }}
-        transition={{ duration: 0.3 }}
-        className="p-8 md:p-10 bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 space-y-8 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
-      >
-        <div className="space-y-6">
-          <div className="w-14 h-14 rounded-2xl bg-[#4DB6AC]/10 text-[#4DB6AC] flex items-center justify-center font-black text-xl italic border border-[#4DB6AC]/20">
-            03
-          </div>
-          <div className="space-y-3">
-            <h3 className="text-2xl sm:text-3xl font-black italic leading-tight text-black dark:text-white">
-              Get the <br />Answer
-            </h3>
-            <p className="text-sm sm:text-base font-semibold text-black/70 dark:text-white/70 leading-relaxed tracking-tight">
-              Receive immediate results and guidance for your skin journey.
-            </p>
-          </div>
-        </div>
-
-        <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2rem] p-8 flex flex-col justify-center space-y-3.5 border border-black/5 dark:border-white/5">
-          <motion.div initial={{ width: "20%" }} whileInView={{ width: "85%" }} transition={{ duration: 0.8 }} className="h-3 bg-[#4DB6AC] rounded-full opacity-90" />
-          <motion.div initial={{ width: "20%" }} whileInView={{ width: "100%" }} transition={{ duration: 0.8, delay: 0.2 }} className="h-3 bg-[#4DB6AC] rounded-full opacity-50" />
-          <motion.div initial={{ width: "20%" }} whileInView={{ width: "65%" }} transition={{ duration: 0.8, delay: 0.4 }} className="h-3 bg-[#4DB6AC] rounded-full opacity-30" />
-        </div>
-      </motion.div>
-
-      {/* STEP 04 - BRAND ORANGE CARD */}
-      <motion.div
-        whileHover={{ y: -6 }}
-        transition={{ duration: 0.3 }}
-        className="p-8 md:p-10 bg-[#E1784F] text-white rounded-[2.5rem] space-y-8 shadow-xl shadow-[#E1784F]/25 relative overflow-hidden flex flex-col justify-between"
-      >
-        <div className="space-y-6 relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center font-black text-xl italic border border-white/30">
-            04
-          </div>
-          <div className="space-y-3">
-            <h3 className="text-2xl sm:text-3xl font-black italic leading-tight text-white">
-              Meet the <br />Consultants
-            </h3>
-            <p className="text-sm sm:text-base font-semibold text-white/95 leading-relaxed tracking-tight">
-              Connect your results to real specialist insight and next-step care.
-            </p>
-          </div>
-        </div>
-
-        <div className="aspect-square bg-black/10 rounded-[2rem] relative border border-white/20 overflow-hidden z-10">
-          <motion.div
-            animate={{ y: [0, -6, 0], scale: [1, 1.03, 1] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute left-1/2 top-1/2 w-20 h-20 -translate-x-1/2 -translate-y-1/2 rounded-[1.75rem] bg-white/20 border border-white/40 flex items-center justify-center shadow-lg backdrop-blur-sm"
-          >
-            <UsersRound size={36} className="text-white" />
-          </motion.div>
-          <motion.div
-            animate={{ x: [0, 8, 0], opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute right-6 top-8 h-10 w-10 rounded-xl bg-white/25 border border-white/30 flex items-center justify-center"
-          >
-            <MessageCircle size={20} className="text-white" />
-          </motion.div>
-          <motion.div
-            animate={{ width: ["30%", "65%", "40%"] }}
-            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute left-6 bottom-10 h-2 rounded-full bg-white/40"
-          />
-          <motion.div
-            animate={{ width: ["50%", "25%", "60%"] }}
-            transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute left-6 bottom-6 h-2 rounded-full bg-white/25"
-          />
-        </div>
-      </motion.div>
-
+<motion.div
+  whileHover={{ y: -6 }}
+  transition={{ duration: 0.3 }}
+  className="p-8 md:p-10 bg-[#E1784F] text-white rounded-[2.5rem] space-y-8 shadow-xl shadow-[#E1784F]/25 relative overflow-hidden flex flex-col justify-between"
+>
+  <div className="space-y-6 relative z-10">
+    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center font-black text-xl italic border border-white/30">
+      02
+    </div>
+    <div className="space-y-3">
+      <h3 className="text-2xl sm:text-3xl font-black capitalize italic leading-tight text-white">
+        Instant <br />Check
+      </h3>
+      <p className="text-sm sm:text-base font-semibold text-white/95 leading-relaxed tracking-tight">
+        We check your scan against clinical health standards for melanin.
+      </p>
     </div>
   </div>
-</section>
+
+  <div className="aspect-square bg-black/10 rounded-[2rem] flex items-center justify-center relative overflow-hidden border border-white/20 z-10">
+    <video
+      src="/videos/step two.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="w-full h-full object-cover rounded-[2rem] pointer-events-none"
+    />
+  </div>
+</motion.div>
+      {/* STEP 03 - WHITE CARD */}
+<motion.div
+  whileHover={{ y: -6 }}
+  transition={{ duration: 0.3 }}
+  className="p-8 md:p-10 bg-white dark:bg-black rounded-[2.5rem] border border-black/5 dark:border-white/5 space-y-8 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+>
+  <div className="space-y-6">
+    <div className="w-14 h-14 rounded-2xl bg-[#4DB6AC]/10 text-[#4DB6AC] flex items-center justify-center font-black text-xl italic border border-[#4DB6AC]/20">
+      03
+    </div>
+    <div className="space-y-3">
+      <h3 className="text-2xl sm:text-3xl font-black italic leading-tight text-black dark:text-white">
+        Get the <br />Answer
+      </h3>
+      <p className="text-sm sm:text-base font-semibold text-black/70 dark:text-white/70 leading-relaxed tracking-tight">
+        Receive immediate results and guidance for your skin journey.
+      </p>
+    </div>
+  </div>
+
+  <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2rem] relative overflow-hidden border border-black/5 dark:border-white/5 flex items-center justify-center">
+    <video
+      src="/videos/step three.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="w-full h-full object-cover rounded-[2rem] pointer-events-none"
+    />
+  </div>
+</motion.div>
+
+      {/* STEP 04 - BRAND ORANGE CARD */}
+        <motion.div
+          whileHover={{ y: -6 }}
+          transition={{ duration: 0.3 }}
+          className="p-8 md:p-10 bg-[#E1784F] text-white rounded-[2.5rem] space-y-8 shadow-xl shadow-[#E1784F]/25 relative overflow-hidden flex flex-col justify-between"
+        >
+          <div className="space-y-6 relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center font-black text-xl italic border border-white/30">
+              04
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-2xl sm:text-3xl font-black italic leading-tight text-white">
+                Meet the <br />Consultants
+              </h3>
+              <p className="text-sm sm:text-base font-semibold text-white/95 leading-relaxed tracking-tight">
+                Connect your results to real specialist insight and next-step care.
+              </p>
+            </div>
+          </div>
+
+          <div className="aspect-square bg-black/10 rounded-[2rem] relative overflow-hidden border border-white/20 z-10 flex items-center justify-center">
+            <video
+              src="/videos/step four.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover rounded-[2rem] pointer-events-none"
+            />
+          </div>
+        </motion.div>
+
+      </div> {/* Closes cards grid */}
+    </div>   {/* Closes line 296: <div className="max-w-screen-xl..."> */}
+  </section>  {/* Closes line 295: <section className="py-20..."> */}
 
 {/* 🛒 5.5 MARKETPLACE PREVIEW */}
 <section id="marketplace-preview" className="py-24 md:py-40 px-6">
