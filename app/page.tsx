@@ -8,7 +8,7 @@
 
 import React, { useEffect, useState } from "react"
 import {
-  Camera, ArrowRight, Heart, ShieldCheck, Activity, Sparkles, Aperture, UsersRound, MessageCircle,
+  Camera, ArrowRight, ShieldCheck, Sparkles,
   ShoppingCart, BadgeCheck
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
@@ -222,9 +222,7 @@ export default function LandingPage() {
       {/* 🌍 1.5 COMMUNITY CAROUSEL — diverse skin tones, right after the video */}
       <CommunityCarousel />
 
-      {/* 🌪️ 2. HERO — Text and CTA moved to HeroVideo component */}
-
-      {/* 🎥 3. THE VISUAL FLOW */}
+      {/* 🎥 2. THE VISUAL FLOW */}
 <section className="py-20 md:py-36 px-6 bg-gray-100/70 dark:bg-white/[0.02] border-y border-black/5 dark:border-white/5 relative overflow-hidden">
   <div className="max-w-screen-xl mx-auto space-y-16 md:space-y-20">
 
