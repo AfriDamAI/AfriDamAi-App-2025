@@ -49,9 +49,25 @@ export default function HeroVideo() {
 
   return (
     <section className="relative h-screen min-h-[640px] w-full overflow-hidden bg-[#141812]">
-      {/* Background video — poster covers first paint / slow connections.
-          If the user has reduced motion enabled, we skip playback and just
-          show the poster frame as a static hero image. */}
+      {/* Blurred backdrop — same poster frame, scaled and blurred, fills the
+          space the uncropped video leaves empty on tall mobile screens (see
+          foreground video below). Always rendered underneath so there's
+          never a flat/empty gap. */}
+      <Image
+        src="/videos/afridam-hero-poster.jpg"
+        alt=""
+        aria-hidden="true"
+        fill
+        sizes="100vw"
+        className="scale-125 object-cover opacity-60 blur-2xl"
+      />
+
+      {/* Foreground video / poster.
+          - On mobile (narrow/tall viewports): object-contain, so the FULL
+            frame is visible — nothing important gets cropped off the sides
+            the way object-cover would on a 16:9 video in a tall box.
+          - From sm breakpoint up (wider/landscape-ish viewports): object-cover,
+            since the crop needed there is mild and a full-bleed look works. */}
       {reducedMotion ? (
         <Image
           src="/videos/afridam-hero-poster.jpg"
@@ -59,12 +75,12 @@ export default function HeroVideo() {
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-contain sm:object-cover"
         />
       ) : (
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-contain sm:object-cover"
           autoPlay
           muted
           loop
