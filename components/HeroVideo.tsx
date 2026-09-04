@@ -49,32 +49,60 @@ export default function HeroVideo() {
 
   return (
     <section className="relative h-screen min-h-[640px] w-full overflow-hidden bg-[#141812]">
-      {/* Background video — poster covers first paint / slow connections.
-          If the user has reduced motion enabled, we skip playback and just
-          show the poster frame as a static hero image. */}
+      {/* Background video / poster.
+          Two source sets, swapped by breakpoint via Tailwind's responsive
+          display utilities (hidden/sm:hidden) rather than object-fit tricks:
+          - Below sm: the true 9:16 vertical cut — full-bleed object-cover
+            with no crop trade-off, since its shape already matches a phone
+            screen.
+          - From sm up: the original 16:9 landscape cut, same as before. */}
       {reducedMotion ? (
-        <Image
-          src="/videos/afridam-hero-poster.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
+        <>
+          <Image
+            src="/videos/afridam-hero-mobile-poster.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover sm:hidden"
+          />
+          <Image
+            src="/videos/afridam-hero-poster.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="hidden object-cover sm:block"
+          />
+        </>
       ) : (
-        <video
-          ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster="/videos/afridam-hero-poster.jpg"
-        >
-          <source src="/videos/afridam-hero.webm" type="video/webm" />
-          <source src="/videos/afridam-hero.mp4" type="video/mp4" />
-        </video>
+        <>
+          <video
+            className="absolute inset-0 h-full w-full object-cover sm:hidden"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/videos/afridam-hero-mobile-poster.jpg"
+          >
+            <source src="/videos/afridam-hero-mobile.webm" type="video/webm" />
+            <source src="/videos/afridam-hero-mobile.mp4" type="video/mp4" />
+          </video>
+          <video
+            ref={videoRef}
+            className="absolute inset-0 hidden h-full w-full object-cover sm:block"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/videos/afridam-hero-poster.jpg"
+          >
+            <source src="/videos/afridam-hero.webm" type="video/webm" />
+            <source src="/videos/afridam-hero.mp4" type="video/mp4" />
+          </video>
+        </>
       )}
 
       {/* Dark diagonal overlay — keeps the left text block legible without
