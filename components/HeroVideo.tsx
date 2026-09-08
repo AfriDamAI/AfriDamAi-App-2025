@@ -45,9 +45,14 @@ export default function HeroVideo() {
     "inline-block overflow-hidden align-bottom pt-[0.12em] -mt-[0.12em] pr-[0.18em] -mr-[0.18em]";
 
   return (
-    <section className="relative w-full bg-[#141812] py-6 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 flex justify-center items-center">
-      {/* FLOATING CARD FRAME */}
-      <div className="relative w-full max-w-6xl h-[65vh] min-h-[480px] max-h-[650px] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border border-white/15 shadow-2xl shadow-[#E1784F]/20 bg-[#1a1f18] flex items-end">
+    // Band 1 of the alternating section rhythm — see `surface-*` in globals.css.
+    <section className="surface-bright relative w-full py-6 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 flex justify-center items-center transition-colors duration-500">
+      {/* FLOATING CARD FRAME.
+          The card keeps its dark interior in both themes — it's a media
+          surface, and the footage underneath is dark, so inverting it would
+          leave the copy sitting on unpredictable video luminance. Light mode
+          changes the band around it and the frame treatment instead. */}
+      <div className="relative w-full max-w-6xl h-[65vh] min-h-[480px] max-h-[650px] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden border border-black/10 dark:border-white/15 shadow-2xl shadow-black/15 dark:shadow-[#E1784F]/20 bg-[#1a1f18] flex items-end transition-colors duration-500">
         
         {/* Background video / poster */}
         {reducedMotion ? (
@@ -99,9 +104,20 @@ export default function HeroVideo() {
           </>
         )}
 
-        {/* Dark diagonal gradient overlay for high contrast text readability */}
+        {/* Diagonal gradient overlay for high contrast text readability.
+            Two elements rather than one, because the gradient is an inline
+            style and `dark:` can't reach it. Light mode runs a softer scrim —
+            a near-opaque black wash looks like a hole punched in a white page —
+            but keeps the left stop dark enough to carry the white copy. */}
         <div
-          className="absolute inset-0 pointer-events-none z-0"
+          className="absolute inset-0 pointer-events-none z-0 dark:hidden"
+          style={{
+            background:
+              "linear-gradient(100deg, rgba(20,18,14,0.80) 0%, rgba(20,18,14,0.48) 45%, rgba(20,18,14,0.14) 80%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none z-0 hidden dark:block"
           style={{
             background:
               "linear-gradient(100deg, rgba(10,12,8,0.85) 0%, rgba(10,12,8,0.55) 45%, rgba(10,12,8,0.2) 80%)",

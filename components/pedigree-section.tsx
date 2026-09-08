@@ -108,7 +108,8 @@ function CountingStat({
 
 export default function PedigreeSection() {
   return (
-    <section className="py-24 md:py-40 px-6 bg-gray-50/50 dark:bg-white/5">
+    // Band 6 of the alternating section rhythm — see `surface-*` in globals.css.
+    <section className="surface-dim py-24 md:py-40 px-6 transition-colors duration-500">
       <div className="max-w-screen-xl mx-auto space-y-20 md:space-y-28">
 
         {/* 🏥 CREDENTIALS & CERTIFICATIONS */}
