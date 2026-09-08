@@ -31,7 +31,10 @@ const careHubItems = [
 export default function CareHubSection() {
   return (
     <>
-      <section id="care-hub" className="py-24 md:py-40 px-6 bg-gray-50/50 dark:bg-[#151312] text-black dark:text-white overflow-hidden">
+      {/* Band 7 of the alternating section rhythm — see `surface-*` in globals.css.
+          Both sections below carry the same surface: the grid and the orange CTA
+          card that follows it are one band, not two. */}
+      <section id="care-hub" className="surface-bright py-24 md:py-40 px-6 text-black dark:text-white overflow-hidden transition-colors duration-500">
         <div className="max-w-screen-xl mx-auto space-y-16 md:space-y-24">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -91,7 +94,7 @@ export default function CareHubSection() {
         </div>
       </section>
 
-      <section className="px-6 py-16 md:py-24 bg-gray-50/50 dark:bg-[#151312] text-white">
+      <section className="surface-bright px-6 py-16 md:py-24 text-white transition-colors duration-500">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
