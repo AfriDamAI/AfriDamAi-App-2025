@@ -223,7 +223,7 @@ export default function LandingPage() {
       <CommunityCarousel />
 
       {/* 🎥 2. THE VISUAL FLOW */}
-<section className="py-20 md:py-36 px-6 bg-gray-100/70 dark:bg-white/[0.02] border-y border-black/5 dark:border-white/5 relative overflow-hidden">
+<section className="surface-bright py-20 md:py-36 px-6 border-y border-black/5 dark:border-white/5 relative overflow-hidden transition-colors duration-500">
   <div className="max-w-screen-xl mx-auto space-y-16 md:space-y-20">
 
     {/* Section Header */}
@@ -372,7 +372,7 @@ export default function LandingPage() {
   </section>  {/* Closes line 295: <section className="py-20..."> */}
 
 {/* 🛒 5.5 MARKETPLACE PREVIEW */}
-<section id="marketplace-preview" className="py-24 md:py-40 px-6">
+<section id="marketplace-preview" className="surface-dim py-24 md:py-40 px-6 transition-colors duration-500">
   <div className="max-w-screen-xl mx-auto space-y-16">
 
     {/* Section header */}
@@ -526,10 +526,13 @@ export default function LandingPage() {
 </section>
 
       {/* 📜 4. THE MANIFESTO */}
-      <section className="relative isolate overflow-hidden py-24 md:py-40 px-6 text-center bg-gradient-to-br from-[#fffaf7] via-white to-[#f6fffd] dark:from-[#130d0a] dark:via-[#1c1a19] dark:to-[#071513] transition-colors duration-500">
-        {/* A restrained brand watermark keeps the message legible in either theme. */}
+      <section className="surface-bright relative isolate overflow-hidden py-24 md:py-40 px-6 text-center transition-colors duration-500">
+        {/* A restrained brand watermark keeps the message legible in either theme.
+            Both washes are tinted to the bright surface rather than a colour of
+            their own — anything lighter and this band reads as a dim step in
+            dark mode, breaking the alternation. */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-          <div className="absolute inset-0 bg-white/70 dark:bg-[#1c1a19]/45" />
+          <div className="absolute inset-0 bg-white/70 dark:bg-[#050505]/45" />
           <div className="absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 md:h-[42rem] md:w-[42rem]">
             <Image
               src="/logo.png"
@@ -539,7 +542,7 @@ export default function LandingPage() {
               className="object-contain opacity-[0.08] mix-blend-multiply dark:opacity-[0.2] dark:brightness-125 dark:mix-blend-screen"
             />
           </div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_16%,rgba(255,255,255,0.55)_78%)] dark:bg-[radial-gradient(circle_at_center,transparent_12%,rgba(28,26,25,0.35)_78%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_16%,rgba(255,255,255,0.55)_78%)] dark:bg-[radial-gradient(circle_at_center,transparent_12%,rgba(5,5,5,0.5)_78%)]" />
         </div>
 
         <div className="relative z-10 max-w-screen-xl mx-auto flex flex-col items-center">
