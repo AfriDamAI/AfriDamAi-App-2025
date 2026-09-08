@@ -272,7 +272,7 @@ export default function FaqChatbot() {
   return (
     <section 
       id="faq" 
-      className="w-full py-10 sm:py-16 md:py-20 bg-gradient-to-br from-[#0D0914] via-[#170E20] to-[#0A1624] text-white flex flex-col justify-center items-center px-3 sm:px-6 md:px-8 relative overflow-hidden selection:bg-[#E1784F]/30"
+      className="w-full py-10 sm:py-16 md:py-20 bg-gradient-to-br from-orange-50 via-white to-teal-50 dark:from-[#0D0914] dark:via-[#170E20] dark:to-[#0A1624] text-slate-900 dark:text-white flex flex-col justify-center items-center px-3 sm:px-6 md:px-8 relative overflow-hidden selection:bg-[#E1784F]/30"
     >
       {/* BRAND COLOR GLOW ACCENTS IN BACKGROUND */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[#E1784F]/20 rounded-full blur-[130px] pointer-events-none" />
@@ -281,7 +281,7 @@ export default function FaqChatbot() {
 
       {/* HEADER SECTION */}
       <div className="max-w-3xl text-center space-y-3 mb-8 md:mb-12 relative z-10">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/15 text-[#E1784F] text-xs sm:text-sm font-bold uppercase tracking-widest backdrop-blur-md shadow-inner">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/5 dark:bg-white/[0.06] border border-black/10 dark:border-white/15 text-[#E1784F] text-xs sm:text-sm font-bold uppercase tracking-widest backdrop-blur-md shadow-inner">
           <Sparkles size={15} className="text-[#4DB6AC]" />
           <span>Interactive Knowledge Assistant</span>
         </div>
@@ -290,20 +290,20 @@ export default function FaqChatbot() {
           GOT QUESTIONS? <span className="bg-gradient-to-r from-[#E1784F] via-[#F2936E] to-[#4DB6AC] bg-clip-text text-transparent whitespace-nowrap">ASK AFRIDAM AI</span>
         </h2>
 
-        <p className="text-white/80 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mx-auto px-2 font-normal">
-          Explore our Marketplace, diagnostic scanner, vendor onboarding, or contact support directly at <strong className="text-white font-semibold underline decoration-[#4DB6AC]">hello@afridamai.com</strong>.
+        <p className="text-slate-600 dark:text-white/80 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mx-auto px-2 font-normal">
+          Explore our Marketplace, diagnostic scanner, vendor onboarding, or contact support directly at <strong className="text-slate-900 dark:text-white font-semibold underline decoration-[#4DB6AC]">hello@afridamai.com</strong>.
         </p>
       </div>
 
       {/* CHATBOX CONTAINER - Enhanced Dimensions & Vibrancy */}
-      <div className="w-full max-w-5xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/15 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.7)] flex flex-col md:flex-row h-[780px] md:h-[620px] relative z-10">
+      <div className="w-full max-w-5xl bg-gradient-to-b from-black/[0.03] to-black/[0.01] dark:from-white/[0.08] dark:to-white/[0.02] border border-black/10 dark:border-white/15 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] flex flex-col md:flex-row h-[780px] md:h-[620px] relative z-10">
         
         {/* LEFT SIDEBAR: TOPICS & KNOWLEDGE BANK */}
-        <div className="w-full md:w-5/12 bg-gradient-to-b from-[#E1784F]/10 via-black/50 to-[#4DB6AC]/10 border-b md:border-b-0 md:border-r border-white/15 p-3.5 sm:p-5 flex flex-col justify-between h-[280px] md:h-full shrink-0">
+        <div className="w-full md:w-5/12 bg-gradient-to-b from-[#E1784F]/10 via-white/50 dark:via-black/50 to-[#4DB6AC]/10 border-b md:border-b-0 md:border-r border-black/10 dark:border-white/15 p-3.5 sm:p-5 flex flex-col justify-between h-[280px] md:h-full shrink-0">
           <div className="space-y-3 flex-1 flex flex-col overflow-hidden">
             
             <div className="flex items-center justify-between">
-              <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-white/70">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-500 dark:text-white/70">
                 Knowledge Bank
               </span>
               <button 
@@ -313,7 +313,7 @@ export default function FaqChatbot() {
                   text: "Chat cleared! How else can I assist you with AfriDam AI?",
                   time: formatTime(new Date())
                 }])}
-                className="text-xs sm:text-sm text-white/50 hover:text-[#E1784F] transition-colors flex items-center gap-1 font-semibold"
+                className="text-xs sm:text-sm text-slate-400 dark:text-white/50 hover:text-[#E1784F] transition-colors flex items-center gap-1 font-semibold"
                 title="Clear Chat"
               >
                 <RefreshCw size={13} /> Clear
@@ -331,7 +331,7 @@ export default function FaqChatbot() {
                     className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                       activeCategory === cat.label
                         ? "bg-gradient-to-r from-[#E1784F] to-[#d8683e] text-white shadow-lg shadow-[#E1784F]/30"
-                        : "bg-white/[0.07] text-white/70 hover:bg-white/15 hover:text-white border border-white/5"
+                        : "bg-black/5 dark:bg-white/[0.07] text-slate-600 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/15 hover:text-slate-900 dark:hover:text-white border border-black/5 dark:border-white/5"
                     }`}
                   >
                     <IconComponent size={14} />
@@ -353,29 +353,29 @@ export default function FaqChatbot() {
                     item.category === "Support"
                   )}
                   disabled={isTyping}
-                  className="w-full text-left p-3 sm:p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/10 hover:border-[#4DB6AC]/50 hover:shadow-[0_0_15px_rgba(77,182,172,0.15)] transition-all duration-200 group flex items-start justify-between gap-2.5 text-xs sm:text-sm md:text-base font-medium text-white/90 hover:text-white disabled:opacity-50"
+                  className="w-full text-left p-3 sm:p-3.5 rounded-xl bg-black/[0.03] dark:bg-white/[0.04] hover:bg-black/[0.06] dark:hover:bg-white/[0.09] border border-black/10 dark:border-white/10 hover:border-[#4DB6AC]/50 hover:shadow-[0_0_15px_rgba(77,182,172,0.15)] transition-all duration-200 group flex items-start justify-between gap-2.5 text-xs sm:text-sm md:text-base font-medium text-slate-700 dark:text-white/90 hover:text-slate-900 dark:hover:text-white disabled:opacity-50"
                 >
                   <span className="line-clamp-2 leading-snug">{item.question}</span>
-                  <ChevronRight size={16} className="text-white/40 group-hover:text-[#4DB6AC] shrink-0 mt-0.5 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight size={16} className="text-slate-400 dark:text-white/40 group-hover:text-[#4DB6AC] shrink-0 mt-0.5 group-hover:translate-x-1 transition-transform" />
                 </button>
               ))}
             </div>
           </div>
 
           {/* Sidebar Footer Stats */}
-          <div className="pt-2.5 mt-2 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm text-white/50 font-medium shrink-0">
+          <div className="pt-2.5 mt-2 border-t border-black/10 dark:border-white/10 flex items-center justify-between text-xs sm:text-sm text-slate-500 dark:text-white/50 font-medium shrink-0">
             <span className="flex items-center gap-1.5">
               <ShieldCheck size={15} className="text-[#4DB6AC]" /> Verified Vendors & Products
             </span>
-            <span className="text-white/70 font-semibold">40k+ Scans</span>
+            <span className="text-slate-700 dark:text-white/70 font-semibold">40k+ Scans</span>
           </div>
         </div>
 
         {/* RIGHT PANEL: LIVE CHAT WINDOW */}
-        <div className="w-full md:w-7/12 flex-1 flex flex-col justify-between bg-gradient-to-br from-black/60 via-[#120B18]/70 to-[#0A1624]/70 relative overflow-hidden">
+        <div className="w-full md:w-7/12 flex-1 flex flex-col justify-between bg-gradient-to-br from-white/60 via-orange-50/30 to-teal-50/30 dark:from-black/60 dark:via-[#120B18]/70 dark:to-[#0A1624]/70 relative overflow-hidden">
           
           {/* Chat Header */}
-          <div className="p-3.5 sm:p-4 border-b border-white/10 bg-white/[0.03] flex items-center justify-between backdrop-blur-md shrink-0">
+          <div className="p-3.5 sm:p-4 border-b border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.03] flex items-center justify-between backdrop-blur-md shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-[#E1784F] to-[#4DB6AC] flex items-center justify-center text-white shadow-md">
@@ -384,7 +384,7 @@ export default function FaqChatbot() {
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-black absolute bottom-0 right-0 animate-pulse" />
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-white">
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                   AfriDam AI Assistant
                 </h3>
                 <p className="text-xs text-[#4DB6AC] font-semibold uppercase tracking-wider">
@@ -420,7 +420,7 @@ export default function FaqChatbot() {
                     className={`max-w-[88%] sm:max-w-[85%] p-3.5 sm:p-4 rounded-2xl text-sm sm:text-base leading-relaxed shadow-xl ${
                       msg.sender === "user"
                         ? "bg-gradient-to-r from-[#E1784F] to-[#d8683e] text-white rounded-br-none font-medium"
-                        : "bg-white/[0.08] border border-white/15 text-white/95 rounded-bl-none backdrop-blur-md"
+                        : "bg-black/[0.04] dark:bg-white/[0.08] border border-black/10 dark:border-white/15 text-slate-800 dark:text-white/95 rounded-bl-none backdrop-blur-md"
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -429,8 +429,8 @@ export default function FaqChatbot() {
                     {msg.showVendorCTA && (
                       <div className="mt-3 p-3 rounded-xl bg-gradient-to-r from-[#E1784F]/30 to-[#4DB6AC]/30 border border-[#E1784F]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <div>
-                          <p className="text-sm font-bold text-white">Join as an Approved Vendor</p>
-                          <p className="text-xs text-white/80">Fill out our Vendor Registration Form on the Homepage.</p>
+                          <p className="text-sm font-bold text-slate-900 dark:text-white">Join as an Approved Vendor</p>
+                          <p className="text-xs text-slate-700 dark:text-white/80">Fill out our Vendor Registration Form on the Homepage.</p>
                         </div>
                         <a
                           href="/#join-as-vendor"
@@ -444,9 +444,9 @@ export default function FaqChatbot() {
 
                     {/* Interactive Support Email CTA Card */}
                     {msg.showSupportCTA && (
-                      <div className="mt-3 p-3 rounded-xl bg-white/10 border border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <div className="mt-3 p-3 rounded-xl bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <div>
-                          <p className="text-sm font-bold text-white">Direct Email Support</p>
+                          <p className="text-sm font-bold text-slate-900 dark:text-white">Direct Email Support</p>
                           <p className="text-xs text-[#4DB6AC] font-semibold">hello@afridamai.com</p>
                         </div>
                         <a
@@ -461,7 +461,7 @@ export default function FaqChatbot() {
 
                     <span
                       className={`block text-xs mt-1.5 text-right ${
-                        msg.sender === "user" ? "text-white/80" : "text-white/50"
+                        msg.sender === "user" ? "text-white/80" : "text-slate-400 dark:text-white/50"
                       }`}
                     >
                       {msg.time}
@@ -469,7 +469,7 @@ export default function FaqChatbot() {
                   </div>
 
                   {msg.sender === "user" && (
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/15 border border-white/25 flex items-center justify-center text-white shrink-0 mb-0.5">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/10 dark:bg-white/15 border border-black/20 dark:border-white/25 flex items-center justify-center text-slate-700 dark:text-white shrink-0 mb-0.5">
                       <User size={15} />
                     </div>
                   )}
@@ -482,13 +482,13 @@ export default function FaqChatbot() {
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2.5 text-white/50 text-xs sm:text-sm pl-1 pt-1"
+                className="flex items-center gap-2.5 text-slate-400 dark:text-white/50 text-xs sm:text-sm pl-1 pt-1"
               >
                 <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#E1784F]/20 border border-[#E1784F]/50 flex items-center justify-center text-[#E1784F] shrink-0">
                   <Bot size={15} />
                 </div>
-                <div className="flex items-center gap-2 bg-white/[0.08] px-3.5 py-2 rounded-xl border border-white/15">
-                  <span className="text-white/70 font-medium text-xs sm:text-sm">AfriDam AI is typing</span>
+                <div className="flex items-center gap-2 bg-black/5 dark:bg-white/[0.08] px-3.5 py-2 rounded-xl border border-black/10 dark:border-white/15">
+                  <span className="text-slate-600 dark:text-white/70 font-medium text-xs sm:text-sm">AfriDam AI is typing</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E1784F] animate-bounce" style={{ animationDelay: "0ms" }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-[#4DB6AC] animate-bounce" style={{ animationDelay: "150ms" }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -500,7 +500,7 @@ export default function FaqChatbot() {
           {/* Form Input Bar */}
           <form
             onSubmit={handleSubmitInput}
-            className="p-3 sm:p-4 border-t border-white/15 bg-black/60 backdrop-blur-md flex items-center gap-2.5 shrink-0"
+            className="p-3 sm:p-4 border-t border-black/10 dark:border-white/15 bg-white/60 dark:bg-black/60 backdrop-blur-md flex items-center gap-2.5 shrink-0"
           >
             <input
               type="text"
@@ -508,7 +508,7 @@ export default function FaqChatbot() {
               onChange={(e) => setInputQuery(e.target.value)}
               placeholder="Ask about skin scans, marketplace, vendors, or email support..."
               disabled={isTyping}
-              className="flex-1 bg-white/[0.07] border border-white/15 focus:border-[#E1784F] rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-white/50 focus:outline-none transition-colors disabled:opacity-50"
+              className="flex-1 bg-black/5 dark:bg-white/[0.07] border border-black/10 dark:border-white/15 focus:border-[#E1784F] rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/50 focus:outline-none transition-colors disabled:opacity-50"
             />
             <button
               type="submit"
