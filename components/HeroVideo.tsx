@@ -140,7 +140,7 @@ export default function HeroVideo() {
               transition={stagger(2)}
               className="mt-4 sm:mt-6 max-w-xl text-xs sm:text-base md:text-lg font-medium leading-relaxed tracking-tight uppercase text-white/80"
             >
-              Melanin-rich skin intelligence for clinical scans, verified care, and safer skincare choices.
+              SKIN OF COLOUR DECODED
             </motion.p>
 
             <motion.div
