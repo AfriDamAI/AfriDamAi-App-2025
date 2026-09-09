@@ -135,3 +135,35 @@
     display: none;
   }
 }
+
+/* ── Landing-page section rhythm ──────────────────────────────────────────
+   Consecutive landing sections alternate between these two surfaces, so
+   every band reads as its own slab instead of one continuous scroll. The
+   run starts bright at the hero: bright → dim → bright → dim …
+
+   Tune the palette here rather than at the call sites — each section only
+   ever names `surface-bright` or `surface-dim`, never a raw colour. The dim
+   step is deliberately shallow (a ~5% luminance drop in light mode); it has
+   to separate the bands without reading as a grey box on the page.
+
+   Not part of the run: the FAQ and Partners sections, which are
+   full-bleed dark feature bands in both themes and supply their own
+   contrast against whatever precedes them. */
+:root {
+  --surface-bright: #ffffff;
+  --surface-dim: #f2efec;
+}
+
+.dark {
+  --surface-bright: #050505;
+  --surface-dim: #141812;
+}
+
+@layer utilities {
+  .surface-bright {
+    background-color: var(--surface-bright);
+  }
+  .surface-dim {
+    background-color: var(--surface-dim);
+  }
+}

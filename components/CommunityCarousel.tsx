@@ -214,7 +214,8 @@ export default function CommunityCarousel() {
   }, []);
 
   return (
-    <section className="relative w-full overflow-hidden bg-white dark:bg-[#050505] py-24 text-black dark:text-white md:py-32 transition-colors duration-500">
+    // Band 2 of the alternating section rhythm — see `surface-*` in globals.css.
+    <section className="surface-dim relative w-full overflow-hidden py-24 text-black dark:text-white md:py-32 transition-colors duration-500">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent"
