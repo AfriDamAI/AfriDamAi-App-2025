@@ -137,10 +137,13 @@ export default function TeamMemberSection() {
   }
 
   return (
-    <section className="relative isolate overflow-hidden py-24 md:py-40 px-6 bg-gradient-to-br from-[#fffaf7] via-white to-[#f6fffd] dark:from-[#130d0a] dark:via-[#1c1a19] dark:to-[#071513] border-y border-black/5 dark:border-white/5 transition-colors duration-500">
-      {/* Brand watermark: low contrast in light mode, gently luminous in dark mode. */}
+    // Band 9 of the alternating section rhythm — see `surface-*` in globals.css.
+    <section className="surface-dim relative isolate overflow-hidden py-24 md:py-40 px-6 border-y border-black/5 dark:border-white/5 transition-colors duration-500">
+      {/* Brand watermark: low contrast in light mode, gently luminous in dark mode.
+          The wash is tinted to the dim surface so it mutes the logo without
+          lifting the band off its step in the rhythm. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-white/75 dark:bg-[#1c1a19]/55" />
+        <div className="absolute inset-0 bg-[#f2efec]/75 dark:bg-[#141812]/55" />
         <div className="absolute -right-24 top-1/2 h-[42rem] w-[42rem] -translate-y-1/2 sm:right-0 md:right-[8%]">
           <Image
             src="/logo.png"
