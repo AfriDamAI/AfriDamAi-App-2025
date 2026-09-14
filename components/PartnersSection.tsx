@@ -10,7 +10,10 @@ import {
   Leaf, 
   ArrowRight,
   Building2,
-  CheckCircle2
+  CheckCircle2,
+  HeartPulse,
+  Handshake,
+  Users
 } from "lucide-react"
 
 interface Partner {
@@ -110,6 +113,87 @@ const PARTNERS: Partner[] = [
           {/* CHANGED: text-white -> theme-aware text */}
           <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">ENE NATURALS</span>
           <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Clean Beauty Brand</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "gilead-health-solution",
+    name: "Gilead Health Solution",
+    location: "Nigeria",
+    category: "Strategic Partner",
+    tagline: "Community-Centered Health Access",
+    description: "Community health partner supporting AfriDam AI's outreach, preventive care education, and accessible wellness pathways for underserved populations.",
+    badgeText: "Community Health Partner",
+    icon: <HeartPulse className="w-5 h-5 text-[#4DB6AC]" />,
+    accentColor: "#4DB6AC",
+    highlights: [
+      "Community health education and outreach",
+      "Preventive care awareness for women and families",
+      "Accessible referral and wellness support pathways"
+    ],
+    logoGraphic: (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#4DB6AC]/10 border border-[#4DB6AC]/30 flex items-center justify-center text-[#4DB6AC] shrink-0">
+          <HeartPulse className="w-5 h-5" />
+        </div>
+        <div>
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">GILEAD</span>
+          <span className="text-[9px] text-[#4DB6AC] font-bold uppercase tracking-widest">Health Solution</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "ikheloa-foundation",
+    name: "Ikheloa Foundation",
+    location: "Nigeria",
+    category: "Strategic Partner",
+    tagline: "Empowering Communities Through Care",
+    description: "Social impact partner advancing community welfare, health education, and inclusive support programs aligned with AfriDam AI's mission.",
+    badgeText: "Social Impact Partner",
+    icon: <Handshake className="w-5 h-5 text-[#E1784F]" />,
+    accentColor: "#E1784F",
+    highlights: [
+      "Community welfare and empowerment programs",
+      "Health education and inclusive outreach",
+      "Local partnership coordination and support"
+    ],
+    logoGraphic: (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#E1784F]/10 border border-[#E1784F]/30 flex items-center justify-center text-[#E1784F] shrink-0">
+          <Handshake className="w-5 h-5" />
+        </div>
+        <div>
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">IKHELOA</span>
+          <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Foundation</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "girl-child-support-initiative",
+    name: "Girl Child Support Initiative",
+    location: "Nigeria",
+    category: "Strategic Partner",
+    tagline: "Advancing Health, Education & Opportunity",
+    description: "Girl-child advocacy partner supporting access to health information, education, mentorship, and safe opportunities for young women.",
+    badgeText: "Girl Child Advocacy Partner",
+    icon: <Users className="w-5 h-5 text-[#E1784F]" />,
+    accentColor: "#E1784F",
+    highlights: [
+      "Girls' health and wellbeing advocacy",
+      "Education, mentorship, and opportunity access",
+      "Safe community support and awareness programs"
+    ],
+    logoGraphic: (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#E1784F]/10 border border-[#E1784F]/30 flex items-center justify-center text-[#E1784F] shrink-0">
+          <Users className="w-5 h-5" />
+        </div>
+        <div>
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">GIRL CHILD</span>
+          <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Support Initiative</span>
         </div>
       </div>
     )
@@ -291,7 +375,7 @@ export default function PartnersSection() {
                 <div className="space-y-3">
                   {/* CHANGED: text-white -> theme-aware */}
                   <h4 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white italic tracking-tight">
-                    "{selectedPartner.tagline}"
+                    &quot;{selectedPartner.tagline}&quot;
                   </h4>
                   {/* CHANGED: text-white/70 -> theme-aware */}
                   <p className="text-gray-700 dark:text-white/70 text-sm sm:text-base leading-relaxed">
