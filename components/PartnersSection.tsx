@@ -10,7 +10,10 @@ import {
   Leaf, 
   ArrowRight,
   Building2,
-  CheckCircle2
+  CheckCircle2,
+  HeartPulse,
+  Handshake,
+  Users
 } from "lucide-react"
 
 interface Partner {
@@ -51,7 +54,8 @@ const PARTNERS: Partner[] = [
           className="w-10 h-10 rounded-xl object-cover border border-[#E1784F]/30 shrink-0"
         />
         <div>
-          <span className="font-black text-lg tracking-wider text-white block uppercase italic leading-none">JAX LAB</span>
+          {/* CHANGED: text-white -> theme-aware text so name is readable in light mode */}
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">JAX LAB</span>
           <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Health & Wellness</span>
         </div>
       </div>
@@ -78,7 +82,8 @@ const PARTNERS: Partner[] = [
           <Building2 className="w-5 h-5" />
         </div>
         <div>
-          <span className="font-black text-lg tracking-wider text-white block uppercase italic leading-none">MAHOGANY</span>
+          {/* CHANGED: text-white -> theme-aware text */}
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">MAHOGANY</span>
           <span className="text-[9px] text-[#4DB6AC] font-bold uppercase tracking-widest">Dermatology USA</span>
         </div>
       </div>
@@ -105,8 +110,90 @@ const PARTNERS: Partner[] = [
           <Sparkles className="w-5 h-5" />
         </div>
         <div>
-          <span className="font-black text-lg tracking-wider text-white block uppercase italic leading-none">ENE NATURALS</span>
+          {/* CHANGED: text-white -> theme-aware text */}
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">ENE NATURALS</span>
           <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Clean Beauty Brand</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "gilead-health-solution",
+    name: "Gilead Health Solution",
+    location: "Nigeria",
+    category: "Strategic Partner",
+    tagline: "Community-Centered Health Access",
+    description: "Community health partner supporting AfriDam AI's outreach, preventive care education, and accessible wellness pathways for underserved populations.",
+    badgeText: "Community Health Partner",
+    icon: <HeartPulse className="w-5 h-5 text-[#4DB6AC]" />,
+    accentColor: "#4DB6AC",
+    highlights: [
+      "Community health education and outreach",
+      "Preventive care awareness for women and families",
+      "Accessible referral and wellness support pathways"
+    ],
+    logoGraphic: (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#4DB6AC]/10 border border-[#4DB6AC]/30 flex items-center justify-center text-[#4DB6AC] shrink-0">
+          <HeartPulse className="w-5 h-5" />
+        </div>
+        <div>
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">GILEAD</span>
+          <span className="text-[9px] text-[#4DB6AC] font-bold uppercase tracking-widest">Health Solution</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "ikheloa-foundation",
+    name: "Ikheloa Foundation",
+    location: "Nigeria",
+    category: "Strategic Partner",
+    tagline: "Empowering Communities Through Care",
+    description: "Social impact partner advancing community welfare, health education, and inclusive support programs aligned with AfriDam AI's mission.",
+    badgeText: "Social Impact Partner",
+    icon: <Handshake className="w-5 h-5 text-[#E1784F]" />,
+    accentColor: "#E1784F",
+    highlights: [
+      "Community welfare and empowerment programs",
+      "Health education and inclusive outreach",
+      "Local partnership coordination and support"
+    ],
+    logoGraphic: (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#E1784F]/10 border border-[#E1784F]/30 flex items-center justify-center text-[#E1784F] shrink-0">
+          <Handshake className="w-5 h-5" />
+        </div>
+        <div>
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">IKHELOA</span>
+          <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Foundation</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "girl-child-support-initiative",
+    name: "Girl Child Support Initiative",
+    location: "Nigeria",
+    category: "Strategic Partner",
+    tagline: "Advancing Health, Education & Opportunity",
+    description: "Girl-child advocacy partner supporting access to health information, education, mentorship, and safe opportunities for young women.",
+    badgeText: "Girl Child Advocacy Partner",
+    icon: <Users className="w-5 h-5 text-[#E1784F]" />,
+    accentColor: "#E1784F",
+    highlights: [
+      "Girls' health and wellbeing advocacy",
+      "Education, mentorship, and opportunity access",
+      "Safe community support and awareness programs"
+    ],
+    logoGraphic: (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#E1784F]/10 border border-[#E1784F]/30 flex items-center justify-center text-[#E1784F] shrink-0">
+          <Users className="w-5 h-5" />
+        </div>
+        <div>
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">GIRL CHILD</span>
+          <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Support Initiative</span>
         </div>
       </div>
     )
@@ -119,10 +206,11 @@ export default function PartnersSection() {
   return (
     <section 
           id="partners" 
-          className="scroll-mt-20 w-full py-16 md:py-24 bg-[#050505] text-white relative overflow-hidden selection:bg-[#E1784F]/30"
+          // CHANGED: bg-[#050505] text-white -> light default (bg-white/gray-900 text) with dark: variant preserving the original dark look
+          className="scroll-mt-20 w-full py-16 md:py-24 bg-white dark:bg-[#050505] text-gray-900 dark:text-white relative overflow-hidden selection:bg-[#E1784F]/30"
         >
       
-      {/* BACKGROUND AMBIANCE */}
+      {/* BACKGROUND AMBIANCE - accent colors work fine in both themes, left unchanged */}
       <div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-[#E1784F]/5 blur-[150px] rounded-full pointer-events-none -translate-y-1/2" />
       <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-[#4DB6AC]/5 blur-[150px] rounded-full pointer-events-none -translate-y-1/2" />
 
@@ -130,23 +218,27 @@ export default function PartnersSection() {
         
         {/* SECTION HEADER */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[#E1784F] text-xs font-bold uppercase tracking-widest">
+          {/* CHANGED: bg-white/[0.04] border-white/10 -> theme-aware pill background/border */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/[0.03] dark:bg-white/[0.04] border border-black/10 dark:border-white/10 text-[#E1784F] text-xs font-bold uppercase tracking-widest">
             <Globe size={14} className="text-[#4DB6AC]" />
             <span>Global Ecosystem & Strategic Network</span>
           </div>
+          {/* Heading already inherits text-gray-900 dark:text-white from the section wrapper, no change needed here */}
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase italic leading-none">
             Backed By Global <span className="text-[#E1784F]">Clinical</span> & <span className="text-[#4DB6AC]">Tech Partners</span>
           </h2>
-          <p className="text-white/60 text-sm md:text-base leading-relaxed">
+          {/* CHANGED: text-white/60 -> theme-aware muted text */}
+          <p className="text-gray-600 dark:text-white/60 text-sm md:text-base leading-relaxed">
             AfriDam AI collaborates with dermatology networks, international wellness laboratories, and commercial beauty brands to scale specialized care for dark skin.
           </p>
         </div>
 
         {/* --- TIER 1: INFINITE MARQUEE TICKER BANNER --- */}
-        <div className="relative w-full overflow-hidden py-4 border-y border-white/10 bg-white/[0.015] backdrop-blur-md">
-          {/* Gradient Edges */}
-          <div className="absolute top-0 bottom-0 left-0 w-20 md:w-32 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
-          <div className="absolute top-0 bottom-0 right-0 w-20 md:w-32 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
+        {/* CHANGED: border-white/10 bg-white/[0.015] -> theme-aware */}
+        <div className="relative w-full overflow-hidden py-4 border-y border-black/10 dark:border-white/10 bg-black/[0.015] dark:bg-white/[0.015] backdrop-blur-md">
+          {/* Gradient Edges - CHANGED: from-[#050505] -> from-white so the fade matches the light bg, dark: keeps original */}
+          <div className="absolute top-0 bottom-0 left-0 w-20 md:w-32 bg-gradient-to-r from-white dark:from-[#050505] to-transparent z-20 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-20 md:w-32 bg-gradient-to-l from-white dark:from-[#050505] to-transparent z-20 pointer-events-none" />
 
           {/* Marquee Motion Container */}
           <motion.div
@@ -165,11 +257,13 @@ export default function PartnersSection() {
                 onClick={() => setSelectedPartner(partner)}
                 className="flex items-center gap-4 cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300 group"
               >
-                <div className="p-2 rounded-xl bg-white/[0.05] border border-white/10 group-hover:border-[#E1784F]/50 group-hover:scale-105 transition-all">
+                {/* CHANGED: bg-white/[0.05] border-white/10 -> theme-aware */}
+                <div className="p-2 rounded-xl bg-black/[0.03] dark:bg-white/[0.05] border border-black/10 dark:border-white/10 group-hover:border-[#E1784F]/50 group-hover:scale-105 transition-all">
                   {partner.logoGraphic}
                 </div>
                 <div className="hidden sm:block">
-                  <span className="text-xs font-semibold text-white/50 group-hover:text-white transition-colors block">
+                  {/* CHANGED: text-white/50 -> theme-aware, hover target text-white -> text-gray-900 dark:text-white */}
+                  <span className="text-xs font-semibold text-gray-500 dark:text-white/50 group-hover:text-gray-900 dark:group-hover:text-white transition-colors block">
                     {partner.location}
                   </span>
                   <span className="text-[10px] text-[#4DB6AC] font-bold uppercase tracking-wider">
@@ -186,7 +280,8 @@ export default function PartnersSection() {
           
           {/* LEFT: PARTNER SELECTOR CARDS (5 COLS) */}
           <div className="lg:col-span-5 space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-white/40 block mb-2 px-1">
+            {/* CHANGED: text-white/40 -> theme-aware */}
+            <span className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-white/40 block mb-2 px-1">
               Select Strategic Partner
             </span>
             {PARTNERS.map((partner) => {
@@ -196,10 +291,11 @@ export default function PartnersSection() {
                   key={partner.id}
                   whileHover={{ x: 4 }}
                   onClick={() => setSelectedPartner(partner)}
+                  // CHANGED: selected/unselected card backgrounds and borders now theme-aware
                   className={`p-4 md:p-5 rounded-2xl cursor-pointer transition-all border ${
                     isSelected
-                      ? "bg-white/[0.06] border-[#E1784F] shadow-lg shadow-[#E1784F]/10"
-                      : "bg-white/[0.02] border-white/10 hover:bg-white/[0.04] hover:border-white/20"
+                      ? "bg-black/[0.04] dark:bg-white/[0.06] border-[#E1784F] shadow-lg shadow-[#E1784F]/10"
+                      : "bg-black/[0.02] dark:bg-white/[0.02] border-black/10 dark:border-white/10 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] hover:border-black/20 dark:hover:border-white/20"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -214,19 +310,23 @@ export default function PartnersSection() {
                         {partner.icon}
                       </div>
                       <div>
-                        <h3 className="font-bold text-base text-white flex items-center gap-2">
+                        {/* CHANGED: text-white -> theme-aware */}
+                        <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
                           {partner.name}
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                          {/* CHANGED: bg-white/10 text-white/70 -> theme-aware pill */}
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/10 text-gray-600 dark:text-white/70">
                             {partner.location}
                           </span>
                         </h3>
-                        <p className="text-xs text-white/50">{partner.badgeText}</p>
+                        {/* CHANGED: text-white/50 -> theme-aware */}
+                        <p className="text-xs text-gray-500 dark:text-white/50">{partner.badgeText}</p>
                       </div>
                     </div>
                     <ArrowRight
                       size={18}
+                      // CHANGED: inactive arrow text-white/20 -> theme-aware
                       className={`transition-transform ${
-                        isSelected ? "text-[#E1784F] translate-x-1" : "text-white/20"
+                        isSelected ? "text-[#E1784F] translate-x-1" : "text-gray-300 dark:text-white/20"
                       }`}
                     />
                   </div>
@@ -244,16 +344,18 @@ export default function PartnersSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.3 }}
-                className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 sm:p-8 md:p-10 backdrop-blur-2xl relative overflow-hidden space-y-6 shadow-2xl"
+                // CHANGED: bg-white/[0.03] border-white/10 -> theme-aware card surface
+                className="bg-black/[0.03] dark:bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-3xl p-6 sm:p-8 md:p-10 backdrop-blur-2xl relative overflow-hidden space-y-6 shadow-2xl"
               >
-                {/* Glow Accent Circle */}
+                {/* Glow Accent Circle - accent color, unchanged */}
                 <div 
                   className="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-[80px] pointer-events-none"
                   style={{ backgroundColor: `${selectedPartner.accentColor}25` }}
                 />
 
                 {/* Card Header Badge */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-5">
+                {/* CHANGED: border-white/10 -> theme-aware */}
+                <div className="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-5">
                   <div className="flex items-center gap-3">
                     {selectedPartner.logoGraphic}
                   </div>
@@ -271,38 +373,45 @@ export default function PartnersSection() {
 
                 {/* Tagline & Main Description */}
                 <div className="space-y-3">
-                  <h4 className="text-xl sm:text-2xl font-black text-white italic tracking-tight">
-                    "{selectedPartner.tagline}"
+                  {/* CHANGED: text-white -> theme-aware */}
+                  <h4 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white italic tracking-tight">
+                    &quot;{selectedPartner.tagline}&quot;
                   </h4>
-                  <p className="text-white/70 text-sm sm:text-base leading-relaxed">
+                  {/* CHANGED: text-white/70 -> theme-aware */}
+                  <p className="text-gray-700 dark:text-white/70 text-sm sm:text-base leading-relaxed">
                     {selectedPartner.description}
                   </p>
                 </div>
 
                 {/* Key Highlights List */}
                 <div className="space-y-3 pt-2">
-                  <span className="text-xs font-black uppercase tracking-widest text-white/40 block">
+                  {/* CHANGED: text-white/40 -> theme-aware */}
+                  <span className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-white/40 block">
                     Strategic Scope & Impact
                   </span>
                   <div className="grid grid-cols-1 gap-2.5">
                     {selectedPartner.highlights.map((item, idx) => (
                       <div 
                         key={idx}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5"
+                        // CHANGED: bg-white/[0.02] border-white/5 -> theme-aware
+                        className="flex items-center gap-3 p-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5"
                       >
                         <CheckCircle2 size={16} className="shrink-0 text-[#4DB6AC]" />
-                        <span className="text-xs md:text-sm text-white/80 font-medium">{item}</span>
+                        {/* CHANGED: text-white/80 -> theme-aware */}
+                        <span className="text-xs md:text-sm text-gray-800 dark:text-white/80 font-medium">{item}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Verified Integration Footer Note */}
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-white/50 font-medium">
+                {/* CHANGED: border-white/10 text-white/50 -> theme-aware */}
+                <div className="pt-4 border-t border-black/10 dark:border-white/10 flex items-center justify-between text-xs text-gray-500 dark:text-white/50 font-medium">
                   <span className="flex items-center gap-1.5">
                     <ShieldCheck size={16} className="text-[#4DB6AC]" /> Verified AfriDam AI Ecosystem Partner
                   </span>
-                  <span className="text-white/30">Ecosystem 2026</span>
+                  {/* CHANGED: text-white/30 -> theme-aware */}
+                  <span className="text-gray-400 dark:text-white/30">Ecosystem 2026</span>
                 </div>
               </motion.div>
             </AnimatePresence>
