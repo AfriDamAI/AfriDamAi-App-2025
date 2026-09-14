@@ -555,7 +555,7 @@ export default function LandingPage() {
           />
           <div className="mb-10 h-px w-16 bg-gradient-to-r from-[#E1784F] to-[#4DB6AC]" />
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-[0.9] max-w-5xl text-black dark:text-white">
-            &quot;Heritage is <br /> our <span className="text-[#4DB6AC]">Foundation</span>, <br /> Skin is our <span className="text-[#E1784F]">Legacy</span>.&quot;
+            &quot;Where cultural <br /> Roots <span className="text-[#4DB6AC]">Meet</span> <br /> Glowing <span className="text-[#E1784F]">Skin</span>.&quot;
           </h2>
           <p className="text-[10px] font-black tracking-[0.5em] opacity-20 mt-16 italic">A Founder&apos;s Promise</p>
         </div>
