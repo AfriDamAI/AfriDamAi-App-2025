@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM MANIFESTO: MISSION & VISION
- * Version: 2026.2.11 (Uniform Team Image Card Radius & Alignment Fix)
- * Focus: High-Tier Glassmorphic Cards, 10-Zone Analysis, Executive Team, Polished Closing.
+ * Version: 2026.2.12 (Founder Image Integration & Vision Text Update)
+ * Focus: High-Tier Glassmorphic Cards, 10-Zone Analysis, Founder Card with Photo, Polished Closing.
  */
 
 "use client"
@@ -51,7 +51,7 @@ export default function MissionPage() {
       bio: "Consultant dermatologist guiding our clinical review and medical accuracy.",
       image: "/pics/Rasheedah.png",
       badgeColor: "#E1784F",
-      imagePosition: "object-[center_30%] scale-110 sm:scale-100"
+      imagePosition: "object-[center_20%] scale-110 sm:scale-100"
     },
     {
       name: "Dr. Dawitt Feleke Zewde",
@@ -203,7 +203,7 @@ export default function MissionPage() {
           <div className="absolute top-0 right-0 w-80 h-80 bg-[#E1784F]/10 blur-[100px] rounded-full pointer-events-none" />
           
           <div className="max-w-3xl space-y-4">
-            <span className="text-[#4DB6AC] text-[10px] font-black tracking-[0.4em] uppercase">Clinical Engineering</span>
+            
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black italic tracking-tight text-black dark:text-white">
               From 40k+ Real Images to <span className="text-[#E1784F]">Accurate Precision</span>
             </h2>
@@ -341,8 +341,13 @@ export default function MissionPage() {
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-br from-[#E1784F]/20 to-[#4DB6AC]/10 blur-[100px] rounded-full pointer-events-none" />
             
             <div className="flex gap-6 items-center mb-16 relative z-10">
-              <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-[#E1784F] to-[#c7623a] flex items-center justify-center text-white font-black text-3xl italic shadow-xl shrink-0">
-                OO
+              <div className="relative w-20 h-20 rounded-[1.5rem] overflow-hidden bg-black/5 border border-white/10 shadow-xl shrink-0">
+                <Image 
+                  src="/pics/og.png" 
+                  alt="Ogirima Obey"
+                  fill
+                  className="object-cover object-top"
+                />
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter">Ogirima Obey</h3>
@@ -361,13 +366,13 @@ export default function MissionPage() {
               The <span className="text-[#4DB6AC]">Vision.</span>
             </h2>
             <p className="text-xl md:text-2xl font-medium text-black/60 dark:text-white/60 leading-relaxed">
-              We are building the continent's most sophisticated clinical vision engine. By merging precision AI analysis with a vetted care marketplace, we empower you to take definitive control of your skin health—instantly, ethically, and securely.
+              We are building the continent's most sophisticated beauty and aesthetic Intelligence. By merging precision AI analysis with a vetted care marketplace, we empower you to take definitive control of your skin health—instantly, ethically, and securely.
             </p>
             <button 
               onClick={() => router.push('/dashboard')}
               className="group flex items-center gap-4 text-[#E1784F] font-black text-[12px] tracking-[0.4em] uppercase hover:opacity-80 transition-opacity mt-4"
             >
-              Enter Clinic <ArrowRight size={20} className="group-hover:translate-x-3 transition-transform duration-300" />
+              Sign Up <ArrowRight size={20} className="group-hover:translate-x-3 transition-transform duration-300" />
             </button>
           </div>
         </section>
