@@ -82,7 +82,7 @@ export default function Footer() {
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#4DB6AC]/5 rounded-xl border border-[#4DB6AC]/20">
                   <Globe size={10} className="text-[#4DB6AC]" />
-                  <span className="text-[9px] font-black tracking-[0.2em] uppercase text-[#4DB6AC]">African Node</span>
+                  <span className="text-[9px] font-black tracking-[0.2em] uppercase text-[#4DB6AC]">Globe</span>
                 </div>
               </div>
             </div>
@@ -205,7 +205,7 @@ export default function Footer() {
             <div className="flex items-center gap-3 px-6 py-2.5 bg-[#4DB6AC]/5 border border-[#4DB6AC]/20 rounded-[1.5rem] shadow-sm md:order-3">
               <ShieldCheck size={14} className="text-[#4DB6AC]" />
               <span className="text-[9px] font-black tracking-[0.3em] text-[#4DB6AC] uppercase">
-                Built for Africa
+                Built for skin of colour
               </span>
             </div>
 
