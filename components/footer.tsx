@@ -72,7 +72,7 @@ export default function Footer() {
             </Link>
             <div className="space-y-6 max-w-sm">
               <p className="text-[11px] font-black tracking-[0.2em] leading-loose text-muted-foreground/80 italic">
-                Restoring dignity in dermatology through ethical AI research. Optimized for the vibrant diversity of African skin phenotypes.
+                Restoring dignity in dermatology through ethical AI research. Optimized for the vibrant diversity of melanin rich-skin.
               </p>
               {/* Tighter, refined location badges */}
               <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
@@ -193,7 +193,7 @@ export default function Footer() {
             {/* Copyright & Security */}
             <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 md:order-1">
               <p className="text-[8px] font-black tracking-[0.5em] text-muted-foreground opacity-60 uppercase">
-                © {currentYear} AfriDam AI • Clinical Systems
+                © {currentYear} AfriDam AI • Beauty And Aesthetic Intelligence. All Rights Reserved.
               </p>
               <div className="hidden md:block w-1.5 h-1.5 bg-muted rounded-full" />
               <p className="text-[8px] font-black tracking-[0.5em] text-muted-foreground opacity-60 uppercase">
