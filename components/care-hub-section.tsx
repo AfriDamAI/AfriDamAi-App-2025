@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Camera, ShieldCheck, ShoppingBag } from "lucide-react"
+import { Camera, ShieldCheck, Stethoscope } from "lucide-react"
 import { motion } from "framer-motion"
 
 const careHubItems = [
@@ -20,9 +20,9 @@ const careHubItems = [
     tile: "bg-[#22342F]",
   },
   {
-    title: "Verified Marketplace",
-    description: "Shop verified skincare from our network of pre-vetted, authentic vendors.",
-    icon: ShoppingBag,
+    title: "Tele-Dermal Consult",
+    description: "Connect with a dermatologist in 2mins.",
+    icon: Stethoscope,
     accent: "#E1784F",
     tile: "bg-[#3A2A24]",
   },
@@ -31,9 +31,7 @@ const careHubItems = [
 export default function CareHubSection() {
   return (
     <>
-      {/* Band 7 of the alternating section rhythm — see `surface-*` in globals.css.
-          Both sections below carry the same surface: the grid and the orange CTA
-          card that follows it are one band, not two. */}
+      {/* Band 7 of the alternating section rhythm — see `surface-*` in globals.css. */}
       <section id="care-hub" className="surface-bright py-24 md:py-40 px-6 text-black dark:text-white overflow-hidden transition-colors duration-500">
         <div className="max-w-screen-xl mx-auto space-y-16 md:space-y-24">
           <motion.div
@@ -83,7 +81,6 @@ export default function CareHubSection() {
                         className="text-[10px] font-black uppercase tracking-[0.28em]"
                         style={{ color: item.accent }}
                       >
-
                       </span>
                     </div>
                   </div>
@@ -94,6 +91,8 @@ export default function CareHubSection() {
         </div>
       </section>
 
+      {/* --- BUILD YOUR BRAND WITH US SECTION (COMMENTED OUT) --- */}
+      {/* 
       <section className="surface-bright px-6 py-16 md:py-24 text-white transition-colors duration-500">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -134,6 +133,7 @@ export default function CareHubSection() {
           </div>
         </motion.div>
       </section>
+      */}
     </>
   )
 }
