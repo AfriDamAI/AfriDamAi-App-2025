@@ -65,7 +65,7 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
 
-        {/* --- PRIVACY POLICY CONTENT CARD --- */}
+        {/* ---- PRIVACY POLICY CONTENT CARD --- */}
         <div className="relative">
           <button 
             type="button"
