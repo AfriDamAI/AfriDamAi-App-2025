@@ -59,9 +59,7 @@ export default function PrivacyPolicyPage() {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter uppercase italic leading-none text-center">
               Privacy <span className="text-[#E1784F]">Policy</span>
             </h1>
-            <p className="text-white/50 text-xs md:text-sm font-bold uppercase tracking-[0.3em] pt-1">
-              Last Updated: September 2026
-            </p>
+            
           </div>
         </div>
 
