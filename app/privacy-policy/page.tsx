@@ -180,4 +180,105 @@ export default function PrivacyPolicyPage() {
               </ul>
             </div>
 
-            {/* Section 6: User Rights
+             {/* Section 6: User Rights & Data Retention */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3.5">
+                <Trash2 className="text-[#E1784F] shrink-0" size={24} />
+                <h2 className="text-[#E1784F] font-black uppercase text-base md:text-lg tracking-[0.18em]">
+                  6. User Rights & Data Retention
+                </h2>
+              </div>
+              <ul className="text-white/70 text-sm md:text-base leading-relaxed pl-9 space-y-3">
+                <li>• <strong className="text-white font-semibold">Account Controls:</strong> Your account profile and active scan history are retained while your account remains open.</li>
+                <li>• <strong className="text-white font-semibold">Right to Erasure (Deletion):</strong> You have the right to request the complete deletion of your personal account, facial images, and scan records at any time. Submit a request via your account dashboard or email <span className="text-[#E1784F] font-bold">hello@afridamai.com</span>. Upon verification, your personal data will be purged within 30 days. (Note: Permanently anonymized, non-identifiable data used in aggregate model training weights cannot be individually removed once fully de-identified).</li>
+              </ul>
+            </div>
+
+            {/* Section 7: Regulatory Compliance & Data Encryption */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3.5">
+                <FileCheck className="text-[#E1784F] shrink-0" size={24} />
+                <h2 className="text-[#E1784F] font-black uppercase text-base md:text-lg tracking-[0.18em]">
+                  7. Regulatory Compliance & Data Encryption
+                </h2>
+              </div>
+              <ul className="text-white/70 text-sm md:text-base leading-relaxed pl-9 space-y-3">
+                <li>• <strong className="text-white font-semibold">Regulatory Alignment:</strong> AfriDam AI operates in compliance with the Nigeria Data Protection Act (NDPA), Nigeria Data Protection Regulation (NDPR), and international frameworks governing health-tech and biometric data handling.</li>
+                <li>• <strong className="text-white font-semibold">Security & Encryption:</strong> All data in transit between your device and our systems is encrypted using high-grade SSL/TLS protocols. Stored data is secured at rest with strict, multi-layer role-based access limits.</li>
+              </ul>
+            </div>
+
+            {/* PART III */}
+            <h2 className="text-white font-black uppercase text-sm md:text-base tracking-[0.2em] border-b border-white/10 pb-3">
+              PART III: LIMITATION OF LIABILITY & CONTACT
+            </h2>
+
+            {/* Section 8: Limitation of Liability */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3.5">
+                <Scale className="text-[#E1784F] shrink-0" size={24} />
+                <h2 className="text-[#E1784F] font-black uppercase text-base md:text-lg tracking-[0.18em]">
+                  8. Limitation of Liability
+                </h2>
+              </div>
+              <p className="text-white/70 text-sm md:text-base leading-relaxed pl-9">
+                To the maximum extent permitted by applicable law, AfriDam AI Ltd., its directors, employees, partners, and medical advisors shall not be held liable for any direct, indirect, incidental, consequential, or punitive damages resulting from:
+              </p>
+              <ul className="text-white/70 text-sm md:text-base leading-relaxed pl-9 space-y-3">
+                <li>• Your reliance on AI-generated skin assessments or product recommendations without professional clinical validation.</li>
+                <li>• Adverse reactions, skin irritation, or dissatisfaction resulting from products purchased through third-party vendors or links.</li>
+                <li>• Delivery failures, shipping delays, or errors caused by third-party marketplace partners.</li>
+              </ul>
+            </div>
+
+            {/* Section 9: Contact */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3.5">
+                <Mail className="text-[#E1784F] shrink-0" size={24} />
+                <h2 className="text-[#E1784F] font-black uppercase text-base md:text-lg tracking-[0.18em]">
+                  9. Contact Our Data Governance & Support Team
+                </h2>
+              </div>
+              <p className="text-white/70 text-sm md:text-base leading-relaxed pl-9">
+                If you have questions regarding these terms, your privacy rights, or clinical data handling, contact us at:
+              </p>
+              <ul className="text-white/70 text-sm md:text-base leading-relaxed pl-9 space-y-3">
+                <li>• <strong className="text-white font-semibold">Email:</strong> <span className="text-[#4DB6AC] font-bold">hello@afridamai.com</span></li>
+                <li>• <strong className="text-white font-semibold">Company:</strong> AfriDam AI Ltd.</li>
+              </ul>
+            </div>
+
+            {/* User Consent Box */}
+            <div className="pt-6 border-t border-white/10">
+              <div className="p-5 md:p-6 bg-[#E1784F]/10 rounded-2xl border border-[#E1784F]/25 shadow-lg space-y-3">
+                <p className="text-white/90 text-sm md:text-base leading-relaxed font-medium">
+                  <span className="text-[#E1784F] font-black uppercase tracking-wider block sm:inline mr-2">User Explicit Consent:</span> 
+                  By using the AfriDam AI platform, creating an account, uploading skin images, or interacting with our AI tools, you explicitly confirm that:
+                </p>
+                <ul className="text-white/90 text-sm md:text-base leading-relaxed font-medium space-y-2">
+                  <li>• You have read, understood, and agreed to these Terms of Service and Privacy Policy.</li>
+                  <li>• You understand that AfriDam AI is an aesthetic profiling tool, NOT a diagnostic medical service.</li>
+                  <li>• You agree to the use of anonymized, non-identifiable image data for AI model optimization and research partnerships.</li>
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+          {/* FOOTER LINK */}
+        <div className="flex flex-col items-center gap-6 pb-12">
+          <p className="text-center text-xs md:text-sm text-white/40 font-bold uppercase tracking-[0.25em]">
+            Need to review our terms and conditions? <Link href="/terms" className="text-white hover:text-[#4DB6AC] transition-all ml-2 border-b border-white/30 hover:border-[#4DB6AC]">Terms & Conditions</Link>
+          </p>
+        </div>
+
+        {/* FOOTER LINK */}
+        <div className="flex flex-col items-center gap-6 pb-12">
+          <p className="text-center text-xs md:text-sm text-white/40 font-bold uppercase tracking-[0.25em]">
+            Already have an account? <Link href="/login" className="text-white hover:text-[#E1784F] transition-all ml-2 border-b border-white/30 hover:border-[#E1784F]">Login</Link>
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
