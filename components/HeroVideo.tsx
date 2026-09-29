@@ -138,18 +138,34 @@ export default function HeroVideo() {
               Melanin rich-skin decoded.
             </motion.p>
 
-            {/* Premium CTA Pill Button with Glassmorphism */}
+            {/* Premium CTA Pill Buttons with Glassmorphism */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={stagger(3)}
-              className="mt-6 sm:mt-8 flex items-center"
+              className="mt-6 sm:mt-8 flex w-full flex-wrap items-center gap-3 sm:gap-4"
             >
               <a
                 href="/public-scan"
                 className="group inline-flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-7 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-[#E1784F] hover:border-[#E1784F] active:scale-95"
               >
                 Start Skin Scan
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+
+              <a
+                href="/brand-onboarding"
+                className="group ml-auto inline-flex items-center gap-3 rounded-full bg-transparent backdrop-blur-md border border-white/40 px-7 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-white hover:text-[#0a0c08] hover:border-white active:scale-95"
+              >
+                Partner With Us
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
