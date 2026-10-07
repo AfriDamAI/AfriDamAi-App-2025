@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   Globe, 
@@ -417,6 +418,30 @@ export default function PartnersSection() {
             </AnimatePresence>
           </div>
 
+        </div>
+
+        {/* --- TIER 3: BECOME A PARTNER CTA --- */}
+        <div className="relative overflow-hidden rounded-3xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/[0.03] p-6 sm:p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-[#E1784F]/10 blur-[80px] pointer-events-none" />
+          <div className="relative space-y-3 max-w-2xl">
+            <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#E1784F]">
+              <Handshake size={14} /> Become a Partner
+            </span>
+            <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tight leading-none">
+              Bring AfriDam AI to <span className="text-[#E1784F]">your brand</span>
+            </h3>
+            <p className="text-gray-600 dark:text-white/60 text-sm md:text-base leading-relaxed">
+              Skincare brands, retailers, pharmacies, clinics and dermatologists can deploy our skin intelligence
+              through a kiosk, website API, Instagram/WhatsApp bot or white-label platform.
+            </p>
+          </div>
+          <Link
+            href="/brand-onboarding"
+            className="group relative inline-flex shrink-0 items-center justify-center gap-3 rounded-full bg-[#E1784F] px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-[#E1784F]/20 transition-all duration-300 hover:bg-[#cf6a42] active:scale-95"
+          >
+            Book a Demo
+            <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
         </div>
 
       </div>

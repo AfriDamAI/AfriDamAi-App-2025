@@ -2,6 +2,8 @@
 
 import type React from "react"
 import { usePathname } from "next/navigation"
+import { Toaster } from "sonner"
+import { useTheme } from "@/providers/theme-provider"
 import { AuthGuard } from "@/components/auth-guard"
 import { AppWrapper } from "@/components/app-wrapper"
 import { AIChatBot } from "@/components/ai/ai-chatbot"
@@ -12,6 +14,7 @@ interface LayoutContentProps {
 
 export default function LayoutContent({ children }: LayoutContentProps) {
   const pathname = usePathname()
+  const { theme } = useTheme()
   const hideChatBotRoutes = ["/", "/ingredient-analyzer", "/specialist"]
   const shouldShowChatBot = !hideChatBotRoutes.includes(pathname)
 
@@ -27,6 +30,9 @@ export default function LayoutContent({ children }: LayoutContentProps) {
         </div>
       )}
       <div className="fixed bottom-8 left-8 z-100" />
+
+      {/* Renders toast() calls made across the app (appointment, marketplace, settings, calls). */}
+      <Toaster theme={theme} richColors position="top-center" />
     </>
   )
 }

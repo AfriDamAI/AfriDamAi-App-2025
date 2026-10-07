@@ -147,7 +147,7 @@ export default function HeroVideo() {
             >
               <a
                 href="/public-scan"
-                className="group inline-flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-7 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-[#E1784F] hover:border-[#E1784F] active:scale-95"
+                className="group inline-flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-md border border-white/30 border-2 px-7 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-[#E1784F] hover:border-[#E1784F] active:scale-95"
               >
                 Start Skin Scan
                 <svg
@@ -163,9 +163,9 @@ export default function HeroVideo() {
 
               <a
                 href="/brand-onboarding"
-                className="group ml-auto inline-flex items-center gap-3 rounded-full bg-transparent backdrop-blur-md border border-white/40 px-7 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-white hover:text-[#0a0c08] hover:border-white active:scale-95"
+                className="group inline-flex items-center gap-3 rounded-full bg-white border border-white px-7 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-[#0a0c08] shadow-xl transition-all duration-300 hover:bg-[#E1784F] hover:border-[#E1784F] hover:text-white active:scale-95"
               >
-                Partner With Us
+                Book a Demo
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
