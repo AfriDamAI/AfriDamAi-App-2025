@@ -6,13 +6,10 @@ import type { NextConfig } from "next";
  * Focus: Clearing TS(2353) & Ensuring Hardware/Security Sync.
  */
 const nextConfig = {
-  // 🚀 OGA FIX: Moving these into the main object and
-  // casting at the end to bypass version-specific type blocks.
-  // ESLint and TypeScript build errors are suppressed here because the codebase
-  // has pre-existing lint/type issues that must not block Vercel deployments.
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // 🚀 OGA FIX: TypeScript build errors are suppressed because the codebase
+  // has pre-existing type issues that must not block Vercel deployments.
+  // NOTE: Next.js 16 removed `eslint.ignoreDuringBuilds` from next.config.
+  // ESLint no longer runs during `next build` in Next.js 15+; `next lint` is separate.
   typescript: {
     ignoreBuildErrors: true,
   },
