@@ -6,11 +6,10 @@ import type { NextConfig } from "next";
  * Focus: Clearing TS(2353) & Ensuring Hardware/Security Sync.
  */
 const nextConfig = {
-  // 🚀 OGA FIX: Moving these into the main object and 
-  // casting at the end to bypass version-specific type blocks.
-  // eslint: {
-  //   ignoreDuringBuilds: true,
-  // },
+  // 🚀 OGA FIX: TypeScript build errors are suppressed because the codebase
+  // has pre-existing type issues that must not block Vercel deployments.
+  // NOTE: Next.js 16 removed `eslint.ignoreDuringBuilds` from next.config.
+  // ESLint no longer runs during `next build` in Next.js 15+; `next lint` is separate.
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -28,7 +27,7 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             // 🛡️ SECURITY SYNC: Backend and AI Brain Whitelisting
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream: https:; connect-src 'self' https: wss://afridam-backend-prod-107032494605.us-central1.run.app wss://afridam-ai2-api-131829695574.us-central1.run.app https://afridam-backend-prod-107032494605.us-central1.run.app https://afridam-ai2-api-131829695574.us-central1.run.app;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: mediastream: https:; frame-src 'self' https://calendly.com https://*.calendly.com; connect-src 'self' https: wss://afridam-backend-prod-107032494605.us-central1.run.app wss://afridam-ai2-api-131829695574.us-central1.run.app https://afridam-backend-prod-107032494605.us-central1.run.app https://afridam-ai2-api-131829695574.us-central1.run.app;",
           },
           {
             key: 'Strict-Transport-Security',
