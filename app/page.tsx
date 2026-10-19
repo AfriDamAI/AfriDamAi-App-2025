@@ -1,25 +1,21 @@
 /**
  * 🛡️ AFRIDAM WELLNESS HUB: ELEGANT UNIFIED EDITION (Rule 6 Synergy)
- * Version: 2026.6.4 (Marketplace Preview Section Added)
+ * Version: 2026.6.4
  * Focus: Sophisticated Scaling, (auth) Group Alignment, Rule 6 Compliance.
  */
 
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React from "react"
 import {
-  Camera, ArrowRight, ShieldCheck, Sparkles,
-  ShoppingCart, BadgeCheck
+  Camera, ArrowRight, ShieldCheck
 } from "lucide-react"
 import { useAuth } from "@/providers/auth-provider"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import TeamMemberSection from "@/components/team-member-section"
 import CareHubSection from "@/components/care-hub-section"
 import PedigreeSection from "@/components/pedigree-section"
-import { getProducts, getImageUrl } from "@/lib/api-client"
-import { useCart } from "@/hooks/use-cart"
 import Image from "next/image";
 import FaqChatbot from "@/components/FaqChatbot"
 import PartnersSection from "@/components/PartnersSection"
@@ -27,101 +23,9 @@ import HeroVideo from "@/components/HeroVideo";
 import CommunityCarousel from "@/components/CommunityCarousel";
 
 
-// -----------------------------------------------------------------------
-// 🛒 MARKETPLACE PREVIEW
-// Field names confirmed against your cart page (app/cart/page.tsx):
-//   product.id, product.name, product.imageUrl, product.basePrice
-// `verifiedShop` is NOT confirmed on the product object — treated as
-// optional so the badge only renders if your API actually sends it.
-// -----------------------------------------------------------------------
-type MarketplaceProduct = {
-  id: string
-  name: string
-  basePrice: number
-  imageUrl?: string
-  verifiedShop?: boolean
-  createdAt?: string
-  restockedAt?: string
-  inStock?: boolean
-  stock?: number
-}
-
-const MAX_PREVIEW_ITEMS = 4
-// Products created (or restocked) within this window are labeled on the marketplace preview.
-// No existing definition of "new"/"recently restocked" was found in the codebase — 14 days
-// is a starting default; adjust here if the team wants a different window.
-const NEW_ARRIVAL_WINDOW_DAYS = 14
-
-function isRecentDate(dateString: string | undefined, withinDays: number) {
-  if (!dateString) return false
-  const date = new Date(dateString)
-  if (isNaN(date.getTime())) return false
-  const diffMs = Date.now() - date.getTime()
-  return diffMs >= 0 && diffMs <= withinDays * 24 * 60 * 60 * 1000
-}
-
-function getInventoryBadge(product: MarketplaceProduct): "new" | "restocked" | null {
-  const restockedIsNewer =
-    !!product.restockedAt &&
-    (!product.createdAt || new Date(product.restockedAt) > new Date(product.createdAt))
-
-  if (restockedIsNewer && isRecentDate(product.restockedAt, NEW_ARRIVAL_WINDOW_DAYS)) {
-    return "restocked"
-  }
-  if (isRecentDate(product.createdAt, NEW_ARRIVAL_WINDOW_DAYS)) {
-    return "new"
-  }
-  return null
-}
-
-function formatNaira(amount: number) {
-  return `₦${amount.toLocaleString("en-NG")}`
-}
-
-function isInStock(product: MarketplaceProduct) {
-  if (product.inStock === false) return false
-  return typeof product.stock === "number" ? product.stock > 0 : true
-}
-
-function getHomepagePreviewProducts(products: MarketplaceProduct[]) {
-  const available = products.filter(isInStock)
-
-  if (available.length === 0) return []
-
-  const ranked = available
-    .map((product) => {
-      const createdAt = product.createdAt ? new Date(product.createdAt).getTime() : 0
-      const restockedAt = product.restockedAt ? new Date(product.restockedAt).getTime() : 0
-      const latestActivity = Math.max(createdAt, restockedAt)
-      const isRecent = Boolean(
-        (product.createdAt && isRecentDate(product.createdAt, NEW_ARRIVAL_WINDOW_DAYS)) ||
-        (product.restockedAt && isRecentDate(product.restockedAt, NEW_ARRIVAL_WINDOW_DAYS))
-      )
-
-      return {
-        product,
-        isRecent,
-        latestActivity,
-        badge: getInventoryBadge(product),
-      }
-    })
-    .sort((a, b) => {
-      if (a.isRecent !== b.isRecent) return a.isRecent ? -1 : 1
-      if (a.badge === "restocked" && b.badge !== "restocked") return -1
-      if (a.badge === "new" && b.badge === null) return -1
-      return b.latestActivity - a.latestActivity
-    })
-
-  const prioritized = ranked.filter((entry) => entry.isRecent)
-  const fallback = prioritized.length > 0 ? prioritized : ranked
-
-  return fallback.slice(0, MAX_PREVIEW_ITEMS).map((entry) => entry.product)
-}
-
 export default function LandingPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { addToCart } = useCart();
 
   /**
    * 🛡️ RULE 6 SYNERGY: 
@@ -134,81 +38,6 @@ export default function LandingPage() {
   const handleFeatureAccess = (path: string) => {
     if (user) router.push(path);
     else navigateToAuth("register");
-  };
-
-  // 🛒 MARKETPLACE PREVIEW: live product fetch
-  const [products, setProducts] = useState<MarketplaceProduct[]>([]);
-  const [productsLoading, setProductsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const windowStart = new Date(Date.now() - NEW_ARRIVAL_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
-        const data = await getProducts({
-          sort: "recent",
-          limit: MAX_PREVIEW_ITEMS * 4,
-          restockedSince: windowStart,
-          createdSince: windowStart,
-        });
-        const list = Array.isArray(data) ? data : [];
-        let previewProducts = getHomepagePreviewProducts(list)
-        console.debug("homepage: fetched recent products", { requested: list.length, preview: previewProducts.length })
-
-        // If the recent/restocked window returned nothing, fall back to a
-        // broader query (all products) so the homepage never appears empty.
-        if (!previewProducts || previewProducts.length === 0) {
-          try {
-            const allData = await getProducts();
-            const allList = Array.isArray(allData) ? allData : [];
-            previewProducts = getHomepagePreviewProducts(allList);
-            console.debug("homepage: fallback fetched all products", { total: allList.length, preview: previewProducts.length })
-          } catch (fallbackErr) {
-            console.error("Fallback product fetch failed", fallbackErr);
-          }
-        }
-
-        setProducts(previewProducts);
-      } catch (err) {
-        console.error("Failed to load marketplace preview products", err);
-      } finally {
-        setProductsLoading(false);
-      }
-    };
-    loadProducts();
-  }, []);
-
-  const handleAddToCart = async (product: MarketplaceProduct) => {
-    if (!user) {
-      try {
-        const pending = {
-          id: product.id,
-          productId: product.id,
-          productName: product.name,
-          productImage: product.imageUrl || "",
-          price: product.basePrice,
-          quantity: 1,
-          createdAt: new Date().toISOString(),
-        } as any
-        localStorage.setItem("afridam:pendingCartAdd", JSON.stringify(pending));
-        console.debug("homepage: saved pending cart item", pending);
-      } catch (e) {
-        console.error("Failed to save pending cart item", e);
-      }
-      navigateToAuth("register");
-      return;
-    }
-    try {
-      // Matches the real CartItem shape from use-cart.ts's addToCart(userId, item).
-      await addToCart(user.id, {
-        productId: product.id,
-        productName: product.name,
-        productImage: getImageUrl(product.imageUrl),
-        price: product.basePrice,
-        quantity: 1,
-      });
-    } catch (err) {
-      console.error("Failed to add product to cart", err);
-    }
   };
 
   return (
@@ -370,160 +199,6 @@ export default function LandingPage() {
       </div> {/* Closes cards grid */}
     </div>   {/* Closes line 296: <div className="max-w-screen-xl..."> */}
   </section>  {/* Closes line 295: <section className="py-20..."> */}
-
-{/* 🛒 5.5 MARKETPLACE PREVIEW */}
-<section id="marketplace-preview" className="surface-dim py-24 md:py-40 px-6 transition-colors duration-500">
-  <div className="max-w-screen-xl mx-auto space-y-16">
-
-    {/* Section header */}
-    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-      <div className="space-y-4">
-        <span className="text-[#E1784F] text-[10px] font-black capitalize tracking-widest opacity-40">Verified Products</span>
-        <h2 className="text-4xl md:text-6xl font-black capitalize italic tracking-tighter leading-tight">
-          Shop the <br className="hidden md:block" /><span className="text-[#4DB6AC]">Marketplace.</span>
-        </h2>
-      </div>
-      <Link
-        href="/marketplace"
-        className="group inline-flex items-center gap-3 self-start md:self-auto h-14 px-8 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black capitalize text-[10px] tracking-widest shadow-xl active:scale-95 transition-all"
-      >
-        View All Products
-        <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-      </Link>
-    </div>
-
-    {/* Product grid */}
-    {productsLoading ? (
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
-        {Array.from({ length: MAX_PREVIEW_ITEMS }).map((_, i) => (
-          <div
-            key={i}
-            className="rounded-[2.5rem] overflow-hidden border border-black/5 dark:border-white/5"
-          >
-            <div className="aspect-[4/5] bg-gray-100 dark:bg-white/5 animate-pulse" />
-            <div className="p-6 space-y-3">
-              <div className="h-2.5 w-20 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
-              <div className="h-4 w-full bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
-            </div>
-          </div>
-        ))}
-      </div>
-    ) : products.length === 0 ? (
-      <div className="py-20 text-center">
-        <p className="text-[10px] font-black uppercase tracking-widest opacity-30">
-          No products available right now
-        </p>
-      </div>
-    ) : (
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
-        {products.map((product, i) => (
-          <motion.div
-            key={product.id}
-            initial="initial"
-            whileInView="animate"
-            whileHover="hover"
-            viewport={{ once: true }}
-            variants={{
-              initial: { opacity: 0, y: 24 },
-              animate: { opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.08 } },
-            }}
-            className="relative bg-white dark:bg-black border border-black/5 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#E1784F]/40 transition-shadow duration-300 flex flex-col justify-between"
-          >
-            {/* Image + Overlay Container */}
-            <div className="relative aspect-[4/5] bg-gray-50 dark:bg-white/5 overflow-hidden">
-              <Link href={`/marketplace/${product.id}`} className="block w-full h-full">
-                <motion.img
-                  src={getImageUrl(product.imageUrl)}
-                  alt={product.name}
-                  variants={{
-                    initial: { scale: 1 },
-                    hover: { scale: 1.08 }
-                  }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="w-full h-full object-cover"
-                />
-              </Link>
-
-              {/* Price badge */}
-              <div className="absolute top-4 right-4 px-3 py-1.5 bg-black/85 backdrop-blur-xl rounded-full z-10 pointer-events-none">
-                <span className="text-[10px] font-black text-white tracking-wide">
-                  {formatNaira(product.basePrice)}
-                </span>
-              </div>
-
-              {/* Desktop Add to Cart (Slides up on hover only) */}
-              <motion.button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleAddToCart(product);
-                }}
-                variants={{
-                  initial: { y: 60, opacity: 0 },
-                  hover: { y: 0, opacity: 1 }
-                }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="hidden md:flex absolute bottom-4 left-4 right-4 h-12 bg-[#E1784F] hover:bg-[#d0673e] text-white rounded-2xl font-black text-[10px] capitalize tracking-widest items-center justify-center gap-2 shadow-lg active:scale-95 z-20 cursor-pointer"
-              >
-                <ShoppingCart size={14} />
-                Add to Cart
-              </motion.button>
-            </div>
-
-            {/* Details + Mobile Permanent Button */}
-            <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
-             <Link href={`/marketplace/${product.id}`} className="block space-y-2">
-                {product.verifiedShop && (
-                  <div className="flex items-center gap-1.5">
-                    <BadgeCheck size={12} className="text-[#4DB6AC]" />
-                    <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">Verified Shop</span>
-                  </div>
-                )}
-                {(() => {
-                  const badge = getInventoryBadge(product)
-                  if (badge === "restocked") {
-                    return (
-                      <div className="flex items-center gap-1.5">
-                        <ShieldCheck size={12} className="text-[#E1784F]" />
-                        <span className="text-[9px] font-black capitalize tracking-widest text-[#E1784F]">Back in Stock</span>
-                      </div>
-                    )
-                  }
-                  if (badge === "new") {
-                    return (
-                      <div className="flex items-center gap-1.5">
-                        <Sparkles size={12} className="text-[#4DB6AC]" />
-                        <span className="text-[9px] font-black capitalize tracking-widest text-[#4DB6AC]">New</span>
-                      </div>
-                    )
-                  }
-                  return null
-                })()}
-                <h3 className="text-sm font-black italic leading-snug line-clamp-2 hover:text-[#E1784F] transition-colors">
-                  {product.name}
-                </h3>
-              </Link>
-              {/* Mobile Add to Cart (Always visible on small screens) */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleAddToCart(product);
-                }}
-                className="md:hidden w-full h-12 bg-[#E1784F] active:bg-[#d0673e] text-white rounded-2xl font-black text-[10px] capitalize tracking-widest flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform"
-              >
-                <ShoppingCart size={14} />
-                Add to Cart
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    )}
-  </div>
-</section>
 
       {/* 📜 4. THE MANIFESTO */}
       <section className="surface-bright relative isolate overflow-hidden py-24 md:py-40 px-6 text-center transition-colors duration-500">

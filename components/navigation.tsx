@@ -82,7 +82,6 @@ export default function Navigation({
   const navLinks = user
     ? [
         { href: "/dashboard", label: "Dashboard" },
-        { href: "/public-scan", label: "AI Scan" },
         { href: "/marketplace", label: "Care Hub" },
         { href: "/contact", label: "Support" },
       ]
