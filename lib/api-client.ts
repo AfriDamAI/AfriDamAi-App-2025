@@ -318,6 +318,7 @@ export interface GetProductsParams {
   limit?: number;
   restockedSince?: string;
   createdSince?: string;
+
 }
 
 export const getProducts = async (params?: GetProductsParams) => {
