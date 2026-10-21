@@ -21,7 +21,7 @@ interface Partner {
   id: string
   name: string
   location: string
-  category: "Strategic Partner" | "Commercial Integration"
+  category: string
   tagline: string
   description: string
   badgeText: string
@@ -36,16 +36,16 @@ const PARTNERS: Partner[] = [
     id: "jax-lab",
     name: "Jax Lab",
     location: "Canada",
-    category: "Strategic Partner",
-    tagline: "Health & Wellness, Nature's Way",
-    description: "International strategic partner supporting AfriDam AI's global beauty-tech growth and natural formulation alignment.",
-    badgeText: "International Growth Partner",
+    category: "Health & Wellness",
+    tagline: "International Growth",
+    description: "Natural wellness and formulation alignment partner supporting cross-border beauty-tech expansion and holistic skin health.",
+    badgeText: "Health & Wellness · Canada",
     icon: <Leaf className="w-5 h-5 text-[#E1784F]" />,
     accentColor: "#E1784F",
     highlights: [
+      "Natural wellness and formulation alignment",
       "Cross-border beauty-tech expansion",
-      "Natural formulation alignment for dark skin health",
-      "Global wellness network integration"
+      "Holistic skin health"
     ],
     logoGraphic: (
       <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ const PARTNERS: Partner[] = [
         <div>
           {/* CHANGED: text-white -> theme-aware text so name is readable in light mode */}
           <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">JAX LAB</span>
-          <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Health & Wellness</span>
+            <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Health & Wellness · Canada</span>
         </div>
       </div>
     )
@@ -66,16 +66,16 @@ const PARTNERS: Partner[] = [
     id: "mahogany-derm",
     name: "Mahogany Dermatology",
     location: "USA",
-    category: "Strategic Partner",
-    tagline: "Global Dark Skin Clinical Excellence",
-    description: "Strategic clinical network supporting AfriDam AI's doctor network and specialist consultation framework.",
-    badgeText: "Clinical Network Partner",
+    category: "Dermatology Education",
+    tagline: "Skin of Color Education & Research",
+    description: "Skin-of-color nursing and dermatology training network supporting beauty and aesthetics guidance, practitioner education and skin assessment protocols.",
+    badgeText: "Dermatology Education · USA",
     icon: <Stethoscope className="w-5 h-5 text-[#4DB6AC]" />,
     accentColor: "#4DB6AC",
     highlights: [
-      "Board-certified dermatologist network integration",
-      "Tele-consultation workflow validation",
-      "Clinical protocol review for dark skin conditions"
+      "Beauty and aesthetics guidance and skin assessment protocols",
+      "Skin-of-color nursing and dermatology training",
+      "Practitioner education"
     ],
     logoGraphic: (
       <div className="flex items-center gap-3">
@@ -93,17 +93,17 @@ const PARTNERS: Partner[] = [
   {
     id: "ene-naturals",
     name: "Ene Naturals",
-    location: "Commercial Partner",
-    category: "Commercial Integration",
-    tagline: "Automated AI Skin Matching Integration",
-    description: "First-tier commercial beauty brand using AfriDam AI's 1-line script to automatically scan and match skincare products online.",
-    badgeText: "Script Integration Partner",
+    location: "Nigeria",
+    category: "Clean Beauty Brand (Commercial)",
+    tagline: "SaaS & API Integration",
+    description: "Commercial brand partner embedding AfriDam AI's skin-screening API into its clean skincare store to match shoppers with tailored routines.",
+    badgeText: "Clean Beauty Brand · Nigeria",
     icon: <Building2 className="w-5 h-5 text-[#E1784F]" />,
     accentColor: "#E1784F",
     highlights: [
-      "Live 1-line script widget deployment",
-      "Automated e-commerce product matching",
-      "Clean beauty compliance verification"
+      "Skin-screening API embedded in clean skincare store",
+      "Shopper matching for tailored routines",
+      "Commercial brand integration"
     ],
     logoGraphic: (
       <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ const PARTNERS: Partner[] = [
         <div>
           {/* CHANGED: text-white -> theme-aware text */}
           <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">ENE NATURALS</span>
-          <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Clean Beauty Brand</span>
+            <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Clean Beauty Brand · Nigeria</span>
         </div>
       </div>
     )
@@ -122,16 +122,16 @@ const PARTNERS: Partner[] = [
     id: "gilead-health-solution",
     name: "Gilead Health Solution",
     location: "Nigeria",
-    category: "Strategic Partner",
-    tagline: "Community-Centered Health Access",
-    description: "Community health partner supporting AfriDam AI's outreach, preventive care education, and accessible wellness pathways for underserved populations.",
-    badgeText: "Community Health Partner",
+    category: "Healthcare Technology Partner",
+    tagline: "Healthcare Technology Partnership",
+    description: "Healthcare partner advocating the adoption of technology in beauty, aesthetics and wellness practice.",
+    badgeText: "Healthcare Technology Partner · Nigeria",
     icon: <HeartPulse className="w-5 h-5 text-[#4DB6AC]" />,
     accentColor: "#4DB6AC",
     highlights: [
-      "Community health education and outreach",
-      "Preventive care awareness for women and families",
-      "Accessible referral and wellness support pathways"
+      "Technology adoption in beauty, aesthetics and wellness practice",
+      "Healthcare technology partnership",
+      "Wellness practice innovation"
     ],
     logoGraphic: (
       <div className="flex items-center gap-3">
@@ -149,16 +149,16 @@ const PARTNERS: Partner[] = [
     id: "ikheloa-foundation",
     name: "Ikheloa Foundation",
     location: "Nigeria",
-    category: "Strategic Partner",
-    tagline: "Empowering Communities Through Care",
-    description: "Social impact partner advancing community welfare, health education, and inclusive support programs aligned with AfriDam AI's mission.",
-    badgeText: "Social Impact Partner",
+    category: "Social Impact & Outreach",
+    tagline: "Ethical Dataset & Outreach",
+    description: "Grassroots NGO driving rural health outreach, skin health awareness and consent-based dataset collection.",
+    badgeText: "Social Impact & Outreach · Nigeria",
     icon: <Handshake className="w-5 h-5 text-[#E1784F]" />,
     accentColor: "#E1784F",
     highlights: [
-      "Community welfare and empowerment programs",
-      "Health education and inclusive outreach",
-      "Local partnership coordination and support"
+      "Rural health outreach",
+      "Skin health awareness",
+      "Consent-based dataset collection"
     ],
     logoGraphic: (
       <div className="flex items-center gap-3">
@@ -176,16 +176,16 @@ const PARTNERS: Partner[] = [
     id: "girl-child-support-initiative",
     name: "Girl Child Support Initiative",
     location: "Nigeria",
-    category: "Strategic Partner",
-    tagline: "Advancing Health, Education & Opportunity",
-    description: "Girl-child advocacy partner supporting access to health information, education, mentorship, and safe opportunities for young women.",
-    badgeText: "Girl Child Advocacy Partner",
+    category: "Advocacy & Health Impact",
+    tagline: "Community Advocacy & Inclusion",
+    description: "Medical outreach for young women, dermatological education and ethical data gathering in underserved communities.",
+    badgeText: "Advocacy & Health Impact · Nigeria",
     icon: <Users className="w-5 h-5 text-[#E1784F]" />,
     accentColor: "#E1784F",
     highlights: [
-      "Girls' health and wellbeing advocacy",
-      "Education, mentorship, and opportunity access",
-      "Safe community support and awareness programs"
+      "Medical outreach for young women",
+      "Dermatological education",
+      "Ethical data gathering in underserved communities"
     ],
     logoGraphic: (
       <div className="flex items-center gap-3">
@@ -195,6 +195,33 @@ const PARTNERS: Partner[] = [
         <div>
           <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">GIRL CHILD</span>
           <span className="text-[9px] text-[#E1784F] font-bold uppercase tracking-widest">Support Initiative</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: "tedx-bori",
+    name: "TEDx BORI",
+    location: "Nigeria",
+    category: "Official Innovation & Stage",
+    tagline: "Global Stage & Community Activation",
+    description: "Live AI skin screening for attendees and skin-of-color health innovation on the TEDx stage.",
+    badgeText: "Official Innovation & Stage · Nigeria",
+    icon: <Sparkles className="w-5 h-5 text-[#4DB6AC]" />,
+    accentColor: "#4DB6AC",
+    highlights: [
+      "Live AI skin screening for attendees",
+      "Skin-of-color health innovation on the TEDx stage",
+      "Community activation"
+    ],
+    logoGraphic: (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#4DB6AC]/10 border border-[#4DB6AC]/30 flex items-center justify-center text-[#4DB6AC] shrink-0">
+          <Sparkles className="w-5 h-5" />
+        </div>
+        <div>
+          <span className="font-black text-lg tracking-wider text-gray-900 dark:text-white block uppercase italic leading-none">TEDx BORI</span>
+          <span className="text-[9px] text-[#4DB6AC] font-bold uppercase tracking-widest">Official Innovation & Stage · Nigeria</span>
         </div>
       </div>
     )
@@ -226,7 +253,7 @@ export default function PartnersSection() {
           </div>
           {/* Heading already inherits text-gray-900 dark:text-white from the section wrapper, no change needed here */}
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase italic leading-none">
-            Backed By Global <span className="text-[#E1784F]">Clinical</span> & <span className="text-[#4DB6AC]">Tech Partners</span>
+            Backed By Global <span className="text-[#E1784F]">Beauty</span> & <span className="text-[#4DB6AC]">Aesthetics Partners</span>
           </h2>
           {/* CHANGED: text-white/60 -> theme-aware muted text */}
           <p className="text-gray-600 dark:text-white/60 text-sm md:text-base leading-relaxed">
