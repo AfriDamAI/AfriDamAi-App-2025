@@ -90,13 +90,12 @@ export default function LandingPage() {
         </div>
 
       <div className="aspect-square bg-gray-50 dark:bg-white/5 rounded-[2rem] relative border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden group">
-  <video
-    src="/videos/step one.mp4"
-    autoPlay
-    loop
-    muted
-    playsInline
-    className="w-full h-full object-cover rounded-[2rem]"
+  <Image
+    src="/videos/step%20one.jpg"
+    alt="Taking a photo of a skin concern"
+    fill
+    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
+    className="object-cover rounded-[2rem]"
   />
 </div>
       </motion.div>
@@ -116,7 +115,7 @@ export default function LandingPage() {
         Instant <br />Check
       </h3>
       <p className="text-sm sm:text-base font-semibold text-white/95 leading-relaxed tracking-tight">
-        We check your scan against clinical health standards for melanin.
+        We tailor your skin analysis and routine suggestions for melanin-rich skin.
       </p>
     </div>
   </div>
