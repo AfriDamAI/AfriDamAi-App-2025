@@ -1,5 +1,5 @@
 /**
- * 🛡️ AFRIDAM PUBLIC CLINICAL SCANNER
+ * 🛡️ AFRIDAM PUBLIC AI SKIN SCANNER
  * Focus: High-Precision Image Handshake for Unauthenticated Users.
  */
 
@@ -22,6 +22,7 @@ export default function PublicScanner() {
   const [isCapturing, setIsCapturing] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState<any>(null)
+  const [selectedCondition, setSelectedCondition] = useState<string | null>(null)
   const [status, setStatus] = useState("System Ready")
   const [scanStep, setScanStep] = useState(0)
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
@@ -32,10 +33,19 @@ export default function PublicScanner() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  const selectedConditionData = Array.isArray(results?.conditions)
+    ? results.conditions.find((condition: any) =>
+        (typeof condition === "string" ? condition : condition?.name || condition?.label || condition?.condition) === selectedCondition
+      )
+    : null
+  const selectedOverlay = selectedCondition && Array.isArray(results?.overlays)
+    ? results.overlays.find((overlay: any) => overlay?.condition === selectedCondition && (overlay?.imageUrl || overlay?.url))
+    : null
+
   const analysisSteps = [
     { icon: <Scan size={16} />, text: "Checking Image Clarity" },
     { icon: <Fingerprint size={16} />, text: "Detecting Patterns" },
-    { icon: <Binary size={16} />, text: "Matching Clinical Data" },
+    { icon: <Binary size={16} />, text: "Matching skin care insights" },
     { icon: <Search size={16} />, text: "Building Your Skin Diary" },
     { icon: <ShieldCheck size={16} />, text: "Finalizing Safe Routine" }
   ];
@@ -130,6 +140,7 @@ export default function PublicScanner() {
     if (!imgSource) return;
     setIsAnalyzing(true)
     setErrorDetails(null)
+    setSelectedCondition(null)
     setStatus("Scanning...")
 
     try {
@@ -141,6 +152,7 @@ export default function PublicScanner() {
         description: data?.description || "",
         severity: data?.severity_score || data?.severity || 0,
         conditions: data?.conditions || [],
+        overlays: data?.overlays || data?.visual_overlays || [],
         image: imgSource,
         id: data?.id || "TEMP-" + Date.now()
       };
@@ -329,46 +341,62 @@ export default function PublicScanner() {
                   {imgSource && (
                     <img
                       src={imgSource}
-                      alt="Clinical Scan"
+                      alt="AI skin scan"
                       className="w-full h-full object-cover opacity-80"
+                    />
+                  )}
+                  {selectedOverlay && (
+                    <img
+                      src={selectedOverlay.imageUrl || selectedOverlay.url}
+                      alt={`${selectedCondition} scan overlay`}
+                      className="absolute inset-0 h-full w-full object-cover pointer-events-none"
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
                   <div className="absolute bottom-6 left-8 md:bottom-10 md:left-12">
                     <p className="text-[9px] font-black tracking-[0.4em] text-[#4DB6AC] mb-2">Scan Successful</p>
                     <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter leading-none text-white">
-                      Diagnostic <br /> <span className="text-[#E1784F]">Report</span>
+                      Skin Analysis <br /> <span className="text-[#E1784F]">Report</span>
                     </h2>
                   </div>
                 </div>
 
-                {/* BLURRED CONTENT WRAPPER */}
+                {/* PUBLIC RESULTS: keep the initial scan visible without requiring an account. */}
                 <div className="relative border-t border-black/5 dark:border-white/5">
-                  {/* LOCK OVERLAY */}
-                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-8 bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-md">
-                    <ShieldCheck size={48} className="text-[#E1784F] mb-4" />
-                    <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter text-center mb-2">Analysis Complete</h3>
-                    <p className="text-xs md:text-sm font-medium opacity-80 text-center max-w-sm mb-8 leading-relaxed">
-                      Your skin analysis has verified results. Sign up to unlock your full clinical diagnosis and a precise personalized routine.
-                    </p>
-                    <button
-                      onClick={() => router.push('/register')}
-                      className="w-full max-w-xs bg-[#4DB6AC] text-black h-14 rounded-2xl font-black tracking-[0.2em] uppercase text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-                    >
-                      Unlock My Results <ArrowRight size={14} />
-                    </button>
-                    <button
-                      onClick={() => setResults(null)}
-                      className="mt-6 text-[9px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-all"
-                    >
-                      Scan Again
-                    </button>
-                  </div>
-
-                  {/* ACTUAL CONTENT (BLURRED OUT) */}
-                  <div className="opacity-20 select-none pointer-events-none">
-                    <div className="p-8 md:p-12 space-y-8 max-h-[60vh] overflow-y-auto no-scrollbar print:max-h-none">
-                      {/* FORMATTED CLINICAL FINDINGS */}
+                  <div className="p-8 md:p-12 space-y-8 max-h-[60vh] overflow-y-auto no-scrollbar print:max-h-none">
+                      {Array.isArray(results.conditions) && results.conditions.length > 0 && (
+                        <section aria-label="Skin appearance focus areas" className="space-y-4">
+                          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50">Skin focus areas</h3>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedCondition(null)}
+                              aria-pressed={selectedCondition === null}
+                              className={`rounded-full px-4 py-2 text-xs font-bold transition-colors ${selectedCondition === null ? "bg-black text-white dark:bg-white dark:text-black" : "bg-black/5 dark:bg-white/10"}`}
+                            >All areas</button>
+                            {results.conditions.map((condition: any, index: number) => {
+                              const label = typeof condition === "string" ? condition : condition?.name || condition?.label || condition?.condition || `Area ${index + 1}`
+                              return (
+                                <button
+                                  key={`${label}-${index}`}
+                                  type="button"
+                                  onClick={() => setSelectedCondition(label)}
+                                  aria-pressed={selectedCondition === label}
+                                  className={`rounded-full px-4 py-2 text-xs font-bold transition-colors ${selectedCondition === label ? "bg-[#E1784F] text-white" : "bg-black/5 dark:bg-white/10"}`}
+                                >{label}</button>
+                              )
+                            })}
+                          </div>
+                          {selectedCondition && (
+                            <p className="rounded-2xl bg-[#E1784F]/10 p-4 text-sm font-medium">
+                              <strong>{selectedCondition}</strong>
+                              {selectedConditionData?.description && `: ${selectedConditionData.description}`}
+                              {selectedConditionData?.confidence != null && ` · Confidence: ${Math.round(Number(selectedConditionData.confidence) * (Number(selectedConditionData.confidence) <= 1 ? 100 : 1))}%.`}
+                            </p>
+                          )}
+                        </section>
+                      )}
+                      {/* FORMATTED scan findings */}
                       <div className="space-y-6">
                     {results.description ? (
                       results.description.split('\n').map((line: string, index: number) => {
@@ -391,10 +419,9 @@ export default function PublicScanner() {
                         );
                       })
                     ) : (
-                      <p className="text-center opacity-40 italic">Processing clinical details...</p>
+                      <p className="text-center opacity-40 italic">Preparing your skin analysis...</p>
                     )}
-                  </div>
-
+                      </div>
                   {/* METADATA SUMMARY */}
                   <div className="flex justify-between items-center py-6 px-8 bg-gray-50 dark:bg-white/5 rounded-3xl">
                     <div className="text-left">
@@ -426,20 +453,18 @@ export default function PublicScanner() {
                   </div>
 
                   <button
-                    onClick={() => router.push('/register')}
-                    className="w-full bg-[#4DB6AC] text-black h-16 rounded-[1.5rem] font-black tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-                  >
-                    Create Profile to Track History <ArrowRight size={14} />
-                  </button>
-
-                  <button
-                    onClick={() => router.push(`/marketplace?focus=${results.finding}`)}
+                    onClick={() => router.push(`/marketplace?focus=${encodeURIComponent(results.finding || "")}`)}
                     className="w-full bg-[#E1784F] text-white h-16 rounded-[1.5rem] font-black tracking-[0.2em] text-[10px] shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                   >
                     View Recommended Products <ArrowRight size={14} />
                   </button>
+                  <button
+                    onClick={() => router.push('/appointment')}
+                    className="w-full border border-black/10 dark:border-white/15 h-16 rounded-[1.5rem] font-black tracking-[0.2em] text-[10px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                  >
+                    Consult a Specialist <ArrowRight size={14} />
+                  </button>
                 </div>
-              </div>
               </div>
               </div>
             </motion.div>
