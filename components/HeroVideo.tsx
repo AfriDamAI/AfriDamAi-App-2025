@@ -128,7 +128,7 @@ export default function HeroVideo() {
               </span>
             </h1>
 
-            {/* Refined Clinical Copy */}
+            {/* Refined Brand Copy */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -147,7 +147,7 @@ export default function HeroVideo() {
             >
               <a
                 href="/public-scan"
-                className="group inline-flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-md border border-white/30 border-2 px-7 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-[#E1784F] hover:border-[#E1784F] active:scale-95"
+                className="group inline-flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-md border-2 border-white/30 px-7 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-[#E1784F] hover:border-[#E1784F] active:scale-95"
               >
                 Start Skin Scan
                 <svg
