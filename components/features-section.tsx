@@ -19,7 +19,7 @@ const features = [
   {
     icon: <ShieldCheck className="text-[#E1784F]" size={32} />,
     title: "Privacy Protocol",
-    description: "Clinical-grade AES-256 encryption. Your scan data is anonymized and never sold to third parties.",
+    description: "AES-256 encryption helps protect your skin analysis data. Your scan data is anonymized and never sold to third parties.",
   },
 ]
 

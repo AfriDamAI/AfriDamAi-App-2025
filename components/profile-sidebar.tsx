@@ -117,7 +117,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
                           {user.profile.primaryConcern}
                        </span>
                     ) : (
-                       <p className="text-[9px] font-bold text-muted-foreground italic uppercase">No clinical alerts.</p>
+                       <p className="text-[9px] font-bold text-muted-foreground italic uppercase">No skin care alerts.</p>
                     )}
                   </div>
                 </div>

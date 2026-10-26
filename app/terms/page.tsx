@@ -79,7 +79,7 @@ export default function TermsAndConditionsPage() {
             className="space-y-10 bg-white/[0.025] border border-white/10 rounded-3xl p-6 sm:p-10 md:p-12 backdrop-blur-2xl shadow-2xl"
           >
             <p className="text-white/80 text-base md:text-lg leading-relaxed md:leading-loose border-b border-white/10 pb-8 font-normal">
-              Welcome to AfriDam AI Clinical Access. These Clinical & Platform Terms govern your access to and use of our AI skin scanning tools, marketplace, and clinical diagnostic platform. By accessing our services, you agree to comply with the terms set forth below.
+              Welcome to the AfriDam AI Beauty & Aesthetics Platform. These Platform Terms govern your access to and use of our AI skin analysis tools, marketplace, and personalized beauty services. By accessing our services, you agree to comply with the terms set forth below.
             </p>
 
             {/* Section 1: Eligibility */}
@@ -91,21 +91,21 @@ export default function TermsAndConditionsPage() {
                 </h2>
               </div>
               <p className="text-white/70 text-sm md:text-base leading-relaxed pl-9">
-                You must be at least 18 years old to create an independent account or execute purchases on the AfriDam AI platform. Minors under the age of 18 are permitted to use the AI scanner or book clinical consultations strictly under the direct supervision of a parent or legal guardian.
+                You must be at least 18 years old to create an independent account or execute purchases on the AfriDam AI platform. Minors under the age of 18 are permitted to use the AI scanner or book specialist consultations strictly under the direct supervision of a parent or legal guardian.
               </p>
             </div>
 
-            {/* Section 2: Medical Disclaimer */}
+            {/* Section 2: Beauty & Wellness Notice */}
             <div className="p-6 md:p-8 bg-gradient-to-br from-[#E1784F]/15 via-black/40 to-[#4DB6AC]/10 rounded-2xl border border-[#E1784F]/30 space-y-5 shadow-xl">
               <div className="flex items-center gap-3.5">
                 <Stethoscope className="text-[#E1784F] shrink-0" size={26} />
                 <h2 className="text-[#E1784F] font-black uppercase text-base md:text-lg tracking-[0.18em]">
-                  2. Crucial Medical Disclaimer
+                  2. Beauty & Wellness Notice
                 </h2>
               </div>
               <ul className="text-white/80 text-sm md:text-base leading-relaxed space-y-3 pl-2">
-                <li>• <strong className="text-white font-bold">Informational & Educational Guidance Only:</strong> The AfriDam AI Skin Scanner, Ingredient Analyzer, and algorithmic recommendations are digital intelligence tools provided solely for cosmetic, informational, and educational guidance.</li>
-                <li>• <strong className="text-white font-bold">Not a Formal Medical Diagnosis:</strong> AI scan outputs and risk flags do not constitute a formal medical diagnosis, definitive treatment plan, or digital prescription.</li>
+                <li>• <strong className="text-white font-bold">Beauty & Wellness Guidance Only:</strong> The AfriDam AI Skin Scanner, Ingredient Analyzer, and algorithmic recommendations are digital tools provided for beauty, personal care, informational, and educational guidance.</li>
+                <li>• <strong className="text-white font-bold">Not a Medical Service:</strong> AI scan outputs and risk flags are not medical evaluations, treatment plans, or prescriptions. AfriDam AI is not a licensed medical device or a substitute for professional care.</li>
                 <li>• <strong className="text-white font-bold">Emergency Medical Care:</strong> AfriDam AI is not designed for acute or emergency medical conditions. If you are experiencing severe, painful, or rapidly worsening skin conditions, seek immediate in-person evaluation from a certified healthcare facility.</li>
               </ul>
             </div>
@@ -119,7 +119,7 @@ export default function TermsAndConditionsPage() {
                 </h2>
               </div>
               <p className="text-white/70 text-sm md:text-base leading-relaxed pl-9">
-                While our computer vision algorithms are continuously trained on over 40,000+ dark skin clinical images (Fitzpatrick Scale IV–VI), scanning precision remains subject to ambient lighting, camera sensor quality, and image focus. Diagnostic outputs are guidance metrics rather than guaranteed clinical outcomes.
+                While our computer vision algorithms are continuously trained on over 40,000+ dark skin photos (Fitzpatrick Scale IV–VI), skin analysis results can vary with lighting, camera quality, and image focus. Results are general guidance and do not guarantee a particular skin outcome.
               </p>
             </div>
 
@@ -132,7 +132,7 @@ export default function TermsAndConditionsPage() {
                 </h2>
               </div>
               <ul className="text-white/70 text-sm md:text-base leading-relaxed pl-9 space-y-3">
-                <li>• <strong className="text-white font-semibold">Technology Marketplace Role:</strong> AfriDam AI operates as a curated technology marketplace connecting users with verified skincare vendors and specialist medical consultations.</li>
+                <li>• <strong className="text-white font-semibold">Technology Marketplace Role:</strong> AfriDam AI operates as a curated technology marketplace connecting users with approved skincare retailers and specialist consultations.</li>
                 <li>• <strong className="text-white font-semibold">Vendor Responsibilities:</strong> Independent third-party vendors remain solely responsible for product formulation, quality assurance, inventory compliance, packaging, and delivery.</li>
                 <li>• <strong className="text-white font-semibold">Dispute Resolution:</strong> AfriDam AI provides dispute resolution support for damaged products, incorrect items, or delivery failures reported within 48 hours of order receipt.</li>
               </ul>
@@ -171,7 +171,7 @@ export default function TermsAndConditionsPage() {
               <div className="p-5 md:p-6 bg-[#4DB6AC]/10 rounded-2xl border border-[#4DB6AC]/25 shadow-lg">
                 <p className="text-white/90 text-sm md:text-base leading-relaxed font-medium">
                   <span className="text-[#4DB6AC] font-black uppercase tracking-wider block sm:inline mr-2">Binding Agreement:</span> 
-                  By continuing to use AfriDam AI, creating an account, or scheduling clinical consultations, you acknowledge that you have read, understood, and agreed to be legally bound by these Clinical & Platform Terms.
+                  By continuing to use AfriDam AI, creating an account, or scheduling specialist consultations, you acknowledge that you have read, understood, and agreed to be legally bound by these Platform & Beauty Services Terms.
                 </p>
               </div>
             </div>

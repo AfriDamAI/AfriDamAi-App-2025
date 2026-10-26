@@ -15,7 +15,7 @@ interface MobileAccountSheetProps {
 /**
  * 📱 MOBILE ACCOUNT SHEET
  * Slide-up bottom sheet that surfaces the actions hidden behind the
- * lg-only sidebar / md-only profile dropdown: Clinical Diary, Settings,
+ * lg-only sidebar / md-only profile dropdown: skin journal, Settings,
  * Theme toggle and Sign Out. Tap the backdrop or the grab handle to dismiss.
  */
 export function MobileAccountSheet({ isOpen, onClose }: MobileAccountSheetProps) {
@@ -94,7 +94,7 @@ export function MobileAccountSheet({ isOpen, onClose }: MobileAccountSheetProps)
                                 className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-foreground bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/[0.12] transition-all"
                             >
                                 <History size={20} className="text-[#E1784F] shrink-0" />
-                                <span className="text-xs font-bold uppercase tracking-widest">Clinical Diary</span>
+                                <span className="text-xs font-bold uppercase tracking-widest">Skin Journal</span>
                             </button>
 
                             <button

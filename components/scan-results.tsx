@@ -1,5 +1,5 @@
 /**
- * 🛡️ AFRIDAM SCAN RESULTS: CLINICAL UI (Rule 7 Precision Sync)
+ * 🛡️ AFRIDAM SCAN RESULTS: SKIN ANALYSIS UI (Rule 7 Precision Sync)
  * Version: 2026.1.25
  * Focus: High-Precision Diary Sync & Mobile-First Result Display.
  */
@@ -162,7 +162,7 @@ export default function ScanResults({ result, onNewScan }: ScanResultsProps) {
          <div className="space-y-1">
             <p className="text-[9px] font-black uppercase tracking-widest text-white">Safe Note</p>
             <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-white/70 leading-relaxed">
-              This scan is for wellness guidance only. It is not a clinical diagnosis. Always speak with an expert for medical concerns.
+              This scan offers beauty and wellness insights, not medical advice or treatment. For health concerns, consult a qualified healthcare professional.
             </p>
          </div>
       </div>

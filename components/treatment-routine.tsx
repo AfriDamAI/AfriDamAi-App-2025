@@ -67,7 +67,7 @@ export function TreatmentRoutine() {
       <div className="pt-6">
         <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6 flex items-center gap-3">
           <Droplets className="w-4 h-4 text-[#E1784F]" />
-          Clinical Product Match
+          Personalized Product Match
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {routine.products.map((product, idx) => (

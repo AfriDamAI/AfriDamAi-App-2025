@@ -26,7 +26,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as Theme | null
     
-    // 🛡️ SYNERGY: Default to dark for the 2026 Clinical Intelligence Hub
+    // 🛡️ SYNERGY: Default to dark for the 2026 Skin & Aesthetics Hub
     const initialTheme = savedTheme || "dark"
 
     setTheme(initialTheme)

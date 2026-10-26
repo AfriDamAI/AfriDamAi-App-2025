@@ -24,7 +24,7 @@ export default function SecurityPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
-  const [diagnosticSharingOverride, setDiagnosticSharingOverride] = useState<boolean | null>(null)
+  const [skinAnalysisSharingOverride, setSkinAnalysisSharingOverride] = useState<boolean | null>(null)
   const [privacyLoading, setPrivacyLoading] = useState(false)
 
   const [passwords, setPasswords] = useState({
@@ -33,8 +33,8 @@ export default function SecurityPage() {
     confirm: ""
   })
 
-  const savedDiagnosticSharing = (user?.profile as any)?.diagnosticSharing
-  const diagnosticSharing = diagnosticSharingOverride ?? (typeof savedDiagnosticSharing === "boolean" ? savedDiagnosticSharing : true)
+  const savedSkinAnalysisSharing = (user?.profile as any)?.diagnosticSharing
+  const skinAnalysisSharing = skinAnalysisSharingOverride ?? (typeof savedSkinAnalysisSharing === "boolean" ? savedSkinAnalysisSharing : true)
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -75,9 +75,9 @@ export default function SecurityPage() {
     }
   }
 
-  const handleToggleDiagnosticSharing = async () => {
-    const nextValue = !diagnosticSharing
-    setDiagnosticSharingOverride(nextValue)
+  const handleToggleSkinAnalysisSharing = async () => {
+    const nextValue = !skinAnalysisSharing
+    setSkinAnalysisSharingOverride(nextValue)
     setPrivacyLoading(true)
 
     try {
@@ -194,21 +194,21 @@ export default function SecurityPage() {
              
              <div className="flex items-center justify-between py-2">
                 <div className="space-y-1">
-                   <p className="text-[10px] font-black uppercase tracking-tight">Diagnostic Sharing</p>
+                   <p className="text-[10px] font-black uppercase tracking-tight">Beauty & Aesthetics Data Sharing</p>
                    <p className="text-[8px] font-bold uppercase opacity-30 tracking-tighter">Anonymously help our AI improve for African skin</p>
                 </div>
                 <button
                   type="button"
-                  onClick={handleToggleDiagnosticSharing}
+                  onClick={handleToggleSkinAnalysisSharing}
                   disabled={privacyLoading}
-                  aria-pressed={diagnosticSharing}
-                  aria-label="Toggle diagnostic sharing"
+                  aria-pressed={skinAnalysisSharing}
+                  aria-label="Toggle beauty and aesthetics data sharing"
                   className={`w-12 h-6 rounded-full relative transition-all disabled:opacity-60 disabled:cursor-wait ${
-                    diagnosticSharing ? "bg-[#4DB6AC]" : "bg-gray-200 dark:bg-white/10"
+                    skinAnalysisSharing ? "bg-[#4DB6AC]" : "bg-gray-200 dark:bg-white/10"
                   }`}
                 >
                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
-                    diagnosticSharing ? "right-1" : "left-1"
+                    skinAnalysisSharing ? "right-1" : "left-1"
                    }`} />
                 </button>
              </div>

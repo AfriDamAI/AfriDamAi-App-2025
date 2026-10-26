@@ -149,7 +149,7 @@ export default function FaqChatbot() {
     {
       id: "welcome-1",
       sender: "bot",
-      text: "Hello! 👋 I am Godspower, the AfriDam AI Virtual Assistant. Ask me about skin scans, personalized routines, dermatologist consultations, or B2B integrations.",
+      text: "Hello! 👋 I am Dami, the AfriDam AI Virtual Assistant. Ask me about skin scans, personalized routines, dermatologist consultations, or B2B integrations.",
       // This message renders on both server and client, which can use different time zones.
       time: "Now"
     }

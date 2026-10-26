@@ -62,7 +62,7 @@ function ProductCard({ products, onClick }: { products: Product[]; onClick?: (pr
                     className={`bg-card border border-border rounded-[2.5rem] hover:border-[#E1784F]/40 transition-all duration-500 overflow-hidden group shadow-sm hover:shadow-2xl ${onClick ? 'cursor-pointer' : ''}`}
                     {...(onClick && !onClick.toString().includes('handleAddToCart') && { onClick: () => onClick(product) })}
                 >
-                    {/* 🛡️ RE-ENFORCED: Product Image with Clinical Overlay */}
+                    {/* 🛡️ RE-ENFORCED: Product Image with Product Image Overlay */}
                     <div className="relative bg-muted aspect-square overflow-hidden">
                         <Image
                             src={product.thumbnail || "/placeholder.svg"}
@@ -76,14 +76,14 @@ function ProductCard({ products, onClick }: { products: Product[]; onClick?: (pr
                         </div>
                     </div>
 
-                    {/* 🛡️ RE-ENFORCED: Bold Clinical Typography */}
+                    {/* 🛡️ RE-ENFORCED: Bold Product Typography */}
                     <div className="p-8 space-y-4">
                         <div className="space-y-1">
                             <h3 className="text-lg font-black italic uppercase tracking-tighter text-foreground leading-tight group-hover:text-[#E1784F] transition-colors">
                                 {product.name}
                             </h3>
                             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#4DB6AC]">
-                                Clinical Supply • {product.unit}
+                                Product Supply • {product.unit}
                             </p>
                         </div>
 

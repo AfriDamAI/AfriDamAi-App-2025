@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * 🛡️ AFRIDAM CLINICAL IMAGE VAULT
- * Optimized for Mobile Webviews and High-Res Clinical Scans.
+ * 🛡️ AFRIDAM skin photos VAULT
+ * Optimized for Mobile Webviews and High-Resolution Skin Scans.
  */
 
 const STORAGE_KEY = "afridam_clinical_vault";
@@ -70,7 +70,7 @@ export function getStoredImages(): StoredImage[] {
     const parsed = JSON.parse(data);
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
-    console.error("Clinical Vault Retrieval Error:", error);
+    console.error("Skin Image Vault Retrieval Error:", error);
     return [];
   }
 }
@@ -86,7 +86,7 @@ export function deleteImage(id: string): void {
     const filtered = images.filter((img) => img.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
   } catch (error) {
-    console.error("Clinical Vault Delete Error:", error);
+    console.error("Skin Image Vault Delete Error:", error);
   }
 }
 

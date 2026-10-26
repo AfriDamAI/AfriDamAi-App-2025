@@ -1,5 +1,5 @@
 /**
- * 🛡️ AFRIDAM CLINICAL CONSOLE: APPOINTMENTS (Rule 7 Sync)
+ * 🛡️ AFRIDAM SPECIALIST CONSOLE: APPOINTMENTS (Rule 7 Sync)
  * Version: 2026.1.4 (Handshake & Sync Alignment)
  * Focus: High-Precision Specialist Access & Billing Handshake.
  */
@@ -47,7 +47,7 @@ export function AppointmentView() {
       // Rule 7: Unpack resultData if present via interceptor
       setAppointmentHistory(response.data || []);
     } catch (err) {
-      console.error("Clinical history sync failed.");
+      console.error("skin history sync failed.");
     }
   };
 
@@ -72,7 +72,7 @@ export function AppointmentView() {
       if (checkoutUrl) {
         window.location.href = checkoutUrl;
       } else {
-        throw new Error("Clinical gateway handshake failed.");
+        throw new Error("specialist service connection failed.");
       }
     } catch (error) {
       console.error("Payment Initialization Failed.");
@@ -90,7 +90,7 @@ export function AppointmentView() {
         <p className="text-[#4DB6AC] font-black uppercase text-[10px] tracking-[0.5em] mb-12">
           Priority Session <span className="text-white">Live Now</span>
         </p>
-        <Button onClick={() => router.push('/specialist')} className="w-full md:w-auto bg-white text-black h-20 px-12 rounded-[2rem] font-black uppercase text-[11px] tracking-[0.4em] shadow-2xl transition-all">Open Clinical Chat</Button>
+        <Button onClick={() => router.push('/specialist')} className="w-full md:w-auto bg-white text-black h-20 px-12 rounded-[2rem] font-black uppercase text-[11px] tracking-[0.4em] shadow-2xl transition-all">Open Specialist Chat</Button>
       </div>
     );
   }
@@ -107,7 +107,7 @@ export function AppointmentView() {
               activeTab === tab ? 'text-[#E1784F]' : 'opacity-30 hover:opacity-100 text-white'
             }`}
           >
-            {tab === 'book' ? (hasSubscription ? "Clinical Console" : "Specialist Access") : "Session Archive"}
+            {tab === 'book' ? (hasSubscription ? "Specialist Console" : "Specialist Access") : "Session Archive"}
             {activeTab === tab && (
               <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-1 bg-[#E1784F] rounded-full" />
             )}
@@ -136,7 +136,7 @@ export function AppointmentView() {
                     </div>
                     <h3 className="text-4xl font-black italic uppercase tracking-tighter">Starter <br/> Access</h3>
                     <p className="opacity-40 text-[10px] font-black uppercase leading-loose tracking-[0.2em]">
-                      Clinical Sync. Expert Support. <br/> Permanent Archive.
+                      Session Sync. Expert Support. <br/> Permanent Archive.
                     </p>
                   </div>
                   <div className="space-y-8 relative z-10">
@@ -189,12 +189,12 @@ export function AppointmentView() {
                       <Stethoscope size={48} className="text-white" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-5xl font-black italic uppercase tracking-tighter">Clinical Console</h3>
+                      <h3 className="text-5xl font-black italic uppercase tracking-tighter">Specialist Console</h3>
                       <p className="text-[#4DB6AC] text-[11px] font-black uppercase tracking-[0.6em]">Specialist Network Online</p>
                     </div>
                   </div>
                   <p className="text-black/40 dark:text-white/40 font-black text-sm max-w-xl leading-relaxed uppercase tracking-[0.2em]">
-                    Your premium clinical link is active. Our specialist network is ready to review your neural scan history and care diary.
+                    Your premium specialist link is active. Our network is ready to review your skin analysis history and care journal.
                   </p>
                   <Button onClick={() => router.push('/specialist')} className="w-full md:w-auto h-24 px-16 bg-black dark:bg-white text-white dark:text-black rounded-[2.5rem] font-black uppercase text-[12px] tracking-[0.5em] hover:bg-[#4DB6AC] hover:text-white transition-all shadow-2xl group">
                     Enter Live Channel <ChevronRight className="ml-2 group-hover:translate-x-2 transition-transform" />
@@ -216,7 +216,7 @@ export function AppointmentView() {
             </div>
             <div className="space-y-2">
                <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white">No Past Sessions</h3>
-               <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 italic text-white">Clinical Archive is currently at standby.</p>
+               <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 italic text-white">Session Archive is currently on standby.</p>
             </div>
           </motion.div>
         )}

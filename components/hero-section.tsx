@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM HOME CONTENT (Rule 6 Synergy)
  * Version: 2026.1.22 (Bypass Integration)
- * Focus: High-Precision Direct Routing & Clinical Disclaimers.
+ * Focus: High-Precision Direct Routing & Wellness Guidance.
  */
 
 "use client";
@@ -53,7 +53,7 @@ export default function HomePageContent() {
               <div className="inline-flex items-center gap-2 w-fit px-4 py-2 rounded-full bg-[#E1784F]/10 border border-[#E1784F]/20">
                 <Sparkles size={14} className="text-[#E1784F]" />
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E1784F]">
-                  Clinical Intelligence
+                  Beauty & Aesthetics Intelligence
                 </span>
               </div>
 

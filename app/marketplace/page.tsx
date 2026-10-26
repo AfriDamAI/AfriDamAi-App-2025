@@ -13,6 +13,7 @@ import { useAuth } from "@/providers/auth-provider"
 import { useCart } from "@/hooks/use-cart"
 import { CartItem } from "@/lib/types"
 import { toast } from "sonner"
+import { readGuestScanSnapshot, type GuestScanSnapshot } from "@/lib/guest-flow-storage"
 
 interface Product {
   id: string;
@@ -63,6 +64,7 @@ export default function MarketplacePage() {
   const [isSearchEmpty, setIsSearchEmpty] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState<string | null>(null);
+  const [guestScan, setGuestScan] = useState<GuestScanSnapshot | null>(null)
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const latestTermRef = useRef("");
@@ -70,6 +72,10 @@ export default function MarketplacePage() {
   useEffect(() => {
     if (user) fetchCart(user.id);
   }, [user, fetchCart]);
+
+  useEffect(() => {
+    setGuestScan(readGuestScanSnapshot())
+  }, [])
 
   useEffect(() => {
     const init = async () => {
@@ -266,6 +272,27 @@ export default function MarketplacePage() {
               Supporting your skin journey with products that feel like home.
             </p>
           </div>
+
+          {guestScan && (
+            <section className="rounded-3xl border border-[#4DB6AC]/25 bg-[#4DB6AC]/5 p-5 md:p-6 space-y-3" aria-label="Your recent scan result">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#4DB6AC]">Your recent skin scan</p>
+              <h2 className="text-xl md:text-2xl font-black italic tracking-tight">{guestScan.finding || "Your scan result"}</h2>
+              {guestScan.description && <p className="text-sm leading-relaxed text-foreground/70 line-clamp-3">{guestScan.description}</p>}
+              {Array.isArray(guestScan.conditions) && guestScan.conditions.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {guestScan.conditions.map((condition: any, index) => {
+                    const label = typeof condition === "string" ? condition : condition?.name || condition?.label || condition?.condition
+                    return label ? <span key={`${label}-${index}`} className="rounded-full bg-black/5 dark:bg-white/10 px-3 py-1 text-[10px] font-bold">{label}</span> : null
+                  })}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => router.push("/public-scan?restoreScan=1")}
+                className="text-[9px] font-black uppercase tracking-[0.2em] text-[#E1784F] hover:underline"
+              >View full scan result</button>
+            </section>
+          )}
 
           {/* ── SEARCH + FILTER ── */}
           <div className="space-y-4">

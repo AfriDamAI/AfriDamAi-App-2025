@@ -33,9 +33,9 @@ export default function RootLayout({
         {/* 📱 VIEWPORT OPTIMIZATION - Mobile First (Rule 3) */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
 
-        {/* 🛡️ CLINICAL BRANDING */}
+        {/* 🛡️ BEAUTY & AESTHETICS BRANDING */}
         <title>AfriDam AI | Melanin-Rich Skin Intelligence</title>
-        <meta name="description" content="Clinical-grade AI diagnostics and verified skincare regimens for the African family." />
+        <meta name="description" content="AI-powered beauty and aesthetics insights with personalized skincare routines for the African family." />
         <meta name="theme-color" content="#050505" />
 
         <link rel="icon" href="/logo.png" />

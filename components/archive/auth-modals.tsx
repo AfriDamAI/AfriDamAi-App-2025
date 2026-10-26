@@ -1,5 +1,5 @@
 /**
- * 🛡️ AFRIDAM CLINICAL ACCESS: AUTH MODALS
+ * 🛡️ AFRIDAM specialist access: AUTH MODALS
  * Version: 2026.1.5 (World-Class & Mobile-First)
  * Handshake: Fully synced with lib/api-client.ts
  * Focus: High-Contrast, Mature Typography, Rule 8 Compliance.
@@ -87,7 +87,7 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
         setSuccess("RECOVERY NODE INITIALIZED. CHECK EMAIL.")
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "ENGINE ROOM TIMEOUT. RETRY.");
+      setError(err.response?.data?.message || "MODEL SERVICE TIMEOUT. RETRY.");
     } finally {
       setIsLoading(false)
     }
@@ -118,7 +118,7 @@ export function AuthModals({ isOpen, onClose, type: initialType }: AuthModalsPro
           
           <header className="flex justify-between items-start mb-12">
             <div className="space-y-2">
-              <p className="text-[10px] font-black text-[#E1784F] uppercase tracking-[0.4em]">Clinical Access</p>
+              <p className="text-[10px] font-black text-[#E1784F] uppercase tracking-[0.4em]">specialist access</p>
               <h2 className="text-5xl md:text-7xl font-black text-black dark:text-white uppercase italic tracking-tighter leading-none">
                 {authView === "signin" ? "Enter" : authView === "signup" ? "Join" : "Recover"}
               </h2>

@@ -13,7 +13,7 @@ export interface Product {
     references?: string[]
 }
 
-// 🛡️ RE-ENFORCED: Clinical Mock Data (Aligned with AI Results)
+// 🛡️ RE-ENFORCED: Product Mock Data (Aligned with AI Results)
 export const mockedProducts: Product[] = [
     {
         id: "prod_001",
@@ -58,14 +58,14 @@ export function OurProductsSection() {
         <section className="py-24 md:py-32 bg-background transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
-                {/* 🏷️ SECTION HEADER: BOLD CLINICAL STYLE */}
+                {/* 🏷️ SECTION HEADER: BOLD PRODUCT STYLE */}
                 <div className="text-left mb-20 border-l-4 border-[#E1784F] pl-8">
                     <div className="inline-flex items-center gap-3 bg-[#E1784F]/10 text-[#E1784F] px-4 py-2 rounded-full mb-6">
                         <Sparkles className="w-4 h-4" />
                         <span className="text-[10px] font-black uppercase tracking-[0.4em]">Neural Marketplace</span>
                     </div>
                     <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-foreground mb-6">
-                        The Clinical <span className="text-[#E1784F]">Collection.</span>
+                        The Beauty & Aesthetics <span className="text-[#E1784F]">Collection.</span>
                     </h2>
                     <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl leading-relaxed uppercase tracking-tight">
                         Vetted protocols crafted with nourishing African botanicals, optimized by AI for melanin-rich skin.

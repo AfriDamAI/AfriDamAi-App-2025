@@ -49,7 +49,7 @@ export async function loadModel(): Promise<void> {
       await tf.setBackend("cpu")
     }
 
-    /** * 🚀 OGA FIX: In production, use the clinical graph model
+    /** * 🚀 OGA FIX: In production, use the skin analysis graph model
      * model = await tf.loadGraphModel('/models/skin_v1/model.json')
      **/
 
@@ -86,13 +86,13 @@ function preprocessImage(imageData: string): any {
 }
 
 /**
- * Simulate model prediction with Clinical Bias
+ * Simulate model prediction with prediction variation
  */
 function simulateModelPrediction(imageData: any): SkinAnalysisOutput {
   const conditions: SkinConditionPrediction[] = [
     {
       condition: "Hyperpigmentation",
-      confidence: Math.random() * 0.2 + 0.75, // High bias for clinical relevance
+      confidence: Math.random() * 0.2 + 0.75, // High bias for skin analysis relevance
       severity: "mild" as SeverityLevel,
     },
     {

@@ -9,6 +9,7 @@
 import { useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
+import { consumeAuthReturnTo, saveAuthReturnTo } from "@/lib/guest-flow-storage"
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -32,7 +33,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const isAuthPage = pathname === "/login" || pathname === "/register"
 
   useEffect(() => {
-    // 🔍 OGA DIAGNOSTIC
+    // 🔍 OGA skin analysis
     // console.log("🛡️ GUARD_CHECK:", { pathname, isSignedIn, isLoading });
 
     if (isLoading) return
@@ -41,6 +42,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     // 1. GUEST GATE: If NOT signed in and trying to hit a PRIVATE page (like /dashboard)
     if (!isSignedIn && !isPublicPath) {
+      saveAuthReturnTo(`${window.location.pathname}${window.location.search}${window.location.hash}`)
       console.log("🚫 Access Blocked: Redirecting to Landing");
       router.replace("/login") // Move to login instead of root to avoid home loops
       return
@@ -49,7 +51,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     // 2. AUTH BYPASS: If IS signed in and trying to hit /login or /register
     if (isSignedIn && isAuthPage) {
       console.log("✅ Already In: Redirecting to Dashboard");
-      router.replace("/dashboard")
+      router.replace(consumeAuthReturnTo())
       return
     }
 

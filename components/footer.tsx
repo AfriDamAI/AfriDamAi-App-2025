@@ -88,16 +88,16 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* 🧬 2. CLINICAL NODE (Accordion on Mobile) */}
+          {/* 🧬 2. BEAUTY & AESTHETICS LINKS (Accordion on Mobile) */}
           <div className="md:col-span-2 border-b border-border/40 md:border-none pb-4 md:pb-0">
             <button 
-              onClick={() => toggleSection('clinical')}
+              onClick={() => toggleSection('beauty')}
               className="w-full flex items-center justify-between md:cursor-default md:pointer-events-none"
             >
-              <h3 className="text-[11px] font-black tracking-[0.5em] text-[#E1784F] uppercase">Clinical</h3>
-              <ChevronDown size={16} className={`md:hidden text-[#E1784F] transition-transform duration-300 ${openSection === 'clinical' ? 'rotate-180' : ''}`} />
+              <h3 className="text-[11px] font-black tracking-[0.5em] text-[#E1784F] uppercase">Beauty & Aesthetics</h3>
+              <ChevronDown size={16} className={`md:hidden text-[#E1784F] transition-transform duration-300 ${openSection === 'beauty' ? 'rotate-180' : ''}`} />
             </button>
-            <div className={`overflow-hidden transition-all duration-300 md:max-h-none md:opacity-100 ${openSection === 'clinical' ? 'max-h-48 opacity-100 mt-6' : 'max-h-0 opacity-0 md:mt-8'}`}>
+            <div className={`overflow-hidden transition-all duration-300 md:max-h-none md:opacity-100 ${openSection === 'beauty' ? 'max-h-48 opacity-100 mt-6' : 'max-h-0 opacity-0 md:mt-8'}`}>
               <ul className="space-y-5">
                 {[
                   { label: "Skin Scanner", href: "/ai-scanner" },

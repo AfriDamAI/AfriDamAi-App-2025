@@ -163,7 +163,7 @@ export const EditProfileForm = ({
         nationality: finalNationality,
       });
 
-      // Update Clinical Profile Fields
+      // Update skin profile Fields
       await updateProfile({
         ageRange: Number(formData.ageRange),
         skinType: formData.skinType,
@@ -180,7 +180,7 @@ export const EditProfileForm = ({
       if (onSuccess) onSuccess();
       setTimeout(() => setSuccess(false), 4000);
     } catch (error) {
-      console.error("Clinical Profile Sync Failed:", error);
+      console.error("skin profile Sync Failed:", error);
     } finally {
       setLoading(false);
     }
@@ -200,7 +200,7 @@ export const EditProfileForm = ({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div className="space-y-1">
           <h2 className="text-4xl font-black italic uppercase tracking-tighter text-foreground leading-none">Profile Sync</h2>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Clinical Architecture & Dermal History</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E1784F]">Skin Care History & Preferences</p>
         </div>
 
         <AnimatePresence>
@@ -283,11 +283,11 @@ export const EditProfileForm = ({
             </div>
           </div>
 
-          {/* 🧬 CLINICAL NODE */}
+          {/* 🧬 SKIN PROFILE */}
           <div className="space-y-6">
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <Activity className="text-[#4DB6AC]" size={16} strokeWidth={3} />
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Clinical Node</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Skin Profile</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -326,7 +326,7 @@ export const EditProfileForm = ({
             />
 
             <TagInput
-              label="Clinical History / Treatments"
+              label="skin history / Treatments"
               placeholder="Type & Press Enter..."
               value={formData.previousTreatments}
               onChange={(tags) => setFormData({ ...formData, previousTreatments: tags })}
@@ -344,13 +344,13 @@ export const EditProfileForm = ({
           <textarea
             name="allergies" value={formData.allergies} onChange={handleChange}
             rows={2} className="w-full bg-muted/20 border border-border rounded-2xl p-6 text-xs font-bold outline-none focus:border-[#E1784F] transition-all resize-none h-28"
-            placeholder="Document detailed raw clinical observations here..."
+            placeholder="Add notes about skin care products and appearance here..."
           />
         </div>
 
         <div className="pt-10 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-[9px] text-muted-foreground font-medium max-w-sm uppercase tracking-tighter">
-            Updating your clinical profile will recalibrate the AI diagnostic engine for your next scan.
+            Updating your skin profile will recalibrate the AI skin analysis model for your next scan.
           </p>
           <button type="submit" disabled={loading} className="w-full md:w-auto px-16 h-16 bg-[#E1784F] text-white rounded-2xl font-black uppercase text-[11px] tracking-[0.4em] shadow-[0_15px_30px_rgba(225,120,79,0.25)] hover:bg-[#d06b45] active:scale-[0.98] transition-all flex items-center justify-center gap-4 disabled:opacity-50">
             {loading ? <Loader2 className="animate-spin" size={18} /> : (

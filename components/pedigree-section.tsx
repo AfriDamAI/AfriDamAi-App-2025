@@ -26,7 +26,7 @@ const certifications = [
   },
   {
     icon: ShieldCheck,
-    title: "Clinical Standards",
+    title: "beauty and wellness guidance",
     text: "Supported by an international team of medical specialists and skin experts to keep our software accurate and safe.",
     color: "#E1784F"
   }
@@ -35,7 +35,7 @@ const certifications = [
 // 🔢 COUNT-UP CONFIG
 const stats = [
   { target: 14000, decimals: 0, prefix: "", suffix: "+", label: "People Reached (4 Months)", icon: Users, color: "#E1784F" },
-  { target: 40000, decimals: 0, prefix: "", suffix: "+", label: "Dark Skin Clinical Images", icon: TestTube, color: "#4DB6AC" },
+  { target: 40000, decimals: 0, prefix: "", suffix: "+", label: "Dark Skin skin photos", icon: TestTube, color: "#4DB6AC" },
   { target: 5.2, decimals: 1, prefix: "", suffix: "B", label: "Global Dark Skin Population", icon: Globe2, color: "#E1784F" },
   { target: 100, decimals: 0, prefix: "", suffix: "%", label: "Fully Working System", icon: CheckCircle, color: "#4DB6AC" }
 ]

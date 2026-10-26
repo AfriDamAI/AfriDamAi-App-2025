@@ -24,7 +24,7 @@ const INQUIRY_TYPES = [
   { value: "general", label: "General Support" },
   { value: "ai-consultation", label: "Dermal Analysis Help" },
   { value: "product", label: "Care Shop Support" },
-  { value: "partnership", label: "Clinical Partnerships" },
+  { value: "partnership", label: "Beauty & Aesthetics Partnerships" },
 ] as const;
 
 const initialFormData: FormData = {
@@ -96,7 +96,7 @@ export function ContactForm() {
               Message Sent
             </h3>
             <p className="text-[9px] font-black tracking-[0.4em] opacity-40 leading-relaxed max-w-[240px] mx-auto">
-              Our clinical team will reach out to you shortly.
+              Our beauty and aesthetics team will reach out to you shortly.
             </p>
           </motion.div>
         ) : (

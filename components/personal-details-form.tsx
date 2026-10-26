@@ -246,7 +246,7 @@ export const PersonalDetailsForm = ({
       {/* HEADER */}
       <div className="space-y-2">
         <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter">
-          Clinical <span className="text-[#E1784F]">Handshake</span>
+          Beauty & Aesthetics <span className="text-[#E1784F]">Handshake</span>
         </h2>
         <p className="text-black/40 dark:text-white/40 text-xs font-black uppercase tracking-[0.3em]">
           Dermal Architecture & Health Context
@@ -347,11 +347,11 @@ export const PersonalDetailsForm = ({
             />
           </div>
 
-          {/* 🧬 CLINICAL NODE */}
+          {/* 🧬 SKIN PROFILE */}
           <div className="space-y-6">
             <div className="flex items-center gap-3 border-b border-black/5 dark:border-white/5 pb-4">
               <Activity className="text-[#4DB6AC]" size={16} strokeWidth={3} />
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Clinical Node</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground italic">Skin Profile</h3>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -464,7 +464,7 @@ export const PersonalDetailsForm = ({
         {/* 🚀 SUBMIT NODE */}
         <div className="pt-10 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-[9px] text-muted-foreground font-medium max-w-sm uppercase tracking-tighter">
-            Your clinical data is protected by Rule 7 sync and used only for AI analysis.
+            Your skin and account data is protected by Rule 7 sync and used only for AI analysis.
           </p>
           <button type="submit" disabled={loading} className="w-full md:w-auto px-16 h-16 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase text-[11px] tracking-[0.4em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-50">
             {loading ? <Loader2 className="animate-spin" size={18} /> : (

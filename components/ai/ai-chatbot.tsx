@@ -144,7 +144,7 @@ export function AIChatBot() {
       setMessages(prev => [...prev, {
         id: "error",
         role: "assistant",
-        content: "I'm having trouble reaching the clinical database. Please check your signal and try again."
+        content: "I'm having trouble reaching the skin care databases. Please check your signal and try again."
       }]);
     } finally {
       setIsTyping(false);
@@ -290,7 +290,7 @@ export function AIChatBot() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Inquire about clinical safety..."
+                  placeholder="Ask about skin care and ingredient safety..."
                   className="w-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[2rem] px-8 py-6 text-sm font-bold outline-none focus:border-[#4DB6AC] transition-all placeholder:opacity-20 shadow-inner"
                 />
                 <button

@@ -1,7 +1,7 @@
 /**
  * 🛡️ AFRIDAM WELLNESS HUB: TAB SECTION (Rule 7 Sync)
  * Version: 2026.1.5 (Handshake & Note Persistence)
- * Focus: High-Precision Data entry for the Clinical Diary.
+ * Focus: High-Precision Data entry for the skin journal.
  */
 
 "use client"

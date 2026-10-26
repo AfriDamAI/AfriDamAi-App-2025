@@ -16,7 +16,7 @@ const teamMembers = [
   {
     name: "Dr. Anand Urhekar",
     role: "Chief Medical Officer (CMO)",
-    bio: "Dermatologist leading our clinical strategy and doctor network to keep our scanner medically safe.",
+    bio: "Dermatologist leading our dermatology strategy and doctor network to keep our scanner medically safe.",
     image: "/pics/anadu.png",
     badgeColor: "#4DB6AC",
     imagePosition: "object-center"
@@ -24,7 +24,7 @@ const teamMembers = [
   {
     name: "Dr. Rasheedah Adesokan",
     role: "Founding Dermatologist",
-    bio: "Consultant dermatologist guiding our clinical review and medical accuracy.",
+    bio: "Consultant dermatologist guiding our specialist review and medical accuracy.",
     image: "/pics/Rasheedah.png",
     badgeColor: "#E1784F",
     imagePosition: "object-[center_20%] scale-110 sm:scale-100"
@@ -52,7 +52,7 @@ export default function TeamMemberSection() {
           </div>
 
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-tight text-black dark:text-white">
-            Expertise Behind<span className="text-[#4DB6AC]">The Brand</span>
+            Meet the <span className="text-[#4DB6AC]">Team</span>
           </h2>
 
           <p className="text-[15px] font-bold opacity-30 tracking-widest max-w-lg mx-auto leading-relaxed">

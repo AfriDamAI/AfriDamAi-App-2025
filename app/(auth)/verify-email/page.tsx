@@ -6,6 +6,7 @@ import { useAuth } from "@/providers/auth-provider"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { consumeAuthReturnTo } from "@/lib/guest-flow-storage"
 
 function VerifyEmailForm() {
   const { verifyRegister } = useAuth()
@@ -36,7 +37,7 @@ function VerifyEmailForm() {
         return
       }
       await verifyRegister(email, verificationCode)
-      router.replace("/dashboard")
+      router.replace(consumeAuthReturnTo())
     } catch (err: any) {
       setError(err?.response?.data?.message || err.message || "We couldn't process your request. Please check your details and try again.")
     } finally {

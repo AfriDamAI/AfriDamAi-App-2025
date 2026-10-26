@@ -32,7 +32,7 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
   
   /**
    * 🛡️ THE HANDSHAKE SYNC (Rule 7)
-   * Prioritize clinical indices from the verified pipeline.
+   * Prioritize skin analysis indicators from the verified pipeline.
    */
   const healthIndex = data.overallHealth || data.overall_health || data.overallGlow || data.overall_glow || 85;
   const findings = data.finding || "Scan complete. Your profile suggests maintaining your current safe hydration routine.";
@@ -109,7 +109,7 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
         </div>
       </div>
 
-      {/* 📜 3. CLINICAL SUMMARY */}
+      {/* 📜 3. SKIN ANALYSIS SUMMARY */}
       <div className="space-y-3 px-2">
         <h3 className="text-md md:text-lg font-black italic uppercase tracking-tighter text-[#E1784F]">AI Interpretation</h3>
         <Card className="p-6 md:p-8 bg-[#E1784F]/5 border-[#E1784F]/10 rounded-[2rem]">
@@ -147,7 +147,7 @@ export default function SkinAnalysisResults({ data }: SkinAnalysisResultsProps) 
         <div className="space-y-1">
           <p className="text-[8px] font-black text-foreground uppercase tracking-[0.2em]">Safe Note</p>
           <p className="text-[8px] font-bold leading-relaxed text-muted-foreground uppercase tracking-tight">
-            These results are for wellness guidance only. They do not replace a clinical consultation. If you have concerns, speak with a specialist.
+            These results offer beauty and wellness guidance, not medical advice or treatment. For health concerns, speak with a qualified healthcare professional.
           </p>
         </div>
       </div>

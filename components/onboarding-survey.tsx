@@ -59,7 +59,7 @@ export function OnboardingSurvey({ onComplete }: { onComplete: () => void }) {
                 Preparing <span className="text-[#4DB6AC]">Dashboard</span>
              </h2>
              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">
-                Direct Clinical Access
+                Direct Specialist Access
              </p>
           </div>
        </motion.div>

@@ -14,6 +14,7 @@ import {
   ArrowRight, Binary, Fingerprint, Search, SwitchCamera
 } from "lucide-react"
 import { analyzePublicSkin } from "@/lib/api-client"
+import { clearGuestScanSnapshot, readGuestScanSnapshot, saveGuestScanSnapshot } from "@/lib/guest-flow-storage"
 
 export default function PublicScanner() {
   const router = useRouter()
@@ -32,6 +33,16 @@ export default function PublicScanner() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("restoreScan") !== "1") return
+
+    const savedScan = readGuestScanSnapshot()
+    if (savedScan) {
+      setResults(savedScan)
+      setStatus("Analysis Restored")
+    }
+  }, [])
 
   const selectedConditionData = Array.isArray(results?.conditions)
     ? results.conditions.find((condition: any) =>
@@ -157,6 +168,7 @@ export default function PublicScanner() {
         id: data?.id || "TEMP-" + Date.now()
       };
 
+      saveGuestScanSnapshot(analysisData)
       setResults(analysisData);
       setStatus("Analysis Complete")
     } catch (err: any) {
@@ -445,7 +457,7 @@ export default function PublicScanner() {
                       Save PDF
                     </button>
                     <button
-                      onClick={() => setResults(null)}
+                      onClick={() => { clearGuestScanSnapshot(); setResults(null); }}
                       className="bg-gray-100 dark:bg-white/5 h-16 rounded-[1.5rem] font-black text-[9px] tracking-widest active:scale-95 transition-all"
                     >
                       New Scan

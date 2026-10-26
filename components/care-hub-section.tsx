@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 const careHubItems = [
   {
     title: "AI Skin Scan",
-    description: "Instant clinical-grade scanning designed to analyze skin health and texture.",
+    description: "Instant AI skin analysis designed to explore appearance, skin texture and personalized routines.",
     icon: Camera,
     accent: "#E1784F",
     tile: "bg-[#3A2A24]",

@@ -59,7 +59,7 @@ export default function ProfilePage() {
       await mutate()
       window.location.reload()
     } catch (err) {
-      console.error("Clinical Profile Sync Error:", err)
+      console.error("skin profile Sync Error:", err)
     } finally {
       setUploadingAvatar(false)
     }
@@ -177,12 +177,12 @@ export default function ProfilePage() {
                  <ShieldCheck className="text-[#4DB6AC]" size={24} />
                  <div className="space-y-1">
                     <p className="text-[10px] font-black uppercase tracking-widest text-[#4DB6AC]">Privacy Guard Active</p>
-                    <p className="text-[8px] font-bold opacity-40">Your data is encrypted and synced with our clinical engine.</p>
+                    <p className="text-[8px] font-bold opacity-40">Your data is encrypted and synced with your skin profile.</p>
                  </div>
               </div>
             </div>
 
-            {/* RIGHT COLUMN: CLINICAL DATA */}
+            {/* RIGHT COLUMN: skin and account data */}
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-[2.5rem] p-8 md:p-10 space-y-10 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
@@ -191,8 +191,8 @@ export default function ProfilePage() {
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="space-y-2">
-                    <h3 className="text-3xl font-black italic uppercase tracking-tighter">Clinical Profile</h3>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">AI-Diagnostic Context</p>
+                    <h3 className="text-3xl font-black italic uppercase tracking-tighter">skin profile</h3>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Skin & Aesthetics Profile</p>
                   </div>
                   
                   {hasProfile ? (
@@ -297,7 +297,7 @@ export default function ProfilePage() {
                     <div className="space-y-2">
                       <h4 className="text-xl font-black italic uppercase tracking-tighter">No Profile Found</h4>
                       <p className="text-[10px] font-bold opacity-40 max-w-xs uppercase tracking-widest leading-loose">
-                        Your clinical metrics are empty. Create a profile to unlock personalized AI analysis.
+                        Your skin appearance insights are empty. Create a profile to unlock personalized AI analysis.
                       </p>
                     </div>
                   </div>

@@ -1,5 +1,5 @@
 /**
- * 🛡️ AFRIDAM CLINICAL AUTH TYPES (Rule 6 Synergy)
+ * 🛡️ AFRIDAM AUTH TYPES (Rule 6 Synergy)
  * Version: 2026.1.9 (Full Schema Alignment)
  * Focus: High-Precision Type alignment for the Intelligence Hub.
  */
