@@ -1,6 +1,6 @@
 /**
  * 🛡️ AFRIDAM ASSET RECOVERY (Rule 7 Sync)
- * Version: 2026.1.4 (Clinical Fallback Alignment)
+ * Version: 2026.1.4 (Image Fallback Alignment)
  * Focus: High-Contrast Resilience for Vendor & Scan Assets.
  */
 
@@ -26,7 +26,7 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
     const handleError = () => {
         setDidError(true)
         // Rule 3: Maintain silent internal logging
-        console.warn(`Clinical Asset Handshake Failed: ${src}`)
+        console.warn(`Image Asset Load Failed: ${src}`)
     }
 
     if (didError || !src) {

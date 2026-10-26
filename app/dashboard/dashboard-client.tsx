@@ -40,7 +40,7 @@ export default function Dashboard() {
         const data = response?.data || response || []
         setHistory(Array.isArray(data) ? data : [])
       } catch (err) {
-        console.error("Clinical Diary sync pending...")
+        console.error("skin journal sync pending...")
       } finally {
         setLoadingHistory(false)
       }
@@ -50,7 +50,7 @@ export default function Dashboard() {
 
   const config = {
     reference: `AFR-${Date.now()}`,
-    email: user?.email || "clinical@afridamai.com",
+    email: user?.email || "hello@afridamai.com",
     amount: 15 * 100 * 1650,
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_test_sample",
   }
@@ -66,7 +66,7 @@ export default function Dashboard() {
     } catch (err: any) {
       const status = err?.response?.status
       if (status === 403 || status === 401) {
-        setReportError("Upgrade to a premium plan to access your full diagnostic report.")
+        setReportError("Upgrade to a premium plan to access your full skin analysis report.")
       } else {
         setReportError("Unable to load this report. Please try again.")
       }
@@ -155,7 +155,7 @@ export default function Dashboard() {
 
           <section className="space-y-5 text-left pb-6">
             <div className="flex items-center justify-between px-3">
-              <h4 className="text-[9px] font-black tracking-[0.4em] opacity-30">Clinical Diary</h4>
+              <h4 className="text-[9px] font-black tracking-[0.4em] opacity-30">skin journal</h4>
               <button
                 onClick={() => !isRestrictedPlan && router.push('/history')}
                 disabled={isRestrictedPlan}
@@ -167,7 +167,7 @@ export default function Dashboard() {
             {isRestrictedPlan && (
               <div className="px-3 py-2 bg-[#E1784F]/10 rounded-xl border border-[#E1784F]/20">
                 <p className="text-[8px] font-bold text-[#E1784F] tracking-wide">
-                  🔒 Upgrade your plan to access Clinical Diary history
+                  🔒 Upgrade your plan to access skin journal history
                 </p>
               </div>
             )}
@@ -191,7 +191,7 @@ export default function Dashboard() {
                           {loadingRecord === scan.id ? <Loader2 size={20} className="animate-spin" /> : <Zap size={22} />}
                         </div>
                         <div>
-                          <h5 className="text-[11px] font-black italic tracking-tight leading-none mb-0.5">{scan.label || "Diagnostic Review"}</h5>
+                          <h5 className="text-[11px] font-black italic tracking-tight leading-none mb-0.5">{scan.label || "Skin Analysis Review"}</h5>
                           <p className="text-[8px] font-bold opacity-30 tracking-widest">{new Date(scan.createdAt).toLocaleDateString()}</p>
                         </div>
                       </div>
@@ -205,7 +205,7 @@ export default function Dashboard() {
                   ))
                 ) : (
                   <div className="py-16 text-center bg-gray-50 dark:bg-white/5 rounded-[2.5rem] border-2 border-dashed border-black/5 dark:border-white/5">
-                    <p className="text-[9px] font-black tracking-[0.3em] opacity-20">Your Clinical Diary is empty</p>
+                    <p className="text-[9px] font-black tracking-[0.3em] opacity-20">Your skin journal is empty</p>
                   </div>
                 )}
               </AnimatePresence>
@@ -238,7 +238,7 @@ export default function Dashboard() {
                 {selectedRecord.imageUrl && (
                   <img
                     src={`${process.env.NEXT_PUBLIC_API_URL || 'https://afridam-backend-prod-107032494605.us-central1.run.app'}/${selectedRecord.imageUrl}`}
-                    alt="Clinical Scan"
+                    alt="AI skin scan"
                     className="w-full h-full object-cover opacity-60"
                   />
                 )}
@@ -252,7 +252,7 @@ export default function Dashboard() {
                 <div className="absolute bottom-6 left-8">
                   <p className="text-[8px] font-black tracking-[0.3em] text-[#4DB6AC] mb-1">Verified Analysis</p>
                   <h2 className="text-2xl md:text-4xl font-black italic tracking-tighter text-white leading-none">
-                    Diagnostic <span className="text-[#E1784F]">Report</span>
+                    Skin Analysis <span className="text-[#E1784F]">Report</span>
                   </h2>
                 </div>
               </div>
@@ -273,7 +273,7 @@ export default function Dashboard() {
                       return <p key={i} className="text-[11px] md:text-[13px] font-medium leading-relaxed opacity-70 dark:text-gray-300">{cleanLine}</p>;
                     })
                   ) : (
-                    <p className="text-center opacity-30 italic text-sm">Clinical details pending verification.</p>
+                    <p className="text-center opacity-30 italic text-sm">Skin analysis details are being prepared.</p>
                   )}
                 </div>
               </div>

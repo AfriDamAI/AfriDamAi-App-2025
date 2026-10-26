@@ -1,5 +1,5 @@
 /**
- * 🛡️ AFRIDAM CLINICAL SCANNER (Rule 7 Precision Sync)
+ * 🛡️ AFRIDAM AI SKIN SCANNER (Rule 7 Precision Sync)
  * Version: 2026.1.25
  * Focus: High-Precision Image Handshake & Mobile-First Result Mapping.
  */
@@ -35,16 +35,41 @@ export default function UnifiedScanner() {
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
   const [isTorchOn, setIsTorchOn] = useState(false)
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
+  const [hasRestoredResults, setHasRestoredResults] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  // Keep the completed report for this tab so it survives navigation away from
+  // the scanner without storing the potentially large captured image.
+  useEffect(() => {
+    try {
+      const savedResults = sessionStorage.getItem("afridam_last_scan_results")
+      if (savedResults) setResults(JSON.parse(savedResults))
+    } catch (error) {
+      console.warn("Unable to restore the previous scan report", error)
+    } finally {
+      setHasRestoredResults(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!hasRestoredResults || !results) return
+
+    try {
+      const { image: _image, ...report } = results
+      sessionStorage.setItem("afridam_last_scan_results", JSON.stringify(report))
+    } catch (error) {
+      console.warn("Unable to save the scan report for this session", error)
+    }
+  }, [hasRestoredResults, results])
+
   /** 🛡️ RULE 4: Simple Language. No Medical Jargon. */
   const analysisSteps = [
     { icon: <Scan size={16} />, text: "Checking Image Clarity" },
     { icon: <Fingerprint size={16} />, text: "Detecting Patterns" },
-    { icon: <Binary size={16} />, text: "Matching Clinical Data" },
+    { icon: <Binary size={16} />, text: "Matching skin care insights" },
     { icon: <Search size={16} />, text: "Building Your Skin Diary" },
     { icon: <ShieldCheck size={16} />, text: "Finalizing Safe Routine" }
   ];
@@ -370,7 +395,7 @@ export default function UnifiedScanner() {
               </div>
             </div>
           ) : (
-            /* 📊 UPDATED: CLINICAL DIAGNOSTIC RESULT HUB */
+            /* 📊 UPDATED: SKIN ANALYSIS RESULT HUB */
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -383,7 +408,7 @@ export default function UnifiedScanner() {
                   {imgSource && (
                     <img
                       src={imgSource}
-                      alt="Clinical Scan"
+                      alt="AI skin scan"
                       className="w-full h-full object-cover opacity-80"
                     />
                   )}
@@ -391,13 +416,13 @@ export default function UnifiedScanner() {
                   <div className="absolute bottom-6 left-8 md:bottom-10 md:left-12">
                     <p className="text-[9px] font-black tracking-[0.4em] text-[#4DB6AC] mb-2">Scan Successful</p>
                     <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter leading-none text-white">
-                      Diagnostic <br /> <span className="text-[#E1784F]">Report</span>
+                      Skin Analysis <br /> <span className="text-[#E1784F]">Report</span>
                     </h2>
                   </div>
                 </div>
 
                 <div className="p-8 md:p-12 space-y-8 max-h-[60vh] overflow-y-auto no-scrollbar print:max-h-none">
-                  {/* FORMATTED CLINICAL FINDINGS */}
+                  {/* FORMATTED scan findings */}
                   <div className="space-y-6">
                     {results.description ? (
                       results.description.split('\n').map((line: string, index: number) => {
@@ -420,7 +445,7 @@ export default function UnifiedScanner() {
                         );
                       })
                     ) : (
-                      <p className="text-center opacity-40 italic">Processing clinical details...</p>
+                      <p className="text-center opacity-40 italic">Preparing your skin analysis...</p>
                     )}
                   </div>
 
@@ -453,7 +478,10 @@ export default function UnifiedScanner() {
                       Download PDF
                     </button>
                     <button
-                      onClick={() => setResults(null)}
+                      onClick={() => {
+                        sessionStorage.removeItem("afridam_last_scan_results")
+                        setResults(null)
+                      }}
                       className="bg-gray-100 dark:bg-white/5 h-16 rounded-[1.5rem] font-black text-[9px] tracking-widest active:scale-95 transition-all"
                     >
                       New Scan

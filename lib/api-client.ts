@@ -13,7 +13,7 @@ const aiURL = "https://afridam-ai2-api-131829695574.us-central1.run.app/api/v1";
 // 🖼️ ASSET HIERARCHY: Synced with Google Cloud Storage / NestJS static uploads
 export const STORAGE_BASE_URL = "https://afridam-backend-prod-107032494605.us-central1.run.app/";
 
-/** 🖼️ HELPER: Generates a full URL for clinical assets stored on the backend **/
+/** 🖼️ HELPER: Generates a full URL for skin image assets stored on the backend **/
 export const getImageUrl = (path?: string | null): string => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
@@ -285,7 +285,7 @@ export const getSpecialistById = async (id: string) => {
 //     user_activeness_on_app: "moderate" 
 //   }));
   
-//   const response = await axios.post(`${aiURL}/skin-diagnosis`, formData, {
+//   const response = await axios.post(`${aiURL}/skin-medical evaluation`, formData, {
 //     headers: { "Content-Type": "multipart/form-data" },
 //   });
 //   return response.data;
@@ -318,6 +318,7 @@ export interface GetProductsParams {
   limit?: number;
   restockedSince?: string;
   createdSince?: string;
+
 }
 
 export const getProducts = async (params?: GetProductsParams) => {
@@ -357,7 +358,7 @@ export const deleteScanResult = async (resultId: string) => {
     return response.data;
 };
 
-/** 🔬 PUBLIC AI SKIN DIAGNOSIS WITHOUT AUTHENTICATION **/
+/** 🔬 PUBLIC AI SKIN medical evaluation WITHOUT AUTHENTICATION **/
 export const analyzePublicSkin = async (imgSource: string) => {
   const formData = new FormData();
   
@@ -369,8 +370,10 @@ export const analyzePublicSkin = async (imgSource: string) => {
   const ia = new Uint8Array(ab);
   for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
   const blob = new Blob([ab], { type: mimeString });
-  
-  formData.append("file", blob, "scan_capture.jpg");
+
+  // Keep the uploaded filename extension consistent with the selected image MIME type.
+  const imageExtension = mimeString.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+  formData.append("file", blob, `scan_capture.${imageExtension}`);
   
   const response = await fetch(`${baseURL}/v1/saas/scan`, {
     method: 'POST',
@@ -382,7 +385,11 @@ export const analyzePublicSkin = async (imgSource: string) => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Analysis failed. Please try again.');
+    const rawMessage = errorData.message || errorData.error?.message || errorData.errors;
+    const message = Array.isArray(rawMessage) ? rawMessage.join("; ") : rawMessage;
+    throw new Error(message
+      ? `${message} (HTTP ${response.status})`
+      : `Scan request failed (HTTP ${response.status}). Please try again.`);
   }
 
   // NestJS may wrap it in resultData, but Saas API might just return the object.
@@ -391,7 +398,7 @@ export const analyzePublicSkin = async (imgSource: string) => {
   return data.resultData ? data.resultData : data;
 };
 
-/** 🔬 AI SKIN DIAGNOSIS WITH USER CONTEXT **/
+/** 🔬 AI SKIN medical evaluation WITH USER CONTEXT **/
 export const analyzeSkinWithUserData = async (imgSource: string, userContext: any) => {
   const formData = new FormData();
   

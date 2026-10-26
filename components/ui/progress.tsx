@@ -4,7 +4,7 @@ import * as React from "react"
 import * as ProgressPrimitive from "@radix-ui/react-progress"
 import { cn } from "@/lib/utils"
 
-// 🛡️ RE-ENFORCED: Adding indicatorClassName to allow clinical color shifts
+// 🛡️ RE-ENFORCED: Adding indicatorClassName to set the progress color
 interface ProgressProps extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
   indicatorClassName?: string;
 }

@@ -8,7 +8,7 @@ const products = [
     {
         id: 1,
         name: "AI Melanin Serum",
-        category: "Clinical Serums",
+        category: "Aesthetic Serums",
         description: "Advanced hydration protocol calibrated for melanin-rich skin types.",
         image: "https://images.unsplash.com/photo-1643379850623-7eb6442cd262?q=80&w=1080",
         price: "₦89",
@@ -30,7 +30,7 @@ const products = [
         description: "Intensive therapy for hyperpigmentation and uneven tones.",
         image: "https://images.unsplash.com/photo-1629051192950-d251e96ab1b0?q=80&w=1080",
         price: "₦75",
-        tag: "Clinical"
+        tag: "Beauty & Aesthetics"
     },
     {
         id: 4,
@@ -52,13 +52,13 @@ export function ProductShowcase() {
                 <div className="text-left mb-20 border-l-4 border-[#E1784F] pl-8">
                     <div className="inline-flex items-center gap-3 bg-[#E1784F]/10 text-[#E1784F] px-4 py-2 rounded-full mb-6">
                         <Sparkles className="w-4 h-4" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Neural Recommendation Engine</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Neural Recommendation Model</span>
                     </div>
                     <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter text-foreground mb-6">
                         The Care <span className="text-[#E1784F]">Market.</span>
                     </h2>
                     <p className="text-muted-foreground text-sm font-medium uppercase tracking-tight max-w-2xl leading-relaxed">
-                        Explore clinical-grade products vetted for the safety of African skin. Every selection is matched to your AI scan profile.
+                        Explore beauty and aesthetics products selected for African skin. Every selection is matched to your AI skin analysis profile.
                     </p>
                 </div>
 
@@ -91,7 +91,7 @@ export function ProductShowcase() {
                                 <div className="flex items-center justify-between pt-4 border-t border-border">
                                     <span className="text-lg font-black italic text-foreground">{product.price}</span>
                                     <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#E1784F] hover:gap-3 transition-all">
-                                        View Clinicals <ArrowRight className="w-4 h-4" />
+                                        View Products <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
@@ -110,7 +110,7 @@ export function ProductShowcase() {
                                 Sync Your <span className="text-[#4DB6AC]">Routine.</span>
                             </h3>
                             <p className="text-sm font-medium text-muted-foreground leading-relaxed uppercase tracking-tight">
-                                Our AI creates a customized clinical routine based on your scan. Stop guessing and start using products vetted for your phenotype.
+                                Our AI creates a personalized beauty and aesthetics routine based on your scan. Find products selected for your skin profile.
                             </p>
                             <button
                                 onClick={() => window.location.href = '/ai-scanner'}

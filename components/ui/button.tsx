@@ -12,7 +12,7 @@ const buttonVariants = cva(
       variant: {
         // 🛡️ RE-ENFORCED: AfriDam Primary Orange
         default: "bg-[#E1784F] text-white shadow-xl shadow-[#E1784F]/20 hover:bg-[#C55A32] italic",
-        // 🛡️ RE-ENFORCED: Clinical Teal
+        // 🛡️ RE-ENFORCED: Teal Brand Color
         clinical: "bg-[#4DB6AC] text-white shadow-xl shadow-[#4DB6AC]/20 hover:bg-[#3d9189] italic",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20",

@@ -30,7 +30,7 @@ export default function LoginPage() {
 
     try {
       await auth.signIn(credentials)
-      router.replace("/dashboard")
+      // AuthGuard returns the user to the page that originally required sign-in.
     } catch (err: any) {
       const message =
         err.response?.data?.message ||

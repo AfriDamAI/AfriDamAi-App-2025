@@ -1,6 +1,6 @@
 /**
  * 🛡️ AFRIDAM NAVIGATION
- * Focus: High-Speed Clinical Navigation, Smooth Anchor Scrolling & Mobile Path Sync.
+ * Focus: High-Speed Main Navigation, Smooth Anchor Scrolling & Mobile Path Sync.
  */
 
 "use client";
@@ -82,7 +82,6 @@ export default function Navigation({
   const navLinks = user
     ? [
         { href: "/dashboard", label: "Dashboard" },
-        { href: "/public-scan", label: "AI Scan" },
         { href: "/marketplace", label: "Care Hub" },
         { href: "/contact", label: "Support" },
       ]
@@ -115,7 +114,7 @@ export default function Navigation({
               />
               <div className="hidden sm:flex flex-col border-l border-border/50 pl-3">
                 <span className="text-xs font-bold uppercase tracking-widest text-[#E1784F]">
-                  Clinical
+                  Beauty & Aesthetics
                 </span>
               </div>
             </Link>
@@ -225,7 +224,7 @@ export default function Navigation({
                   className="h-9 w-auto object-contain"
                 />
                 <span className="text-xs font-bold uppercase tracking-widest text-[#E1784F]">
-                  Clinical
+                  Beauty & Aesthetics
                 </span>
               </Link>
 

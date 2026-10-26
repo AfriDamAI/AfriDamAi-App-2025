@@ -221,7 +221,7 @@ export default function IngredientCheckerPage() {
               </div>
             </div>
             <p className="text-[11px] font-medium leading-relaxed opacity-60 max-w-sm">
-              Verify every chemical. Our AI checks ingredients against skin-safe clinical databases to ensure your heritage skin is always protected.
+              Verify every chemical. Our AI checks ingredients against skin-safe ingredient references to ensure your heritage skin is always protected.
             </p>
             <div className="space-y-3 max-w-sm">
               <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-[1.5rem] border border-black/5 dark:border-white/10 flex items-start gap-3">
@@ -239,7 +239,7 @@ export default function IngredientCheckerPage() {
               </button>
             </div>
           </div>
-          <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-20">© 2026 AFRIDAM AI CLINICAL LABORATORIES</p>
+          <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-20">© 2026 AFRIDAM AI BEAUTY & AESTHETICS</p>
         </div>
 
         {/* Desktop Right: Chat */}
@@ -250,7 +250,7 @@ export default function IngredientCheckerPage() {
             </div>
             <div>
               <h3 className="text-[10px] font-black uppercase tracking-widest">Analysis Stream</h3>
-              <p className="text-[7px] font-black uppercase tracking-[0.15em] opacity-30">Secured Clinical Handshake</p>
+              <p className="text-[7px] font-black uppercase tracking-[0.15em] opacity-30">Secure Data Connection</p>
             </div>
           </div>
 
@@ -307,7 +307,7 @@ export default function IngredientCheckerPage() {
               </button>
             </div>
             <div className="mt-3 flex items-center justify-center opacity-20">
-              <p className="text-[7px] font-black uppercase tracking-[0.2em]">Melanin Safe Check • Clinical Labs • 2026</p>
+              <p className="text-[7px] font-black uppercase tracking-[0.2em]">Melanin Safe Check • Beauty & Aesthetics • 2026</p>
             </div>
           </div>
         </div>

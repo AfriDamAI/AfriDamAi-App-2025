@@ -131,7 +131,7 @@ function ChartTooltipContent({
 
     if (labelFormatter) {
       return (
-        /* 🛡️ RE-ENFORCED: Clinical Brand Styling */
+        /* 🛡️ RE-ENFORCED: Brand Styling */
         <div className={cn("font-black italic uppercase tracking-tighter text-[#E1784F]", labelClassName)}>
           {labelFormatter(value, payload)}
         </div>

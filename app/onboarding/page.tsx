@@ -17,12 +17,12 @@ import {
 } from "lucide-react"
 
 const STEPS = [
-  { id: "welcome", title: "Welcome", subtitle: "Let's personalize your clinical experience" },
+  { id: "welcome", title: "Welcome", subtitle: "Let's personalize your skin care experience" },
   { id: "age", title: "Metrics", subtitle: "Biological data for AI precision" },
   { id: "skin-type", title: "Skin Type", subtitle: "Identify your dermal category" },
   { id: "skin-tone", title: "Skin Tone", subtitle: "Fitzpatrick scale alignment" },
   { id: "concerns", title: "History", subtitle: "Allergies and previous treatments" },
-  { id: "complete", title: "Syncing", subtitle: "Securing your clinical identity" }
+  { id: "complete", title: "Syncing", subtitle: "Securing your account" }
 ]
 
 const SKIN_TYPES = [
@@ -264,7 +264,7 @@ export default function OnboardingPage() {
                   />
                   <div className="text-center space-y-2">
                     <p className="text-white/80 font-black uppercase text-[11px] tracking-[0.4em]">Finalizing your vault</p>
-                    <p className="text-white/30 font-medium uppercase text-[8px] tracking-widest">Encrypting clinical data nodes...</p>
+                    <p className="text-white/30 font-medium uppercase text-[8px] tracking-widest">Securing your profile details...</p>
                   </div>
                 </div>
               )}

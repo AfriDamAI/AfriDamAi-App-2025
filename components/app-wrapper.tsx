@@ -10,7 +10,6 @@ import { useState, useEffect } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { useAuth } from "@/providers/auth-provider"
 import Navigation from "@/components/navigation"
-import Footer from "@/components/footer"
 import { ProfileSidebar } from "@/components/profile-sidebar"
 import { MobileNav } from "@/components/mobile-nav"
 import { FloatingScrollNav } from "@/components/floating-scroll-nav"
@@ -40,7 +39,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   const showNav =
     !isFullscreenRoute &&
     (!isAuthRoute || pathname === "/login" || pathname === "/register");
-  const showFooter = !hideFooterRoutes.some(route => pathname.startsWith(route)) && !isFullscreenRoute;
+  // Footer removed from the public layout per design request.
 
   // 🧭 SIDEBAR SYNC: Show on all internal protected pages
   const showSidebar = user && !isAuthRoute && !isFullscreenRoute;
@@ -104,12 +103,6 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
             {children}
           </main>
 
-          {/* 🎯 3. PUBLIC FOOTER */}
-          {showFooter && (
-            <div className="relative z-20">
-              <Footer />
-            </div>
-          )}
         </div>
       </div>
 

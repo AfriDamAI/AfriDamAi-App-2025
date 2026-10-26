@@ -12,7 +12,7 @@ import { useAuth } from "@/providers/auth-provider"
 import { apiClient, getScanHistory, deleteScanResult, getSingleScanResult } from "@/lib/api-client"
 
 /**
- * 🛡️ AFRIDAM CLINICAL DIARY: HISTORY (Rule 6 Synergy)
+ * 🛡️ AFRIDAM skin journal: HISTORY (Rule 6 Synergy)
  * Version: 2026.1.25
  * Focus: High-Precision Backend Handshake & Mobile-First Dermal Records.
  */
@@ -65,7 +65,7 @@ export default function HistoryPage() {
     } catch (err: any) {
       const status = err?.response?.status
       if (status === 403 || status === 401) {
-        setReportError("Upgrade to a premium plan to access your full diagnostic report.")
+        setReportError("Upgrade to a premium plan to access your full skin analysis report.")
       } else {
         setReportError("Unable to load this report. Please try again.")
       }
@@ -125,7 +125,7 @@ export default function HistoryPage() {
               <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter leading-[0.8]">
                 Skin <br /> <span className="text-[#E1784F]">Diary</span>
               </h1>
-              <p className="text-[8px] font-bold tracking-[0.3em] opacity-30">Clinical History Node • {user.firstName}</p>
+              <p className="text-[8px] font-bold tracking-[0.3em] opacity-30">skin history Node • {user.firstName}</p>
             </div>
           </div>
 
@@ -193,7 +193,7 @@ export default function HistoryPage() {
                           <span className="text-[7px] font-bold tracking-widest italic">• {record.id.slice(0, 8)}</span>
                         </div>
                         <h3 className="text-base md:text-lg font-black italic tracking-tighter leading-none">
-                          {record.title || 'Diagnostic Review'}
+                          {record.title || 'Skin Analysis Review'}
                         </h3>
                       </div>
                     </div>
@@ -222,7 +222,7 @@ export default function HistoryPage() {
           )}
         </div>
 
-        {/* MODAL: CLINICAL FINDINGS */}
+        {/* MODAL: scan findings */}
         <AnimatePresence>
           {selectedRecord && (
             <div className="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center p-3 md:p-4 z-[100] overflow-y-auto">
@@ -237,14 +237,14 @@ export default function HistoryPage() {
                   {selectedRecord.imageUrl && (
                     <img
                       src={`/${selectedRecord.imageUrl}`} // Adjust path based on your API/Public folder
-                      alt="Clinical Scan"
+                      alt="AI skin scan"
                       className="w-full h-full object-cover opacity-60"
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
                   <div className="absolute bottom-4 left-5">
                     <h2 className="text-xl font-black italic tracking-tighter text-white">
-                      Diagnostic <span className="text-[#E1784F]">Report</span>
+                      Skin Analysis <span className="text-[#E1784F]">Report</span>
                     </h2>
                     <p className="text-[8px] font-bold tracking-[0.3em] text-[#4DB6AC]">
                       ID: {selectedRecord.id.slice(0, 13)} • {new Date(selectedRecord.createdAt).toLocaleDateString()}
@@ -253,7 +253,7 @@ export default function HistoryPage() {
                 </div>
 
                 <div className="p-5 md:p-8 space-y-5 max-h-[50vh] overflow-y-auto no-scrollbar print:max-h-none">
-                  {/* MAIN DIAGNOSIS PARSING */}
+                  {/* MAIN medical evaluation PARSING */}
                   <section className="space-y-2">
                     {selectedRecord.description ? (
                       selectedRecord.description.split('\n').map((line: string, i: number) => {
@@ -275,7 +275,7 @@ export default function HistoryPage() {
                         );
                       })
                     ) : (
-                      <p className="opacity-30 italic text-center">No detailed clinical description available.</p>
+                      <p className="opacity-30 italic text-center">No detailed skin analysis information available.</p>
                     )}
                   </section>
 
@@ -371,7 +371,7 @@ export default function HistoryPage() {
                 <div className="space-y-1.5">
                   <h3 className="text-base font-black italic tracking-tighter">Delete Record?</h3>
                   <p className="text-[9px] font-bold opacity-40 tracking-widest leading-relaxed">
-                    This clinical record will be permanently erased.
+                    This skin journal entry will be permanently erased.
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">

@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * 🛡️ AFRIDAM CLINICAL PROTOCOLS
+ * 🛡️ AFRIDAM skin care guidance
  * Standardized treatment routines optimized for melanin-rich skin phenotypes.
  */
 

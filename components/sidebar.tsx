@@ -59,7 +59,7 @@ export function Sidebar() {
                 <SidebarItem icon={Scan} label="AI Scanner" path="/ai-scanner" />
                 <SidebarItem icon={MessageSquare} label="Specialists" path="/specialist" onClick={handleSpecialistClick} />
                 <SidebarItem icon={ShoppingBag} label="Market Place" path="/marketplace" />
-                <SidebarItem icon={History} label="Clinical Diary" path="/history" />
+                <SidebarItem icon={History} label="Skin Journal" path="/history" />
                 <SidebarItem icon={Settings} label="Settings" path="/settings" />
             </nav>
             <div className="p-6 bg-gray-50 dark:bg-white/5 rounded-[2.5rem] space-y-4">

@@ -55,7 +55,7 @@ export function UserProfile({ onSignInClick, onSignUpClick, onViewProfileClick }
             {fullName}
           </span>
           <span className="text-[8px] font-bold text-[#4DB6AC] uppercase tracking-widest">
-            {(user as any)?.plan?.name || "Clinical Account"}
+            {(user as any)?.plan?.name || "Beauty & Aesthetics Account"}
           </span>
         </div>
         <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />

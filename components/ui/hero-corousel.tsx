@@ -10,7 +10,7 @@ const slides = [
     id: "s1",
     tagline: "Neural Intelligence",
     title: "AI Powered <br/> Skin Analysis",
-    subtitle: "Handcrafted products vetted by clinical data.",
+    subtitle: "Handcrafted products selected with beauty and skin care insights.",
     img: "/hero-1.jpg",
   },
   {
@@ -67,7 +67,7 @@ export default function HeroCarousel() {
               priority={i === 0}
             />
 
-            {/* 🛡️ RE-ENFORCED: Clinical Gradient Overlay */}
+            {/* 🛡️ RE-ENFORCED: Brand Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-center px-8 md:px-20">
               <div className="max-w-2xl space-y-6">
                 <motion.div 
@@ -103,7 +103,7 @@ export default function HeroCarousel() {
         ))}
       </div>
 
-      {/* 🏛️ CONTROLS: Refined for Clinical Look */}
+      {/* 🏛️ CONTROLS: Refined for Brand Look */}
       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           aria-label="Previous"

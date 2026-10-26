@@ -14,7 +14,7 @@ import { motion } from "framer-motion"
 import { apiClient } from "@/lib/api-client"
 
 /**
- * 🛡️ AFRIDAM NEURAL DIAGNOSTICS: REPORT (Rule 7 Precision Sync)
+ * 🛡️ AFRIDAM SKIN ANALYSIS REPORT (Rule 7 Precision Sync)
  * Version: 2026.1.25
  * Focus: Mobile-First Report Sync & Zero-Flicker Loading.
  */

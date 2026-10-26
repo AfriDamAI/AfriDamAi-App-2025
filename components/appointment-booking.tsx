@@ -1,8 +1,8 @@
 /**
- * 🛡️ AFRIDAM CLINICAL SCHEDULER: BOOKING
+ * 🛡️ AFRIDAM SPECIALIST SCHEDULER: BOOKING
  * Version: 2026.1.3 (Premium Editorial Refactor)
  * Handshake: Ready for NestJS Appointment Node
- * Focus: High-Contrast, Mature Typography, Clinical Integrity.
+ * Focus: High-Contrast, Mature Typography, Session Integrity.
  */
 
 "use client"
@@ -70,7 +70,7 @@ export function AppointmentBooking() {
                 Protocol <br /> <span className="text-[#4DB6AC]">Authorized</span>
               </h3>
               <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40 max-w-[320px] mx-auto leading-loose">
-                Specialist Node Synchronized. <br/> Your Clinical ID has been verified.
+                Specialist connection ready. <br/> Your account has been verified.
               </p>
             </div>
             <div className="flex items-center gap-3 opacity-20">
@@ -85,7 +85,7 @@ export function AppointmentBooking() {
                 <Sparkles className="text-[#4DB6AC]" size={28} />
               </div>
               <div className="space-y-1">
-                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Clinical Reservation</h3>
+                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">specialist booking</h3>
                 <p className="text-[9px] font-black text-[#4DB6AC] uppercase tracking-[0.4em]">Afridam Specialist Node</p>
               </div>
             </div>
@@ -120,10 +120,10 @@ export function AppointmentBooking() {
                     required
                   >
                     <option value="" className="bg-[#050505]">Select Priority Time</option>
-                    <option value="09:00" className="bg-[#050505]">09:00 AM — Clinical Alpha</option>
-                    <option value="11:00" className="bg-[#050505]">11:00 AM — Diagnostic Window</option>
-                    <option value="14:00" className="bg-[#050505]">02:00 PM — Peak Analysis</option>
-                    <option value="16:00" className="bg-[#050505]">04:00 PM — Evening Review</option>
+                    <option value="09:00" className="bg-[#050505]">09:00 AM: Available session</option>
+                    <option value="11:00" className="bg-[#050505]">11:00 AM: Available session</option>
+                    <option value="14:00" className="bg-[#050505]">02:00 PM - Peak Session</option>
+                    <option value="16:00" className="bg-[#050505]">04:00 PM - Evening Session</option>
                   </select>
                   <div className="absolute right-10 top-1/2 -translate-y-1/2 pointer-events-none opacity-20 text-[12px]">▼</div>
                 </div>

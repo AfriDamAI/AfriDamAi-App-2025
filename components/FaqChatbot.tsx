@@ -10,11 +10,9 @@ import {
   RefreshCw, 
   ChevronRight, 
   ShieldCheck,
-  Stethoscope,
   Scan,
   Store,
   CreditCard,
-  Lock,
   ShoppingBag,
   Headphones,
   ArrowRight
@@ -23,7 +21,7 @@ import {
 // --- COMPREHENSIVE AFRIDAM AI KNOWLEDGE DATABASE ---
 interface FAQItem {
   id: string
-  category: "General" | "Marketplace" | "Vendors" | "Scanner" | "Safety" | "Doctors" | "Support" | "Pricing" | "Privacy"
+  category: string
   question: string
   answer: string
   keywords: string[]
@@ -34,55 +32,41 @@ const FAQ_DATABASE: FAQItem[] = [
   {
     id: "g1",
     category: "General",
-    question: "What is the name of this platform and what does it do?",
-    answer: "This platform is AfriDam AI — a clinical AI skin diagnostic and e-commerce marketplace engine specifically engineered for dark skin (melanin-rich skin). We provide deep AI skin scanning, tele-dermatology consultations, safe skincare ingredient verification, and an approved vendor marketplace.",
+    question: "What is AfriDam AI and how does it work?",
+    answer: "AfriDam AI is a health-tech platform and B2B skin intelligence model specialized in melanin-rich skin (Fitzpatrick Phototypes IV–VI). Our clinician-verified AI analyzes skin concerns instantly from a photo and provides personalized, doctor-approved routine recommendations and tele-dermatology access.",
     keywords: ["name", "platform", "what is this platform", "afridam", "afridam ai", "about", "overview"]
   },
 
-  // --- MARKETPLACE & PRODUCTS ---
-  {
-    id: "m1",
-    category: "Marketplace",
-    question: "What is the AfriDam AI Marketplace?",
-    answer: "The AfriDam Marketplace is an e-commerce hub featuring dermatologically verified skincare products specifically formulated for dark skin. Every product in our marketplace is laboratory-verified to be 100% free of toxic bleaching agents, harmful steroids, and severe irritants.",
-    keywords: ["marketplace", "shop", "buy products", "store", "ecommerce", "creams", "products"]
-  },
-  {
-    id: "m2",
-    category: "Marketplace",
-    question: "How do product recommendations work on the Marketplace?",
-    answer: "After completing your AI skin scan, our engine matches your skin's diagnostic profile (hyperpigmentation, acne, hydration, etc.) with safe, verified products available directly in our Marketplace.",
-    keywords: ["recommendations", "match", "buy after scan", "product match", "routine products"]
-  },
+  // --- ROUTINE RECOMMENDATIONS ---
   {
     id: "m3",
-    category: "Marketplace",
-    question: "Are all Marketplace products safe for melanin-rich skin?",
-    answer: "Yes! All vendor products listed in the AfriDam Marketplace undergo strict chemical and ingredient audits before approval to prevent hyperpigmentation triggers and skin damage.",
-    keywords: ["safe", "safe products", "bleaching free", "quality", "verified products"]
+    category: "Shop My Routine",
+    question: "How does ‘Shop My Routine’ select products?",
+    answer: "After your skin scan, our model matches your findings (acne, hyperpigmentation, eczema) with skin-conscious products connected directly to live retail inventory, including Jumia. You can see real-time pricing and stock availability before purchasing.",
+    keywords: ["recommendations", "match", "buy after scan", "product match", "routine products", "jumia", "shop my routine", "inventory"]
+  },
+  {
+    id: "m4",
+    category: "Shop My Routine",
+    question: "Are all recommended products safe for melanin-rich skin?",
+    answer: "Yes. Recommended products are filtered to favor non-comedogenic formulations, avoid known post-inflammatory hyperpigmentation (PIH) triggers, and suit darker skin phototypes.",
+    keywords: ["safe", "safe products", "bleaching free", "quality", "verified products", "PIH", "melanin-rich"]
   },
 
-  // --- VENDORS & BRAND ONBOARDING ---
-  {
-    id: "v1",
-    category: "Vendors",
-    question: "How do I join AfriDam AI as an approved vendor?",
-    answer: "You can apply directly on our Homepage by navigating to the 'Join as Vendor' section! Step 1: Submit your brand details. Step 2: Upload product safety & ingredient sheets for clinical verification. Step 3: Once verified, your products will be featured in our Marketplace and AI recommendation engine.",
-    keywords: ["join vendor", "become vendor", "vendor", "join as vendor", "sell on afridam", "brand partner", "apply", "vendor form"]
-  },
-  {
-    id: "v2",
-    category: "Vendors",
-    question: "Where can I find the Vendor Application form?",
-    answer: "Scroll down to the 'Join as Vendor' section on our homepage or click 'Care Hub' -> 'Vendor Portal'. You can also contact our team directly at hello@afridamai.com.",
-    keywords: ["vendor form", "vendor link", "where to apply", "application form", "vendor section"]
-  },
+  // --- B2B & BRAND INTEGRATIONS ---
   {
     id: "v3",
-    category: "Vendors",
-    question: "How can skincare brands integrate the AI widget into their shop?",
-    answer: "We offer e-commerce brands a simple 1-line script or Shopify widget. When embedded on your online store, your customers can scan their face and receive instant product recommendations directly from your store inventory.",
-    keywords: ["widget", "integrate", "shopify", "api", "b2b", "embed", "1-line script", "brand shop"]
+    category: "B2B & Brand Integrations",
+    question: "How can skincare brands and pharmacies integrate the model?",
+    answer: "We offer a plug-and-play B2B API and software suite. Brands can embed our instant skin-scanning widget into e-commerce checkouts or mobile apps to build customer trust and drive conversion, with catalog linking to Jumia and other retail inventory for live product recommendations.",
+    keywords: ["widget", "integrate", "shopify", "api", "b2b", "embed", "brand shop", "catalog linking", "software"]
+  },
+  {
+    id: "v4",
+    category: "B2B & Brand Integrations",
+    question: "How can enterprise brands get started?",
+    answer: "Click ‘Book a Demo’ on our homepage or contact hello@afridamai.com to review integration specifications and API licensing terms.",
+    keywords: ["enterprise", "brand", "get started", "book a demo", "API licensing", "integration specs"]
   },
 
   // --- SUPPORT & CONTACT ---
@@ -104,34 +88,25 @@ const FAQ_DATABASE: FAQItem[] = [
   // --- SCANNER TOPICS ---
   {
     id: "s1",
-    category: "Scanner",
+    category: "AI Scanner & Accuracy",
     question: "How does the AI skin scanner work?",
-    answer: "AfriDam AI is trained on over 40,000+ verified clinical dark skin datasets (Fitzpatrick Scale IV–VI). Simply snap or upload a selfie, and our engine analyzes hyperpigmentation, acne grade, texture, and hydration within seconds.",
-    keywords: ["how scanner work", "scanner", "technology", "scan face", "dark skin scan"]
+    answer: "Take or upload a photo of your skin concern. Our model, trained on 57,000+ clinician-annotated dark-skin images, analyzes visual patterns, maps areas such as texture, dark spots, and redness, and delivers an instant visual analysis report with care guidance and ingredient safety insights.",
+    keywords: ["how scanner work", "scanner", "technology", "scan face", "dark skin scan", "ingredient safety", "ingredient analyzer", "product ingredients"]
   },
   {
     id: "s2",
-    category: "Scanner",
+    category: "AI Scanner & Accuracy",
     question: "How do I start my first skin scan?",
-    answer: "Navigate to the 'Care Hub' tab on our platform or visit app.afridamai.com. Click 'Start Scan', grant camera permissions or upload a photo, and view your diagnostic report immediately.",
+    answer: "Click ‘Start Skin Scan’ on our landing page. You can get preliminary visual results without downloading an app or registering first.",
     keywords: ["start scan", "how to scan", "use app", "take photo"]
   },
 
-  // --- SAFETY & INGREDIENTS ---
-  {
-    id: "sf1",
-    category: "Safety",
-    question: "What is the Product Ingredient Analyzer?",
-    answer: "Our Product Ingredient Analyzer scans beauty product labels or ingredient text to detect harmful steroids, toxic bleaching chemicals (like mercury or high-dose hydroquinone), and irritants unsafe for dark skin.",
-    keywords: ["ingredient", "analyzer", "chemicals", "bleaching", "steroids", "safe"]
-  },
-
-  // --- TELE-DOCTORS ---
+  // --- CONSULTATIONS & SECURITY ---
   {
     id: "d1",
-    category: "Doctors",
+    category: "Consultations & Security",
     question: "Can I consult with certified dermatologists on AfriDam AI?",
-    answer: "Yes! If your scan detects a condition requiring professional medical care, you can book virtual consultations with board-certified dermatologists specializing in melanin-rich skin health.",
+    answer: "Yes. After your scan, select ‘Consult a Dermatologist’ to book a one-on-one virtual tele-dermatology session with licensed specialists across Nigeria and international networks.",
     keywords: ["doctor", "dermatologist", "consultation", "telehealth", "book appointment"]
   },
 
@@ -140,16 +115,16 @@ const FAQ_DATABASE: FAQItem[] = [
     id: "p1",
     category: "Pricing",
     question: "Is AfriDam AI free to use?",
-    answer: "We offer a Free tier that includes basic AI skin scans and ingredient safety checks. Our Pro tier unlocks unlimited deep clinical scans, routine tracking, and discounted specialist consultation fees.",
+    answer: "We offer a Free tier that includes basic AI skin scans and ingredient safety checks. Our Pro tier unlocks unlimited detailed skin analyses, routine tracking, and discounted specialist consultation fees.",
     keywords: ["free", "cost", "price", "pricing", "subscription", "plans"]
   },
 
   // --- PRIVACY & SECURITY ---
   {
     id: "pr1",
-    category: "Privacy",
+    category: "Consultations & Security",
     question: "Is my facial photo and personal health data secure?",
-    answer: "All facial images and personal health records are encrypted using end-to-end medical-grade standards. Your photos are analyzed securely and are never sold or shared without your explicit consent.",
+    answer: "Yes. Image data is encrypted in transit using TLS 1.3 and at rest using AES-256, in line with NDPA and GDPR privacy standards. We never sell raw personal health data.",
     keywords: ["privacy", "data", "secure", "photo safe", "encryption"]
   }
 ]
@@ -159,7 +134,7 @@ interface Message {
   sender: "bot" | "user"
   text: string
   time: string
-  showVendorCTA?: boolean
+  showBusinessCTA?: boolean
   showSupportCTA?: boolean
 }
 
@@ -174,7 +149,7 @@ export default function FaqChatbot() {
     {
       id: "welcome-1",
       sender: "bot",
-      text: "Hello! 👋 I am Godspower, the AfriDam AI Virtual Assistant. Ask me anything about our dark skin scanner, Marketplace, tele-dermatologists, or how to join as an approved vendor!",
+      text: "Hello! 👋 I am Dami, the AfriDam AI Virtual Assistant. Ask me about skin scans, personalized routines, dermatologist consultations, or B2B integrations.",
       // This message renders on both server and client, which can use different time zones.
       time: "Now"
     }
@@ -197,7 +172,7 @@ export default function FaqChatbot() {
     scrollToBottomInternal()
   }, [messages, isTyping])
 
-  const triggerBotResponse = (questionText: string, answerText: string, isVendorRelated: boolean = false, isSupportRelated: boolean = false) => {
+  const triggerBotResponse = (questionText: string, answerText: string, isBusinessRelated: boolean = false, isSupportRelated: boolean = false) => {
     if (isTyping) return
 
     const userMsg: Message = {
@@ -216,7 +191,7 @@ export default function FaqChatbot() {
         sender: "bot",
         text: answerText,
         time: formatTime(new Date()),
-        showVendorCTA: isVendorRelated,
+        showBusinessCTA: isBusinessRelated,
         showSupportCTA: isSupportRelated
       }
       setMessages((prev) => [...prev, botMsg])
@@ -232,7 +207,7 @@ export default function FaqChatbot() {
     const cleanQuery = rawInput.toLowerCase()
     setInputQuery("")
 
-    const isVendorRelated = ["vendor", "join", "seller", "partner", "brand", "apply"].some(kw => cleanQuery.includes(kw))
+    const isBusinessRelated = ["brand", "business", "enterprise", "integrate", "integration", "api", "software", "b2b", "demo"].some(kw => cleanQuery.includes(kw))
     const isSupportRelated = ["contact", "email", "support", "help", "reach", "mail", "hello@afridamai.com"].some(kw => cleanQuery.includes(kw))
 
     // Find best match using full-text and keyword match
@@ -243,12 +218,12 @@ export default function FaqChatbot() {
 
     const responseAnswer = foundMatch
       ? foundMatch.answer
-      : "I don't have an exact answer for that specific question yet, but you can explore our Marketplace, check out our Knowledge Bank, or email our support team directly at hello@afridamai.com!"
+      : "I don't have an exact answer for that specific question yet. Explore the Knowledge Bank or contact our support team at hello@afridamai.com."
 
     triggerBotResponse(
       rawInput, 
       responseAnswer, 
-      isVendorRelated || foundMatch?.category === "Vendors",
+      isBusinessRelated || foundMatch?.category === "B2B & Brand Integrations",
       isSupportRelated || foundMatch?.category === "Support"
     )
   }
@@ -259,14 +234,13 @@ export default function FaqChatbot() {
 
   const categories = [
     { label: "All", icon: Sparkles },
-    { label: "Marketplace", icon: ShoppingBag },
-    { label: "Vendors", icon: Store },
-    { label: "Scanner", icon: Scan },
-    { label: "Safety", icon: ShieldCheck },
-    { label: "Doctors", icon: Stethoscope },
+    { label: "General", icon: Sparkles },
+    { label: "Shop My Routine", icon: ShoppingBag },
+    { label: "B2B & Brand Integrations", icon: Store },
+    { label: "AI Scanner & Accuracy", icon: Scan },
+    { label: "Consultations & Security", icon: ShieldCheck },
     { label: "Support", icon: Headphones },
-    { label: "Pricing", icon: CreditCard },
-    { label: "Privacy", icon: Lock }
+    { label: "Pricing", icon: CreditCard }
   ]
 
   return (
@@ -291,7 +265,7 @@ export default function FaqChatbot() {
         </h2>
 
         <p className="text-slate-600 dark:text-white/80 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mx-auto px-2 font-normal">
-          Explore our Marketplace, diagnostic scanner, vendor onboarding, or contact support directly at <strong className="text-slate-900 dark:text-white font-semibold underline decoration-[#4DB6AC]">hello@afridamai.com</strong>.
+          Explore personalized routines, our AI skin scanner, B2B integrations, or contact support at <strong className="text-slate-900 dark:text-white font-semibold underline decoration-[#4DB6AC]">hello@afridamai.com</strong>.
         </p>
       </div>
 
@@ -349,7 +323,7 @@ export default function FaqChatbot() {
                   onClick={() => triggerBotResponse(
                     item.question, 
                     item.answer, 
-                    item.category === "Vendors",
+                    item.category === "B2B & Brand Integrations",
                     item.category === "Support"
                   )}
                   disabled={isTyping}
@@ -365,9 +339,9 @@ export default function FaqChatbot() {
           {/* Sidebar Footer Stats */}
           <div className="pt-2.5 mt-2 border-t border-black/10 dark:border-white/10 flex items-center justify-between text-xs sm:text-sm text-slate-500 dark:text-white/50 font-medium shrink-0">
             <span className="flex items-center gap-1.5">
-              <ShieldCheck size={15} className="text-[#4DB6AC]" /> Verified Vendors & Products
+              <ShieldCheck size={15} className="text-[#4DB6AC]" /> Beauty & Aesthetics Routines
             </span>
-            <span className="text-slate-700 dark:text-white/70 font-semibold">40k+ Scans</span>
+            <span className="text-slate-700 dark:text-white/70 font-semibold">57k+ Scans</span>
           </div>
         </div>
 
@@ -388,7 +362,7 @@ export default function FaqChatbot() {
                   AfriDam AI Assistant
                 </h3>
                 <p className="text-xs text-[#4DB6AC] font-semibold uppercase tracking-wider">
-                  Always Online • Clinical, Marketplace & Support
+                  Always Online • Beauty, Routines & Support
                 </p>
               </div>
             </div>
@@ -425,18 +399,18 @@ export default function FaqChatbot() {
                   >
                     <p className="whitespace-pre-wrap">{msg.text}</p>
 
-                    {/* Interactive Vendor CTA Card */}
-                    {msg.showVendorCTA && (
+                    {/* Interactive B2B CTA Card */}
+                    {msg.showBusinessCTA && (
                       <div className="mt-3 p-3 rounded-xl bg-gradient-to-r from-[#E1784F]/30 to-[#4DB6AC]/30 border border-[#E1784F]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <div>
-                          <p className="text-sm font-bold text-slate-900 dark:text-white">Join as an Approved Vendor</p>
-                          <p className="text-xs text-slate-700 dark:text-white/80">Fill out our Vendor Registration Form on the Homepage.</p>
+                          <p className="text-sm font-bold text-slate-900 dark:text-white">Explore a B2B Integration</p>
+                          <p className="text-xs text-slate-700 dark:text-white/80">Book a demo to discuss API integration and catalog linking.</p>
                         </div>
                         <a
-                          href="/#join-as-vendor"
+                          href="/brand-onboarding"
                           className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white bg-[#E1784F] hover:bg-[#c9623b] px-3 py-1.5 rounded-lg transition-all shrink-0 shadow-md"
                         >
-                          <span>Go to Homepage</span>
+                          <span>Book a Demo</span>
                           <ArrowRight size={14} />
                         </a>
                       </div>
@@ -506,7 +480,7 @@ export default function FaqChatbot() {
               type="text"
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
-              placeholder="Ask about skin scans, marketplace, vendors, or email support..."
+              placeholder="Ask about skin scans, routines, B2B integrations, or support..."
               disabled={isTyping}
               className="flex-1 bg-black/5 dark:bg-white/[0.07] border border-black/10 dark:border-white/15 focus:border-[#E1784F] rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/50 focus:outline-none transition-colors disabled:opacity-50"
             />

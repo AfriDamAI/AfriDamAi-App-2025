@@ -16,7 +16,7 @@ export function ProtectedLink({ href, children, className, onAuthRequired }: Pro
   const { user } = useAuth()
 
   const handleClick = (e: React.MouseEvent) => {
-    // 🛡️ RE-ENFORCED: Comprehensive list of clinical & private routes
+    // 🛡️ RE-ENFORCED: Comprehensive list of restricted routes
     const protectedRoutes = [
       "/ai-scanner",
       "/ingredient-analyzer",

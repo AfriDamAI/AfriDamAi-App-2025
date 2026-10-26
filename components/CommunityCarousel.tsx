@@ -17,57 +17,51 @@ type Entry = {
 const entries: Entry[] = [
   {
     src: "/images/community/woman-1.jpg",
-    label: "Deep tone care",
-    caption: "Balanced routines for visible, confident skin health.",
-    alt: "Community member with deep skin tone",
+    label: "A skin check-in",
+    caption: "Take a moment to notice how your skin feels and changes.",
+    alt: "Woman examining her face in a mirror with one hand on her cheek",
   },
   {
     src: "/images/community/woman-2.jpg",
-    label: "Golden undertones",
-    caption: "Guidance shaped around tone, texture, and climate.",
-    alt: "Community member with golden undertones",
+    label: "Digital skin scan",
+    caption: "A phone-based scan can help you explore your skin concerns.",
+    alt: "Woman looking into a phone camera with a digital skin analysis overlay",
   },
   {
     src: "/images/community/woman-3.jpg",
-    label: "Sensitive skin",
-    caption: "Ingredient checks that make daily choices feel simpler.",
-    alt: "Community member with sensitive skin",
+    label: "At-home scan",
+    caption: "Explore your skin from the comfort of home.",
+    alt: "Woman's face framed on a phone screen during a digital skin scan",
   },
   {
     src: "/images/community/woman-4.jpg",
-    label: "Even glow goals",
-    caption: "Support for hyperpigmentation, dryness, and clarity.",
-    alt: "Community member with even glow goals",
+    label: "Skin insights",
+    caption: "Clear visual cues can make skin observations easier to follow.",
+    alt: "Woman's face with a digital overlay highlighting pigmentation, acne, texture, and hydration",
   },
   {
     src: "/images/community/woman-5.jpg",
-    label: "Melanin-first",
-    caption: "Care built for every shade, not retrofitted later.",
-    alt: "Community member representing melanin-rich skin",
+    label: "Guidance on the go",
+    caption: "Keep useful skincare guidance close at hand.",
+    alt: "Woman holding a phone displaying a skincare app",
   },
   {
     src: "/images/community/woman-6.jpg",
-    label: "Everyday protection",
-    caption: "Safer skincare decisions from scan to marketplace.",
-    alt: "Community member focused on everyday skin protection",
+    label: "Care from home",
+    caption: "Connect with a skincare professional from wherever you are.",
+    alt: "Woman smiling during a video consultation with a clinician on her phone",
   },
   {
     src: "/images/community/woman-7.jpg",
-    label: "Clinical confidence",
-    caption: "Specialist insight when your skin needs a closer look.",
-    alt: "Community member representing clinical skin confidence",
+    label: "A dermatologist's perspective",
+    caption: "Talk through your skin concerns in a one-to-one consultation.",
+    alt: "Dermatologist speaking with a patient across a desk",
   },
   {
     src: "/images/community/woman-8.jpg",
-    label: "Healthy texture",
-    caption: "Track visible changes with clear, practical next steps.",
-    alt: "Community member with healthy skin texture",
-  },
-  {
-    src: "/images/community/woman-9.jpg",
-    label: "One standard",
-    caption: "A beauty-tech experience designed for the full community.",
-    alt: "Community member representing inclusive skincare",
+    label: "A moment of self-care",
+    caption: "Make time to check in with your skin and care for yourself.",
+    alt: "Smiling woman gently touching her face while looking in a mirror",
   },
 ];
 
@@ -237,7 +231,7 @@ export default function CommunityCarousel() {
               Every Tone, One Standard
             </div>
             <h2 className="max-w-[15ch] text-4xl font-black italic leading-tight tracking-tight text-black dark:text-white md:text-6xl">
-              Every complexion <span className="text-[#E1784F]">deserves</span> to be understood.
+              Every skin type <span className="text-[#E1784F]">deserves</span> care.
             </h2>
           </div>
 

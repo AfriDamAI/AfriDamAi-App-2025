@@ -40,7 +40,7 @@ export default function MissionPage() {
     {
       name: "Dr. Anand Urhekar",
       role: "Chief Medical Officer (CMO)",
-      bio: "Dermatologist leading our clinical strategy and doctor network to keep our scanner medically safe.",
+      bio: "Dermatologist leading our dermatology strategy and doctor network to keep our scanner medically safe.",
       image: "/pics/anadu.png",
       badgeColor: "#4DB6AC",
       imagePosition: "object-center"
@@ -48,7 +48,7 @@ export default function MissionPage() {
     {
       name: "Dr. Rasheedah Adesokan",
       role: "Founding Dermatologist",
-      bio: "Consultant dermatologist guiding our clinical review and medical accuracy.",
+      bio: "Consultant dermatologist guiding our specialist review and medical accuracy.",
       image: "/pics/Rasheedah.png",
       badgeColor: "#E1784F",
       imagePosition: "object-[center_20%] scale-110 sm:scale-100"
@@ -106,7 +106,7 @@ export default function MissionPage() {
               For decades, medical dermatology and artificial intelligence shared a huge, hidden flaw: they were built almost entirely for lighter skin types.
             </p>
             <p className="opacity-90">
-              Globally, less than <span className="text-[#E1784F] font-black">3% of public dermatological AI datasets</span> represent dark or melanin-rich skin (Fitzpatrick IV–VI). Because of this bias, standard AI models miss the mark on darker skin, leading to wrong answers, missed diagnoses, and delayed care.
+              Globally, less than <span className="text-[#E1784F] font-black">3% of public dermatological AI datasets</span> represent dark or melanin-rich skin (Fitzpatrick IV–VI). Because of this bias, standard AI models miss the mark on darker skin, leading to wrong answers, missed medical evaluations, and delayed care.
             </p>
           </motion.div>
         </motion.div>
@@ -132,7 +132,7 @@ export default function MissionPage() {
             <div className="flex items-center gap-6 p-6 bg-white/70 dark:bg-white/5 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-white/10 shadow-sm">
                <AlertTriangle className="text-[#E1784F] shrink-0" size={28} />
                <p className="text-[10px] font-black tracking-[0.2em] leading-relaxed text-black/70 dark:text-white/70 uppercase">
-                 We are replacing dangerous product trial-and-error with clinical matching.
+                 We are replacing dangerous product trial-and-error with personalized matching.
                </p>
             </div>
           </motion.div>
@@ -175,7 +175,7 @@ export default function MissionPage() {
             {[
               { title: "Tech Bias", text: "Building AI designed specifically for melanin-rich skin.", color: "#E1784F", icon: Zap },
               { title: "Access Gap", text: "Putting expert-level skin analysis right on a phone.", color: "#4DB6AC", icon: Globe },
-              { title: "Unregulated Products", text: "Stopping dangerous product trial-and-error with clinical matching.", color: "#3B82F6", icon: ShieldCheck }
+              { title: "Unregulated Products", text: "Stopping dangerous product trial-and-error with personalized matching.", color: "#3B82F6", icon: ShieldCheck }
             ].map((pillar, i) => (
               <motion.div 
                 key={i}
@@ -214,7 +214,7 @@ export default function MissionPage() {
               A basic single photo scan is never enough. Real skin has different needs on different parts of the face—your forehead might be oily, your eyes might have dark circles, and your cheeks might have post-acne marks.
             </p>
             <p className="text-lg md:text-xl font-medium text-black/70 dark:text-white/80 leading-relaxed">
-              To capture true human skin diversity, our team mapped tens of thousands of real-world skin photos. We built a <span className="text-black dark:text-white font-black underline decoration-[#4DB6AC]">10-Zone Facial Analysis System</span>. By dividing the face into 10 distinct zones and tracking 24 specific conditions across 6 main groups, our engine calculates 190 precision biomarkers—delivering clinical clarity in seconds.
+              To capture true human skin diversity, our team mapped tens of thousands of real-world skin photos. We built a <span className="text-black dark:text-white font-black underline decoration-[#4DB6AC]">10-Zone Facial Analysis System</span>. By dividing the face into 10 distinct zones and tracking 24 specific conditions across 6 main groups, our model calculates 190 precision biomarkers—delivering skin insights in seconds.
             </p>
           </div>
 
@@ -247,7 +247,7 @@ export default function MissionPage() {
               Meet the <span className="text-[#E1784F]">Team.</span>
             </h2>
             <p className="text-lg md:text-xl font-medium text-black/60 dark:text-white/70 leading-relaxed">
-              Our platform is grounded in medical care and global clinical standards. Our leadership and medical advisory team combine registered nursing experience, clinical oversight, and specialist dermatology to ensure every scan meets real health standards.
+              Our platform is grounded in medical care and global beauty and wellness guidance. Our leadership and medical advisory team combine registered nursing experience, specialist oversight, and specialist dermatology to ensure every scan meets real health standards.
             </p>
           </div>
 

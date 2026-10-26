@@ -1,5 +1,5 @@
 /**
- * 🛡️ AFRIDAM CLINICAL ACCESS: REGISTRATION
+ * 🛡️ AFRIDAM specialist access: REGISTRATION
  * Version: 2026.1.25
  * Focus: Premium Glassmorphism, Dual Brand Glow (Teal & Orange), Mobile-First Precision.
  */
@@ -388,7 +388,7 @@ export default function RegisterPage() {
                   <div className="flex items-start gap-3 p-3.5 bg-white/[0.03] rounded-2xl border border-white/10">
                     <ShieldCheck className="text-[#4DB6AC] shrink-0 mt-0.5" size={18} />
                     <p className="text-xs text-white/60 font-medium leading-relaxed">
-                      Your clinical and identity data is end-to-end encrypted and safeguarded under high compliance standards.
+                      Your personal and identity data is end-to-end encrypted and safeguarded under high compliance standards.
                     </p>
                   </div>
 

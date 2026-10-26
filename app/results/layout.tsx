@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 /**
- * 🛡️ AFRIDAM NEURAL DIAGNOSTICS: LAYOUT (Rule 7 Precision Sync)
+ * 🛡️ AFRIDAM SKIN ANALYSIS LAYOUT (Rule 7 Precision Sync)
  * Version: 2026.1.25
  * Focus: Specialist Branding & Zero-Flicker SEO.
  */

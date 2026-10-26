@@ -78,7 +78,7 @@ export async function performSkinAnalysis(
 
     return combinedAnalysis;
   } catch (error) {
-    console.error("Clinical Sync Failed:", error);
+    console.error("Skin Analysis Sync Failed:", error);
     // 🛡️ RE-ENFORCED: Relatable English
     throw new Error("We couldn't sync your skin data. Please check your connection and try again.");
   }
