@@ -16,6 +16,8 @@ import {
 import { analyzePublicSkin } from "@/lib/api-client"
 import { clearGuestScanSnapshot, readGuestScanSnapshot, saveGuestScanSnapshot } from "@/lib/guest-flow-storage"
 
+const CONSULTATION_PAYSTACK_URL = "https://paystack.shop/pay/2kzqv2seg5"
+
 export default function PublicScanner() {
   const router = useRouter()
 
@@ -470,12 +472,12 @@ export default function PublicScanner() {
                   >
                     View Recommended Products <ArrowRight size={14} />
                   </button>
-                  <button
-                    onClick={() => router.push('/appointment')}
+                  <a
+                    href={CONSULTATION_PAYSTACK_URL}
                     className="w-full border border-black/10 dark:border-white/15 h-16 rounded-[1.5rem] font-black tracking-[0.2em] text-[10px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                   >
                     Consult a Specialist <ArrowRight size={14} />
-                  </button>
+                  </a>
                 </div>
               </div>
               </div>

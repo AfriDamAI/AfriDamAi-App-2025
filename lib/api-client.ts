@@ -361,25 +361,29 @@ export const deleteScanResult = async (resultId: string) => {
 /** 🔬 PUBLIC AI SKIN medical evaluation WITHOUT AUTHENTICATION **/
 export const analyzePublicSkin = async (imgSource: string) => {
   const formData = new FormData();
-  
-  // Convert base64 to blob
-  const parts = imgSource.split(',');
-  const byteString = atob(parts[1]);
-  const mimeString = parts[0].split(':')[1].split(';')[0];
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-  const blob = new Blob([ab], { type: mimeString });
 
-  // Keep the uploaded filename extension consistent with the selected image MIME type.
+  // The guest scanner stores captures/selections as data URLs. Preserve their
+  // encoded bytes and MIME type when constructing the multipart upload.
+  const match = imgSource.match(/^data:(image\/[\w.+-]+);base64,(.+)$/);
+  if (!match) throw new Error("The selected image could not be read. Please choose another image.");
+  const [, mimeString, encodedImage] = match;
+  const byteString = atob(encodedImage);
+  const bytes = new Uint8Array(byteString.length);
+  for (let i = 0; i < byteString.length; i++) bytes[i] = byteString.charCodeAt(i);
+  const blob = new Blob([bytes], { type: mimeString });
   const imageExtension = mimeString.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
   formData.append("file", blob, `scan_capture.${imageExtension}`);
-  
-  const response = await fetch(`${baseURL}/v1/saas/scan`, {
+  formData.append("more_info", JSON.stringify({
+    region: "West Africa",
+    country: "NG",
+    gender: "female",
+    age: 25,
+  }));
+
+  // Guest scans must use the unauthenticated v2 endpoint; do not attach a SaaS
+  // API key or set Content-Type so fetch can add the multipart boundary.
+  const response = await fetch(`${baseURL}/v2/skin-diagnosis`, {
     method: 'POST',
-    headers: {
-      'X-API-KEY': 'org_live_fc8248b606dbcce1185d9d32812902a83496e30f0f24d6a1'
-    },
     body: formData
   });
 

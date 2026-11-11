@@ -77,6 +77,12 @@ export default function MarketplacePage() {
     setGuestScan(readGuestScanSnapshot())
   }, [])
 
+  // Carry the scan's finding into product search when a visitor chooses a routine.
+  useEffect(() => {
+    const focus = new URLSearchParams(window.location.search).get("focus")
+    if (focus) setSearchQuery(focus)
+  }, [])
+
   useEffect(() => {
     const init = async () => {
       setIsLoading(true);
