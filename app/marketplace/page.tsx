@@ -8,7 +8,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
-import { getProducts, searchProducts, getProductsByCategory, getCategories } from "@/lib/api-client"
+import { getProducts, searchProducts, getProductsByCategory, getCategories, getJumiaRecommendations, type JumiaRecommendation, type JumiaRecommendationCondition } from "@/lib/api-client"
 import { useAuth } from "@/providers/auth-provider"
 import { useCart } from "@/hooks/use-cart"
 import { CartItem } from "@/lib/types"
@@ -30,6 +30,35 @@ interface Product {
 interface Category {
   id: string;
   name: string;
+}
+
+const conditionAliases: Record<string, JumiaRecommendationCondition["condition"]> = {
+  dark_spots: "DARK_SPOTS", hyperpigmentation: "DARK_SPOTS", acne_marks: "DARK_SPOTS", acne: "DARK_SPOTS",
+  pores: "PORES", enlarged_pores: "PORES",
+  redness: "REDNESS", irritation: "REDNESS",
+  texture: "TEXTURE", uneven_texture: "TEXTURE",
+  lines: "LINES", fine_lines: "LINES", wrinkles: "LINES",
+  dark_circles: "DARK_CIRCLES", under_eye_darkness: "DARK_CIRCLES",
+  sun_spots: "SUN_SPOTS",
+}
+
+function toJumiaConditions(snapshot: GuestScanSnapshot | null, fallbackFocus: string): JumiaRecommendationCondition[] {
+  const source = Array.isArray(snapshot?.conditions) && snapshot.conditions.length > 0
+    ? snapshot.conditions
+    : fallbackFocus ? [fallbackFocus] : []
+  const byCondition = new Map<JumiaRecommendationCondition["condition"], number>()
+
+  for (const item of source) {
+    const record = typeof item === "string" ? { name: item } : (item as Record<string, unknown>) || {}
+    const rawName = String(record.name || record.label || record.condition || "").trim().toLowerCase()
+    const condition = conditionAliases[rawName.replace(/[\s-]+/g, "_")]
+    if (!condition) continue
+    const rawSeverity = Number(record.severity ?? record.severity_score ?? record.confidence ?? snapshot?.severity ?? 0.5)
+    const severity = Math.max(0, Math.min(1, rawSeverity > 1 ? rawSeverity / 100 : rawSeverity))
+    byCondition.set(condition, Math.max(byCondition.get(condition) ?? 0, severity))
+  }
+
+  return [...byCondition].map(([condition, severity]) => ({ condition, severity }))
 }
 
 function mapProducts(data: any[]): Product[] {
@@ -65,6 +94,10 @@ export default function MarketplacePage() {
   const [showFilters, setShowFilters] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState<string | null>(null);
   const [guestScan, setGuestScan] = useState<GuestScanSnapshot | null>(null)
+  const [routineFocus, setRoutineFocus] = useState("")
+  const [jumiaProducts, setJumiaProducts] = useState<JumiaRecommendation[]>([])
+  const [jumiaLoading, setJumiaLoading] = useState(false)
+  const [jumiaError, setJumiaError] = useState(false)
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const latestTermRef = useRef("");
@@ -80,8 +113,25 @@ export default function MarketplacePage() {
   // Carry the scan's finding into product search when a visitor chooses a routine.
   useEffect(() => {
     const focus = new URLSearchParams(window.location.search).get("focus")
-    if (focus) setSearchQuery(focus)
+    if (focus) {
+      setRoutineFocus(focus)
+      setSearchQuery(focus)
+    }
   }, [])
+
+  useEffect(() => {
+    if (!routineFocus && !guestScan?.conditions?.length) return
+    const conditions = toJumiaConditions(guestScan, routineFocus)
+    if (conditions.length === 0) return
+    let active = true
+    setJumiaLoading(true)
+    setJumiaError(false)
+    getJumiaRecommendations(conditions)
+      .then((products) => { if (active) setJumiaProducts(products) })
+      .catch(() => { if (active) setJumiaError(true) })
+      .finally(() => { if (active) setJumiaLoading(false) })
+    return () => { active = false }
+  }, [guestScan, routineFocus])
 
   useEffect(() => {
     const init = async () => {
@@ -445,6 +495,53 @@ export default function MarketplacePage() {
             )}
           </div>
         </header>
+
+        {routineFocus && (
+          <section aria-labelledby="jumia-routine-heading" className="space-y-5">
+            <div className="space-y-1">
+              <p className="text-[8px] font-black tracking-[0.3em] text-[#4DB6AC] uppercase">Matched to your scan</p>
+              <h2 id="jumia-routine-heading" className="text-2xl md:text-3xl font-black italic tracking-tight">Shop My Routine</h2>
+            </div>
+            {jumiaLoading ? (
+              <p className="text-sm text-foreground/60">Finding products for your scan…</p>
+            ) : jumiaError ? (
+              <p role="status" className="text-sm text-foreground/60">Routine recommendations are temporarily unavailable. You can still browse the care market below.</p>
+            ) : jumiaProducts.length === 0 ? (
+              <p className="text-sm text-foreground/60">No matching Jumia products were found for these scan results.</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+                {jumiaProducts.map((product) => {
+                  const canBuy = product.buyable ?? (typeof product.stock === "number" && product.stock > 0)
+                  let productUrl = ""
+                  try {
+                    const parsedUrl = new URL(product.url)
+                    if (parsedUrl.protocol === "https:" && parsedUrl.hostname.endsWith("jumia.com.ng")) productUrl = parsedUrl.toString()
+                  } catch { /* Do not render an unsafe or malformed external link. */ }
+                  return (
+                    <article key={product.id} className="overflow-hidden rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-white/[0.03]">
+                      <div className="relative aspect-square bg-gray-100 dark:bg-white/5">
+                        <img src={product.imageUrl || "/placeholder-product.jpg"} alt={product.name} loading="lazy" className="h-full w-full object-cover" />
+                        <span className={`absolute left-2 top-2 rounded-full px-2.5 py-1 text-[8px] font-black uppercase tracking-wide ${canBuy ? "bg-emerald-600 text-white" : "bg-gray-700 text-white"}`}>
+                          {canBuy ? "In Stock" : "Out of Stock"}
+                        </span>
+                      </div>
+                      <div className="space-y-3 p-3">
+                        <h3 className="line-clamp-2 min-h-10 text-sm font-bold">{product.name}</h3>
+                        <p className="font-black">{product.price_text || `${product.currency === "NGN" || !product.currency ? "₦" : `${product.currency} `}${Number(product.price || 0).toLocaleString()}`}</p>
+                        <p className="text-[9px] text-foreground/55">Matched to {(product.matchedCondition || "your scan").replace(/_/g, " ").toLowerCase()}</p>
+                        {productUrl ? (
+                          <a href={productUrl} target="_blank" rel="noopener noreferrer" aria-disabled={!canBuy} className={`block rounded-xl py-3 text-center text-[9px] font-black uppercase tracking-widest ${canBuy ? "bg-[#E1784F] text-white" : "pointer-events-none bg-gray-200 text-gray-500 dark:bg-white/10"}`}>
+                            {canBuy ? "Buy Now" : "Unavailable"}
+                          </a>
+                        ) : <span className="block text-center text-[9px] text-foreground/50">Product link unavailable</span>}
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* ── PRODUCT GRID / STATES ── */}
         {isError ? (
