@@ -341,6 +341,31 @@ export const getCategories = async () => {
   return response.data;
 };
 
+export interface JumiaRecommendation {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  price: number;
+  price_text?: string;
+  currency?: string;
+  stock?: number | null;
+  buyable?: boolean;
+  url: string;
+  categories?: string[];
+  matchedCondition?: string;
+}
+
+export interface JumiaRecommendationCondition {
+  condition: "DARK_SPOTS" | "PORES" | "REDNESS" | "TEXTURE" | "LINES" | "DARK_CIRCLES" | "SUN_SPOTS";
+  severity: number;
+}
+
+export const getJumiaRecommendations = async (conditions: JumiaRecommendationCondition[]): Promise<JumiaRecommendation[]> => {
+  const response = await apiClient.post("/jumia-shop/recommendations", { conditions });
+  const data = response.data;
+  return Array.isArray(data) ? data : Array.isArray(data?.products) ? data.products : [];
+};
+
 export const getScanHistory = async (userId: string) => {
   const response = await apiClient.get(`/v2/result/${userId}`); 
   return response.data;
